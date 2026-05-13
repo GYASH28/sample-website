@@ -72,7 +72,7 @@ svg {
 }
 
 main {
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 .container {
@@ -99,6 +99,31 @@ main {
 
 .section-heading p {
   margin-inline: auto;
+}
+
+.section-heading h2 {
+  position: relative;
+}
+
+.section-heading h2::after {
+  display: block;
+  width: 52px;
+  height: 3px;
+  margin: 14px auto 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  content: "";
+  opacity: 0;
+  transform: scaleX(0.35);
+  transition:
+    opacity 260ms ease,
+    transform 360ms ease;
+  transition-delay: calc(var(--reveal-delay, 0ms) + 120ms);
+}
+
+.section-heading.is-visible h2::after {
+  opacity: 1;
+  transform: scaleX(1);
 }
 
 .eyebrow {
@@ -162,6 +187,8 @@ p {
 }
 
 .btn {
+  position: relative;
+  overflow: hidden;
   display: inline-flex;
   min-height: 46px;
   align-items: center;
@@ -179,8 +206,31 @@ p {
     background 180ms ease;
 }
 
+.btn::before {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.32), transparent);
+  content: "";
+  transform: translateX(-120%);
+  transition: transform 420ms ease;
+}
+
 .btn:hover {
   transform: translateY(-2px);
+}
+
+.btn:hover::before {
+  transform: translateX(120%);
+}
+
+.btn {
+  isolation: isolate;
+}
+
+.btn > svg,
+.btn > span {
+  position: relative;
+  z-index: 1;
 }
 
 .btn-primary {
@@ -218,6 +268,10 @@ p {
 
 .btn-whatsapp:hover {
   box-shadow: 0 18px 38px rgba(31, 168, 85, 0.32);
+}
+
+.btn-whatsapp:hover {
+  animation: whatsappGlow 950ms ease both;
 }
 
 .btn-small {
@@ -266,8 +320,8 @@ p {
 
 .site-header--scrolled {
   border-bottom-color: rgba(20, 33, 61, 0.1);
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 10px 30px rgba(20, 33, 61, 0.08);
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 16px 36px rgba(20, 33, 61, 0.1);
 }
 
 .nav-shell {
@@ -342,6 +396,7 @@ p {
 }
 
 .main-nav a:not(.btn) {
+  position: relative;
   border-radius: 999px;
   color: #344054;
   padding: 10px 12px;
@@ -352,10 +407,32 @@ p {
     color 180ms ease;
 }
 
+.main-nav a:not(.btn)::after {
+  position: absolute;
+  right: 14px;
+  bottom: 6px;
+  left: 14px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  content: "";
+  opacity: 0;
+  transform: scaleX(0.36);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
 .main-nav a:not(.btn):hover,
 .main-nav a.active:not(.btn) {
   background: rgba(201, 149, 26, 0.12);
   color: var(--navy);
+}
+
+.main-nav a:not(.btn):hover::after,
+.main-nav a.active:not(.btn)::after {
+  opacity: 1;
+  transform: scaleX(1);
 }
 
 .menu-toggle {
@@ -371,6 +448,46 @@ p {
   position: relative;
   min-height: min(760px, calc(100vh - 76px));
   padding: 68px 0 58px;
+}
+
+.hero-thread-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hero-thread-field span {
+  position: absolute;
+  width: 54vw;
+  height: 220px;
+  border: 1px solid rgba(201, 149, 26, 0.16);
+  border-color: rgba(201, 149, 26, 0.18) transparent transparent transparent;
+  border-radius: 50%;
+  filter: blur(0.2px);
+  opacity: 0.6;
+  animation: threadDrift 9s ease-in-out infinite alternate;
+}
+
+.hero-thread-field span:nth-child(1) {
+  top: 11%;
+  left: -16%;
+  transform: rotate(-10deg);
+}
+
+.hero-thread-field span:nth-child(2) {
+  right: -18%;
+  bottom: 16%;
+  border-color: rgba(15, 118, 110, 0.12) transparent transparent transparent;
+  animation-delay: -2.4s;
+}
+
+.hero-thread-field span:nth-child(3) {
+  top: 52%;
+  left: 28%;
+  width: 32vw;
+  border-color: rgba(20, 33, 61, 0.1) transparent transparent transparent;
+  animation-delay: -4.2s;
 }
 
 .thread-bg,
@@ -395,6 +512,48 @@ p {
   grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
   gap: 56px;
   align-items: center;
+}
+
+.hero-kicker {
+  animation: heroFadeUp 480ms ease 60ms both;
+}
+
+.hero-title {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.22em;
+}
+
+.hero-title span {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(26px) rotateX(18deg);
+  transform-origin: left bottom;
+  animation: heroWordIn 520ms cubic-bezier(0.2, 0.78, 0.25, 1) both;
+  animation-delay: calc(110ms + (var(--word-index) * 72ms));
+}
+
+.hero-sequence {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: heroFadeUp 520ms ease both;
+}
+
+.hero-sequence-subtitle {
+  animation-delay: 660ms;
+}
+
+.hero-sequence-actions {
+  animation-delay: 800ms;
+}
+
+.hero-sequence-badges {
+  animation-delay: 940ms;
+}
+
+.hero-sequence-badges span {
+  animation: badgePop 430ms ease both;
+  animation-delay: calc(980ms + (var(--badge-index) * 70ms));
 }
 
 .hero-subtitle {
@@ -442,6 +601,17 @@ p {
     linear-gradient(160deg, rgba(255, 255, 255, 0.94), rgba(255, 240, 189, 0.3)),
     #ffffff;
   box-shadow: var(--shadow-premium);
+}
+
+.hero-parallax-layer {
+  height: 100%;
+  border-radius: inherit;
+  transform: translate3d(0, var(--hero-shift, 0px), 0);
+  transition: transform 120ms linear;
+}
+
+.hero-visual-card .thread-visual:not(.thread-visual--compact) {
+  animation: visualFloat 6s ease-in-out 900ms infinite alternate;
 }
 
 .hero-visual-card::before,
@@ -660,12 +830,14 @@ p {
   width: 82%;
   height: 66%;
   transform: translateY(80px) rotate(-10deg);
+  animation: threadLineBreathe 5.2s ease-in-out infinite alternate;
 }
 
 .line-two {
   width: 68%;
   height: 55%;
   transform: translateY(36px) rotate(14deg);
+  animation: threadLineBreatheAlt 5.8s ease-in-out infinite alternate;
 }
 
 .card-grid {
@@ -697,6 +869,7 @@ p {
 .contact-card,
 .map-placeholder,
 .gallery-card {
+  position: relative;
   border: 1px solid rgba(20, 33, 61, 0.1);
   background: rgba(255, 255, 255, 0.92);
   box-shadow: var(--shadow-soft);
@@ -704,6 +877,12 @@ p {
     transform 190ms ease,
     box-shadow 190ms ease,
     border-color 190ms ease;
+}
+
+.category-card,
+.product-card,
+.gallery-card {
+  overflow: hidden;
 }
 
 .category-card:hover,
@@ -714,6 +893,48 @@ p {
   border-color: rgba(201, 149, 26, 0.34);
   box-shadow: var(--shadow-premium);
   transform: translateY(-6px);
+}
+
+.card-shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 10%, rgba(255, 255, 255, 0.7) 44%, transparent 58%);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-120%);
+  transition:
+    opacity 220ms ease,
+    transform 620ms ease;
+}
+
+.category-card:hover .card-shine {
+  opacity: 0.55;
+  transform: translateX(120%);
+}
+
+.category-card .icon-badge,
+.industry-card .icon-badge {
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.category-card:hover .icon-badge,
+.industry-card:hover .icon-badge {
+  box-shadow: 0 14px 28px rgba(20, 33, 61, 0.13);
+  transform: translateY(-2px) scale(1.07);
+}
+
+.category-card .text-link {
+  transition:
+    gap 180ms ease,
+    transform 180ms ease,
+    color 180ms ease;
+}
+
+.category-card:hover .text-link {
+  gap: 11px;
+  transform: translateX(2px);
 }
 
 .category-card,
@@ -820,6 +1041,23 @@ p {
   overflow: hidden;
   border-radius: 16px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 253, 248, 0.96));
+  transform-style: preserve-3d;
+  perspective: 900px;
+}
+
+.product-card:hover {
+  transform: translateY(-7px) rotateX(1.4deg) rotateY(-1.4deg);
+}
+
+.product-card .thread-visual--compact {
+  transition:
+    filter 260ms ease,
+    transform 260ms ease;
+}
+
+.product-card:hover .thread-visual--compact {
+  filter: saturate(1.08);
+  transform: scale(1.025);
 }
 
 .product-content {
@@ -828,6 +1066,47 @@ p {
   flex-direction: column;
   gap: 10px;
   padding: 20px;
+}
+
+.product-card-topline {
+  display: grid;
+  gap: 9px;
+}
+
+.product-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.product-badges span {
+  border: 1px solid rgba(20, 33, 61, 0.1);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.76);
+  color: #475467;
+  padding: 5px 8px;
+  font-size: 0.72rem;
+  font-weight: 850;
+  line-height: 1;
+  animation: badgeSoftPulse 3.8s ease-in-out infinite;
+}
+
+.product-card:hover .product-badges span {
+  border-color: rgba(201, 149, 26, 0.28);
+  color: var(--navy);
+}
+
+.product-card .btn {
+  transition:
+    transform 190ms ease,
+    box-shadow 190ms ease,
+    border-color 190ms ease,
+    color 190ms ease;
+}
+
+.product-card:hover .btn-outline {
+  border-color: rgba(201, 149, 26, 0.45);
+  box-shadow: 0 16px 30px rgba(20, 33, 61, 0.11);
 }
 
 .product-content h3 {
@@ -897,6 +1176,7 @@ p {
   position: relative;
   overflow: hidden;
   margin: 62px 0;
+  border: 1px solid rgba(247, 215, 116, 0.22);
   border-radius: 28px;
   background:
     linear-gradient(135deg, rgba(20, 33, 61, 0.96), rgba(31, 41, 55, 0.94)),
@@ -905,13 +1185,36 @@ p {
   color: #ffffff;
 }
 
+.catalogue-cta::before {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(120deg, rgba(247, 215, 116, 0.38), transparent 34%, rgba(31, 168, 85, 0.28), transparent 72%);
+  content: "";
+  opacity: 0.65;
+  animation: ctaBorderSweep 7s ease-in-out infinite alternate;
+}
+
+.catalogue-cta::after {
+  position: absolute;
+  inset: 1px;
+  border-radius: 27px;
+  background:
+    linear-gradient(135deg, rgba(20, 33, 61, 0.96), rgba(31, 41, 55, 0.94)),
+    var(--navy);
+  content: "";
+}
+
 .catalogue-cta .cta-pattern {
   inset: 0;
+  z-index: 1;
   opacity: 0.9;
+  animation: patternSlide 11s linear infinite;
 }
 
 .cta-content {
   position: relative;
+  z-index: 2;
   max-width: 780px;
   padding: 46px;
 }
@@ -1000,6 +1303,8 @@ p {
 }
 
 .filter-chip {
+  position: relative;
+  overflow: hidden;
   min-height: 42px;
   border: 1px solid rgba(20, 33, 61, 0.12);
   border-radius: 999px;
@@ -1014,6 +1319,28 @@ p {
     transform 160ms ease;
 }
 
+.filter-chip::before {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--navy), #24375f);
+  content: "";
+  opacity: 0;
+  transform: scaleX(0.2);
+  transform-origin: left;
+  transition:
+    opacity 190ms ease,
+    transform 240ms ease;
+}
+
+.filter-chip {
+  isolation: isolate;
+}
+
+.filter-chip::after {
+  position: relative;
+  z-index: 1;
+}
+
 .filter-chip:hover {
   border-color: rgba(201, 149, 26, 0.45);
   transform: translateY(-1px);
@@ -1021,18 +1348,23 @@ p {
 
 .filter-chip.active {
   border-color: transparent;
-  background: var(--navy);
+  background: transparent;
   color: #ffffff;
 }
 
+.filter-chip.active::before {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
 .product-grid--filtered .product-card {
-  animation: cardIn 260ms ease both;
+  animation: cardIn 320ms cubic-bezier(0.2, 0.78, 0.25, 1) both;
 }
 
 @keyframes cardIn {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(10px) scale(0.975);
   }
   to {
     opacity: 1;
@@ -1110,6 +1442,37 @@ p {
 
 .gallery-card:hover .gallery-visual {
   transform: scale(1.04);
+}
+
+.gallery-overlay {
+  position: absolute;
+  inset: auto 18px 18px 18px;
+  z-index: 4;
+  display: flex;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  background: rgba(20, 33, 61, 0.72);
+  color: #ffffff;
+  padding: 8px 12px;
+  opacity: 0;
+  transform: translateY(10px);
+  backdrop-filter: blur(8px);
+  transition:
+    opacity 210ms ease,
+    transform 210ms ease;
+}
+
+.gallery-overlay small {
+  color: #ffffff;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.gallery-card:hover .gallery-overlay {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .gallery-visual span {
@@ -1200,6 +1563,11 @@ label {
   gap: 8px;
   color: var(--navy);
   font-weight: 850;
+  transition: color 170ms ease;
+}
+
+label:focus-within {
+  color: var(--gold-dark);
 }
 
 input,
@@ -1214,7 +1582,8 @@ textarea {
   outline: none;
   transition:
     border-color 160ms ease,
-    box-shadow 160ms ease;
+    box-shadow 160ms ease,
+    transform 160ms ease;
 }
 
 textarea {
@@ -1226,6 +1595,21 @@ select:focus,
 textarea:focus {
   border-color: rgba(201, 149, 26, 0.78);
   box-shadow: 0 0 0 4px rgba(201, 149, 26, 0.14);
+  transform: translateY(-1px);
+}
+
+.submit-button:disabled {
+  cursor: wait;
+  opacity: 0.9;
+}
+
+.button-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(31, 41, 55, 0.22);
+  border-top-color: rgba(31, 41, 55, 0.9);
+  border-radius: 50%;
+  animation: spin 680ms linear infinite;
 }
 
 .enquiry-aside,
@@ -1268,6 +1652,7 @@ textarea:focus {
   color: #166534;
   padding: 18px 20px;
   font-weight: 760;
+  animation: successIn 320ms ease both;
 }
 
 .contact-details {
@@ -1406,14 +1791,41 @@ textarea:focus {
   background: #1fa855;
   color: #ffffff;
   box-shadow: 0 18px 38px rgba(31, 168, 85, 0.35);
+  animation: floatingPulse 2.6s ease-in-out infinite;
   transition:
     transform 180ms ease,
     box-shadow 180ms ease;
 }
 
 .floating-whatsapp:hover {
+  animation-play-state: paused;
   box-shadow: 0 22px 46px rgba(31, 168, 85, 0.48);
   transform: translateY(-3px) scale(1.03);
+}
+
+.floating-whatsapp span {
+  position: absolute;
+  right: calc(100% + 12px);
+  width: max-content;
+  max-width: 180px;
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.92);
+  color: #ffffff;
+  padding: 8px 11px;
+  font-size: 0.78rem;
+  font-weight: 850;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(8px);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.floating-whatsapp:hover span,
+.floating-whatsapp:focus-visible span {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .reveal {
@@ -1422,11 +1834,169 @@ textarea:focus {
   transition:
     opacity 280ms ease,
     transform 280ms ease;
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.reveal-fade-up {
+  transform: translateY(14px);
+}
+
+.reveal-slide-left {
+  transform: translateX(-10px);
+}
+
+.reveal-slide-right {
+  transform: translateX(10px);
+}
+
+.reveal-scale-in {
+  transform: translateY(10px) scale(0.975);
 }
 
 .reveal.is-visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+@keyframes heroWordIn {
+  0% {
+    opacity: 0;
+    transform: translateY(26px) rotateX(18deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotateX(0);
+  }
+}
+
+@keyframes heroFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes badgePop {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes visualFloat {
+  0% {
+    transform: translateY(0) rotate(-0.25deg);
+  }
+  100% {
+    transform: translateY(-10px) rotate(0.35deg);
+  }
+}
+
+@keyframes threadDrift {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(-8deg);
+  }
+  100% {
+    transform: translate3d(22px, -14px, 0) rotate(-3deg);
+  }
+}
+
+@keyframes whatsappGlow {
+  0%,
+  100% {
+    box-shadow: 0 18px 38px rgba(31, 168, 85, 0.32);
+  }
+  50% {
+    box-shadow: 0 18px 44px rgba(31, 168, 85, 0.48), 0 0 0 7px rgba(31, 168, 85, 0.12);
+  }
+}
+
+@keyframes floatingPulse {
+  0%,
+  100% {
+    box-shadow: 0 18px 38px rgba(31, 168, 85, 0.35), 0 0 0 0 rgba(31, 168, 85, 0.18);
+  }
+  50% {
+    box-shadow: 0 20px 42px rgba(31, 168, 85, 0.38), 0 0 0 11px rgba(31, 168, 85, 0);
+  }
+}
+
+@keyframes badgeSoftPulse {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1px);
+  }
+}
+
+@keyframes threadLineBreathe {
+  0% {
+    opacity: 0.64;
+    transform: translateY(80px) rotate(-10deg) scaleX(0.985);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(76px) rotate(-8deg) scaleX(1.015);
+  }
+}
+
+@keyframes threadLineBreatheAlt {
+  0% {
+    opacity: 0.58;
+    transform: translateY(36px) rotate(14deg) scaleX(0.98);
+  }
+  100% {
+    opacity: 0.92;
+    transform: translateY(40px) rotate(12deg) scaleX(1.02);
+  }
+}
+
+@keyframes ctaBorderSweep {
+  0% {
+    filter: hue-rotate(0deg);
+    transform: translateX(-1%);
+  }
+  100% {
+    filter: hue-rotate(8deg);
+    transform: translateX(1%);
+  }
+}
+
+@keyframes patternSlide {
+  0% {
+    background-position: 0 0, 0 0;
+  }
+  100% {
+    background-position: 42px 0, 90px 0;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes successIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.99);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1440,6 +2010,24 @@ textarea:focus {
     animation-duration: 1ms !important;
     scroll-behavior: auto !important;
     transition-duration: 1ms !important;
+  }
+
+  .reveal,
+  .hero-title span,
+  .hero-sequence,
+  .hero-kicker {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .hero-visual-card .thread-visual,
+  .hero-thread-field span,
+  .thread-line,
+  .floating-whatsapp,
+  .product-badges span,
+  .catalogue-cta::before,
+  .catalogue-cta .cta-pattern {
+    animation: none !important;
   }
 }
 
@@ -1502,15 +2090,18 @@ textarea:focus {
     box-shadow: var(--shadow);
     opacity: 0;
     pointer-events: none;
+    clip-path: inset(0 0 100% 0 round 18px);
     transform: translateY(-10px);
     transition:
-      opacity 180ms ease,
-      transform 180ms ease;
+      opacity 150ms ease,
+      clip-path 180ms ease,
+      transform 150ms ease;
   }
 
   .main-nav--open {
     opacity: 1;
     pointer-events: auto;
+    clip-path: inset(0 0 0 0 round 18px);
     transform: translateY(0);
   }
 
@@ -1518,6 +2109,11 @@ textarea:focus {
   .main-nav .btn {
     justify-content: flex-start;
     width: 100%;
+  }
+
+  .reveal-slide-left,
+  .reveal-slide-right {
+    transform: translateY(10px);
   }
 
   .hero {

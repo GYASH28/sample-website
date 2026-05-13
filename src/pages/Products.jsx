@@ -27,13 +27,13 @@ export default function Products() {
 
       <section className="section">
         <div className="container">
-          <Reveal className="section-heading">
+          <Reveal className="section-heading" variant="scale-in">
             <p className="eyebrow">Categories</p>
             <h2>Thread categories available for enquiry</h2>
           </Reveal>
           <div className="card-grid category-grid">
             {productCategories.map((category, index) => (
-              <Reveal key={category.name} delay={(index % 4) * 60}>
+              <Reveal key={category.name} delay={(index % 4) * 65} variant="fade-up">
                 <CategoryCard category={category} />
               </Reveal>
             ))}
@@ -43,13 +43,13 @@ export default function Products() {
 
       <section className="section section-tinted">
         <div className="container">
-          <Reveal className="section-heading">
+          <Reveal className="section-heading" variant="scale-in">
             <p className="eyebrow">Filter Catalogue</p>
             <h2>Featured Thread Products</h2>
             <p>Select a category to quickly view relevant thread options.</p>
           </Reveal>
 
-          <Reveal className="filter-bar">
+          <Reveal className="filter-bar" variant="fade-up">
             {productFilters.map((filter) => (
               <button
                 key={filter}
@@ -62,9 +62,9 @@ export default function Products() {
             ))}
           </Reveal>
 
-          <div className="card-grid product-grid product-grid--filtered" aria-live="polite">
+          <div key={activeFilter} className="card-grid product-grid product-grid--filtered" aria-live="polite">
             {visibleProducts.map((product, index) => (
-              <Reveal key={product.name} delay={index * 55}>
+              <Reveal key={`${activeFilter}-${product.name}`} delay={index * 60} variant="scale-in">
                 <ProductCard product={product} />
               </Reveal>
             ))}

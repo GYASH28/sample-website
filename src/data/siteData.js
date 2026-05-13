@@ -96,6 +96,7 @@ export const featuredProducts = [
     colors: "Available in multiple colors",
     suitableFor: "Garment stitching, boutiques, uniform makers",
     palette: ["#1d3557", "#f4a261", "#2a9d8f"],
+    badges: ["Popular", "Multiple Colors"],
   },
   {
     name: "3 Ply Sewing Thread",
@@ -104,6 +105,7 @@ export const featuredProducts = [
     colors: "Available in regular and bright shades",
     suitableFor: "Tailors, textile shops, retail stitching",
     palette: ["#2f4858", "#ffbe0b", "#e76f51"],
+    badges: ["Retail Ready"],
   },
   {
     name: "Cotton Sewing Thread Roll",
@@ -112,6 +114,7 @@ export const featuredProducts = [
     colors: "Available in daily-use color range",
     suitableFor: "Cotton garments, repairs, boutique work",
     palette: ["#44633f", "#f5ebe0", "#8ecae6"],
+    badges: ["Soft Finish"],
   },
   {
     name: "Embroidery Thread Set",
@@ -120,6 +123,7 @@ export const featuredProducts = [
     colors: "Available in shade sets and singles",
     suitableFor: "Embroidery units, designers, decorative stitching",
     palette: ["#8338ec", "#ff006e", "#3a86ff"],
+    badges: ["Shade Sets", "Boutique Work"],
   },
   {
     name: "Nylon Industrial Thread",
@@ -128,6 +132,7 @@ export const featuredProducts = [
     colors: "Available in core industrial shades",
     suitableFor: "Heavy stitching, manufacturing, utility goods",
     palette: ["#111827", "#6b7280", "#14b8a6"],
+    badges: ["Bulk Orders", "Heavy Duty"],
   },
   {
     name: "Zari Decorative Thread",
@@ -136,6 +141,7 @@ export const featuredProducts = [
     colors: "Available in gold, silver, and festive tones",
     suitableFor: "Ethnic wear, bridal work, craft and borders",
     palette: ["#b7791f", "#f7d774", "#8a5a44"],
+    badges: ["Decorative", "Premium Finish"],
   },
 ];
 

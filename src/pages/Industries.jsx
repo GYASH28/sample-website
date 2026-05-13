@@ -19,13 +19,13 @@ export default function Industries() {
 
       <section className="section">
         <div className="container">
-          <Reveal className="section-heading">
+          <Reveal className="section-heading" variant="scale-in">
             <p className="eyebrow">Who We Serve</p>
             <h2>Customers across textile and stitching businesses</h2>
           </Reveal>
           <div className="card-grid industry-grid">
             {industries.map((industry, index) => (
-              <Reveal key={industry.name} className="industry-card" delay={(index % 4) * 60}>
+              <Reveal key={industry.name} className="industry-card" delay={(index % 4) * 65} variant="fade-up">
                 <IconBadge name={industry.icon} tone={index % 2 === 0 ? "gold" : "teal"} />
                 <h3>{industry.name}</h3>
                 <p>{industry.description}</p>
@@ -37,7 +37,7 @@ export default function Industries() {
 
       <section className="section section-tinted">
         <div className="container support-band">
-          <Reveal>
+          <Reveal variant="slide-left">
             <p className="eyebrow">Bulk Enquiry</p>
             <h2>Need thread supply for repeated orders?</h2>
             <p>
@@ -45,7 +45,7 @@ export default function Industries() {
               team can respond with catalogue options and availability.
             </p>
           </Reveal>
-          <Reveal delay={120}>
+          <Reveal delay={120} variant="slide-right">
             <Link className="btn btn-primary" to="/enquiry">
               Send Enquiry
               <ArrowRight size={18} />

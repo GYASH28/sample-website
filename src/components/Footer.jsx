@@ -1,11 +1,12 @@
 import { MessageCircle, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
 import { businessInfo, createWhatsAppLink, navItems, productCategories } from "../data/siteData.js";
+import Reveal from "./Reveal.jsx";
 
 export default function Footer() {
   return (
     <footer className="site-footer">
-      <div className="container footer-grid">
+      <Reveal className="container footer-grid" variant="fade-up">
         <div className="footer-brand">
           <Link to="/" className="brand brand-footer">
             <span className="brand-mark">ST</span>
@@ -61,10 +62,10 @@ export default function Footer() {
             <li>{businessInfo.address}</li>
           </ul>
         </div>
-      </div>
-      <div className="footer-bottom">
+      </Reveal>
+      <Reveal className="footer-bottom" variant="fade-up" delay={90}>
         <p>Copyright (c) 2026 {businessInfo.name}. All rights reserved.</p>
-      </div>
+      </Reveal>
     </footer>
   );
 }

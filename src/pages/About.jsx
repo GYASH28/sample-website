@@ -31,11 +31,11 @@ export default function About() {
 
       <section className="section">
         <div className="container split-grid">
-          <Reveal>
+          <Reveal variant="slide-left">
             <p className="eyebrow">Our Business</p>
             <h2>Built around reliable supply and practical product selection.</h2>
           </Reveal>
-          <Reveal delay={100}>
+          <Reveal delay={100} variant="slide-right">
             <p className="large-copy">
               Shree Threads & Textile Supplies provides high-quality threads for tailoring, garment
               production, embroidery, boutiques, textile traders, and industrial stitching
@@ -52,13 +52,13 @@ export default function About() {
 
       <section className="section section-tinted">
         <div className="container">
-          <Reveal className="section-heading">
+          <Reveal className="section-heading" variant="scale-in">
             <p className="eyebrow">Highlights</p>
             <h2>What buyers can expect</h2>
           </Reveal>
           <div className="card-grid highlight-grid">
             {highlights.map((item, index) => (
-              <Reveal key={item.title} className="highlight-card" delay={index * 80}>
+              <Reveal key={item.title} className="highlight-card" delay={index * 80} variant="fade-up">
                 <CheckCircle2 size={26} />
                 <h3>{item.title}</h3>
                 <p>{item.text}</p>

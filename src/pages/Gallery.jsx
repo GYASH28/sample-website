@@ -18,14 +18,14 @@ export default function Gallery() {
 
       <section className="section">
         <div className="container">
-          <Reveal className="section-heading">
+          <Reveal className="section-heading" variant="scale-in">
             <p className="eyebrow">Shade Gallery</p>
             <h2>Product Gallery & Shade Collection</h2>
             <p>Organized visuals for thread stock, shade variety, packing, and wholesale supply.</p>
           </Reveal>
           <div className="gallery-grid">
             {galleryItems.map((item, index) => (
-              <Reveal key={item.title} className="gallery-card" delay={(index % 3) * 70}>
+              <Reveal key={item.title} className="gallery-card" delay={(index % 3) * 75} variant="scale-in">
                 <GalleryVisual item={item} />
                 <div>
                   <h3>{item.title}</h3>

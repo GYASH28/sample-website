@@ -7,6 +7,7 @@ export default function CategoryCard({ category }) {
 
   return (
     <article className={`category-card tone-border-${category.tone}`}>
+      <span className="card-shine" aria-hidden="true" />
       <IconBadge name={category.icon} tone={category.tone} />
       <h3>{category.name}</h3>
       <p>{category.description}</p>

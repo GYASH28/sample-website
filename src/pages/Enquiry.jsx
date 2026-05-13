@@ -1,5 +1,5 @@
 import { MessageCircle, Send } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import PageHero from "../components/PageHero.jsx";
 import ProductVisual from "../components/ProductVisual.jsx";
 import Reveal from "../components/Reveal.jsx";
@@ -9,10 +9,23 @@ const businessTypes = ["Tailor", "Boutique", "Manufacturer", "Wholesaler", "Reta
 
 export default function Enquiry() {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const submitTimer = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (submitTimer.current) window.clearTimeout(submitTimer.current);
+    };
+  }, []);
 
   function handleSubmit(event) {
     event.preventDefault();
-    setSubmitted(true);
+    setSubmitted(false);
+    setSubmitting(true);
+    submitTimer.current = window.setTimeout(() => {
+      setSubmitting(false);
+      setSubmitted(true);
+    }, 700);
   }
 
   return (
@@ -27,7 +40,7 @@ export default function Enquiry() {
 
       <section className="section">
         <div className="container enquiry-layout">
-          <Reveal className="enquiry-card">
+          <Reveal className="enquiry-card" variant="slide-left">
             <form className="enquiry-form" onSubmit={handleSubmit}>
               <div className="form-grid">
                 <label>
@@ -84,14 +97,14 @@ export default function Enquiry() {
                 />
               </label>
 
-              <button className="btn btn-primary" type="submit">
-                <Send size={18} />
-                Submit Enquiry
+              <button className="btn btn-primary submit-button" type="submit" disabled={submitting}>
+                {submitting ? <span className="button-spinner" aria-hidden="true" /> : <Send size={18} />}
+                {submitting ? "Submitting..." : "Submit Enquiry"}
               </button>
             </form>
           </Reveal>
 
-          <Reveal className="enquiry-aside" delay={120}>
+          <Reveal className="enquiry-aside" delay={120} variant="slide-right">
             <p className="eyebrow">Fast Response</p>
             <h2>Share your requirement directly on WhatsApp.</h2>
             <p>

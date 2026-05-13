@@ -17,7 +17,7 @@ export default function Contact() {
 
       <section className="section">
         <div className="container contact-layout">
-          <Reveal className="contact-details">
+          <Reveal className="contact-details" variant="slide-left">
             <div className="contact-card">
               <MapPin size={24} />
               <div>
@@ -57,7 +57,7 @@ export default function Contact() {
             </div>
           </Reveal>
 
-          <Reveal className="map-placeholder" delay={130}>
+          <Reveal className="map-placeholder" delay={130} variant="slide-right">
             <div className="map-pin">
               <MapPin size={28} />
             </div>
