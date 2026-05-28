@@ -1,7 +1,8 @@
-import { FileText, MessageCircle } from "lucide-react";
+import { FileText } from "lucide-react";
 import { Link } from "react-router-dom";
 import { catalogueMessage, createWhatsAppLink } from "../data/siteData.js";
 import Reveal from "./Reveal.jsx";
+import WhatsAppIcon from "./WhatsAppIcon.jsx";
 
 export default function CatalogueCta() {
   return (
@@ -20,7 +21,7 @@ export default function CatalogueCta() {
             Request Catalogue
           </Link>
           <a className="btn btn-whatsapp" href={createWhatsAppLink(catalogueMessage)} target="_blank" rel="noreferrer">
-            <MessageCircle size={18} />
+            <WhatsAppIcon size={18} />
             WhatsApp Now
           </a>
         </div>

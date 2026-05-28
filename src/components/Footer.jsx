@@ -1,8 +1,9 @@
-import { Instagram, MessageCircle, Phone } from "lucide-react";
+import { Instagram, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
 import logo from "../assets/fakhri-mart-logo.webp";
 import { businessInfo, createWhatsAppLink, navItems, productCategories } from "../data/siteData.js";
 import Reveal from "./Reveal.jsx";
+import WhatsAppIcon from "./WhatsAppIcon.jsx";
 
 export default function Footer() {
   return (
@@ -21,7 +22,7 @@ export default function Footer() {
             cords, embroidery threads, beads, bases and purse-making essentials.
           </p>
           <a className="btn btn-whatsapp" href={createWhatsAppLink()} target="_blank" rel="noreferrer">
-            <MessageCircle size={18} />
+            <WhatsAppIcon size={18} />
             WhatsApp Catalogue
           </a>
         </div>

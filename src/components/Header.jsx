@@ -1,8 +1,9 @@
-import { Menu, MessageCircle, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import logo from "../assets/fakhri-mart-logo.webp";
 import { announcementItems, businessInfo, createWhatsAppLink, navItems } from "../data/siteData.js";
+import WhatsAppIcon from "./WhatsAppIcon.jsx";
 
 function NavItem({ item, activePath, onClick }) {
   const isAnchor = item.href.includes("#");
@@ -75,6 +76,14 @@ export default function Header() {
         </button>
 
         <nav className={`main-nav ${menuOpen ? "main-nav--open" : ""}`} aria-label="Primary navigation">
+          <div className="mobile-nav-header">
+            <img src={logo} alt="Fakhri Mart logo" className="mobile-nav-logo" />
+            <div className="mobile-nav-text">
+              <strong>{businessInfo.shortName}</strong>
+              <small>{businessInfo.descriptor}</small>
+            </div>
+          </div>
+
           {navItems.map((item) => (
             <NavItem
               key={item.href}
@@ -90,7 +99,7 @@ export default function Header() {
             rel="noreferrer"
             onClick={() => setMenuOpen(false)}
           >
-            <MessageCircle size={17} />
+            <WhatsAppIcon size={17} />
             WhatsApp
           </a>
         </nav>

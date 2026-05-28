@@ -4,7 +4,6 @@ import {
   FileText,
   Instagram,
   MapPin,
-  MessageCircle,
   Phone,
   Sparkles,
 } from "lucide-react";
@@ -19,6 +18,7 @@ import IconBadge from "../components/IconBadge.jsx";
 import ProductCard from "../components/ProductCard.jsx";
 import ProductVisual from "../components/ProductVisual.jsx";
 import Reveal from "../components/Reveal.jsx";
+import WhatsAppIcon from "../components/WhatsAppIcon.jsx";
 import {
   aboutCopy,
   aboutPoints,
@@ -78,7 +78,7 @@ export default function Home() {
                 <ArrowRight size={18} />
               </a>
               <a className="btn btn-whatsapp" href={createWhatsAppLink(bulkMessage)} target="_blank" rel="noreferrer">
-                <MessageCircle size={18} />
+                <WhatsAppIcon size={18} />
                 Get Bulk Price on WhatsApp
               </a>
               <Link className="btn btn-outline" to="/enquiry">
@@ -204,7 +204,7 @@ export default function Home() {
               team will help you with availability and bulk pricing.
             </p>
             <a className="btn btn-primary" href={createWhatsAppLink(bulkMessage)} target="_blank" rel="noreferrer">
-              <MessageCircle size={18} />
+              <WhatsAppIcon size={18} />
               Get Bulk Price on WhatsApp
             </a>
           </Reveal>
@@ -311,7 +311,7 @@ export default function Home() {
               WhatsApp button stays available after submission.
             </p>
             <a className="btn btn-whatsapp" href={createWhatsAppLink(catalogueMessage)} target="_blank" rel="noreferrer">
-              <MessageCircle size={18} />
+              <WhatsAppIcon size={18} />
               WhatsApp Catalogue
             </a>
           </Reveal>
