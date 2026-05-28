@@ -5,12 +5,12 @@ export const businessInfo = {
   name: "Fakhri Mart",
   tagline: "Colourful Threads, Endless Creation",
   descriptor: "Yarn & Craft Supplier",
-  phoneDisplay: "+91 98765 43210",
-  phoneHref: "tel:+919876543210",
-  whatsappDisplay: "+91 98765 43210",
-  whatsappNumber: "919876543210",
+  phoneDisplay: "+91 88307 37551",
+  phoneHref: "tel:+918830737551",
+  whatsappDisplay: "+91 88307 37551",
+  whatsappNumber: "918830737551",
   whatsappMessage:
-    "Hello Fakhri Mart, I am interested in your yarn and craft products. Please share catalogue, availability and bulk pricing details.",
+    "Hello Fakhri Mart, I hope you are doing well. I am interested in your yarns and craft products. Could you please share your latest product catalogue, shade details, and bulk pricing information? Thank you!",
   email: "hello@fakhrimart.in",
   emailHref: "mailto:hello@fakhrimart.in",
   address: "Pune, Maharashtra, India",
@@ -504,10 +504,10 @@ export const aboutPoints = [
 ];
 
 export const catalogueMessage =
-  "Hello Fakhri Mart, please share your product catalogue, shade details, availability, packaging details and bulk order support.";
+  "Hello Fakhri Mart, I would love to explore your collection. Could you please share your latest product catalogue, shade cards, and delivery/payment details? Looking forward to hearing from you. Thanks!";
 
 export const bulkMessage =
-  "Hello Fakhri Mart, I need yarn or craft materials in bulk. Please share availability and bulk pricing details.";
+  "Hello Fakhri Mart, I would like to place a bulk order enquiry. Could you please assist me with the pricing, availability, and lead time for bulk purchases of your yarns and craft supplies? Thank you so much!";
 
 export function createWhatsAppLink(message = businessInfo.whatsappMessage) {
   return `https://wa.me/${businessInfo.whatsappNumber}?text=${encodeURIComponent(message)}`;
