@@ -5,7 +5,7 @@ export default function GalleryVisual({ item }) {
         <span key={`${item.title}-${color}`} style={{ "--gallery-color": color, "--i": index }} />
       ))}
       <div className="gallery-overlay">
-        <small>Shade collection</small>
+        <small>View Range</small>
       </div>
     </div>
   );

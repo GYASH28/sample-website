@@ -5,11 +5,17 @@ import Footer from "./Footer.jsx";
 import Header from "./Header.jsx";
 
 function ScrollToTop() {
-  const { pathname } = useLocation();
+  const { hash, pathname } = useLocation();
 
   useEffect(() => {
+    if (hash) {
+      window.requestAnimationFrame(() => {
+        document.querySelector(hash)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+      return;
+    }
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [pathname]);
+  }, [hash, pathname]);
 
   return null;
 }

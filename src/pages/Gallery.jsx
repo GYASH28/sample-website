@@ -10,22 +10,22 @@ export default function Gallery() {
     <>
       <PageHero
         eyebrow="Gallery"
-        title="Product Gallery & Shade Collection"
-        text="Explore a premium visual catalogue style for thread cones, color shelves, packaging, bulk stock, and embroidery shade selections."
+        title="Yarns, Threads, Accessories & Purse Materials"
+        text="A polished product-range gallery for yarn collection, crochet threads, macrame cords, embroidery threads, accessories, beads, purse materials and organized stock."
       >
-        <ProductVisual palette={["#8338ec", "#ffbe0b", "#3a86ff"]} />
+        <ProductVisual palette={["#e86f9e", "#35b8ad", "#f4cf6a"]} />
       </PageHero>
 
       <section className="section">
         <div className="container">
           <Reveal className="section-heading" variant="scale-in">
-            <p className="eyebrow">Shade Gallery</p>
-            <h2>Product Gallery & Shade Collection</h2>
-            <p>Organized visuals for thread stock, shade variety, packing, and wholesale supply.</p>
+            <p className="eyebrow">Product Gallery</p>
+            <h2>Explore the Fakhri Mart material range.</h2>
+            <p>Organized views for product range, shade discovery, bulk stock and catalogue enquiries.</p>
           </Reveal>
           <div className="gallery-grid">
             {galleryItems.map((item, index) => (
-              <Reveal key={item.title} className="gallery-card" delay={(index % 3) * 75} variant="scale-in">
+              <Reveal key={item.title} className="gallery-card" delay={(index % 4) * 60} variant="scale-in">
                 <GalleryVisual item={item} />
                 <div>
                   <h3>{item.title}</h3>

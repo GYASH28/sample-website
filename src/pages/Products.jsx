@@ -19,17 +19,18 @@ export default function Products() {
     <>
       <PageHero
         eyebrow="Products"
-        title="Catalogue of Sewing, Embroidery & Industrial Threads"
-        text="Browse key categories and featured thread options. Prices are shared on enquiry because quantity, shade, and supply type can change the final rate."
+        title="Yarns, Crochet Threads & Craft Essentials"
+        text="Browse the Fakhri Mart catalogue by category. Ask for prices, availability, shade details and bulk options directly through WhatsApp."
       >
-        <ProductVisual palette={["#1d3557", "#ffbe0b", "#e76f51"]} />
+        <ProductVisual palette={["#35b8ad", "#f6a7b8", "#f3c65f"]} />
       </PageHero>
 
       <section className="section">
         <div className="container">
           <Reveal className="section-heading" variant="scale-in">
             <p className="eyebrow">Categories</p>
-            <h2>Thread categories available for enquiry</h2>
+            <h2>Product categories available for enquiry</h2>
+            <p>Each category is ready for catalogue, shade card, availability and bulk order enquiries.</p>
           </Reveal>
           <div className="card-grid category-grid">
             {productCategories.map((category, index) => (
@@ -45,8 +46,8 @@ export default function Products() {
         <div className="container">
           <Reveal className="section-heading" variant="scale-in">
             <p className="eyebrow">Filter Catalogue</p>
-            <h2>Featured Thread Products</h2>
-            <p>Select a category to quickly view relevant thread options.</p>
+            <h2>Featured products for enquiry</h2>
+            <p>Select a group to quickly view yarns, macrame cords, embroidery threads, accessories and purse materials.</p>
           </Reveal>
 
           <Reveal className="filter-bar" variant="fade-up">
@@ -64,7 +65,7 @@ export default function Products() {
 
           <div key={activeFilter} className="card-grid product-grid product-grid--filtered" aria-live="polite">
             {visibleProducts.map((product, index) => (
-              <Reveal key={`${activeFilter}-${product.name}`} delay={index * 60} variant="scale-in">
+              <Reveal key={`${activeFilter}-${product.name}`} delay={(index % 6) * 45} variant="scale-in">
                 <ProductCard product={product} />
               </Reveal>
             ))}

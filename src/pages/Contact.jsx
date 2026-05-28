@@ -1,4 +1,4 @@
-import { Clock, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { Clock, Instagram, Mail, MapPin, MessageCircle, Phone, Truck } from "lucide-react";
 import PageHero from "../components/PageHero.jsx";
 import ProductVisual from "../components/ProductVisual.jsx";
 import Reveal from "../components/Reveal.jsx";
@@ -9,10 +9,10 @@ export default function Contact() {
     <>
       <PageHero
         eyebrow="Contact"
-        title="Connect for catalogue, shade card, and bulk supply details"
-        text="Reach out for product catalogue details, shade card options, and retail or wholesale supply enquiries."
+        title="Connect for catalogue, shade card and bulk order support"
+        text="Reach out for yarns, crochet threads, macrame cords, embroidery threads, beads, bases, purse accessories, delivery details and product availability."
       >
-        <ProductVisual palette={["#264653", "#e9c46a", "#e76f51"]} />
+        <ProductVisual palette={["#35b8ad", "#f6a7b8", "#c99b6b"]} />
       </PageHero>
 
       <section className="section">
@@ -49,6 +49,15 @@ export default function Contact() {
               </div>
             </div>
             <div className="contact-card">
+              <Instagram size={24} />
+              <div>
+                <h3>Instagram</h3>
+                <a href={businessInfo.instagramUrl} target="_blank" rel="noreferrer">
+                  @{businessInfo.instagram}
+                </a>
+              </div>
+            </div>
+            <div className="contact-card">
               <Clock size={24} />
               <div>
                 <h3>Business Hours</h3>
@@ -57,13 +66,17 @@ export default function Contact() {
             </div>
           </Reveal>
 
-          <Reveal className="map-placeholder" delay={130} variant="slide-right">
+          <Reveal className="map-panel" delay={130} variant="slide-right">
             <div className="map-pin">
               <MapPin size={28} />
             </div>
-            <h3>Location Map</h3>
+            <h3>{businessInfo.location}</h3>
             <p>{businessInfo.address}</p>
-            <span>Shop location map can be added here once the final address is confirmed.</span>
+            <span>Visit or message us to request catalogue, shade details and delivery support.</span>
+            <div className="delivery-chip">
+              <Truck size={18} />
+              {businessInfo.delivery}
+            </div>
           </Reveal>
         </div>
       </section>

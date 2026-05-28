@@ -1,20 +1,33 @@
-import { MessageCircle } from "lucide-react";
+import { ArrowRight, MessageCircle } from "lucide-react";
 import { createWhatsAppLink } from "../data/siteData.js";
 import IconBadge from "./IconBadge.jsx";
 
 export default function CategoryCard({ category }) {
-  const message = `Hello, I am interested in ${category.name}. Please share catalogue and pricing details.`;
+  const message = `Hello Fakhri Mart, I am interested in ${category.name}. Please share items, availability and catalogue details.`;
 
   return (
     <article className={`category-card tone-border-${category.tone}`}>
       <span className="card-shine" aria-hidden="true" />
-      <IconBadge name={category.icon} tone={category.tone} />
+      <div className="category-card-head">
+        <IconBadge name={category.icon} tone={category.tone} />
+        <span className="category-count">{category.count}</span>
+      </div>
       <h3>{category.name}</h3>
       <p>{category.description}</p>
-      <a href={createWhatsAppLink(message)} target="_blank" rel="noreferrer" className="text-link">
-        Enquire Now
-        <MessageCircle size={15} />
-      </a>
+      <ul className="mini-list" aria-label={`${category.name} products`}>
+        {category.products.slice(0, 3).map((product) => (
+          <li key={product}>{product}</li>
+        ))}
+      </ul>
+      <div className="category-actions">
+        <a href="/products" className="text-link">
+          View Items
+          <ArrowRight size={15} />
+        </a>
+        <a href={createWhatsAppLink(message)} target="_blank" rel="noreferrer" className="icon-link" aria-label={`Enquire about ${category.name} on WhatsApp`}>
+          <MessageCircle size={17} />
+        </a>
+      </div>
     </article>
   );
 }

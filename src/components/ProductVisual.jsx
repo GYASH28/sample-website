@@ -1,4 +1,4 @@
-export default function ProductVisual({ palette = ["#1d3557", "#f4a261", "#2a9d8f"], compact = false }) {
+export default function ProductVisual({ palette = ["#35b8ad", "#f6a7b8", "#f3c65f"], compact = false }) {
   return (
     <div className={`thread-visual ${compact ? "thread-visual--compact" : ""}`} aria-hidden="true">
       <div className="shade-card">
@@ -6,15 +6,15 @@ export default function ProductVisual({ palette = ["#1d3557", "#f4a261", "#2a9d8
           <span key={color} style={{ "--shade": color }} />
         ))}
       </div>
-      <div className="thread-cone cone-a" style={{ "--thread": palette[0] }}>
+      <div className="yarn-basket">
+        <span />
+        <span />
         <span />
       </div>
-      <div className="thread-cone cone-b" style={{ "--thread": palette[1] }}>
-        <span />
-      </div>
-      <div className="thread-cone cone-c" style={{ "--thread": palette[2] }}>
-        <span />
-      </div>
+      <div className="yarn-ball ball-a" style={{ "--thread": palette[0] }} />
+      <div className="yarn-ball ball-b" style={{ "--thread": palette[1] }} />
+      <div className="yarn-ball ball-c" style={{ "--thread": palette[2] }} />
+      <div className="hook-line" />
       <div className="thread-line line-one" />
       <div className="thread-line line-two" />
       <div className="bobbin-row">
