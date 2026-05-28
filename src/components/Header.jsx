@@ -58,7 +58,7 @@ export default function Header() {
 
       <div className="container nav-shell">
         <Link to="/" className="brand" aria-label="Fakhri Mart home">
-          <img src={logo} alt="Fakhri Mart logo" />
+          <img id="navbar-logo" src={logo} alt="Fakhri Mart logo" />
           <span>
             <strong>{businessInfo.shortName}</strong>
             <small>{businessInfo.descriptor}</small>

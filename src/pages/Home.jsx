@@ -37,7 +37,7 @@ import {
   whyChooseUs,
 } from "../data/siteData.js";
 
-const heroWords = "Colourful Yarns, Threads & Accessories Delivered Across India".split(" ");
+const heroWords = "Colourful Yarns & Craft Essentials".split(" ");
 
 export default function Home() {
   const [activeFilter, setActiveFilter] = useState("All");
@@ -60,7 +60,7 @@ export default function Home() {
         <div className="container hero-grid">
           <Reveal className="hero-copy" variant="fade-up">
             <p className="eyebrow hero-kicker">{businessInfo.tagline}</p>
-            <h1 className="hero-title" aria-label="Colourful Yarns, Threads and Accessories Delivered Across India">
+            <h1 className="hero-title" aria-label="Colourful Yarns and Craft Essentials">
               {heroWords.map((word, index) => (
                 <span key={`${word}-${index}`} style={{ "--word-index": index }}>
                   {word}
@@ -68,9 +68,8 @@ export default function Home() {
               ))}
             </h1>
             <p className="hero-subtitle hero-sequence hero-sequence-subtitle">
-              Explore quality yarns, crochet threads, macrame cords, embroidery threads, beads,
-              purse accessories, bases, handles, hooks and craft essentials for makers, boutiques,
-              resellers and wholesale buyers.
+              Explore quality yarns, crochet threads, macrame cords, beads, bases and accessories
+              with all-India delivery and easy WhatsApp enquiry.
             </p>
             <div className="button-row hero-sequence hero-sequence-actions">
               <a className="btn btn-primary" href="#categories">
@@ -79,17 +78,21 @@ export default function Home() {
               </a>
               <a className="btn btn-whatsapp" href={createWhatsAppLink(bulkMessage)} target="_blank" rel="noreferrer">
                 <WhatsAppIcon size={18} />
-                Get Bulk Price on WhatsApp
+                WhatsApp Enquiry
               </a>
-              <Link className="btn btn-outline" to="/enquiry">
-                <FileText size={18} />
+              <Link className="btn-link-text" to="/enquiry">
                 Request Catalogue
               </Link>
             </div>
             <div className="trust-badges hero-sequence hero-sequence-badges">
-              {trustBadges.map((badge, index) => (
+              {[
+                "All India Delivery",
+                "12+ Categories",
+                "Bulk Orders Available",
+                "WhatsApp Catalogue",
+              ].map((badge, index) => (
                 <span key={badge} style={{ "--badge-index": index }}>
-                  <CheckCircle2 size={16} />
+                  <CheckCircle2 size={15} />
                   {badge}
                 </span>
               ))}
@@ -97,9 +100,6 @@ export default function Home() {
           </Reveal>
 
           <Reveal className="hero-visual-card" delay={140} variant="scale-in">
-            <div className="hero-logo-medallion">
-              <img src={logo} alt="Fakhri Mart logo with yarn basket" />
-            </div>
             <ProductVisual palette={["#35b8ad", "#f6a7b8", "#f3c65f"]} />
             <div className="stock-card stock-card-one">
               <strong>12+ Categories</strong>
@@ -107,11 +107,7 @@ export default function Home() {
             </div>
             <div className="stock-card stock-card-two">
               <strong>All India Delivery</strong>
-              <span>Catalogue and bulk support</span>
-            </div>
-            <div className="floating-material-card">
-              <Sparkles size={18} />
-              <span>Shade details on request</span>
+              <span>Catalogue & bulk support</span>
             </div>
           </Reveal>
         </div>
