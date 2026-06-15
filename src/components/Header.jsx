@@ -1,8 +1,8 @@
 import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import logo from "../assets/fakhri-mart-logo.webp";
+import { useLocation } from "react-router-dom";
 import { announcementItems, businessInfo, createWhatsAppLink, navItems } from "../data/siteData.js";
+import SmartLink from "./SmartLink.jsx";
 import WhatsAppIcon from "./WhatsAppIcon.jsx";
 
 function NavItem({ item, activePath, onClick }) {
@@ -10,18 +10,10 @@ function NavItem({ item, activePath, onClick }) {
   const isActive = !isAnchor && activePath === item.href;
   const className = isActive ? "active" : undefined;
 
-  if (isAnchor) {
-    return (
-      <a href={item.href} className={className} onClick={onClick}>
-        {item.label}
-      </a>
-    );
-  }
-
   return (
-    <Link to={item.href} className={className} onClick={onClick}>
+    <SmartLink to={item.href} className={className} onClick={onClick}>
       {item.label}
-    </Link>
+    </SmartLink>
   );
 }
 
@@ -57,13 +49,13 @@ export default function Header() {
       </div>
 
       <div className="container nav-shell">
-        <Link to="/" className="brand" aria-label="Fakhri Mart home">
-          <img id="navbar-logo" src={logo} alt="Fakhri Mart logo" />
+        <SmartLink to="/" className="brand" aria-label="Fakhri Mart home">
+          <img id="navbar-logo" src="/assets/fakhri-mart-logo.webp" alt="Fakhri Mart logo" />
           <span>
             <strong>{businessInfo.shortName}</strong>
             <small>{businessInfo.descriptor}</small>
           </span>
-        </Link>
+        </SmartLink>
 
         <button
           className="menu-toggle"

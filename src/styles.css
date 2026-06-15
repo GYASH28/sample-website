@@ -1,4 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap");
+@import "./detail-styles.css";
+
 
 :root {
   color-scheme: light;
@@ -84,7 +86,9 @@ main {
 }
 
 .section {
-  padding: 76px 0;
+  padding: 82px 0;
+  content-visibility: auto;
+  contain-intrinsic-size: 0 500px;
 }
 
 .section-tinted {
@@ -601,11 +605,10 @@ textarea:focus-visible {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  border: 1px solid rgba(50, 48, 45, 0.1);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.95);
   color: var(--charcoal);
-  padding: 9px 12px;
   font-size: 0.88rem;
   font-weight: 850;
   box-shadow: 0 8px 20px rgba(67, 52, 43, 0.06);
@@ -1564,14 +1567,13 @@ textarea:focus-visible {
   z-index: 5;
   display: flex;
   justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 999px;
-  background: rgba(50, 48, 45, 0.72);
+  background: rgba(50, 48, 45, 0.9);
   color: #ffffff;
   padding: 8px 12px;
   opacity: 0;
   transform: translateY(10px);
-  backdrop-filter: blur(8px);
   transition:
     opacity 210ms ease,
     transform 210ms ease;
@@ -2732,3 +2734,4 @@ body.intro-running .announcement-bar {
     padding: 52px 0 44px;
   }
 }
+

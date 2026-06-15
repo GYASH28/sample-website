@@ -1,4 +1,5 @@
 import { ArrowRight, MessageCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 import { createWhatsAppLink } from "../data/siteData.js";
 import IconBadge from "./IconBadge.jsx";
 
@@ -20,10 +21,10 @@ export default function CategoryCard({ category }) {
         ))}
       </ul>
       <div className="category-actions">
-        <a href="/products" className="text-link">
+        <Link to="/products" className="text-link">
           View Items
           <ArrowRight size={15} />
-        </a>
+        </Link>
         <a href={createWhatsAppLink(message)} target="_blank" rel="noreferrer" className="icon-link" aria-label={`Enquire about ${category.name} on WhatsApp`}>
           <MessageCircle size={17} />
         </a>

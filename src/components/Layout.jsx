@@ -15,7 +15,8 @@ function ScrollToTop() {
       });
       return;
     }
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    // Instant scroll for pathname-only changes — no janky smooth animation
+    window.scrollTo(0, 0);
   }, [hash, pathname]);
 
   return null;

@@ -1,5 +1,5 @@
 import { MessageCircle, Send } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   businessTypes,
   createWhatsAppLink,
@@ -9,15 +9,8 @@ import {
 export default function EnquiryForm({ compact = false }) {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [whatsappLink, setWhatsappLink] = useState(() => createWhatsAppLink());
   const submitTimer = useRef(null);
-
-  const whatsappLink = useMemo(
-    () =>
-      createWhatsAppLink(
-        "Hello Fakhri Mart, I submitted an enquiry on the website. Please help me with catalogue, availability and bulk pricing details.",
-      ),
-    [],
-  );
 
   useEffect(() => {
     return () => {
@@ -25,15 +18,48 @@ export default function EnquiryForm({ compact = false }) {
     };
   }, []);
 
+  function buildMessage(formData) {
+    const name = formData.get("name") || "";
+    const phone = formData.get("phone") || "";
+    const businessType = formData.get("businessType") || "";
+    const product = formData.get("product") || "";
+    const quantity = formData.get("quantity") || "";
+    const city = formData.get("city") || "";
+    const shade = formData.get("shade") || "";
+    const message = formData.get("message") || "";
+
+    let text = `Hello Fakhri Mart, I submitted an enquiry on the website.\n\n`;
+    text += `*Name:* ${name}\n`;
+    text += `*Phone:* ${phone}\n`;
+    if (businessType) text += `*Business Type:* ${businessType}\n`;
+    if (product) text += `*Product Interested In:* ${product}\n`;
+    if (quantity) text += `*Quantity Required:* ${quantity}\n`;
+    if (city) text += `*Delivery City:* ${city}\n`;
+    if (shade) text += `*Colour/Shade:* ${shade}\n`;
+    if (message) text += `*Message:* ${message}\n`;
+    text += `\nPlease share catalogue, availability and bulk pricing details. Thank you!`;
+
+    return text;
+  }
+
   function handleSubmit(event) {
     event.preventDefault();
     const form = event.currentTarget;
+    const formData = new FormData(form);
+    const message = buildMessage(formData);
+    const link = createWhatsAppLink(message);
+
     setSubmitted(false);
     setSubmitting(true);
+    setWhatsappLink(link);
+
     submitTimer.current = window.setTimeout(() => {
       setSubmitting(false);
       setSubmitted(true);
       form.reset();
+
+      // Auto-open WhatsApp with the enquiry details
+      window.open(link, "_blank");
     }, 650);
   }
 
@@ -120,8 +146,8 @@ export default function EnquiryForm({ compact = false }) {
       {submitted ? (
         <div className="success-message" role="status" aria-live="polite">
           <span>
-            <strong>Thank you!</strong> Your enquiry has been noted. For faster response, please
-            connect on WhatsApp.
+            <strong>Your enquiry details are ready</strong> — continue on WhatsApp to send them to
+            Fakhri Mart. If the window didn't open automatically, click the button below.
           </span>
           <a className="btn btn-whatsapp" href={whatsappLink} target="_blank" rel="noreferrer">
             <MessageCircle size={18} />

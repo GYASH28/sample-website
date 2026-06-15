@@ -1,8 +1,8 @@
 import { Instagram, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
-import logo from "../assets/fakhri-mart-logo.webp";
 import { businessInfo, createWhatsAppLink, navItems, productCategories } from "../data/siteData.js";
 import Reveal from "./Reveal.jsx";
+import SmartLink from "./SmartLink.jsx";
 import WhatsAppIcon from "./WhatsAppIcon.jsx";
 
 export default function Footer() {
@@ -11,7 +11,7 @@ export default function Footer() {
       <Reveal className="container footer-grid" variant="fade-up">
         <div className="footer-brand">
           <Link to="/" className="brand brand-footer">
-            <img src={logo} alt="Fakhri Mart logo" />
+            <img src="/assets/fakhri-mart-logo.webp" alt="Fakhri Mart logo" />
             <span>
               <strong>{businessInfo.shortName}</strong>
               <small>{businessInfo.tagline}</small>
@@ -32,7 +32,7 @@ export default function Footer() {
           <ul className="footer-links">
             {navItems.slice(0, 7).map((item) => (
               <li key={item.href}>
-                <a href={item.href}>{item.label}</a>
+                <SmartLink to={item.href}>{item.label}</SmartLink>
               </li>
             ))}
           </ul>

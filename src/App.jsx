@@ -1,23 +1,32 @@
+import { Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 import Layout from "./components/Layout.jsx";
-import About from "./pages/About.jsx";
-import Contact from "./pages/Contact.jsx";
-import Enquiry from "./pages/Enquiry.jsx";
-import Gallery from "./pages/Gallery.jsx";
-import Home from "./pages/Home.jsx";
-import Products from "./pages/Products.jsx";
+import LoadingFallback from "./components/LoadingFallback.jsx";
+
+const Home = lazy(() => import("./pages/Home.jsx"));
+const About = lazy(() => import("./pages/About.jsx"));
+const Products = lazy(() => import("./pages/Products.jsx"));
+const ProductDetail = lazy(() => import("./pages/ProductDetail.jsx"));
+const Gallery = lazy(() => import("./pages/Gallery.jsx"));
+const Enquiry = lazy(() => import("./pages/Enquiry.jsx"));
+const Contact = lazy(() => import("./pages/Contact.jsx"));
+const NotFound = lazy(() => import("./pages/NotFound.jsx"));
 
 export default function App() {
   return (
-    <Routes>
-      <Route element={<Layout />}>
-        <Route index element={<Home />} />
-        <Route path="about" element={<About />} />
-        <Route path="products" element={<Products />} />
-        <Route path="gallery" element={<Gallery />} />
-        <Route path="enquiry" element={<Enquiry />} />
-        <Route path="contact" element={<Contact />} />
-      </Route>
-    </Routes>
+    <Suspense fallback={<LoadingFallback />}>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="about" element={<About />} />
+          <Route path="products" element={<Products />} />
+          <Route path="products/:slug" element={<ProductDetail />} />
+          <Route path="gallery" element={<Gallery />} />
+          <Route path="enquiry" element={<Enquiry />} />
+          <Route path="contact" element={<Contact />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
+      </Routes>
+    </Suspense>
   );
 }

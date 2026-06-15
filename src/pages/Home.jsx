@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import logo from "../assets/fakhri-mart-logo.webp";
+import SmartLink from "../components/SmartLink.jsx";
 import CatalogueCta from "../components/CatalogueCta.jsx";
 import CategoryCard from "../components/CategoryCard.jsx";
 import EnquiryForm from "../components/EnquiryForm.jsx";
@@ -72,10 +72,10 @@ export default function Home() {
               with all-India delivery and easy WhatsApp enquiry.
             </p>
             <div className="button-row hero-sequence hero-sequence-actions">
-              <a className="btn btn-primary" href="#categories">
+              <SmartLink to="/#categories" className="btn btn-primary">
                 Explore Products
                 <ArrowRight size={18} />
-              </a>
+              </SmartLink>
               <a className="btn btn-whatsapp" href={createWhatsAppLink(bulkMessage)} target="_blank" rel="noreferrer">
                 <WhatsAppIcon size={18} />
                 WhatsApp Enquiry
@@ -145,6 +145,11 @@ export default function Home() {
           </Reveal>
 
           <Reveal className="filter-bar" variant="fade-up">
+            <img
+              src="/assets/fakhri-mart-logo.webp"
+              alt="Fakhri Mart brand mark"
+              className="hero-logo-medallion"
+            />
             {productFilters.map((filter) => (
               <button
                 key={filter}

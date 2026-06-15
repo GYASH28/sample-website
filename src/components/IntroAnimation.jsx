@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import logo from "../assets/fakhri-mart-logo.webp";
+import { businessInfo } from "../data/siteData.js";
 
 export default function IntroAnimation({ onComplete }) {
   const [phase, setPhase] = useState("logo-in"); // logo-in, drawing, text-in, flying, done
@@ -100,7 +100,7 @@ export default function IntroAnimation({ onComplete }) {
           className={`intro-logo-wrapper ${phase === "logo-in" ? "intro-logo--initial" : "intro-logo--sharp"}`}
           style={phase === "flying" ? flyStyle : {}}
         >
-          <img src={logo} alt="Fakhri Mart logo" className="intro-logo-img" />
+          <img src="/assets/fakhri-mart-logo.webp" alt="Fakhri Mart logo" className="intro-logo-img" />
         </div>
 
         {/* Text and Tagline */}
