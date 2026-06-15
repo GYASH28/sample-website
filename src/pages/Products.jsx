@@ -5,14 +5,17 @@ import PageHero from "../components/PageHero.jsx";
 import ProductCard from "../components/ProductCard.jsx";
 import ProductVisual from "../components/ProductVisual.jsx";
 import Reveal from "../components/Reveal.jsx";
-import { featuredProducts, productCategories, productFilters } from "../data/siteData.js";
+import { featuredProducts, productCategories, productFilters, newArrivals } from "../data/siteData.js";
 import { useRecentlyViewed } from "../hooks/useRecentlyViewed.js";
+import { Search, SlidersHorizontal, ArrowUpDown, XCircle } from "lucide-react";
 
 export default function Products() {
   const [activeFilter, setActiveFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("featured");
 
-  const visibleProducts = useMemo(() => {
+  // Filtering logic
+  const filteredProducts = useMemo(() => {
     let filtered = featuredProducts;
 
     if (activeFilter !== "All") {
@@ -23,12 +26,40 @@ export default function Products() {
       const q = searchQuery.toLowerCase();
       filtered = filtered.filter(
         (product) =>
-          product.name.toLowerCase().includes(q) || product.category.toLowerCase().includes(q),
+          product.name.toLowerCase().includes(q) ||
+          product.category.toLowerCase().includes(q) ||
+          product.suitableFor.toLowerCase().includes(q)
       );
     }
 
     return filtered;
   }, [activeFilter, searchQuery]);
+
+  // Sorting logic
+  const sortedProducts = useMemo(() => {
+    const result = [...filteredProducts];
+
+    if (sortBy === "name-asc") {
+      result.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortBy === "category-asc") {
+      result.sort((a, b) => a.category.localeCompare(b.category));
+    } else if (sortBy === "newest") {
+      const getNewArrivalIndex = (product) => {
+        // Matches product names like "Baby Soft" in siteData.js newArrivals
+        return newArrivals.findIndex((na) => na.name.toLowerCase().includes(product.name.toLowerCase()));
+      };
+      result.sort((a, b) => {
+        const indexA = getNewArrivalIndex(a);
+        const indexB = getNewArrivalIndex(b);
+        if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+        if (indexA !== -1) return -1;
+        if (indexB !== -1) return 1;
+        return 0;
+      });
+    }
+
+    return result;
+  }, [filteredProducts, sortBy]);
 
   const recentSlugs = useRecentlyViewed(null); // null currentSlug because this is a list page
   const recentlyViewedProducts = useMemo(() => {
@@ -36,6 +67,12 @@ export default function Products() {
       .map((recentSlug) => featuredProducts.find((p) => p.slug === recentSlug))
       .filter(Boolean);
   }, [recentSlugs]);
+
+  const handleResetFilters = () => {
+    setActiveFilter("All");
+    setSearchQuery("");
+    setSortBy("featured");
+  };
 
   return (
     <>
@@ -47,6 +84,7 @@ export default function Products() {
         <ProductVisual palette={["#35b8ad", "#f6a7b8", "#f3c65f"]} />
       </PageHero>
 
+      {/* Category Section */}
       <section className="section">
         <div className="container">
           <Reveal className="section-heading" variant="scale-in">
@@ -64,14 +102,16 @@ export default function Products() {
         </div>
       </section>
 
-      <section className="section section-tinted">
+      {/* Filters, Search & Products Section */}
+      <section className="section section-tinted" id="catalogue-browser">
         <div className="container">
           <Reveal className="section-heading" variant="scale-in">
             <p className="eyebrow">Filter Catalogue</p>
-            <h2>Featured products for enquiry</h2>
-            <p>Select a group to quickly view yarns, macrame cords, embroidery threads, accessories and purse materials.</p>
+            <h2>Explore our products catalogue</h2>
+            <p>Use filters, search or sorting options to find the perfect yarn or craft tool for your handmade creations.</p>
           </Reveal>
 
+          {/* Filtering chips row */}
           <Reveal className="filter-bar" variant="fade-up">
             {productFilters.map((filter) => (
               <button
@@ -80,7 +120,6 @@ export default function Products() {
                 className={activeFilter === filter ? "filter-chip active" : "filter-chip"}
                 onClick={() => {
                   setActiveFilter(filter);
-                  setSearchQuery(""); // clear search when clicking category
                 }}
               >
                 {filter}
@@ -88,40 +127,94 @@ export default function Products() {
             ))}
           </Reveal>
 
-          <Reveal variant="fade-up" delay={100} style={{ display: "flex", justifyContent: "center", marginBottom: "30px" }}>
-            <div className="search-wrapper" style={{ maxWidth: "400px", width: "100%", position: "relative" }}>
-              <input
-                type="search"
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ paddingLeft: "16px", borderRadius: "999px" }}
-                aria-label="Search products"
-              />
+          {/* Search, Sort and Summary Control row */}
+          <Reveal variant="fade-up" delay={80}>
+            <div className="catalogue-controls-row">
+              {/* Premium Search Box */}
+              <div className="search-box-premium">
+                <Search size={18} className="search-icon-inside" />
+                <input
+                  type="search"
+                  placeholder="Search by product, category or uses..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  aria-label="Search products"
+                />
+              </div>
+
+              {/* Sorting & Filter controls */}
+              <div className="sorting-controls-wrapper">
+                <SlidersHorizontal size={16} className="control-icon-grey" />
+                <label htmlFor="product-sort-select" className="sr-only">Sort by</label>
+                <select
+                  id="product-sort-select"
+                  className="product-sort-select"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                >
+                  <option value="featured">Featured Order</option>
+                  <option value="name-asc">Alphabetical (A–Z)</option>
+                  <option value="category-asc">Sort by Category</option>
+                  <option value="newest">Newest Arrivals</option>
+                </select>
+                <ArrowUpDown size={15} className="select-arrow-icon" />
+              </div>
             </div>
           </Reveal>
 
-          <div key={`${activeFilter}-${searchQuery}`} className="card-grid product-grid product-grid--filtered" aria-live="polite">
-            {visibleProducts.length > 0 ? (
-              visibleProducts.map((product, index) => (
+          {/* Results Info and Clear All filters button */}
+          <Reveal variant="fade-up" delay={120}>
+            <div className="catalogue-result-summary">
+              <span className="result-count-text">
+                Showing <strong>{sortedProducts.length}</strong> of <strong>{featuredProducts.length}</strong> products
+              </span>
+              {(activeFilter !== "All" || searchQuery.trim() !== "" || sortBy !== "featured") && (
+                <button
+                  type="button"
+                  className="clear-filters-btn"
+                  onClick={handleResetFilters}
+                >
+                  <XCircle size={14} />
+                  Reset Filters
+                </button>
+              )}
+            </div>
+          </Reveal>
+
+          {/* Product Cards Grid */}
+          <div key={`${activeFilter}-${searchQuery}-${sortBy}`} className="card-grid product-grid product-grid--filtered" aria-live="polite">
+            {sortedProducts.length > 0 ? (
+              sortedProducts.map((product, index) => (
                 <Reveal key={product.slug} delay={(index % 6) * 45} variant="scale-in">
                   <ProductCard product={product} />
                 </Reveal>
               ))
             ) : (
-              <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "40px", color: "var(--muted)" }}>
-                No products found matching your search.
+              <div className="empty-results-box" style={{ gridColumn: "1 / -1", textAlign: "center", padding: "60px 20px" }}>
+                <XCircle size={48} className="empty-state-icon" style={{ marginInline: "auto", marginBottom: "16px", color: "var(--muted)" }} />
+                <h3>No products found</h3>
+                <p>We couldn't find any yarns or accessories matching your selection.</p>
+                <button
+                  type="button"
+                  className="btn btn-outline btn-small"
+                  onClick={handleResetFilters}
+                  style={{ marginTop: "16px" }}
+                >
+                  Clear all search and filters
+                </button>
               </div>
             )}
           </div>
         </div>
       </section>
 
+      {/* Recently Viewed Products */}
       {recentlyViewedProducts.length > 0 && (
         <section className="section">
           <div className="container">
             <Reveal variant="fade-up">
               <div className="section-head text-center" style={{ marginBottom: "32px" }}>
+                <p className="eyebrow" style={{ display: "inline-block" }}>History</p>
                 <h2>Recently Viewed</h2>
               </div>
               <div className="card-grid product-grid">

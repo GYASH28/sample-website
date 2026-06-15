@@ -1,7 +1,8 @@
-import { Menu, X } from "lucide-react";
+import { Menu, X, ShoppingBag } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { announcementItems, businessInfo, createWhatsAppLink, navItems } from "../data/siteData.js";
+import { useEnquiryBasket } from "../hooks/useEnquiryBasket.js";
 import SmartLink from "./SmartLink.jsx";
 import WhatsAppIcon from "./WhatsAppIcon.jsx";
 
@@ -21,6 +22,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const { itemsCount } = useEnquiryBasket();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 18);
@@ -57,15 +59,23 @@ export default function Header() {
           </span>
         </SmartLink>
 
-        <button
-          className="menu-toggle"
-          type="button"
-          aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen((open) => !open)}
-        >
-          {menuOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          {/* Mobile-only Enquiry Basket Shortcut */}
+          <SmartLink to="/enquiry" className="mobile-basket-btn" aria-label="Enquiry Basket">
+            <ShoppingBag size={22} />
+            {itemsCount > 0 && <span className="basket-badge-floating">{itemsCount}</span>}
+          </SmartLink>
+
+          <button
+            className="menu-toggle"
+            type="button"
+            aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            {menuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
 
         <nav className={`main-nav ${menuOpen ? "main-nav--open" : ""}`} aria-label="Primary navigation">
           <div className="mobile-nav-header">
@@ -84,6 +94,18 @@ export default function Header() {
               onClick={() => setMenuOpen(false)}
             />
           ))}
+
+          {/* Desktop Enquiry Basket Link */}
+          <SmartLink
+            to="/enquiry"
+            className={location.pathname === "/enquiry" ? "active enquiry-basket-nav" : "enquiry-basket-nav"}
+            onClick={() => setMenuOpen(false)}
+            style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+          >
+            <span>Enquiry</span>
+            {itemsCount > 0 && <span className="basket-badge">{itemsCount}</span>}
+          </SmartLink>
+
           <a
             className="btn btn-small btn-whatsapp"
             href={createWhatsAppLink()}
@@ -99,3 +121,4 @@ export default function Header() {
     </header>
   );
 }
+

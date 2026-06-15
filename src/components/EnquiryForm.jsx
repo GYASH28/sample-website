@@ -6,11 +6,13 @@ import {
   productInterestOptions,
 } from "../data/siteData.js";
 
-export default function EnquiryForm({ compact = false }) {
+export default function EnquiryForm({ compact = false, basket = [], onClearBasket }) {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [whatsappLink, setWhatsappLink] = useState(() => createWhatsAppLink());
   const submitTimer = useRef(null);
+
+  const hasBasket = basket && basket.length > 0;
 
   useEffect(() => {
     return () => {
@@ -22,22 +24,34 @@ export default function EnquiryForm({ compact = false }) {
     const name = formData.get("name") || "";
     const phone = formData.get("phone") || "";
     const businessType = formData.get("businessType") || "";
-    const product = formData.get("product") || "";
-    const quantity = formData.get("quantity") || "";
     const city = formData.get("city") || "";
-    const shade = formData.get("shade") || "";
     const message = formData.get("message") || "";
 
     let text = `Hello Fakhri Mart, I submitted an enquiry on the website.\n\n`;
     text += `*Name:* ${name}\n`;
     text += `*Phone:* ${phone}\n`;
     if (businessType) text += `*Business Type:* ${businessType}\n`;
-    if (product) text += `*Product Interested In:* ${product}\n`;
-    if (quantity) text += `*Quantity Required:* ${quantity}\n`;
     if (city) text += `*Delivery City:* ${city}\n`;
-    if (shade) text += `*Colour/Shade:* ${shade}\n`;
-    if (message) text += `*Message:* ${message}\n`;
-    text += `\nPlease share catalogue, availability and bulk pricing details. Thank you!`;
+
+    if (hasBasket) {
+      text += `\n*Enquiry Items in Basket:*\n`;
+      basket.forEach((item, index) => {
+        const shadeText = item.shade ? ` - Shade: ${item.shade.name}` : "";
+        const variantText = item.variant ? ` (${item.variant})` : "";
+        text += `${index + 1}. *${item.name}*${variantText}${shadeText}\n`;
+        text += `   Quantity: ${item.quantity} ${item.unit}\n`;
+      });
+    } else {
+      const product = formData.get("product") || "";
+      const quantity = formData.get("quantity") || "";
+      const shade = formData.get("shade") || "";
+      if (product) text += `*Product Interested In:* ${product}\n`;
+      if (quantity) text += `*Quantity Required:* ${quantity}\n`;
+      if (shade) text += `*Colour/Shade:* ${shade}\n`;
+    }
+
+    if (message) text += `\n*Message:* ${message}\n`;
+    text += `\nPlease share availability, catalogue, and bulk pricing. Thank you!`;
 
     return text;
   }
@@ -60,11 +74,16 @@ export default function EnquiryForm({ compact = false }) {
 
       // Auto-open WhatsApp with the enquiry details
       window.open(link, "_blank");
+
+      // Clear the basket if callback is present
+      if (hasBasket && onClearBasket) {
+        onClearBasket();
+      }
     }, 650);
   }
 
   return (
-    <div className={`enquiry-card ${compact ? "enquiry-card--compact" : ""}`}>
+    <div className={`enquiry-card ${compact ? "enquiry-card--compact" : ""} ${hasBasket ? "enquiry-card--has-basket" : ""}`}>
       <form className="enquiry-form" onSubmit={handleSubmit}>
         <div className="form-grid">
           <label>
@@ -98,48 +117,60 @@ export default function EnquiryForm({ compact = false }) {
             </select>
           </label>
 
-          <label>
-            Product Interested In
-            <select name="product" defaultValue="" required>
-              <option value="" disabled>
-                Select product
-              </option>
-              {productInterestOptions.map((product) => (
-                <option key={product} value={product}>
-                  {product}
+          {!hasBasket ? (
+            <label>
+              Product Interested In
+              <select name="product" defaultValue="" required>
+                <option value="" disabled>
+                  Select product
                 </option>
-              ))}
-            </select>
-          </label>
+                {productInterestOptions.map((product) => (
+                  <option key={product} value={product}>
+                    {product}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : (
+            <label>
+              Delivery City
+              <input type="text" name="city" autoComplete="address-level2" required />
+            </label>
+          )}
         </div>
 
-        <div className="form-grid">
-          <label>
-            Quantity Required
-            <input type="text" name="quantity" />
-          </label>
-          <label>
-            Delivery City
-            <input type="text" name="city" autoComplete="address-level2" />
-          </label>
-        </div>
+        {!hasBasket ? (
+          <>
+            <div className="form-grid">
+              <label>
+                Quantity Required
+                <input type="text" name="quantity" />
+              </label>
+              <label>
+                Delivery City
+                <input type="text" name="city" autoComplete="address-level2" />
+              </label>
+            </div>
+
+            <label>
+              Colour/Shade Requirement
+              <input type="text" name="shade" />
+            </label>
+          </>
+        ) : null}
 
         <label>
-          Colour/Shade Requirement
-          <input type="text" name="shade" />
-        </label>
-
-        <label>
-          Message
+          Message / Notes
           <textarea
             name="message"
+            placeholder="Any specific requests, delivery directions or custom shade codes..."
             rows={compact ? 4 : 5}
           />
         </label>
 
         <button className="btn btn-primary submit-button" type="submit" disabled={submitting}>
           {submitting ? <span className="button-spinner" aria-hidden="true" /> : <Send size={18} />}
-          {submitting ? "Submitting..." : "Submit Enquiry"}
+          {submitting ? "Preparing WhatsApp..." : "Send Enquiry on WhatsApp"}
         </button>
       </form>
 
