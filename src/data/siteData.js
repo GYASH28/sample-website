@@ -199,6 +199,7 @@ export const featuredProducts = [
     description:
       "Makhhi Thread is a versatile crochet thread ideal for everyday handmade projects. Available in a wide palette of vibrant and pastel shades, it works beautifully for doilies, amigurumi, bags, and decorative craft items. A go-to choice for crochet artists and craft stores across India.",
     suitableFor: "Crochet projects, craft work, decorative handmade pieces",
+    image: "/assets/images/base_makhhi_thread.webp",
     palette: ["#35b8ad", "#f6a7b8", "#f3c65f"],
     colors: [
       { name: "Teal", hex: "#35b8ad" },
@@ -220,6 +221,7 @@ export const featuredProducts = [
     description:
       "A popular 4-ply cotton thread suitable for crochet, knitting, and handmade accessories. Its soft twist and cotton blend make it comfortable to work with for extended sessions. Ideal for bags, amigurumi, wearables, and everyday craft products.",
     suitableFor: "Crochet, knitting, bags, accessories, craft products",
+    image: "/assets/images/base_4_ply_cotton_thread.webp",
     palette: ["#2f9f98", "#ffe2d8", "#c77d90"],
     colors: [
       { name: "Deep Teal", hex: "#2f9f98" },
@@ -241,6 +243,7 @@ export const featuredProducts = [
     description:
       "Cotton Dreamz by Vardhaman is a premium cotton yarn trusted by crochet artists and boutiques. Its smooth texture and rich colour palette make it perfect for wearables, home décor, and resale-ready handmade products.",
     suitableFor: "Crochet artists, boutiques, resellers, yarn stores",
+    image: "/assets/images/base_cotton_dreamz.webp",
     palette: ["#94d4c9", "#ed7fa2", "#f9d976"],
     colors: [
       { name: "Seafoam", hex: "#94d4c9" },
@@ -262,6 +265,7 @@ export const featuredProducts = [
     description:
       "Cool Knit from Vardhaman offers a soft, lightweight yarn perfect for knitting and crochet. Its gentle texture is suitable for wearables, scarves, baby garments, and everyday craft creations that need a soft, comfortable finish.",
     suitableFor: "Knitting, soft craft products, everyday creations",
+    image: "/assets/images/base_cool_knit.webp",
     palette: ["#68b7c8", "#f8b3be", "#8b6f47"],
     colors: [
       { name: "Ocean Blue", hex: "#68b7c8" },

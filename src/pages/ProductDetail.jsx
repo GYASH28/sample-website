@@ -71,14 +71,35 @@ export default function ProductDetail() {
             <div className="product-detail-visual">
               <div className="sticky-visual-wrapper">
                 {(() => {
-                  const categoryData = productCategories.find((c) => c.name === product.category);
-                  if (categoryData?.image) {
+                  const productBaseImage = product.image || productCategories.find((c) => c.name === product.category)?.image;
+                  if (productBaseImage) {
                     return (
-                      <img
-                        src={categoryData.image}
-                        alt={product.name}
-                        className="product-detail-hero-image"
-                      />
+                      <div className="product-image-container" style={{ position: "relative", display: "flex", width: "100%", height: "100%", borderRadius: "var(--radius-lg)", overflow: "hidden", backgroundColor: "#fdfdfd" }}>
+                        <img
+                          src={productBaseImage}
+                          alt={product.name}
+                          className="product-detail-hero-image"
+                          style={{ position: "relative", zIndex: 1, width: "100%", height: "100%", objectFit: "cover" }}
+                        />
+                        {activeColor && (
+                          <div
+                            className="product-color-overlay"
+                            style={{
+                              position: "absolute",
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              backgroundColor: activeColor.hex,
+                              mixBlendMode: "multiply",
+                              opacity: 0.80,
+                              pointerEvents: "none",
+                              zIndex: 2,
+                              transition: "background-color 0.3s ease"
+                            }}
+                          />
+                        )}
+                      </div>
                     );
                   }
                   return null;

@@ -10,11 +10,17 @@ export default function ProductCard({ product, compact = false }) {
   return (
     <article className={`product-card ${compact ? "product-card--compact" : ""}`}>
       <Link to={`/products/${product.slug}`} className="product-card-link-wrapper">
-        {imageUrl && (
-          <div className="product-image-wrapper">
-            <img src={imageUrl} alt={product.name} loading="lazy" className="product-image" />
-          </div>
-        )}
+        {(() => {
+          const productBaseImage = product.image || categoryData?.image;
+          if (productBaseImage) {
+            return (
+              <div className="product-image-wrapper">
+                <img src={productBaseImage} alt={product.name} loading="lazy" className="product-image" />
+              </div>
+            );
+          }
+          return null;
+        })()}
         <div className="product-content">
           <div className="product-card-topline">
             <span className="pill">{product.category}</span>

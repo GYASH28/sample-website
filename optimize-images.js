@@ -13,11 +13,11 @@ const files = fs.readdirSync(sourceDir).filter(file => file.endsWith('.png') || 
 
 async function optimizeImages() {
   for (const file of files) {
-    if (!file.startsWith('hero_') && !file.startsWith('cat_')) continue;
+    if (!file.startsWith('hero_') && !file.startsWith('cat_') && !file.startsWith('base_')) continue;
     
     // We want to extract the base name before the timestamp
     // e.g. cat_bliss_1781508615068.png -> cat_bliss.webp
-    const baseNameMatch = file.match(/^(hero_banner|cat_[a-z_]+)_\d+\.png$/);
+    const baseNameMatch = file.match(/^(hero_banner|cat_[a-z_]+|base_[a-z0-9_]+)_\d+\.png$/);
     if (!baseNameMatch) continue;
     
     const outputName = `${baseNameMatch[1]}.webp`;
