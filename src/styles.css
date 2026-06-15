@@ -391,6 +391,7 @@ textarea:focus-visible {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  min-width: 0;
 }
 
 .brand strong,
@@ -404,6 +405,9 @@ textarea:focus-visible {
   font-weight: 850;
   line-height: 1.15;
   margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .brand small {
