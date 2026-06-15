@@ -100,7 +100,9 @@ export default function Home() {
           </Reveal>
 
           <Reveal className="hero-visual-card" delay={140} variant="scale-in">
-            <ProductVisual palette={["#35b8ad", "#f6a7b8", "#f3c65f"]} />
+            <div className="home-hero-visual">
+              <img src="/assets/images/hero_banner.webp" alt="Vibrant yarn balls and craft accessories" fetchPriority="high" />
+            </div>
             <div className="stock-card stock-card-one">
               <strong>12+ Categories</strong>
               <span>Yarns, threads, beads, bases</span>

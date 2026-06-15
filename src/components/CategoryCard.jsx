@@ -9,6 +9,11 @@ export default function CategoryCard({ category }) {
   return (
     <article className={`category-card tone-border-${category.tone}`}>
       <span className="card-shine" aria-hidden="true" />
+      {category.image && (
+        <div className="category-image-wrapper">
+          <img src={category.image} alt={category.name} loading="lazy" className="category-image" />
+        </div>
+      )}
       <div className="category-card-head">
         <IconBadge name={category.icon} tone={category.tone} />
         <span className="category-count">{category.count}</span>

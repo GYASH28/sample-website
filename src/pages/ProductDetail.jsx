@@ -9,7 +9,7 @@ import ProductVisual from "../components/ProductVisual.jsx";
 import QuantitySelector from "../components/QuantitySelector.jsx";
 import Reveal from "../components/Reveal.jsx";
 import WhatsAppIcon from "../components/WhatsAppIcon.jsx";
-import { createWhatsAppLink, featuredProducts } from "../data/siteData.js";
+import { createWhatsAppLink, featuredProducts, productCategories } from "../data/siteData.js";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
 import { useRecentlyViewed } from "../hooks/useRecentlyViewed.js";
 
@@ -70,10 +70,19 @@ export default function ProductDetail() {
             {/* Left Column: Visual (Sticky on desktop) */}
             <div className="product-detail-visual">
               <div className="sticky-visual-wrapper">
-                <ProductVisual
-                  palette={product.palette}
-                  activeColor={activeColor?.hex}
-                />
+                {(() => {
+                  const categoryData = productCategories.find((c) => c.name === product.category);
+                  if (categoryData?.image) {
+                    return (
+                      <img
+                        src={categoryData.image}
+                        alt={product.name}
+                        className="product-detail-hero-image"
+                      />
+                    );
+                  }
+                  return null;
+                })()}
               </div>
             </div>
 

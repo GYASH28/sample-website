@@ -1,15 +1,20 @@
 import { MessageCircle, Tags } from "lucide-react";
 import { Link } from "react-router-dom";
-import { createWhatsAppLink } from "../data/siteData.js";
-import ProductVisual from "./ProductVisual.jsx";
+import { createWhatsAppLink, productCategories } from "../data/siteData.js";
 
 export default function ProductCard({ product, compact = false }) {
   const message = `Hello Fakhri Mart, I want to ask price for ${product.name}. Please share availability, shade options and bulk pricing details.`;
+  const categoryData = productCategories.find((c) => c.name === product.category);
+  const imageUrl = categoryData?.image;
 
   return (
     <article className={`product-card ${compact ? "product-card--compact" : ""}`}>
       <Link to={`/products/${product.slug}`} className="product-card-link-wrapper">
-        <ProductVisual palette={product.palette} compact />
+        {imageUrl && (
+          <div className="product-image-wrapper">
+            <img src={imageUrl} alt={product.name} loading="lazy" className="product-image" />
+          </div>
+        )}
         <div className="product-content">
           <div className="product-card-topline">
             <span className="pill">{product.category}</span>
