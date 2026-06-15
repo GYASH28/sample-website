@@ -1750,6 +1750,14 @@ textarea {
     transform 160ms ease;
 }
 
+input[type="checkbox"],
+input[type="radio"] {
+  width: auto;
+  padding: 0;
+  accent-color: var(--teal-dark);
+  cursor: pointer;
+}
+
 textarea {
   resize: vertical;
 }
