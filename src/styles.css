@@ -1033,6 +1033,16 @@ textarea:focus-visible {
   gap: 20px;
 }
 
+.card-grid > .reveal {
+  display: flex;
+  height: 100%;
+}
+
+.card-grid > .reveal > * {
+  flex: 1;
+  width: 100%;
+}
+
 .category-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
@@ -1116,6 +1126,8 @@ textarea:focus-visible {
 .contact-strip-card {
   min-height: 100%;
   padding: 22px;
+  display: flex;
+  flex-direction: column;
 }
 
 .category-card-head,
@@ -1124,6 +1136,10 @@ textarea:focus-visible {
   align-items: center;
   justify-content: space-between;
   gap: 14px;
+}
+
+.category-actions {
+  margin-top: auto;
 }
 
 .category-card-head {
