@@ -69,7 +69,7 @@ export default function Header() {
 
         <nav className={`main-nav ${menuOpen ? "main-nav--open" : ""}`} aria-label="Primary navigation">
           <div className="mobile-nav-header">
-            <img src={logo} alt="Fakhri Mart logo" className="mobile-nav-logo" />
+            <img src="/assets/fakhri-mart-logo.webp" alt="Fakhri Mart logo" className="mobile-nav-logo" />
             <div className="mobile-nav-text">
               <strong>{businessInfo.shortName}</strong>
               <small>{businessInfo.descriptor}</small>
