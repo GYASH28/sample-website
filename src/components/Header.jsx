@@ -1,8 +1,10 @@
-import { Menu, X, ShoppingBag } from "lucide-react";
+import { Menu, X, ShoppingBag, Heart, ArrowUpDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { announcementItems, businessInfo, createWhatsAppLink, navItems } from "../data/siteData.js";
 import { useEnquiryBasket } from "../hooks/useEnquiryBasket.js";
+import { useWishlist } from "../hooks/useWishlist.js";
+import { useCompare } from "../hooks/useCompare.js";
 import SmartLink from "./SmartLink.jsx";
 import WhatsAppIcon from "./WhatsAppIcon.jsx";
 
@@ -23,6 +25,8 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const { itemsCount } = useEnquiryBasket();
+  const { count: wishlistCount } = useWishlist();
+  const { count: compareCount } = useCompare();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 18);
@@ -59,10 +63,16 @@ export default function Header() {
           </span>
         </SmartLink>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          {/* Mobile Favorites Shortcut */}
+          <SmartLink to="/enquiry?tab=favorites" className="mobile-basket-btn" aria-label="Favorites">
+            <Heart size={21} />
+            {wishlistCount > 0 && <span className="basket-badge-floating bg-rose">{wishlistCount}</span>}
+          </SmartLink>
+
           {/* Mobile-only Enquiry Basket Shortcut */}
           <SmartLink to="/enquiry" className="mobile-basket-btn" aria-label="Enquiry Basket">
-            <ShoppingBag size={22} />
+            <ShoppingBag size={21} />
             {itemsCount > 0 && <span className="basket-badge-floating">{itemsCount}</span>}
           </SmartLink>
 
@@ -95,6 +105,18 @@ export default function Header() {
             />
           ))}
 
+          {/* Desktop Favorites Link */}
+          <SmartLink
+            to="/enquiry?tab=favorites"
+            className="favorites-nav-link"
+            onClick={() => setMenuOpen(false)}
+            style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+          >
+            <Heart size={16} />
+            <span>Favorites</span>
+            {wishlistCount > 0 && <span className="basket-badge wishlist-badge">{wishlistCount}</span>}
+          </SmartLink>
+
           {/* Desktop Enquiry Basket Link */}
           <SmartLink
             to="/enquiry"
@@ -105,6 +127,14 @@ export default function Header() {
             <span>Enquiry</span>
             {itemsCount > 0 && <span className="basket-badge">{itemsCount}</span>}
           </SmartLink>
+
+          {/* Compare Count Indicator */}
+          {compareCount > 0 && (
+            <span className="compare-count-nav-item" style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+              <ArrowUpDown size={15} />
+              <span>Compare ({compareCount})</span>
+            </span>
+          )}
 
           <a
             className="btn btn-small btn-whatsapp"

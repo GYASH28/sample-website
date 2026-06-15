@@ -199,7 +199,14 @@ export const featuredProducts = [
     description:
       "Makhhi Thread is a versatile crochet thread ideal for everyday handmade projects. Available in a wide palette of vibrant and pastel shades, it works beautifully for doilies, amigurumi, bags, and decorative craft items. A go-to choice for crochet artists and craft stores across India.",
     suitableFor: "Crochet projects, craft work, decorative handmade pieces",
-    image: "/assets/images/base_makhhi_thread.webp",
+    image: "/assets/images/products/makhhi-thread/hero.webp",
+    galleryImages: [
+      "/assets/images/products/makhhi-thread/gallery-1.webp",
+      "/assets/images/products/makhhi-thread/gallery-2.webp"
+    ],
+    type: "crochet-thread",
+    brand: "Bliss",
+    tags: ["Crochet", "Beginner Friendly", "Retail", "Bulk Orders"],
     palette: ["#35b8ad", "#f6a7b8", "#f3c65f"],
     colors: [
       { name: "Teal", hex: "#35b8ad" },
@@ -221,7 +228,14 @@ export const featuredProducts = [
     description:
       "A popular 4-ply cotton thread suitable for crochet, knitting, and handmade accessories. Its soft twist and cotton blend make it comfortable to work with for extended sessions. Ideal for bags, amigurumi, wearables, and everyday craft products.",
     suitableFor: "Crochet, knitting, bags, accessories, craft products",
-    image: "/assets/images/base_4_ply_cotton_thread.webp",
+    image: "/assets/images/products/4-ply-cotton-thread/hero.webp",
+    galleryImages: [
+      "/assets/images/products/4-ply-cotton-thread/gallery-1.webp",
+      "/assets/images/products/4-ply-cotton-thread/gallery-2.webp"
+    ],
+    type: "cotton-thread",
+    brand: "Bliss",
+    tags: ["Crochet", "Knitting", "Wearables", "Retail", "Bulk Orders"],
     palette: ["#2f9f98", "#ffe2d8", "#c77d90"],
     colors: [
       { name: "Deep Teal", hex: "#2f9f98" },
@@ -243,7 +257,14 @@ export const featuredProducts = [
     description:
       "Cotton Dreamz by Vardhaman is a premium cotton yarn trusted by crochet artists and boutiques. Its smooth texture and rich colour palette make it perfect for wearables, home décor, and resale-ready handmade products.",
     suitableFor: "Crochet artists, boutiques, resellers, yarn stores",
-    image: "/assets/images/base_cotton_dreamz.webp",
+    image: "/assets/images/products/cotton-dreamz/hero.webp",
+    galleryImages: [
+      "/assets/images/products/cotton-dreamz/gallery-1.webp",
+      "/assets/images/products/cotton-dreamz/gallery-2.webp"
+    ],
+    type: "yarn-ball",
+    brand: "Vardhaman",
+    tags: ["Crochet", "Boutique", "Reseller", "Wearables", "Bulk Orders"],
     palette: ["#94d4c9", "#ed7fa2", "#f9d976"],
     colors: [
       { name: "Seafoam", hex: "#94d4c9" },
@@ -265,7 +286,14 @@ export const featuredProducts = [
     description:
       "Cool Knit from Vardhaman offers a soft, lightweight yarn perfect for knitting and crochet. Its gentle texture is suitable for wearables, scarves, baby garments, and everyday craft creations that need a soft, comfortable finish.",
     suitableFor: "Knitting, soft craft products, everyday creations",
-    image: "/assets/images/base_cool_knit.webp",
+    image: "/assets/images/products/cool-knit/hero.webp",
+    galleryImages: [
+      "/assets/images/products/cool-knit/gallery-1.webp",
+      "/assets/images/products/cool-knit/gallery-2.webp"
+    ],
+    type: "yarn-ball",
+    brand: "Vardhaman",
+    tags: ["Knitting", "Soft Yarn", "Wearables", "Retail", "Bulk Orders"],
     palette: ["#68b7c8", "#f8b3be", "#8b6f47"],
     colors: [
       { name: "Ocean Blue", hex: "#68b7c8" },
@@ -286,6 +314,14 @@ export const featuredProducts = [
     description:
       "Cotone by Vardhaman is a pure cotton yarn with a smooth, mercerized finish. It produces clean, defined stitches and is ideal for crochet wearables, handmade accessories, and boutique-quality products. Available in elegant shades.",
     suitableFor: "Crochet wearables, handmade accessories, boutique orders",
+    image: "/assets/images/products/cotone/hero.webp",
+    galleryImages: [
+      "/assets/images/products/cotone/gallery-1.webp",
+      "/assets/images/products/cotone/gallery-2.webp"
+    ],
+    type: "yarn-ball",
+    brand: "Vardhaman",
+    tags: ["Crochet", "Boutique", "Mercerized", "Wearables", "Bulk Orders"],
     palette: ["#1e9f92", "#f7c8d1", "#f1f7ee"],
     colors: [
       { name: "Emerald Teal", hex: "#1e9f92" },
@@ -306,6 +342,14 @@ export const featuredProducts = [
     description:
       "Baby Soft by Vardhaman is an ultra-gentle yarn designed for baby garments, soft toys, and delicate knitting projects. Its hypoallergenic texture and pastel colour range make it a favourite among makers creating gifts and baby products.",
     suitableFor: "Baby projects, soft toys, light knitting and crochet",
+    image: "/assets/images/products/baby-soft/hero.webp",
+    galleryImages: [
+      "/assets/images/products/baby-soft/gallery-1.webp",
+      "/assets/images/products/baby-soft/gallery-2.webp"
+    ],
+    type: "yarn-ball",
+    brand: "Vardhaman",
+    tags: ["Crochet", "Knitting", "Hypoallergenic", "Baby Wear", "Bulk Orders", "New Arrivals"],
     palette: ["#f7a9bd", "#d8f2ee", "#b7dfd8"],
     colors: [
       { name: "Candy Pink", hex: "#f7a9bd" },
@@ -327,6 +371,14 @@ export const featuredProducts = [
     description:
       "Blankie by Ganga is a plush, chunky yarn perfect for blankets, throws, and cozy home décor. Its soft, bulky texture works up quickly for satisfying projects. Available in soothing, muted tones ideal for living spaces and gifting.",
     suitableFor: "Blankets, soft decor, crochet and knitting projects",
+    image: "/assets/images/products/blankie/hero.webp",
+    galleryImages: [
+      "/assets/images/products/blankie/gallery-1.webp",
+      "/assets/images/products/blankie/gallery-2.webp"
+    ],
+    type: "yarn-ball",
+    brand: "Ganga",
+    tags: ["Crochet", "Knitting", "Chunky", "Home Decor", "Bulk Orders"],
     palette: ["#85c7bd", "#f2d0d8", "#ddc49a"],
     colors: [
       { name: "Sage Teal", hex: "#85c7bd" },
@@ -347,6 +399,14 @@ export const featuredProducts = [
     description:
       "Spectrum by Ganga is a vibrant yarn range designed for colour-rich projects. Each shade is selected for maximum visual impact, making it ideal for boutique products, statement pieces, and craft makers who want their work to stand out.",
     suitableFor: "Bright projects, boutiques, resellers, craft makers",
+    image: "/assets/images/products/spectrum/hero.webp",
+    galleryImages: [
+      "/assets/images/products/spectrum/gallery-1.webp",
+      "/assets/images/products/spectrum/gallery-2.webp"
+    ],
+    type: "yarn-ball",
+    brand: "Ganga",
+    tags: ["Crochet", "Knitting", "Vibrant Colors", "Boutique", "Bulk Orders", "New Arrivals"],
     palette: ["#e86f9e", "#32b8ac", "#f5c84b"],
     colors: [
       { name: "Fuchsia", hex: "#e86f9e" },
@@ -368,6 +428,14 @@ export const featuredProducts = [
     description:
       "Superstitch by Ganga is a versatile thread suitable for crochet, craft finishing, and decorative stitching. Its reliable twist and colour fastness make it a dependable choice for both beginners and experienced makers.",
     suitableFor: "Crochet, craft finishing, decorative stitching",
+    image: "/assets/images/products/superstitch/hero.webp",
+    galleryImages: [
+      "/assets/images/products/superstitch/gallery-1.webp",
+      "/assets/images/products/superstitch/gallery-2.webp"
+    ],
+    type: "yarn-ball",
+    brand: "Ganga",
+    tags: ["Crochet", "Sewing", "Craft Finishing", "Retail", "Bulk Orders"],
     palette: ["#296f68", "#f9a8b7", "#f6e6b6"],
     colors: [
       { name: "Forest Teal", hex: "#296f68" },
@@ -388,6 +456,14 @@ export const featuredProducts = [
     description:
       "T-Shirt Yarn is a chunky, flat yarn made from jersey fabric strips. Perfect for bags, baskets, mats, and home décor, it works up quickly with large hooks. Available in solid and multicolour options in 250gm and 500gm packs.",
     suitableFor: "Bags, baskets, mats, decor, chunky handmade projects",
+    image: "/assets/images/products/t-shirt-yarn/hero.webp",
+    galleryImages: [
+      "/assets/images/products/t-shirt-yarn/gallery-1.webp",
+      "/assets/images/products/t-shirt-yarn/gallery-2.webp"
+    ],
+    type: "fabric-yarn",
+    brand: "Fakhri",
+    tags: ["Crochet", "Bag Making", "Baskets", "Chunky", "Bulk Orders", "New Arrivals"],
     palette: ["#32b8ac", "#ed7fa2", "#b9855b"],
     colors: [
       { name: "Teal", hex: "#32b8ac" },
@@ -410,6 +486,14 @@ export const featuredProducts = [
     description:
       "Single twist macrame cord available in 3MM and 4MM thickness. Its smooth, single-strand construction is ideal for wall hangings, plant hangers, dreamcatchers, and bag work. Available in natural and coloured options.",
     suitableFor: "Macrame decor, wall hangings, plant hangers, bag work",
+    image: "/assets/images/products/single-macrame-cord/hero.webp",
+    galleryImages: [
+      "/assets/images/products/single-macrame-cord/gallery-1.webp",
+      "/assets/images/products/single-macrame-cord/gallery-2.webp"
+    ],
+    type: "macrame-cord",
+    brand: "Fakhri",
+    tags: ["Macrame", "Wall Hangers", "Plant Hangers", "Bags", "Bulk Orders", "New Arrivals"],
     palette: ["#d8b38f", "#35b8ad", "#f7c8d1"],
     colors: [
       { name: "Natural Beige", hex: "#d8b38f" },
@@ -431,6 +515,14 @@ export const featuredProducts = [
     description:
       "Twisted macrame cord with a structured, rope-like finish. Available in 3MM and 4MM, its multi-strand twist adds texture and definition to macrame projects, handles, and accessories. Great for structured wall hangings and bag details.",
     suitableFor: "Structured macrame projects, decor, handles, accessories",
+    image: "/assets/images/products/twisted-macrame-cord/hero.webp",
+    galleryImages: [
+      "/assets/images/products/twisted-macrame-cord/gallery-1.webp",
+      "/assets/images/products/twisted-macrame-cord/gallery-2.webp"
+    ],
+    type: "macrame-cord",
+    brand: "Fakhri",
+    tags: ["Macrame", "Structured Weaves", "Handles", "Bags", "Bulk Orders"],
     palette: ["#9a704f", "#f2b8c6", "#6dc7bd"],
     colors: [
       { name: "Coffee Brown", hex: "#9a704f" },
@@ -451,6 +543,14 @@ export const featuredProducts = [
     description:
       "Anchor Lacchi is a classic embroidery thread lacchi known for its vibrant colours and smooth texture. Ideal for detailed embroidery, surface work, and craft decoration. Available in a wide range of shades for every design need.",
     suitableFor: "Embroidery, detailing, surface work, craft decoration",
+    image: "/assets/images/products/anchor-lacchi/hero.webp",
+    galleryImages: [
+      "/assets/images/products/anchor-lacchi/gallery-1.webp",
+      "/assets/images/products/anchor-lacchi/gallery-2.webp"
+    ],
+    type: "embroidery-floss",
+    brand: "Anchor",
+    tags: ["Embroidery", "Surface Work", "Needlework", "Retail", "Bulk Orders"],
     palette: ["#db5d8b", "#27a69b", "#f5c84b"],
     colors: [
       { name: "Magenta", hex: "#db5d8b" },
@@ -472,6 +572,14 @@ export const featuredProducts = [
     description:
       "Doli Lacchi is a vibrant embroidery thread lacchi for decorative stitching, craft projects, and handmade detailing. Its colour range spans bright and subtle shades, making it versatile for both traditional and modern embroidery work.",
     suitableFor: "Decorative stitching, craft projects, handmade detailing",
+    image: "/assets/images/products/doli-lacchi/hero.webp",
+    galleryImages: [
+      "/assets/images/products/doli-lacchi/gallery-1.webp",
+      "/assets/images/products/doli-lacchi/gallery-2.webp"
+    ],
+    type: "embroidery-floss",
+    brand: "Doli",
+    tags: ["Embroidery", "Decorative Stitching", "Needlework", "Retail", "Bulk Orders"],
     palette: ["#9a5cc8", "#f2a7b7", "#45b8ad"],
     colors: [
       { name: "Purple", hex: "#9a5cc8" },
@@ -492,6 +600,14 @@ export const featuredProducts = [
     description:
       "Quality crochet hooks available in a variety of sizes suitable for different yarn weights. Essential for every crochet artist, from beginners learning their first stitches to experienced makers working on intricate patterns. Size details available on request.",
     suitableFor: "Crochet artists, beginners, boutiques, craft stores",
+    image: "/assets/images/products/crochet-hook/hero.webp",
+    galleryImages: [
+      "/assets/images/products/crochet-hook/gallery-1.webp",
+      "/assets/images/products/crochet-hook/gallery-2.webp"
+    ],
+    type: "hook",
+    brand: "Fakhri",
+    tags: ["Accessories", "Crochet Tools", "Essential", "Retail", "Bulk Orders"],
     palette: ["#35b8ad", "#f3c65f", "#ffb0bd"],
     colors: [
       { name: "Teal", hex: "#35b8ad" },
@@ -511,6 +627,14 @@ export const featuredProducts = [
     description:
       "Premium purse handles in wooden, chain, pearl, and decorative styles. These finishing accessories elevate handmade crochet bags and purses to boutique quality. Available in various sizes and finishes to match any design aesthetic.",
     suitableFor: "Crochet bags, handmade purses, boutique accessories",
+    image: "/assets/images/products/purse-handles/hero.webp",
+    galleryImages: [
+      "/assets/images/products/purse-handles/gallery-1.webp",
+      "/assets/images/products/purse-handles/gallery-2.webp"
+    ],
+    type: "purse-handle",
+    brand: "Fakhri",
+    tags: ["Accessories", "Bag Making", "Finishing Hardware", "Bulk Orders", "New Arrivals"],
     palette: ["#c09162", "#f3b4c2", "#3aaea5"],
     colors: [
       { name: "Wooden Brown", hex: "#c09162" },
@@ -522,7 +646,7 @@ export const featuredProducts = [
     badges: ["Purse", "Finishing"],
     relatedSlugs: ["t-shirt-yarn", "crochet-hook"],
   },
-];
+];;
 
 export const newArrivals = [
   "Vardhaman Baby Soft",

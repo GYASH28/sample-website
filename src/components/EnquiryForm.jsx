@@ -1,4 +1,4 @@
-import { MessageCircle, Send } from "lucide-react";
+import { MessageCircle, Send, Copy, Check } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
   businessTypes,
@@ -7,9 +7,12 @@ import {
 } from "../data/siteData.js";
 
 export default function EnquiryForm({ compact = false, basket = [], onClearBasket }) {
+  const formRef = useRef(null);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [whatsappLink, setWhatsappLink] = useState(() => createWhatsAppLink());
+  const [compiledMessage, setCompiledMessage] = useState("");
+  const [copied, setCopied] = useState(false);
   const submitTimer = useRef(null);
 
   const hasBasket = basket && basket.length > 0;
@@ -66,12 +69,12 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
     setSubmitted(false);
     setSubmitting(true);
     setWhatsappLink(link);
+    setCompiledMessage(message);
 
     submitTimer.current = window.setTimeout(() => {
       setSubmitting(false);
       setSubmitted(true);
-      form.reset();
-
+      
       // Auto-open WhatsApp with the enquiry details
       window.open(link, "_blank");
 
@@ -79,12 +82,21 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
       if (hasBasket && onClearBasket) {
         onClearBasket();
       }
+      form.reset();
     }, 650);
   }
 
+  const handleCopySummary = () => {
+    if (compiledMessage) {
+      navigator.clipboard.writeText(compiledMessage);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
   return (
     <div className={`enquiry-card ${compact ? "enquiry-card--compact" : ""} ${hasBasket ? "enquiry-card--has-basket" : ""}`}>
-      <form className="enquiry-form" onSubmit={handleSubmit}>
+      <form ref={formRef} className="enquiry-form" onSubmit={handleSubmit}>
         <div className="form-grid">
           <label>
             Name
@@ -175,15 +187,25 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
       </form>
 
       {submitted ? (
-        <div className="success-message" role="status" aria-live="polite">
-          <span>
-            <strong>Your enquiry details are ready</strong> — continue on WhatsApp to send them to
-            Fakhri Mart. If the window didn't open automatically, click the button below.
+        <div className="success-message" role="status" aria-live="polite" style={{ marginTop: "20px", padding: "16px", background: "var(--primary-light, #eaf6f5)", borderRadius: "6px", border: "1px solid rgba(0,0,0,0.05)" }}>
+          <span style={{ display: "block", marginBottom: "12px", fontSize: "14px", color: "var(--text-dark)" }}>
+            <strong>Your enquiry details are ready!</strong> If the WhatsApp window did not open automatically, use the buttons below.
           </span>
-          <a className="btn btn-whatsapp" href={whatsappLink} target="_blank" rel="noreferrer">
-            <MessageCircle size={18} />
-            Continue on WhatsApp
-          </a>
+          <div className="success-actions-flex" style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+            <a className="btn btn-whatsapp" href={whatsappLink} target="_blank" rel="noreferrer" style={{ flexGrow: 1, display: "inline-flex", justifyContent: "center" }}>
+              <MessageCircle size={18} />
+              Continue on WhatsApp
+            </a>
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={handleCopySummary}
+              style={{ display: "inline-flex", alignItems: "center", gap: "6px", flexGrow: 1, justifyContent: "center" }}
+            >
+              {copied ? <Check size={16} /> : <Copy size={16} />}
+              {copied ? "Summary Copied!" : "Copy Summary Text"}
+            </button>
+          </div>
         </div>
       ) : null}
     </div>

@@ -1,11 +1,18 @@
 import {
   ArrowRight,
   CheckCircle2,
-  FileText,
   Instagram,
   MapPin,
   Phone,
+  Scissors,
+  Wand2,
   Sparkles,
+  ShoppingBag,
+  Heart,
+  HelpCircle,
+  Truck,
+  Percent,
+  Check
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
@@ -33,19 +40,37 @@ import {
   productCategories,
   productFilters,
   testimonials,
-  trustBadges,
   whyChooseUs,
 } from "../data/siteData.js";
 
 const heroWords = "Colourful Yarns & Craft Essentials".split(" ");
 
+const CRAFT_USE_CASES = [
+  { name: "Crochet", tag: "Crochet", desc: "Hooks, yarns, cotton threads, and amigurumi supplies.", icon: "Sparkles" },
+  { name: "Knitting", tag: "Knitting", desc: "Soft Vardhaman wools, Cool Knit, and acrylic yarns.", icon: "Wand2" },
+  { name: "Macrame", tag: "Macrame", desc: "Single & twisted cotton ropes, rings, and wall decor.", icon: "Scissors" },
+  { name: "Embroidery", tag: "Embroidery", desc: "Anchor & Doli lacchi threads for fine needlework.", icon: "Sparkles" },
+  { name: "Bag Making", tag: "Bag Making", desc: "T-Shirt yarns, leather bases, and wooden purse handles.", icon: "ShoppingBag" },
+  { name: "Accessories", tag: "Accessories", desc: "Steel rings, handles, purse locks, and starter kits.", icon: "Wand2" }
+];
+
 export default function Home() {
   const [activeFilter, setActiveFilter] = useState("All");
 
   const visibleProducts = useMemo(() => {
-    if (activeFilter === "All") return featuredProducts;
-    return featuredProducts.filter((product) => product.filters.includes(activeFilter));
+    if (activeFilter === "All") return featuredProducts.slice(0, 8); // Limit to 8 featured on home
+    return featuredProducts.filter((product) => product.filters.includes(activeFilter)).slice(0, 8);
   }, [activeFilter]);
+
+  // Curated Best Sellers List
+  const bestSellers = useMemo(() => {
+    return [
+      featuredProducts.find(p => p.slug === "makhhi-thread"),
+      featuredProducts.find(p => p.slug === "cotton-dreamz"),
+      featuredProducts.find(p => p.slug === "single-macrame-cord"),
+      featuredProducts.find(p => p.slug === "purse-handles")
+    ].filter(Boolean);
+  }, []);
 
   return (
     <>
@@ -72,8 +97,8 @@ export default function Home() {
               with all-India delivery and easy WhatsApp enquiry.
             </p>
             <div className="button-row hero-sequence hero-sequence-actions">
-              <SmartLink to="/#categories" className="btn btn-primary">
-                Explore Products
+              <SmartLink to="/products" className="btn btn-primary">
+                Explore Catalogue
                 <ArrowRight size={18} />
               </SmartLink>
               <a className="btn btn-whatsapp" href={createWhatsAppLink(bulkMessage)} target="_blank" rel="noreferrer">
@@ -88,7 +113,7 @@ export default function Home() {
               {[
                 "All India Delivery",
                 "12+ Categories",
-                "Bulk Orders Available",
+                "Wholesale Friendly",
                 "WhatsApp Catalogue",
               ].map((badge, index) => (
                 <span key={badge} style={{ "--badge-index": index }}>
@@ -115,6 +140,7 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Category Section */}
       <section className="section" id="categories">
         <div className="container">
           <Reveal className="section-heading" variant="scale-in">
@@ -126,16 +152,104 @@ export default function Home() {
             </p>
           </Reveal>
           <div className="card-grid category-grid">
-            {productCategories.map((category, index) => (
+            {productCategories.slice(0, 8).map((category, index) => (
               <Reveal key={category.name} delay={(index % 4) * 65} variant="fade-up">
                 <CategoryCard category={category} />
+              </Reveal>
+            ))}
+          </div>
+          <div style={{ textAlign: "center", marginTop: "40px" }}>
+            <Link to="/products" className="btn btn-outline">
+              View All Categories
+              <ArrowRight size={16} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Shop by Craft / Use Case Section */}
+      <section className="section section-tinted" id="shop-by-craft">
+        <div className="container">
+          <Reveal className="section-heading" variant="scale-in">
+            <p className="eyebrow">Shop by Craft</p>
+            <h2>Find materials for your specific project</h2>
+            <p>Select your favorite needlework or weaving hobby and browse tailored supplies.</p>
+          </Reveal>
+          <div className="card-grid use-cases-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "20px" }}>
+            {CRAFT_USE_CASES.map((craft, idx) => (
+              <Reveal key={craft.name} delay={idx * 50} variant="fade-up">
+                <Link to={`/products?tag=${craft.tag}`} className="craft-discovery-card" style={{ display: "block", background: "#fff", padding: "24px", borderRadius: "10px", border: "1px solid rgba(0,0,0,0.05)", textDecoration: "none", color: "inherit", transition: "transform 0.2s ease, box-shadow 0.2s ease" }}>
+                  <div className="craft-card-icon" style={{ marginBottom: "16px", color: "var(--primary)" }}>
+                    {craft.name === "Bag Making" ? <ShoppingBag size={28} /> : craft.name === "Macrame" ? <Scissors size={28} /> : <Sparkles size={28} />}
+                  </div>
+                  <h3 style={{ fontSize: "18px", marginBottom: "8px", fontWeight: "600" }}>{craft.name}</h3>
+                  <p style={{ fontSize: "14px", color: "var(--text-muted)", marginBottom: "16px" }}>{craft.desc}</p>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: "600", color: "var(--primary)" }}>
+                    Browse {craft.name} <ArrowRight size={14} />
+                  </span>
+                </Link>
               </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="section section-tinted" id="products">
+      {/* Curated Best Sellers Row */}
+      <section className="section" id="best-sellers">
+        <div className="container">
+          <Reveal className="section-heading" variant="scale-in">
+            <p className="eyebrow">Best Sellers</p>
+            <h2>Reseller & maker favorite products</h2>
+            <p>Our top-enquired yarns and accessories ready for immediate catalogue orders.</p>
+          </Reveal>
+          <div className="card-grid product-grid">
+            {bestSellers.map((product, index) => (
+              <Reveal key={`best-${product.slug}`} delay={index * 80} variant="scale-in">
+                <ProductCard product={product} />
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How Enquiry Works Stepper */}
+      <section className="section bg-dark text-light enquiry-how-it-works-home" style={{ background: "#211f1d", color: "#f5f0e8" }}>
+        <div className="container">
+          <Reveal className="section-heading text-center" variant="scale-in">
+            <p className="eyebrow" style={{ color: "var(--primary)" }}>Order Flow</p>
+            <h2 style={{ color: "#fff" }}>How the Enquiry Process Works</h2>
+            <p style={{ color: "rgba(255,255,255,0.7)", maxWidth: "560px", marginInline: "auto" }}>
+              Since Fakhri Mart supplies custom wholesale orders and shade varieties, we process final payments and deliveries manually on WhatsApp.
+            </p>
+          </Reveal>
+          
+          <div className="how-it-works-timeline" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "32px", marginTop: "48px" }}>
+            <div className="timeline-step">
+              <span className="step-badge" style={{ display: "inline-flex", width: "40px", height: "40px", borderRadius: "50%", background: "var(--primary)", color: "#fff", alignItems: "center", justifyContent: "center", fontWeight: "700", marginBottom: "16px" }}>1</span>
+              <h3 style={{ fontSize: "18px", marginBottom: "10px", color: "#fff" }}>Add to Basket</h3>
+              <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.6)" }}>Browse our range of 12+ categories. Choose your desired shades and quantities, and add them to your client-side Enquiry Basket.</p>
+            </div>
+            <div className="timeline-step">
+              <span className="step-badge" style={{ display: "inline-flex", width: "40px", height: "40px", borderRadius: "50%", background: "var(--primary)", color: "#fff", alignItems: "center", justifyContent: "center", fontWeight: "700", marginBottom: "16px" }}>2</span>
+              <h3 style={{ fontSize: "18px", marginBottom: "10px", color: "#fff" }}>Aggregate Quote</h3>
+              <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.6)" }}>View your basket checklist on the Enquiry tab. Adjust quantities, review selected shades, and click "Submit Enquiry".</p>
+            </div>
+            <div className="timeline-step">
+              <span className="step-badge" style={{ display: "inline-flex", width: "40px", height: "40px", borderRadius: "50%", background: "var(--primary)", color: "#fff", alignItems: "center", justifyContent: "center", fontWeight: "700", marginBottom: "16px" }}>3</span>
+              <h3 style={{ fontSize: "18px", marginBottom: "10px", color: "#fff" }}>WhatsApp Connect</h3>
+              <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.6)" }}>Your browser compile a clean summarized message with all products, quantities, and color codes, opening a direct chat with our team.</p>
+            </div>
+            <div className="timeline-step">
+              <span className="step-badge" style={{ display: "inline-flex", width: "40px", height: "40px", borderRadius: "50%", background: "var(--primary)", color: "#fff", alignItems: "center", justifyContent: "center", fontWeight: "700", marginBottom: "16px" }}>4</span>
+              <h3 style={{ fontSize: "18px", marginBottom: "10px", color: "#fff" }}>Confirm & Deliver</h3>
+              <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.6)" }}>We will confirm exact stock availability, share verified digital shade cards on request, calculate final shipping quotes, and complete the order.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Catalogue Grid */}
+      <section className="section" id="products">
         <div className="container">
           <Reveal className="section-heading" variant="scale-in">
             <p className="eyebrow">Featured Catalogue</p>
@@ -171,10 +285,18 @@ export default function Home() {
               </Reveal>
             ))}
           </div>
+
+          <div style={{ textAlign: "center", marginTop: "40px" }}>
+            <Link to="/products" className="btn btn-outline">
+              Browse Entire Catalogue
+              <ArrowRight size={16} />
+            </Link>
+          </div>
         </div>
       </section>
 
-      <section className="section" id="new-arrivals">
+      {/* New Arrivals Section */}
+      <section className="section section-tinted" id="new-arrivals">
         <div className="container">
           <Reveal className="section-heading" variant="scale-in">
             <p className="eyebrow">New Arrivals</p>

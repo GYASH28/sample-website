@@ -14,7 +14,10 @@ import {
   Info,
   ChevronDown,
   ChevronUp,
-  Tags
+  Tags,
+  Heart,
+  ArrowUpDown,
+  Maximize2
 } from "lucide-react";
 import { useMemo, useState, useEffect } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
@@ -22,6 +25,8 @@ import CatalogueCta from "../components/CatalogueCta.jsx";
 import ProductCard from "../components/ProductCard.jsx";
 import { createWhatsAppLink, featuredProducts, productCategories } from "../data/siteData.js";
 import { useEnquiryBasket } from "../hooks/useEnquiryBasket.js";
+import { useWishlist } from "../hooks/useWishlist.js";
+import { useCompare } from "../hooks/useCompare.js";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
 import { useRecentlyViewed } from "../hooks/useRecentlyViewed.js";
 
@@ -40,6 +45,12 @@ export default function ProductDetail() {
   });
 
   const { add: addToBasket } = useEnquiryBasket();
+  const { has: isInWishlist, toggle: toggleWishlist } = useWishlist();
+  const { has: isInCompare, toggle: toggleCompare } = useCompare();
+
+  const isFavorited = isInWishlist(product.slug);
+  const isCompared = isInCompare(product.slug);
+
   const [activeColor, setActiveColor] = useState(product.colors?.[0] || null);
   
   // Extract variants from product.variants
@@ -74,29 +85,51 @@ export default function ProductDetail() {
   // Reset quantity when shifting mode or product
   useEffect(() => {
     if (isBulkMode) {
-      // Set to a sensible bulk minimum
       setQuantity(product.quantityOptions?.presets[2] || 50);
     } else {
       setQuantity(product.quantityOptions?.presets[0] || 1);
     }
   }, [isBulkMode, product]);
 
-  // Handle color-specific image swapping
-  const baseImageUrl = product.image || productCategories.find((c) => c.name === product.category)?.image;
-  const [imgSrc, setImgSrc] = useState(baseImageUrl);
-  const [imgError, setImgError] = useState(false);
+  // Image Gallery Architecture
+  const baseImageUrl = product.image || "/assets/images/hero_banner.webp";
+  const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
+  // Compile all images available for the product
+  const productImages = useMemo(() => {
+    const images = [
+      { type: "hero", src: baseImageUrl, label: "Hero View" },
+      ...(product.galleryImages || []).map((img, i) => ({
+        type: `gallery-${i + 1}`,
+        src: img,
+        label: `Gallery View ${i + 1}`
+      }))
+    ];
+
+    if (product.colors && product.colors.length > 0) {
+      product.colors.forEach((color) => {
+        const colorSlug = color.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+        images.push({
+          type: `color-${colorSlug}`,
+          src: `/assets/images/products/${product.slug}/color-${colorSlug}.webp`,
+          label: `${color.name} Shade`
+        });
+      });
+    }
+    return images;
+  }, [product, baseImageUrl]);
+
+  // Update gallery index when active color changes
   useEffect(() => {
     if (activeColor) {
       const colorSlug = activeColor.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-      setImgSrc(`/assets/images/products/${product.slug}-${colorSlug}.webp`);
-      setImgError(false);
-    } else {
-      setImgSrc(baseImageUrl);
+      const index = productImages.findIndex(img => img.type === `color-${colorSlug}`);
+      if (index > -1) {
+        setActiveGalleryIndex(index);
+      }
     }
-  }, [activeColor, product, baseImageUrl]);
-
-  const isBaseImage = imgSrc === baseImageUrl || imgError;
+  }, [activeColor, productImages]);
 
   // Share link feedback
   const [copied, setCopied] = useState(false);
@@ -207,24 +240,72 @@ export default function ProductDetail() {
     setOpenFaq(openFaq === index ? null : index);
   };
 
-  const productFaqs = [
-    {
-      q: "Do you provide bulk wholesale pricing?",
-      a: "Yes! While we do not display prices publicly on the website, we offer competitive wholesale prices for bulk quantities. Click the 'WhatsApp Enquiry' or 'Add to Basket' buttons to discuss pricing options directly."
-    },
-    {
-      q: "Is shipping available all over India?",
-      a: "Absolutely. We ship yarns, cords, handles, and accessories all across India. Delivery times typically range between 3 to 7 business days depending on your delivery location."
-    },
-    {
-      q: "Can I mix different shades in a single bulk order?",
-      a: "Yes, you can enquire about and order mixed shades in a single wholesale delivery. Simply add the individual shades and quantities to your enquiry basket and submit."
-    },
-    {
-      q: "How do I choose the exact shade numbers?",
-      a: "Since digital screens can shift colours slightly, you can ask for our verified digital shade cards on WhatsApp. We will help you select the exact colour codes for your project."
+  // Category-specific FAQs
+  const productFaqs = useMemo(() => {
+    const defaultFaqs = [
+      {
+        q: "Do you provide bulk wholesale pricing?",
+        a: "Yes! While we do not display prices publicly on the website, we offer competitive wholesale prices for bulk quantities. Click the 'WhatsApp Enquiry' or 'Add to Basket' buttons to discuss pricing options directly."
+      },
+      {
+        q: "Is shipping available all over India?",
+        a: "Absolutely. We ship yarns, cords, handles, and accessories all across India. Delivery times typically range between 3 to 7 business days depending on your delivery location."
+      },
+      {
+        q: "Can I mix different shades in a single bulk order?",
+        a: "Yes, you can enquire about and order mixed shades in a single wholesale delivery. Simply add the individual shades and quantities to your enquiry basket and submit."
+      }
+    ];
+
+    if (product.category === "Bliss Threads" || product.category.includes("Yarn")) {
+      return [
+        ...defaultFaqs,
+        {
+          q: "What is the recommended hook or needle size?",
+          a: `For ${product.name}, we recommend using hooks ranging from ${product.category.includes("T-Shirt") ? "6.0mm to 9.0mm" : "1.5mm to 3.0mm"}. Gauge guidance can be confirmed on WhatsApp.`
+        },
+        {
+          q: "Are these yarns colour-fast and washable?",
+          a: "Yes, our yarns are carefully dyed. We recommend gentle hand washing in cold water and drying flat in the shade to maintain thread structure and colour vibrance."
+        }
+      ];
     }
-  ];
+    if (product.category.includes("Macrame")) {
+      return [
+        ...defaultFaqs,
+        {
+          q: "Can I comb or fringe this macrame cord?",
+          a: "Yes! The single-twist macrame cord fringes out beautifully for feathers, tassels, and leaves. The twisted cord offers more structural strength for large plant hangers."
+        }
+      ];
+    }
+    if (product.category.includes("Handles") || product.category.includes("Accessories")) {
+      return [
+        ...defaultFaqs,
+        {
+          q: "Are these handles durable for regular handbag use?",
+          a: "Yes, our wooden, chain, and pearl handles are designed with reinforced attachments, making them sturdy enough for premium boutiques and everyday handmade purses."
+        }
+      ];
+    }
+    return defaultFaqs;
+  }, [product]);
+
+  // Keyboard navigation for Lightbox
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "ArrowRight") {
+        setActiveGalleryIndex((prev) => (prev + 1) % productImages.length);
+      } else if (e.key === "ArrowLeft") {
+        setActiveGalleryIndex((prev) => (prev - 1 + productImages.length) % productImages.length);
+      } else if (e.key === "Escape") {
+        setLightboxOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [lightboxOpen, productImages]);
 
   return (
     <>
@@ -242,70 +323,120 @@ export default function ProductDetail() {
             {/* Left Column: Visual (Sticky on desktop) */}
             <div className="product-detail-visual">
               <div className="sticky-visual-wrapper">
-                <div className="product-image-container" style={{ position: "relative", display: "flex", width: "100%", aspectRatio: "1/1", borderRadius: "var(--radius)", overflow: "hidden", backgroundColor: "#faf6f0", border: "1px solid rgba(50, 48, 45, 0.05)" }}>
+                <div 
+                  className="product-image-container group" 
+                  style={{ position: "relative", display: "flex", width: "100%", aspectRatio: "1/1", borderRadius: "var(--radius)", overflow: "hidden", backgroundColor: "#faf6f0", border: "1px solid rgba(50, 48, 45, 0.05)", cursor: "zoom-in" }}
+                  onClick={() => setLightboxOpen(true)}
+                >
                   <img
-                    src={imgSrc}
-                    alt={product.name}
+                    src={productImages[activeGalleryIndex]?.src}
+                    alt={productImages[activeGalleryIndex]?.label || product.name}
                     className="product-detail-hero-image"
                     style={{ position: "relative", zIndex: 1, width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.4s ease" }}
-                    onError={() => {
-                      setImgError(true);
-                      setImgSrc(baseImageUrl);
-                    }}
                   />
-                  {activeColor && isBaseImage && (
-                    <div
-                      className="product-color-overlay"
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        backgroundColor: activeColor.hex,
-                        mixBlendMode: "multiply",
-                        opacity: 0.75,
-                        pointerEvents: "none",
-                        zIndex: 2,
-                        transition: "background-color 0.3s ease"
-                      }}
-                    />
-                  )}
+                  <div className="image-zoom-overlay-badge" style={{ position: "absolute", bottom: "16px", right: "16px", zIndex: 5, background: "rgba(0,0,0,0.5)", color: "#fff", padding: "8px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Maximize2 size={16} />
+                  </div>
                 </div>
 
-                {/* Color swatches thumbnail strip */}
-                {product.colors && product.colors.length > 0 && (
-                  <div className="gallery-thumbnail-strip">
-                    <span className="thumbnail-label">Select Color Shade:</span>
-                    <div className="thumbnail-grid-row">
-                      {product.colors.map((color) => {
-                        const isSelected = activeColor?.hex === color.hex;
-                        return (
-                          <button
-                            key={color.hex}
-                            type="button"
-                            className={`thumbnail-circle-btn ${isSelected ? "active" : ""}`}
-                            style={{ backgroundColor: color.hex }}
-                            title={color.name}
-                            onClick={() => setActiveColor(color)}
-                            aria-label={`Select ${color.name} shade`}
-                          />
-                        );
-                      })}
-                    </div>
+                {/* Gallery Thumbnails Carousel Strip */}
+                <div className="gallery-thumbnail-strip" style={{ marginTop: "16px" }}>
+                  <span className="thumbnail-label" style={{ display: "block", marginBottom: "8px", fontWeight: "600", fontSize: "14px", color: "var(--text-muted)" }}>Gallery & Shade Options:</span>
+                  <div className="thumbnail-grid-row" style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "6px" }}>
+                    {productImages.map((img, i) => {
+                      const isSelected = activeGalleryIndex === i;
+                      return (
+                        <button
+                          key={i}
+                          type="button"
+                          className={`thumbnail-rect-btn ${isSelected ? "active" : ""}`}
+                          onClick={() => {
+                            setActiveGalleryIndex(i);
+                            if (img.type.startsWith("color-")) {
+                              const matchingColor = product.colors.find(c => 
+                                img.type.endsWith(c.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"))
+                              );
+                              if (matchingColor) setActiveColor(matchingColor);
+                            }
+                          }}
+                          style={{
+                            width: "60px",
+                            height: "60px",
+                            borderRadius: "var(--radius-small, 6px)",
+                            border: isSelected ? "2px solid var(--primary)" : "1px solid rgba(0,0,0,0.1)",
+                            overflow: "hidden",
+                            flexShrink: 0,
+                            padding: 0,
+                            cursor: "pointer",
+                            background: "#fff"
+                          }}
+                          aria-label={`View ${img.label}`}
+                        >
+                          <img src={img.src} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        </button>
+                      );
+                    })}
                   </div>
-                )}
+                </div>
               </div>
             </div>
 
             {/* Right Column: Details & Actions */}
             <div className="product-detail-content">
-              {/* Category & Badges */}
-              <div className="product-badges-row" style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "12px" }}>
-                <span className="category-tag-pill">{product.category}</span>
-                {product.badges.map((badge) => (
-                  <span key={badge} className="feature-tag-pill">{badge}</span>
-                ))}
+              {/* Category, Wishlist, Compare Actions */}
+              <div className="product-badges-row-flex" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                <div className="product-badges-row" style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                  <span className="category-tag-pill">{product.category}</span>
+                  {product.badges.map((badge) => (
+                    <span key={badge} className="feature-tag-pill">{badge}</span>
+                  ))}
+                </div>
+
+                <div className="detail-header-actions" style={{ display: "flex", gap: "8px" }}>
+                  {/* Compare Toggle */}
+                  <button
+                    type="button"
+                    className={`btn-detail-action-circle ${isCompared ? "active" : ""}`}
+                    onClick={() => toggleCompare(product.slug)}
+                    title={isCompared ? "Remove from comparison list" : "Add to comparison list"}
+                    style={{
+                      width: "36px",
+                      height: "36px",
+                      borderRadius: "50%",
+                      border: "1px solid rgba(0,0,0,0.1)",
+                      background: isCompared ? "var(--primary-light, #eaf6f5)" : "#fff",
+                      color: isCompared ? "var(--primary)" : "currentColor",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer"
+                    }}
+                  >
+                    <ArrowUpDown size={16} />
+                  </button>
+
+                  {/* Favorite Toggle */}
+                  <button
+                    type="button"
+                    className={`btn-detail-action-circle ${isFavorited ? "active" : ""}`}
+                    onClick={() => toggleWishlist(product.slug)}
+                    title={isFavorited ? "Remove from Favorites" : "Save to Favorites"}
+                    style={{
+                      width: "36px",
+                      height: "36px",
+                      borderRadius: "50%",
+                      border: "1px solid rgba(0,0,0,0.1)",
+                      background: isFavorited ? "var(--rose-light, #fff0f2)" : "#fff",
+                      color: isFavorited ? "var(--accent-rose, #e05c75)" : "currentColor",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer"
+                    }}
+                  >
+                    <Heart size={16} fill={isFavorited ? "currentColor" : "none"} />
+                  </button>
+                </div>
               </div>
 
               <h1 className="product-detail-title-new">{product.name}</h1>
@@ -328,7 +459,7 @@ export default function ProductDetail() {
                 <p>{product.description}</p>
               </div>
 
-              {/* Interactive Variant Options (e.g. thickness, weight) */}
+              {/* Interactive Variant Options */}
               {variantOptions && (
                 <div className="detail-section-configured">
                   <span className="configure-label">Select Options:</span>
@@ -515,6 +646,34 @@ export default function ProductDetail() {
         </div>
       </section>
 
+      {/* Timeline Section Explaining How Enquiry Works */}
+      <section className="section bg-tinted border-top-line enquiry-how-it-works-detail">
+        <div className="container">
+          <div className="section-head text-center" style={{ marginBottom: "40px" }}>
+            <p className="eyebrow" style={{ display: "inline-block" }}>Simple Steps</p>
+            <h2>How Your Enquiry Works</h2>
+            <p>Fakhri Mart operates as an enquiry-first digital catalogue. We do not require payment online.</p>
+          </div>
+          <div className="enquiry-timeline-grid">
+            <div className="timeline-step-card">
+              <span className="step-num">01</span>
+              <h4>Add Your Items</h4>
+              <p>Select your favorite shades, weights, or dimensions and add them to your enquiry basket.</p>
+            </div>
+            <div className="timeline-step-card">
+              <span className="step-num">02</span>
+              <h4>Verify & Submit</h4>
+              <p>Review your basket list on the Enquiry page and submit the aggregated list to WhatsApp.</p>
+            </div>
+            <div className="timeline-step-card">
+              <span className="step-num">03</span>
+              <h4>Confirm & Complete</h4>
+              <p>Our team verifies actual stock availability, calculates delivery charges, and shares final billing details directly on WhatsApp.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Structured modules below the fold */}
       <section className="section bg-light-details border-top-line">
         <div className="container">
@@ -605,6 +764,48 @@ export default function ProductDetail() {
             </div>
           </div>
         </section>
+      )}
+
+      {/* Zoom Lightbox Modal */}
+      {lightboxOpen && (
+        <div className="lightbox-backdrop" onClick={() => setLightboxOpen(false)} role="dialog" aria-modal="true" aria-label="Fullscreen Gallery">
+          <button type="button" className="lightbox-close-btn" onClick={() => setLightboxOpen(false)} aria-label="Close Lightbox">
+            <X size={28} />
+          </button>
+          
+          <button 
+            type="button" 
+            className="lightbox-arrow-btn left" 
+            onClick={(e) => {
+              e.stopPropagation();
+              setActiveGalleryIndex((prev) => (prev - 1 + productImages.length) % productImages.length);
+            }}
+            aria-label="Previous Image"
+          >
+            <ChevronRight size={36} style={{ transform: "rotate(180deg)" }} />
+          </button>
+
+          <div className="lightbox-image-wrapper" onClick={(e) => e.stopPropagation()}>
+            <img 
+              src={productImages[activeGalleryIndex]?.src} 
+              alt={productImages[activeGalleryIndex]?.label} 
+              className="lightbox-active-img"
+            />
+            <span className="lightbox-index-label">{activeGalleryIndex + 1} / {productImages.length} - {productImages[activeGalleryIndex]?.label}</span>
+          </div>
+
+          <button 
+            type="button" 
+            className="lightbox-arrow-btn right" 
+            onClick={(e) => {
+              e.stopPropagation();
+              setActiveGalleryIndex((prev) => (prev + 1) % productImages.length);
+            }}
+            aria-label="Next Image"
+          >
+            <ChevronRight size={36} />
+          </button>
+        </div>
       )}
 
       {/* Bottom CTA */}

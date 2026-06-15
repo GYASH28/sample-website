@@ -1,39 +1,188 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import CatalogueCta from "../components/CatalogueCta.jsx";
 import CategoryCard from "../components/CategoryCard.jsx";
 import PageHero from "../components/PageHero.jsx";
 import ProductCard from "../components/ProductCard.jsx";
 import ProductVisual from "../components/ProductVisual.jsx";
 import Reveal from "../components/Reveal.jsx";
-import { featuredProducts, productCategories, productFilters, newArrivals } from "../data/siteData.js";
+import { featuredProducts, productCategories, newArrivals } from "../data/siteData.js";
 import { useRecentlyViewed } from "../hooks/useRecentlyViewed.js";
-import { Search, SlidersHorizontal, ArrowUpDown, XCircle } from "lucide-react";
+import { Search, SlidersHorizontal, ArrowUpDown, XCircle, Grid, List, HelpCircle, Check, ArrowRight } from "lucide-react";
+
+const PRODUCT_TYPES = [
+  { label: "All Types", value: "All" },
+  { label: "Yarn Balls", value: "yarn-ball" },
+  { label: "Cotton Threads", value: "cotton-thread" },
+  { label: "Crochet Threads", value: "crochet-thread" },
+  { label: "Macrame Cords", value: "macrame-cord" },
+  { label: "Embroidery Floss", value: "embroidery-floss" },
+  { label: "Crochet Hooks", value: "hook" },
+  { label: "Purse Handles", value: "purse-handle" }
+];
+
+const USE_CASES = [
+  "All",
+  "Crochet",
+  "Knitting",
+  "Embroidery",
+  "Macrame",
+  "Bag Making",
+  "Beginner Friendly"
+];
+
+const POPULAR_SEARCHES = ["Yarn", "Macrame", "Hook", "Cotton", "Soft", "Embroidery"];
 
 export default function Products() {
-  const [activeFilter, setActiveFilter] = useState("All");
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeType, setActiveType] = useState("All");
+  const [activeTag, setActiveTag] = useState("All");
+  const [filterHasShades, setFilterHasShades] = useState(false);
+  const [filterBulkOnly, setFilterBulkOnly] = useState(false);
+  
   const [sortBy, setSortBy] = useState("featured");
+  const [viewMode, setViewMode] = useState("grid"); // "grid" or "list"
 
-  // Filtering logic
-  const filteredProducts = useMemo(() => {
-    let filtered = featuredProducts;
+  // Load filter parameters from query search
+  useEffect(() => {
+    const tag = searchParams.get("tag");
+    const category = searchParams.get("category");
+    const type = searchParams.get("type");
+    if (tag) setActiveTag(tag);
+    if (category) setActiveCategory(category);
+    if (type) setActiveType(type);
+  }, [searchParams]);
 
-    if (activeFilter !== "All") {
-      filtered = filtered.filter((product) => product.filters.includes(activeFilter));
+  // Search Auto-Suggestions State
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [suggestionIndex, setSuggestionIndex] = useState(-1);
+  const searchContainerRef = useRef(null);
+
+  // Generate suggestions based on search query
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSuggestions([]);
+      return;
     }
 
+    const q = searchQuery.toLowerCase();
+    const matches = [];
+
+    // Match Category Names
+    productCategories.forEach(c => {
+      if (c.name.toLowerCase().includes(q)) {
+        matches.push({ type: "category", value: c.name, display: `Browse Category: ${c.name}` });
+      }
+    });
+
+    // Match Craft Tags
+    USE_CASES.forEach(tag => {
+      if (tag !== "All" && tag.toLowerCase().includes(q)) {
+        matches.push({ type: "tag", value: tag, display: `Craft Tag: ${tag}` });
+      }
+    });
+
+    // Match Product Names
+    featuredProducts.forEach(p => {
+      if (p.name.toLowerCase().includes(q)) {
+        matches.push({ type: "product", value: p.name, display: p.name });
+      }
+    });
+
+    setSuggestions(matches.slice(0, 6)); // Limit to 6 suggestions
+  }, [searchQuery]);
+
+  // Click outside search dismisses suggestions
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSuggestionClick = (suggestion) => {
+    if (suggestion.type === "category") {
+      setActiveCategory(suggestion.value);
+      setSearchQuery("");
+    } else if (suggestion.type === "tag") {
+      setActiveTag(suggestion.value);
+      setSearchQuery("");
+    } else {
+      setSearchQuery(suggestion.value);
+    }
+    setShowSuggestions(false);
+    setSuggestionIndex(-1);
+  };
+
+  const handleSearchKeyDown = (e) => {
+    if (!showSuggestions || suggestions.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setSuggestionIndex(prev => (prev + 1) % suggestions.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setSuggestionIndex(prev => (prev - 1 + suggestions.length) % suggestions.length);
+    } else if (e.key === "Enter") {
+      if (suggestionIndex > -1 && suggestions[suggestionIndex]) {
+        e.preventDefault();
+        handleSuggestionClick(suggestions[suggestionIndex]);
+      }
+    } else if (e.key === "Escape") {
+      setShowSuggestions(false);
+      setSuggestionIndex(-1);
+    }
+  };
+
+  // Multi-facet filtering logic
+  const filteredProducts = useMemo(() => {
+    let result = featuredProducts;
+
+    // Search input
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      filtered = filtered.filter(
+      result = result.filter(
         (product) =>
           product.name.toLowerCase().includes(q) ||
           product.category.toLowerCase().includes(q) ||
-          product.suitableFor.toLowerCase().includes(q)
+          product.suitableFor.toLowerCase().includes(q) ||
+          product.tags?.some(t => t.toLowerCase().includes(q))
       );
     }
 
-    return filtered;
-  }, [activeFilter, searchQuery]);
+    // Category
+    if (activeCategory !== "All") {
+      result = result.filter((product) => product.category === activeCategory);
+    }
+
+    // Type
+    if (activeType !== "All") {
+      result = result.filter((product) => product.type === activeType);
+    }
+
+    // Tags
+    if (activeTag !== "All") {
+      result = result.filter((product) => product.tags?.includes(activeTag));
+    }
+
+    // Shade Availability
+    if (filterHasShades) {
+      result = result.filter((product) => product.colors && product.colors.length > 0);
+    }
+
+    // Bulk Ordering
+    if (filterBulkOnly) {
+      result = result.filter((product) => product.tags?.includes("Bulk Orders"));
+    }
+
+    return result;
+  }, [searchQuery, activeCategory, activeType, activeTag, filterHasShades, filterBulkOnly]);
 
   // Sorting logic
   const sortedProducts = useMemo(() => {
@@ -45,7 +194,6 @@ export default function Products() {
       result.sort((a, b) => a.category.localeCompare(b.category));
     } else if (sortBy === "newest") {
       const getNewArrivalIndex = (product) => {
-        // Matches product names like "Baby Soft" in siteData.js newArrivals
         return newArrivals.findIndex((na) => na.name.toLowerCase().includes(product.name.toLowerCase()));
       };
       result.sort((a, b) => {
@@ -61,7 +209,7 @@ export default function Products() {
     return result;
   }, [filteredProducts, sortBy]);
 
-  const recentSlugs = useRecentlyViewed(null); // null currentSlug because this is a list page
+  const recentSlugs = useRecentlyViewed(null);
   const recentlyViewedProducts = useMemo(() => {
     return recentSlugs
       .map((recentSlug) => featuredProducts.find((p) => p.slug === recentSlug))
@@ -69,10 +217,16 @@ export default function Products() {
   }, [recentSlugs]);
 
   const handleResetFilters = () => {
-    setActiveFilter("All");
+    setActiveCategory("All");
+    setActiveType("All");
+    setActiveTag("All");
+    setFilterHasShades(false);
+    setFilterBulkOnly(false);
     setSearchQuery("");
     setSortBy("featured");
   };
+
+  const hasActiveFilters = activeCategory !== "All" || activeType !== "All" || activeTag !== "All" || filterHasShades || filterBulkOnly || searchQuery.trim() !== "";
 
   return (
     <>
@@ -85,7 +239,7 @@ export default function Products() {
       </PageHero>
 
       {/* Category Section */}
-      <section className="section">
+      <section className="section" id="categories">
         <div className="container">
           <Reveal className="section-heading" variant="scale-in">
             <p className="eyebrow">Categories</p>
@@ -102,7 +256,7 @@ export default function Products() {
         </div>
       </section>
 
-      {/* Filters, Search & Products Section */}
+      {/* Main Browse & Advanced Filters Section */}
       <section className="section section-tinted" id="catalogue-browser">
         <div className="container">
           <Reveal className="section-heading" variant="scale-in">
@@ -111,38 +265,53 @@ export default function Products() {
             <p>Use filters, search or sorting options to find the perfect yarn or craft tool for your handmade creations.</p>
           </Reveal>
 
-          {/* Filtering chips row */}
-          <Reveal className="filter-bar" variant="fade-up">
-            {productFilters.map((filter) => (
-              <button
-                key={filter}
-                type="button"
-                className={activeFilter === filter ? "filter-chip active" : "filter-chip"}
-                onClick={() => {
-                  setActiveFilter(filter);
-                }}
-              >
-                {filter}
-              </button>
-            ))}
-          </Reveal>
-
-          {/* Search, Sort and Summary Control row */}
+          {/* Controls Bar: Search Suggestions, Sorting, Grid/List view */}
           <Reveal variant="fade-up" delay={80}>
             <div className="catalogue-controls-row">
-              {/* Premium Search Box */}
-              <div className="search-box-premium">
-                <Search size={18} className="search-icon-inside" />
-                <input
-                  type="search"
-                  placeholder="Search by product, category or uses..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  aria-label="Search products"
-                />
+              {/* Premium Search Box with suggestions */}
+              <div className="search-box-premium-wrapper" ref={searchContainerRef} style={{ position: "relative", flexGrow: 1 }}>
+                <div className="search-box-premium">
+                  <Search size={18} className="search-icon-inside" />
+                  <input
+                    type="search"
+                    placeholder="Search by product name, category or uses..."
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setShowSuggestions(true);
+                    }}
+                    onFocus={() => setShowSuggestions(true)}
+                    onKeyDown={handleSearchKeyDown}
+                    aria-label="Search products"
+                  />
+                </div>
+                {showSuggestions && suggestions.length > 0 && (
+                  <ul className="search-suggestions-dropdown" style={{ position: "absolute", top: "100%", left: 0, right: 0, zIndex: 100, background: "#fff", border: "1px solid rgba(0,0,0,0.1)", borderRadius: "6px", listStyle: "none", padding: "4px 0", marginTop: "4px", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
+                    {suggestions.map((s, idx) => (
+                      <li key={idx}>
+                        <button
+                          type="button"
+                          onClick={() => handleSuggestionClick(s)}
+                          className={`suggestion-item-btn ${suggestionIndex === idx ? 'highlighted' : ''}`}
+                          style={{
+                            width: "100%",
+                            textAlign: "left",
+                            padding: "10px 16px",
+                            border: "none",
+                            background: suggestionIndex === idx ? "rgba(0,0,0,0.05)" : "transparent",
+                            cursor: "pointer",
+                            fontSize: "14px"
+                          }}
+                        >
+                          {s.display}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
 
-              {/* Sorting & Filter controls */}
+              {/* Sorting controls */}
               <div className="sorting-controls-wrapper">
                 <SlidersHorizontal size={16} className="control-icon-grey" />
                 <label htmlFor="product-sort-select" className="sr-only">Sort by</label>
@@ -159,51 +328,175 @@ export default function Products() {
                 </select>
                 <ArrowUpDown size={15} className="select-arrow-icon" />
               </div>
-            </div>
-          </Reveal>
 
-          {/* Results Info and Clear All filters button */}
-          <Reveal variant="fade-up" delay={120}>
-            <div className="catalogue-result-summary">
-              <span className="result-count-text">
-                Showing <strong>{sortedProducts.length}</strong> of <strong>{featuredProducts.length}</strong> products
-              </span>
-              {(activeFilter !== "All" || searchQuery.trim() !== "" || sortBy !== "featured") && (
+              {/* Grid / List view toggle */}
+              <div className="view-mode-toggle-group" style={{ display: "flex", gap: "6px" }}>
                 <button
                   type="button"
-                  className="clear-filters-btn"
-                  onClick={handleResetFilters}
+                  onClick={() => setViewMode("grid")}
+                  className={`view-mode-btn ${viewMode === "grid" ? "active" : ""}`}
+                  title="Grid View"
+                  aria-label="Switch to Grid View"
                 >
-                  <XCircle size={14} />
-                  Reset Filters
+                  <Grid size={18} />
                 </button>
-              )}
-            </div>
-          </Reveal>
-
-          {/* Product Cards Grid */}
-          <div key={`${activeFilter}-${searchQuery}-${sortBy}`} className="card-grid product-grid product-grid--filtered" aria-live="polite">
-            {sortedProducts.length > 0 ? (
-              sortedProducts.map((product, index) => (
-                <Reveal key={product.slug} delay={(index % 6) * 45} variant="scale-in">
-                  <ProductCard product={product} />
-                </Reveal>
-              ))
-            ) : (
-              <div className="empty-results-box" style={{ gridColumn: "1 / -1", textAlign: "center", padding: "60px 20px" }}>
-                <XCircle size={48} className="empty-state-icon" style={{ marginInline: "auto", marginBottom: "16px", color: "var(--muted)" }} />
-                <h3>No products found</h3>
-                <p>We couldn't find any yarns or accessories matching your selection.</p>
                 <button
                   type="button"
-                  className="btn btn-outline btn-small"
-                  onClick={handleResetFilters}
-                  style={{ marginTop: "16px" }}
+                  onClick={() => setViewMode("list")}
+                  className={`view-mode-btn ${viewMode === "list" ? "active" : ""}`}
+                  title="List View"
+                  aria-label="Switch to List View"
                 >
-                  Clear all search and filters
+                  <List size={18} />
                 </button>
               </div>
-            )}
+            </div>
+          </Reveal>
+
+          {/* Filtering Sidebars / Columns Layout */}
+          <div className="products-layout-flex" style={{ display: "flex", gap: "28px", marginTop: "24px", flexDirection: "column" }}>
+            
+            {/* Filter controls row */}
+            <Reveal variant="fade-up" className="filter-controls-flex-row" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px", background: "#fff", padding: "16px", borderRadius: "8px", border: "1px solid rgba(0,0,0,0.05)" }}>
+              {/* Category selector */}
+              <div className="filter-select-box">
+                <span className="filter-label" style={{ display: "block", marginBottom: "6px", fontSize: "12px", fontWeight: "600", color: "var(--text-muted)", textTransform: "uppercase" }}>Category</span>
+                <select value={activeCategory} onChange={(e) => setActiveCategory(e.target.value)} className="filter-inner-select" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid rgba(0,0,0,0.1)", background: "#fafafa" }}>
+                  <option value="All">All Categories</option>
+                  {productCategories.map(c => (
+                    <option key={c.name} value={c.name}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Product Type selector */}
+              <div className="filter-select-box">
+                <span className="filter-label" style={{ display: "block", marginBottom: "6px", fontSize: "12px", fontWeight: "600", color: "var(--text-muted)", textTransform: "uppercase" }}>Product Type</span>
+                <select value={activeType} onChange={(e) => setActiveType(e.target.value)} className="filter-inner-select" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid rgba(0,0,0,0.1)", background: "#fafafa" }}>
+                  {PRODUCT_TYPES.map(t => (
+                    <option key={t.value} value={t.value}>{t.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Tag / Use Case selector */}
+              <div className="filter-select-box">
+                <span className="filter-label" style={{ display: "block", marginBottom: "6px", fontSize: "12px", fontWeight: "600", color: "var(--text-muted)", textTransform: "uppercase" }}>Craft Use Case</span>
+                <select value={activeTag} onChange={(e) => setActiveTag(e.target.value)} className="filter-inner-select" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid rgba(0,0,0,0.1)", background: "#fafafa" }}>
+                  {USE_CASES.map(tag => (
+                    <option key={tag} value={tag}>{tag === "All" ? "All Use Cases" : tag}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Checkbox filter options */}
+              <div className="filter-select-box checkboxes" style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: "8px" }}>
+                <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", cursor: "pointer" }}>
+                  <input type="checkbox" checked={filterHasShades} onChange={(e) => setFilterHasShades(e.target.checked)} />
+                  <span>Has Color Shades</span>
+                </label>
+                <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", cursor: "pointer" }}>
+                  <input type="checkbox" checked={filterBulkOnly} onChange={(e) => setFilterBulkOnly(e.target.checked)} />
+                  <span>Wholesale/Bulk Only</span>
+                </label>
+              </div>
+            </Reveal>
+
+            {/* Active Chips / Count row */}
+            <div className="active-chips-summary-row" style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
+              <span className="result-count-text" style={{ fontSize: "14px", color: "var(--text-muted)" }}>
+                Showing <strong>{sortedProducts.length}</strong> of <strong>{featuredProducts.length}</strong> products
+              </span>
+
+              {hasActiveFilters && (
+                <div className="active-chips-flex" style={{ display: "flex", flexWrap: "wrap", gap: "8px", alignItems: "center" }}>
+                  {activeCategory !== "All" && (
+                    <span className="active-filter-chip">{activeCategory} <button type="button" onClick={() => setActiveCategory("All")}>&times;</button></span>
+                  )}
+                  {activeType !== "All" && (
+                    <span className="active-filter-chip">{PRODUCT_TYPES.find(t => t.value === activeType)?.label} <button type="button" onClick={() => setActiveType("All")}>&times;</button></span>
+                  )}
+                  {activeTag !== "All" && (
+                    <span className="active-filter-chip">Use: {activeTag} <button type="button" onClick={() => setActiveTag("All")}>&times;</button></span>
+                  )}
+                  {filterHasShades && (
+                    <span className="active-filter-chip">Has Shades <button type="button" onClick={() => setFilterHasShades(false)}>&times;</button></span>
+                  )}
+                  {filterBulkOnly && (
+                    <span className="active-filter-chip">Bulk/Wholesale <button type="button" onClick={() => setFilterBulkOnly(false)}>&times;</button></span>
+                  )}
+                  {searchQuery.trim() !== "" && (
+                    <span className="active-filter-chip">Search: "{searchQuery}" <button type="button" onClick={() => setSearchQuery("")}>&times;</button></span>
+                  )}
+                  
+                  <button
+                    type="button"
+                    className="clear-filters-btn font-semibold"
+                    onClick={handleResetFilters}
+                    style={{ fontSize: "13px", color: "var(--primary)", border: "none", background: "none", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
+                  >
+                    <XCircle size={14} />
+                    Reset All
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Product Cards Grid / List */}
+            <div key={`${activeCategory}-${activeType}-${activeTag}-${filterHasShades}-${filterBulkOnly}-${searchQuery}-${sortBy}`} className={`product-gallery-view-wrapper view-mode-${viewMode}`}>
+              <div 
+                className={viewMode === "grid" ? "card-grid product-grid product-grid--filtered" : "list-layout product-list-layout--filtered"} 
+                aria-live="polite"
+                style={viewMode === "list" ? { display: "flex", flexDirection: "column", gap: "16px" } : {}}
+              >
+                {sortedProducts.length > 0 ? (
+                  sortedProducts.map((product, index) => (
+                    <Reveal key={product.slug} delay={(index % 6) * 45} variant="scale-in">
+                      <ProductCard product={product} compact={viewMode === "list"} />
+                    </Reveal>
+                  ))
+                ) : (
+                  /* Upgraded No Results Box with recommendations */
+                  <div className="empty-results-box" style={{ gridColumn: "1 / -1", textAlign: "center", padding: "60px 20px", background: "#fff", borderRadius: "12px", border: "1px solid rgba(0,0,0,0.05)" }}>
+                    <HelpCircle size={52} className="empty-state-icon" style={{ marginInline: "auto", marginBottom: "18px", color: "var(--accent-rose, #e05c75)" }} />
+                    <h3 style={{ fontSize: "20px", marginBottom: "8px" }}>No products match your filters</h3>
+                    <p style={{ color: "var(--text-muted)", maxWidth: "460px", marginInline: "auto", fontSize: "15px" }}>
+                      We couldn't find any yarns or craft tools matching your exact selections. Try clearing some filters or searching popular terms.
+                    </p>
+                    
+                    <div className="no-results-suggestions-box" style={{ marginTop: "24px" }}>
+                      <span style={{ fontSize: "14px", fontWeight: "600", display: "block", marginBottom: "10px" }}>Popular Searches:</span>
+                      <div className="popular-terms-flex" style={{ display: "flex", justifyContent: "center", gap: "8px", flexWrap: "wrap" }}>
+                        {POPULAR_SEARCHES.map(term => (
+                          <button
+                            key={term}
+                            type="button"
+                            className="btn btn-outline btn-small"
+                            onClick={() => {
+                              setSearchQuery(term);
+                              setShowSuggestions(false);
+                            }}
+                            style={{ fontSize: "12px" }}
+                          >
+                            {term}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={handleResetFilters}
+                      style={{ marginTop: "28px" }}
+                    >
+                      Clear all search and filters
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
