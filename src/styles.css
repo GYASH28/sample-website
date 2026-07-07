@@ -26,7 +26,7 @@
   --pink-soft: #FFE3EA;
 
   --craft: #826E33;           /* bronze (gold family) */
-  --gold: #8F7422;            /* antique gold — signature accent */
+  --gold: #76591A;            /* Phase 6 item 4: improved WCAG AA contrast for eyebrow text */
   --gold-soft: #C9B36A;
   --cream: #FFF7E9;
 
@@ -128,8 +128,9 @@ main {
   margin: 0 auto;
 }
 
+/* Phase 6 item 3: consolidated .section padding — was 5 competing rules. Single rule now. */
 .section {
-  padding: 82px 0;
+  padding: clamp(60px, 8vw, 120px) 0;
   content-visibility: auto;
   contain-intrinsic-size: 0 500px;
 }
@@ -260,7 +261,7 @@ p {
   isolation: isolate;
   overflow: hidden;
   display: inline-flex;
-  min-height: 46px;
+  min-height: 48px; /* Phase 6 item 5: consolidated button min-height */
   align-items: center;
   justify-content: center;
   gap: 9px;
@@ -346,7 +347,7 @@ textarea:focus-visible {
 }
 
 .btn-small {
-  min-height: 40px;
+  min-height: 44px; /* Phase 6 item 5: consolidated */
   padding: 10px 14px;
   font-size: 0.92rem;
 }
@@ -1210,9 +1211,12 @@ textarea:focus-visible {
     transform 620ms ease;
 }
 
-.category-card:hover .card-shine {
-  opacity: 0.55;
-  transform: translateX(120%);
+/* Phase 6 item 6: decorative hover wrapped in @media (hover: hover) — no sticky hover on touch */
+@media (hover: hover) {
+  .category-card:hover .card-shine {
+    opacity: 0.55;
+    transform: translateX(120%);
+  }
 }
 
 .category-card,
@@ -2137,7 +2141,6 @@ textarea:focus {
     opacity 280ms ease,
     transform 280ms ease;
   transition-delay: var(--reveal-delay, 0ms);
-  will-change: opacity, transform;
 }
 
 .reveal-fade-up {
@@ -2165,7 +2168,6 @@ textarea:focus {
     opacity var(--duration-slow, 700ms) var(--ease-soft, cubic-bezier(0.22, 1, 0.36, 1)),
     transform var(--duration-slow, 700ms) var(--ease-soft, cubic-bezier(0.22, 1, 0.36, 1));
   transition-delay: var(--reveal-delay, 0ms);
-  will-change: clip-path, opacity, transform;
 }
 
 .reveal-clip-reveal-left {
@@ -2174,7 +2176,6 @@ textarea:focus {
     clip-path var(--duration-slow, 700ms) var(--ease-soft, cubic-bezier(0.22, 1, 0.36, 1)),
     opacity var(--duration-slow, 700ms) var(--ease-soft, cubic-bezier(0.22, 1, 0.36, 1));
   transition-delay: var(--reveal-delay, 0ms);
-  will-change: clip-path;
 }
 
 .reveal-thread-draw {
@@ -2184,7 +2185,6 @@ textarea:focus {
     opacity var(--duration-slow, 700ms) var(--ease-soft, cubic-bezier(0.22, 1, 0.36, 1)),
     transform var(--duration-slow, 700ms) var(--ease-soft, cubic-bezier(0.22, 1, 0.36, 1));
   transition-delay: var(--reveal-delay, 0ms);
-  will-change: opacity, transform;
 }
 
 .reveal.is-visible {
@@ -4191,7 +4191,7 @@ body.intro-running .announcement-bar {
 }
 
 .btn-cinematic {
-  min-height: 52px;
+  /* Phase 6 item 5: min-height removed — inherits 48px from .btn */
   padding: 14px 28px;
   font-size: 1rem;
   font-weight: 600;
@@ -4335,16 +4335,7 @@ body.intro-running .announcement-bar {
   max-width: 640px;
 }
 
-/* Larger section padding for cinematic spacing */
-.section {
-  padding: 120px 0 !important;
-}
-
-@media (max-width: 900px) {
-  .section {
-    padding: 80px 0 !important;
-  }
-}
+/* Phase 6 item 3: old competing .section padding rules removed — consolidated above */
 
 /* Hide old hero (replaced by cinematic) */
 .hero {
@@ -5008,11 +4999,7 @@ html[data-theme="warm"] .enquiry-how-it-works-home {
   flex-shrink: 0;
 }
 
-/* Ensure all buttons in a row have the same height */
-.button-row .btn,
-.hero-cinematic-actions .btn {
-  min-height: 48px;
-}
+/* Phase 6 item 5: .button-row .btn override removed — .btn already has min-height: 48px */
 
 /* ── REDUCED MOTION: ensure fixes don't break ── */
 
