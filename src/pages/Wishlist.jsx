@@ -26,7 +26,7 @@ export default function Wishlist() {
       <section className="page-hero" style={{ padding: "120px 0 40px" }}>
         <div className="container">
           <Reveal variant="fade-up">
-            <p className="eyebrow">Aapki Pasand</p>
+            <p className="eyebrow">Your Wishlist</p>
             <h1 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem, 4vw, 3rem)", marginBottom: "12px" }}>
               Wishlist
             </h1>
@@ -34,8 +34,8 @@ export default function Wishlist() {
               {/* A2 fix: hero copy was unconditionally showing empty-state text.
                   Now state-dependent — shows "saved favourites" copy when populated. */}
               {wishlistProducts.length > 0
-                ? "Yahan aapke saved favourites hain — sab ko ek WhatsApp message mein enquire karo, ya individual products ke liye detail page kholo."
-                : "Abhi tak koi favourite nahi — heart icon dabao aur save karo."}
+                ? "Your saved favourites — enquire all at once on WhatsApp, or open a product detail page."
+                : "Your wishlist is empty. Browse products and save your favourites."}
             </p>
           </Reveal>
         </div>
@@ -56,13 +56,13 @@ export default function Wishlist() {
                   <Heart size={36} style={{ color: "var(--pink-dark)" }} aria-hidden="true" />
                 </div>
                 <h2 style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", marginBottom: "10px" }}>
-                  Abhi tak koi favourite nahi
+                  No favourites yet
                 </h2>
                 <p style={{ color: "var(--muted)", marginBottom: "24px" }}>
-                  {"Abhi tak koi favourite nahi — heart icon dabao aur save karo."} Har product pe heart icon dabao aur yahan save karo.
+                  Your wishlist is empty. Browse products and save your favourites.
                 </p>
                 <Link to="/products" className="btn btn-primary">
-                  Products Browse Karo
+                  Browse Products
                   <ArrowRight size={18} aria-hidden="true" />
                 </Link>
               </div>
@@ -81,7 +81,7 @@ export default function Wishlist() {
                     {count} {count === 1 ? "product" : "products"} saved
                   </strong>
                   <p style={{ fontSize: "0.85rem", color: "var(--muted)", margin: "2px 0 0" }}>
-                    Sab ko ek WhatsApp message mein enquire karo — fast aur easy.
+                    Enquire all on WhatsApp — ek message mein.
                   </p>
                 </div>
                 <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>

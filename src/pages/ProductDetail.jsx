@@ -562,7 +562,7 @@ export default function ProductDetail() {
                   <ShareButton
                     url={typeof window !== "undefined" ? window.location.href : ""}
                     title={`${product.name} — Fakhri Mart`}
-                    text={`Dekho ye product from Fakhri Mart: ${product.name}`}
+                    text={`${product.name} from Fakhri Mart`}
                   />
                   <a
                     href={createWhatsAppLink(`Hello Fakhri Mart, I would like to ask for bulk price quotation for *${product.name}*`)}
@@ -774,7 +774,7 @@ export default function ProductDetail() {
             <div className="section-head text-center" style={{ marginBottom: "32px" }}>
               <p className="eyebrow" style={{ display: "inline-block" }}>Cross-sell</p>
               <h2>People Also Enquired</h2>
-              <p>Ye products bhi zyada enquire hote hain — ek nazar dekho.</p>
+              <p>Related products — you might also like these.</p>
             </div>
             <div className="card-grid product-grid">
               {relatedProducts.map((relProduct) => (
@@ -792,7 +792,7 @@ export default function ProductDetail() {
             <div className="section-head text-center" style={{ marginBottom: "32px" }}>
               <p className="eyebrow" style={{ display: "inline-block" }}>History</p>
               <h2>Recently Viewed</h2>
-              <p>Ye products aapne pehle dekhe hain — phir se enquire karna chahenge?</p>
+              <p>Recently viewed — phir se dekhna chahenge?</p>
             </div>
             <div className="card-grid product-grid">
               {recentlyViewedProducts.map((recentProduct) => (

@@ -258,7 +258,7 @@ export default function Home() {
               transition={{ duration: duration.standard, ease: ease.soft, delay: 0.2 }}
             >
               <span className="hero-cinematic-eyebrow-line" aria-hidden="true" />
-              {"Har shade mein creativity, har thread mein story."}
+              {"Yarns, threads & craft supplies — Pune se, poore India ke liye."}
             </motion.p>
 
             <h1 className="hero-cinematic-title" aria-label="Colourful Yarns and Craft Essentials" style={{ position: "relative" }}>
@@ -314,7 +314,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: duration.standard, ease: ease.soft, delay: 1.2 }}
             >
-              {"Aapki next handmade creation ka start yahin se hota hai."} Explore quality yarns, crochet threads, macrame cords, beads, bases and accessories
+              {"12+ categories, 70+ shades — aapke next project ka starting point."} Explore quality yarns, crochet threads, macrame cords, beads, bases and accessories
               with all-India delivery and easy WhatsApp enquiry.
             </motion.p>
 
@@ -408,7 +408,7 @@ export default function Home() {
         <div className="container">
           <Reveal className="section-heading" variant="scale-in">
             <p className="eyebrow">Product Categories</p>
-            <h2>Har project ke liye perfect yarn milta hai yahan.</h2>
+            <h2>Shop by category — har project ke liye sahi yarn</h2>
             <p>
               Browse yarns, crochet threads, macrame cords, embroidery threads, beads, bases,
               handles, purse accessories and craft essentials.
@@ -466,7 +466,7 @@ export default function Home() {
         <div className="container">
           <Reveal className="section-heading" variant="scale-in">
             <p className="eyebrow">Best Sellers</p>
-            <h2>Resellers ki pasand — sabse zyada enquire hote hain</h2>
+            <h2>Most enquired products — resellers ki regular picks</h2>
             <p>Our top-enquired yarns and accessories ready for immediate catalogue orders.</p>
           </Reveal>
           <div className="card-grid product-grid">
@@ -486,7 +486,7 @@ export default function Home() {
         <div className="container">
           <Reveal className="section-heading text-center" variant="scale-in">
             <p className="eyebrow">Order Flow</p>
-            <h2>Enquiry kaise hoti hai — 4 simple steps</h2>
+            <h2>How enquiry works — 4 simple steps</h2>
             <p>
               Since Fakhri Mart supplies custom wholesale orders and shade varieties, we process final payments and deliveries manually on WhatsApp.
             </p>
@@ -524,7 +524,7 @@ export default function Home() {
         <div className="container">
           <Reveal className="section-heading" variant="scale-in">
             <p className="eyebrow">Featured Catalogue</p>
-            <h2>Featured products — abhi enquire karo</h2>
+            <h2>Featured products — enquire on WhatsApp</h2>
             <p>
               Prices are shared on enquiry because quantity, shade, size, packaging and availability
               can change the final bulk or retail rate.
@@ -573,7 +573,7 @@ export default function Home() {
         <div className="container">
           <Reveal className="section-heading" variant="scale-in">
             <p className="eyebrow">New Arrivals</p>
-            <h2>Naya stock aaya hai — pehle dekho, pehle poocho</h2>
+            <h2>New arrivals this month — fresh stock, naye shades</h2>
             <p>New product lines and accessories can be checked quickly through WhatsApp.</p>
           </Reveal>
           <div className="card-grid arrivals-grid">
@@ -598,7 +598,7 @@ export default function Home() {
         <div className="container bulk-layout">
           <Reveal className="bulk-copy" variant="slide-left">
             <p className="eyebrow">Bulk Orders</p>
-            <h2>Bulk mein chahiye? Best quote paao ek message mein</h2>
+            <h2>Bulk orders — wholesale pricing on enquiry</h2>
             <p>
               Share your required product, quantity, colour, shade, size and delivery location. Our
               team will help you with availability and bulk pricing.
@@ -630,7 +630,7 @@ export default function Home() {
         <div className="container">
           <Reveal className="section-heading" variant="scale-in">
             <p className="eyebrow">Gallery</p>
-            <h2>Ek nazar mein dekho — organized, clear aur inspiring</h2>
+            <h2>Gallery — projects made with our yarns</h2>
             <p>Organized views of yarns, cords, embroidery threads, accessories, beads and purse materials.</p>
           </Reveal>
           <div className="gallery-grid">
@@ -653,7 +653,7 @@ export default function Home() {
         <div className="container split-grid">
           <Reveal variant="slide-left">
             <p className="eyebrow">About Fakhri Mart</p>
-            <h2>Creators, boutiques, resellers — sab ke liye colourful supplies</h2>
+            <h2>For creators, boutiques, and resellers — sab ke liye</h2>
           </Reveal>
           <Reveal delay={100} variant="slide-right">
             <p className="large-copy">{aboutCopy}</p>
@@ -675,7 +675,7 @@ export default function Home() {
         <div className="container">
           <Reveal className="section-heading" variant="scale-in">
             <p className="eyebrow">Why Choose Fakhri Mart</p>
-            <h2>Trust aur quick enquiries — yahi humara promise hai</h2>
+            <h2>Why shop with us — quick WhatsApp replies, all-India delivery</h2>
           </Reveal>
           <div className="card-grid why-card-grid">
             {whyChooseUs.map((item, index) => (
@@ -695,7 +695,7 @@ export default function Home() {
         <div className="container">
           <Reveal className="section-heading" variant="scale-in">
             <p className="eyebrow">Customer Notes</p>
-            <h2>Hamare customers ke dil ki baat</h2>
+            <h2>Customer notes — WhatsApp pe aaye hue feedback</h2>
           </Reveal>
           <div className="testimonial-grid">
             {testimonials.map((testimonial, index) => (
@@ -715,7 +715,7 @@ export default function Home() {
         <div className="container enquiry-layout">
           <Reveal variant="slide-left">
             <p className="eyebrow">Send Enquiry</p>
-            <h2>Aapki next creation ke liye kya chahiye? Batao</h2>
+            <h2>Ready to start your next project? Enquire on WhatsApp</h2>
             <p>
               Share your product, quantity, shade, city and business type. For faster support, the
               WhatsApp button stays available after submission.

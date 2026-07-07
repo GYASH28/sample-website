@@ -132,20 +132,19 @@ export default function NotFound() {
       <section className="page-hero not-found-hero">
         <div className="container page-hero-grid">
           <Reveal variant="slide-left">
-            <p className="eyebrow">404 — Thread Tangled</p>
-            <h1>Ye thread ulajh gayi!</h1>
+            <p className="eyebrow">404</p>
+            <h1>Page not found</h1>
             <p className="page-hero-text">
-              Page nahi mila, par yarn zaroor milega. Wapas workshop mein aao
-              aur apne project ke liye perfect material dhundo.
+              The page you're looking for doesn't exist. Browse our yarns instead.
             </p>
             <div className="button-row" style={{ marginTop: "24px" }}>
               <Link className="btn btn-primary" to="/">
                 <Home size={18} aria-hidden="true" />
-                Wapas Workshop Mein
+                Back to Home
               </Link>
               <Link className="btn btn-outline" to="/products">
                 <Search size={18} aria-hidden="true" />
-                Products Dekho
+                Browse Products
               </Link>
             </div>
           </Reveal>

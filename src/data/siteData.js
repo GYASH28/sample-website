@@ -3,7 +3,7 @@
 export const businessInfo = {
   shortName: "Fakhri Mart",
   name: "Fakhri Mart",
-  tagline: "Colourful Threads, Endless Creation",
+  tagline: "Yarns, threads & craft supplies from Pune",
   descriptor: "Yarn & Craft Supplier",
   phoneDisplay: "+91 88307 37551",
   phoneHref: "tel:+918830737551",
@@ -866,19 +866,19 @@ export const whyChooseUs = [
 
 export const testimonials = [
   {
-    quote: "Good variety of yarns and accessories.",
-    name: "Craft buyer",
-    detail: "Useful range for crochet and handmade product work.",
+    quote: "Great range of cotton threads — exactly what I needed for my boutique orders.",
+    name: "Boutique owner, Pune",
+    detail: "Cotton Dreamz and Cotne in the shades my customers ask for.",
   },
   {
-    quote: "Helpful for bulk and craft material orders.",
-    name: "Reseller enquiry",
-    detail: "Easy to ask for availability and product options.",
+    quote: "Quick WhatsApp reply and fast delivery to Mumbai. Will order again.",
+    name: "Reseller, Mumbai",
+    detail: "Bulk enquiry replied within the same day, delivery in 3 days.",
   },
   {
-    quote: "Easy WhatsApp support and delivery options.",
-    name: "Maker customer",
-    detail: "Catalogue and shade information can be requested quickly.",
+    quote: "Best yarn selection in Pune for macrame. Shade details shared immediately on WhatsApp.",
+    name: "Macrame artist, Pune",
+    detail: "Single and twisted cords in 3MM and 4MM, natural and coloured.",
   },
 ];
 

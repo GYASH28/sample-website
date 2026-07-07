@@ -19,7 +19,7 @@ export default function Footer() {
           </Link>
           <p>
             Pune ki yarn store — poore India ke liye. Colourful yarns, crochet threads, macrame
-            cords, embroidery threads, beads, bases aur purse-making essentials. Har shade mein creativity, har thread mein story.
+            cords, embroidery threads, beads, bases aur purse-making essentials. Yarns, threads & craft supplies from Pune.
           </p>
           <a className="btn btn-whatsapp" href={createWhatsAppLink()} target="_blank" rel="noreferrer" aria-label="Chat with Fakhri Mart on WhatsApp for catalogue">
             <WhatsAppIcon size={18} />
@@ -71,7 +71,7 @@ export default function Footer() {
         </div>
       </Reveal>
       <Reveal className="footer-bottom" variant="fade-up" delay={90}>
-        <p>Copyright © 2026 {businessInfo.name}. Pune se, poore India ke liye — banaya gaya pyaar se.</p>
+        <p>© 2026 {businessInfo.name}, Pune. All-India delivery.</p>
       </Reveal>
     </footer>
   );

@@ -352,7 +352,7 @@ export default function Products() {
           <Reveal className="section-heading" variant="scale-in">
             <p className="eyebrow">Filter Catalogue</p>
             <h2>Explore our products catalogue</h2>
-            <p>Use filters, search or sorting options to find the perfect yarn or craft tool for your handmade creations.</p>
+            <p>Use filters, search or sorting options to find the right yarn or craft tool for your handmade creations.</p>
           </Reveal>
 
           {/* Controls Bar: Search Suggestions, Sorting, Grid/List view */}
