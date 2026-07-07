@@ -1,49 +1,82 @@
-// src/hooks/useEnquiryBasket.js
-// The enquiry basket is the ONLY conversion mechanism on the site (no cart, no checkout).
-// Each entry is a full record so the WhatsApp message can be assembled without re-resolving.
-// Extends the old site's pattern faithfully — rebuilt fresh, not patched.
+import { useEffect, useState } from "react";
 
-import { useCallback } from "react";
-import { useLocalStorage } from "./useLocalStorage.js";
-import { createWhatsAppLink } from "../data/catalogue.js";
+const STORAGE_KEY = "fakhri_enquiry_basket";
+
+export function getEnquiryBasket() {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch (e) {
+    console.error("Failed to load enquiry basket from localStorage", e);
+    return [];
+  }
+}
+
+export function saveEnquiryBasket(basket) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(basket));
+    window.dispatchEvent(new Event("enquiry-basket-updated"));
+  } catch (e) {
+    console.error("Failed to save enquiry basket to localStorage", e);
+  }
+}
+
+export function addToEnquiryBasket(item) {
+  const basket = getEnquiryBasket();
+  // Find if same product, same shade, and same variant already exists
+  const existingIndex = basket.findIndex(
+    (i) => i.slug === item.slug && 
+           i.shade?.name === item.shade?.name && 
+           i.variant === item.variant
+  );
+
+  if (existingIndex > -1) {
+    // Add quantity
+    basket[existingIndex].quantity += item.quantity;
+  } else {
+    basket.push(item);
+  }
+  saveEnquiryBasket(basket);
+}
+
+export function removeFromEnquiryBasket(index) {
+  const basket = getEnquiryBasket();
+  basket.splice(index, 1);
+  saveEnquiryBasket(basket);
+}
+
+export function updateBasketItemQuantity(index, quantity) {
+  const basket = getEnquiryBasket();
+  if (basket[index]) {
+    basket[index].quantity = quantity;
+    saveEnquiryBasket(basket);
+  }
+}
+
+export function clearEnquiryBasket() {
+  saveEnquiryBasket([]);
+}
 
 export function useEnquiryBasket() {
-  const [items, setItems] = useLocalStorage("fakhri:enquiry-basket", []);
+  const [basket, setBasket] = useState(() => getEnquiryBasket());
 
-  const has = useCallback((slug) => items.some((i) => i.slug === slug), [items]);
-  const add = useCallback(
-    (entry) => {
-      setItems((cur) => (cur.some((i) => i.slug === entry.slug) ? cur : [...cur, entry]));
-    },
-    [setItems]
-  );
-  const addMany = useCallback(
-    (entries) => {
-      setItems((cur) => {
-        const existing = new Set(cur.map((i) => i.slug));
-        return [...cur, ...entries.filter((e) => !existing.has(e.slug))];
-      });
-    },
-    [setItems]
-  );
-  const remove = useCallback(
-    (slug) => setItems((cur) => cur.filter((i) => i.slug !== slug)),
-    [setItems]
-  );
-  const clear = useCallback(() => setItems([]), [setItems]);
+  useEffect(() => {
+    const handleUpdate = () => {
+      setBasket(getEnquiryBasket());
+    };
+    window.addEventListener("enquiry-basket-updated", handleUpdate);
+    return () => {
+      window.removeEventListener("enquiry-basket-updated", handleUpdate);
+    };
+  }, []);
 
-  const buildMessage = useCallback(() => {
-    if (!items.length) return "";
-    const lines = items.map((i, idx) => {
-      const parts = [`${idx + 1}. ${i.name}`];
-      if (i.colorName) parts.push(`   Shade: ${i.colorName}`);
-      if (i.quantity) parts.push(`   Qty: ${i.quantity}`);
-      return parts.join("\n");
-    });
-    return `Hello Fakhri Mart, I'd like to enquire about:\n\n${lines.join("\n")}\n\nPlease share availability and pricing. Thank you!`;
-  }, [items]);
-
-  const whatsappLink = useCallback(() => createWhatsAppLink(buildMessage()), [buildMessage]);
-
-  return { items, has, add, addMany, remove, clear, buildMessage, whatsappLink, count: items.length };
+  return {
+    basket,
+    add: addToEnquiryBasket,
+    remove: removeFromEnquiryBasket,
+    updateQuantity: updateBasketItemQuantity,
+    clear: clearEnquiryBasket,
+    count: basket.reduce((acc, item) => acc + item.quantity, 0),
+    itemsCount: basket.length,
+  };
 }

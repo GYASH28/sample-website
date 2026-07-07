@@ -1,85 +1,134 @@
-// src/pages/Wishlist.jsx
-// Wishlist — persisted client-side (localStorage). Simple, fast, state-dependent copy.
-
+import { Heart, Trash2, MessageCircle, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Heart, Trash2, ArrowRight, MessageCircle } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useWishlist } from "../hooks/useWishlist.js";
-import { useEnquiryBasket } from "../hooks/useEnquiryBasket.js";
-import { ProductCard } from "../components/ProductCard.jsx";
-import { Reveal } from "../components/Reveal.jsx";
-import { useDocumentMeta } from "../hooks/useDocumentMeta.js";
-import { featuredProducts, createWhatsAppLink } from "../data/catalogue.js";
+import { featuredProducts, createWhatsAppLink } from "../data/siteData.js";
+import { smartWhatsAppLink, phrases } from "../i18n.jsx";
+import Reveal from "../components/Reveal.jsx";
+import ProductCard from "../components/ProductCard.jsx";
+import { ease, duration } from "../motion-tokens.js";
 
 export default function Wishlist() {
-  useDocumentMeta({
-    title: "Wishlist",
-    description: "Your saved Fakhri Mart products. Enquire about all of them in one WhatsApp message.",
-  });
+  const { wishlist, remove, clear, count } = useWishlist();
 
-  const { items, clear, count } = useWishlist();
-  const basket = useEnquiryBasket();
-  const wishlistProducts = items
+  const wishlistProducts = wishlist
     .map((slug) => featuredProducts.find((p) => p.slug === slug))
     .filter(Boolean);
 
-  const enquireAllMessage = `Hello Fakhri Mart, I'd like to enquire about my wishlist:\n\n${wishlistProducts.map((p, i) => `${i + 1}. ${p.name}`).join("\n")}\n\nPlease share availability and pricing. Thank you!`;
+  const enquireAllLink = smartWhatsAppLink({
+    type: "wishlist",
+    items: wishlistProducts,
+  });
 
   return (
-    <div className="wishlist-page">
-      <div className="container">
-        <Reveal>
-          <header className="page-header">
-            <p className="eyebrow">Your saves</p>
-            <h1>Wishlist</h1>
-            <p className="page-lede">
+    <>
+      {/* Hero */}
+      <section className="page-hero" style={{ padding: "120px 0 40px" }}>
+        <div className="container">
+          <Reveal variant="fade-up">
+            <p className="eyebrow">Aapki Pasand</p>
+            <h1 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem, 4vw, 3rem)", marginBottom: "12px" }}>
+              Wishlist
+            </h1>
+            <p style={{ fontSize: "1.05rem", color: "var(--muted)", maxWidth: "560px" }}>
+              {/* A2 fix: hero copy was unconditionally showing empty-state text.
+                  Now state-dependent — shows "saved favourites" copy when populated. */}
               {wishlistProducts.length > 0
-                ? `${count} ${count === 1 ? "product" : "products"} saved — enquire about all of them in one WhatsApp message.`
-                : "Tap the heart icon on any product to save it here."}
+                ? "Yahan aapke saved favourites hain — sab ko ek WhatsApp message mein enquire karo, ya individual products ke liye detail page kholo."
+                : phrases.emptyWishlist}
             </p>
-          </header>
-        </Reveal>
-
-        {wishlistProducts.length === 0 ? (
-          <Reveal>
-            <div className="empty-state">
-              <Heart size={48} className="empty-icon" aria-hidden="true" />
-              <h2>No favourites yet</h2>
-              <p>Browse the catalogue and tap the heart on any product to save it here.</p>
-              <Link to="/products" className="btn btn-primary">
-                Browse products <ArrowRight size={16} />
-              </Link>
-            </div>
           </Reveal>
-        ) : (
-          <>
-            <div className="wishlist-actions">
-              <a href={createWhatsAppLink(enquireAllMessage)} target="_blank" rel="noreferrer noopener" className="btn btn-whatsapp">
-                <MessageCircle size={16} /> Enquire about all
-              </a>
-              <button type="button" onClick={clear} className="btn btn-outline">
-                <Trash2 size={14} /> Clear all
-              </button>
-            </div>
-            <div className="product-grid">
-              <AnimatePresence>
-                {wishlistProducts.map((p, i) => (
-                  <motion.div
-                    key={p.slug}
-                    layout
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.3, delay: i * 0.04 }}
+        </div>
+      </section>
+
+      <section className="section" style={{ paddingTop: "20px" }}>
+        <div className="container">
+          {wishlistProducts.length === 0 ? (
+            /* Empty state */
+            <Reveal variant="scale-in" className="empty-wishlist">
+              <div style={{ textAlign: "center", padding: "60px 20px", maxWidth: "480px", margin: "0 auto" }}>
+                <div style={{
+                  width: 80, height: 80, borderRadius: "50%",
+                  background: "var(--pink-soft)", display: "flex",
+                  alignItems: "center", justifyContent: "center",
+                  margin: "0 auto 20px",
+                }}>
+                  <Heart size={36} style={{ color: "var(--pink-dark)" }} aria-hidden="true" />
+                </div>
+                <h2 style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", marginBottom: "10px" }}>
+                  Abhi tak koi favourite nahi
+                </h2>
+                <p style={{ color: "var(--muted)", marginBottom: "24px" }}>
+                  {phrases.emptyWishlist} Har product pe heart icon dabao aur yahan save karo.
+                </p>
+                <Link to="/products" className="btn btn-primary">
+                  Products Browse Karo
+                  <ArrowRight size={18} aria-hidden="true" />
+                </Link>
+              </div>
+            </Reveal>
+          ) : (
+            <>
+              {/* Wishlist header bar */}
+              <div style={{
+                display: "flex", justifyContent: "space-between", alignItems: "center",
+                flexWrap: "wrap", gap: "16px", marginBottom: "24px",
+                padding: "16px 20px", background: "var(--surface)",
+                borderRadius: "var(--radius-lg)", border: "1px solid var(--line)",
+              }}>
+                <div>
+                  <strong style={{ fontSize: "1.1rem", color: "var(--charcoal)" }}>
+                    {count} {count === 1 ? "product" : "products"} saved
+                  </strong>
+                  <p style={{ fontSize: "0.85rem", color: "var(--muted)", margin: "2px 0 0" }}>
+                    Sab ko ek WhatsApp message mein enquire karo — fast aur easy.
+                  </p>
+                </div>
+                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                  <a
+                    href={enquireAllLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn btn-whatsapp btn-small"
+                    aria-label="Enquire about all wishlist items on WhatsApp"
                   >
-                    <ProductCard product={p} />
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-          </>
-        )}
-      </div>
-    </div>
+                    <MessageCircle size={16} aria-hidden="true" />
+                    Enquire About All
+                  </a>
+                  <button
+                    type="button"
+                    onClick={clear}
+                    className="btn btn-outline btn-small"
+                    style={{ color: "var(--pink-dark)" }}
+                    aria-label="Clear all wishlist items"
+                  >
+                    <Trash2 size={14} aria-hidden="true" />
+                    Clear All
+                  </button>
+                </div>
+              </div>
+
+              {/* Product grid */}
+              <div className="card-grid product-grid">
+                <AnimatePresence>
+                  {wishlistProducts.map((product, index) => (
+                    <motion.div
+                      key={product.slug}
+                      layout
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={{ duration: duration.standard, ease: ease.soft, delay: index * 0.05 }}
+                    >
+                      <ProductCard product={product} />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            </>
+          )}
+        </div>
+      </section>
+    </>
   );
 }

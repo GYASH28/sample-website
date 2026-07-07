@@ -1,7 +1,8 @@
 // src/scripts/prerender.js
-// Build-time prerendering via Playwright. Boots the preview server, visits every route,
-// writes fully-rendered HTML back into dist/. This makes meta tags + JSON-LD visible
-// to crawlers and link-preview bots (WhatsApp/Instagram) that don't execute JS.
+// Phase 4.6 — Playwright-based prerendering.
+// Boots the preview server, visits each route, writes fully-rendered HTML back into
+// dist/ so crawlers and link-preview bots that don't execute JS see real content
+// + JSON-LD + meta tags.
 
 import { chromium } from "playwright";
 import { existsSync, writeFileSync, mkdirSync } from "node:fs";
@@ -18,11 +19,12 @@ if (!existsSync(distDir)) {
   process.exit(1);
 }
 
-const { businessInfo, products } = await import("../data/catalogue.js");
+const { businessInfo, featuredProducts, blogPosts } = await import("../data/siteData.js");
 
-const staticRoutes = ["/", "/products", "/about", "/contact", "/wishlist", "/enquiry"];
-const productRoutes = products.map((p) => `/products/${p.slug}`);
-const allRoutes = [...staticRoutes, ...productRoutes];
+const staticRoutes = ["/", "/products", "/gallery", "/about", "/contact", "/blog"];
+const productRoutes = featuredProducts.map((p) => `/products/${p.slug}`);
+const blogRoutes = blogPosts.map((p) => `/blog/${p.slug}`);
+const allRoutes = [...staticRoutes, ...productRoutes, ...blogRoutes];
 
 // Bypass on Vercel or CI environment where running headless browser during build is unsupported/unreliable
 if (process.env.VERCEL || process.env.CI) {
@@ -79,15 +81,17 @@ try {
   let failCount = 0;
 
   for (const route of allRoutes) {
-    const url = `http://127.0.0.1:4173${route}`;
+    const url = `http://localhost:4173${route}`;
     try {
       await page.goto(url, { waitUntil: "networkidle", timeout: 15000 });
-      await page.waitForTimeout(500); // let hydration write JSON-LD + meta tags
+      await page.waitForTimeout(500); // allow hydration to write JSON-LD + meta tags
+
       const html = await page.content();
       const finalPath =
         route === "/"
           ? resolve(distDir, "index.html")
           : resolve(distDir, route.slice(1), "index.html");
+
       mkdirSync(dirname(finalPath), { recursive: true });
       writeFileSync(finalPath, html, "utf-8");
       successCount++;

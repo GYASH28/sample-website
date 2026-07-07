@@ -1,67 +1,78 @@
-// src/components/Footer.jsx
-// Site footer — brand, quick links, contact, social. Real content, no decorative filler.
-
+import { Instagram, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Phone, Mail, MapPin, Clock, Instagram } from "lucide-react";
-import { businessInfo, MASTER_CATEGORIES } from "../data/catalogue.js";
+import { businessInfo, createWhatsAppLink, navItems, productCategories } from "../data/siteData.js";
+import Reveal from "./Reveal.jsx";
+import SmartLink from "./SmartLink.jsx";
+import WhatsAppIcon from "./WhatsAppIcon.jsx";
 
-export function Footer() {
+export default function Footer() {
   return (
     <footer className="site-footer">
-      <div className="container footer-grid">
-        <div className="footer-col footer-brand">
-          <div className="footer-brand-name">{businessInfo.name}</div>
-          <div className="footer-brand-tag">{businessInfo.tagline}</div>
-          <p className="footer-blurb">
-            Yarns, crochet threads, macrame cords, embroidery floss, beads, bases and
-            purse-making essentials. Pan-India delivery. WhatsApp enquiry catalogue.
+      <Reveal className="container footer-grid" variant="fade-up">
+        <div className="footer-brand">
+          <Link to="/" className="brand brand-footer">
+            <img src="/assets/fakhri-mart-logo.webp" alt="Fakhri Mart logo" />
+            <span>
+              <strong>{businessInfo.shortName}</strong>
+              <small>{businessInfo.tagline}</small>
+            </span>
+          </Link>
+          <p>
+            Pune ki yarn store — poore India ke liye. Colourful yarns, crochet threads, macrame
+            cords, embroidery threads, beads, bases aur purse-making essentials. Har shade mein creativity, har thread mein story.
           </p>
+          <a className="btn btn-whatsapp" href={createWhatsAppLink()} target="_blank" rel="noreferrer" aria-label="Chat with Fakhri Mart on WhatsApp for catalogue">
+            <WhatsAppIcon size={18} />
+            WhatsApp Catalogue
+          </a>
         </div>
 
-        <div className="footer-col">
-          <h4>Shop</h4>
-          <ul>
-            <li><Link to="/products">All Products</Link></li>
-            {MASTER_CATEGORIES.map((mc) => (
-              <li key={mc}><Link to={`/products?department=${mc}`}>{mc}</Link></li>
+        <div>
+          <h3>Quick Links</h3>
+          <ul className="footer-links">
+            {navItems.slice(0, 7).map((item) => (
+              <li key={item.href}>
+                <SmartLink to={item.href}>{item.label}</SmartLink>
+              </li>
             ))}
           </ul>
         </div>
 
-        <div className="footer-col">
-          <h4>Pages</h4>
-          <ul>
-            <li><Link to="/">Home</Link></li>
-            <li><Link to="/about">About</Link></li>
-            <li><Link to="/contact">Contact</Link></li>
-            <li><Link to="/wishlist">Wishlist</Link></li>
-            <li><Link to="/enquiry">Enquiry Basket</Link></li>
+        <div>
+          <h3>Categories</h3>
+          <ul className="footer-links">
+            {productCategories.slice(0, 8).map((category) => (
+              <li key={category.name}>
+                <Link to="/products">{category.shortName}</Link>
+              </li>
+            ))}
           </ul>
         </div>
 
-        <div className="footer-col">
-          <h4>Contact</h4>
+        <div>
+          <h3>Contact</h3>
           <ul className="footer-contact">
-            <li><Phone size={14} /> <a href={businessInfo.phoneHref}>{businessInfo.phoneDisplay}</a></li>
-            <li><Mail size={14} /> <a href={`mailto:${businessInfo.email}`}>{businessInfo.email}</a></li>
-            <li><MapPin size={14} /> {businessInfo.address}</li>
-            <li><Clock size={14} /> {businessInfo.hours}</li>
+            <li>{businessInfo.name}</li>
+            <li>{businessInfo.delivery}</li>
+            <li>{businessInfo.location}</li>
+            <li>
+              <a href={businessInfo.phoneHref} aria-label={`Call Fakhri Mart at ${businessInfo.phoneDisplay}`}>
+                <Phone size={15} aria-hidden="true" />
+                {businessInfo.phoneDisplay}
+              </a>
+            </li>
+            <li>
+              <a href={businessInfo.instagramUrl} target="_blank" rel="noreferrer" aria-label={`Visit Fakhri Mart on Instagram @${businessInfo.instagram}`}>
+                <Instagram size={15} aria-hidden="true" />
+                @{businessInfo.instagram}
+              </a>
+            </li>
           </ul>
-          <a
-            href={businessInfo.instagramUrl}
-            className="footer-social"
-            target="_blank"
-            rel="noreferrer noopener"
-            aria-label="Instagram"
-          >
-            <Instagram size={16} />
-          </a>
         </div>
-      </div>
-      <div className="footer-bottom">
-        <span>© {new Date().getFullYear()} {businessInfo.name}. All rights reserved.</span>
-        <span className="footer-quote">{businessInfo.delivery}</span>
-      </div>
+      </Reveal>
+      <Reveal className="footer-bottom" variant="fade-up" delay={90}>
+        <p>Copyright © 2026 {businessInfo.name}. Pune se, poore India ke liye — banaya gaya pyaar se.</p>
+      </Reveal>
     </footer>
   );
 }

@@ -1,120 +1,162 @@
-// src/components/Header.jsx
-// Site header — brand, primary nav (with Yarns/Threads/Accessories as first-class departments),
-// i18n toggle, dark mode toggle, enquiry basket shortcut. Sticky, single subtle blur (not stacked).
-
-import { useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import { ShoppingBag, Globe, Sun, Moon, Menu, X } from "lucide-react";
-import { businessInfo, MASTER_CATEGORIES } from "../data/catalogue.js";
-import { useI18n } from "../lib/i18n.jsx";
-import { useTheme } from "../lib/theme.jsx";
+import { Menu, X, ShoppingBag, Heart, ArrowUpDown } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { announcementItems, businessInfo, createWhatsAppLink, navItems } from "../data/siteData.js";
 import { useEnquiryBasket } from "../hooks/useEnquiryBasket.js";
-import { buttonTap } from "../lib/motion.js";
-import { motion } from "framer-motion";
+import { useWishlist } from "../hooks/useWishlist.js";
+import { useCompare } from "../hooks/useCompare.js";
+import SmartLink from "./SmartLink.jsx";
+import WhatsAppIcon from "./WhatsAppIcon.jsx";
+import ThemeToggle from "./ThemeToggle.jsx";
+import HindiToggle from "./HindiToggle.jsx";
 
-export function Header() {
-  const { lang, setLang } = useI18n();
-  const { theme, toggle } = useTheme();
-  const basket = useEnquiryBasket();
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const navigate = useNavigate();
+function NavItem({ item, activePath, onClick }) {
+  const isAnchor = item.href.includes("#");
+  const isActive = !isAnchor && activePath === item.href;
+  const className = isActive ? "active" : undefined;
 
   return (
-    <header className="site-header">
-      <div className="container header-inner">
-        <Link to="/" className="brand" aria-label={`${businessInfo.name} home`}>
-          <span className="brand-mark">FM</span>
-          <span className="brand-text">
-            <span className="brand-name">{businessInfo.shortName}</span>
-            <span className="brand-tag">{businessInfo.descriptor}</span>
-          </span>
-        </Link>
+    <SmartLink to={item.href} className={className} onClick={onClick}>
+      {item.label}
+    </SmartLink>
+  );
+}
 
-        <nav className="primary-nav" aria-label="Primary">
-          <NavLink to="/" end className="nav-link">Home</NavLink>
-          <NavLink to="/products" className="nav-link">Shop</NavLink>
-          {MASTER_CATEGORIES.map((mc) => (
-            <NavLink
-              key={mc}
-              to={`/products?department=${mc}`}
-              className="nav-link nav-link-dept"
-            >
-              {mc}
-            </NavLink>
+export default function Header() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
+  const { itemsCount } = useEnquiryBasket();
+  const { count: wishlistCount } = useWishlist();
+  const { count: compareCount } = useCompare();
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 18);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    document.body.classList.toggle("menu-lock", menuOpen);
+    return () => document.body.classList.remove("menu-lock");
+  }, [menuOpen]);
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname, location.hash]);
+
+  return (
+    <header className={`site-header ${scrolled ? "site-header--scrolled" : ""}`}>
+      <div className="announcement-bar" aria-label="Store highlights">
+        <div className="announcement-track">
+          {[...announcementItems, ...announcementItems].map((item, index) => (
+            <span key={`${item}-${index}`}>{item}</span>
           ))}
-          <NavLink to="/about" className="nav-link">About</NavLink>
-          <NavLink to="/contact" className="nav-link">Contact</NavLink>
-        </nav>
-
-        <div className="header-tools">
-          <button
-            type="button"
-            className="header-toggle"
-            onClick={() => setLang(lang === "en" ? "hi" : "en")}
-            aria-label={lang === "en" ? "हिंदी में देखें" : "View in English"}
-            whileTap={buttonTap}
-          >
-            <Globe size={15} />
-            <span>{lang === "en" ? "EN" : "हि"}</span>
-          </button>
-
-          <button
-            type="button"
-            className="header-toggle"
-            onClick={toggle}
-            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-            whileTap={buttonTap}
-          >
-            {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
-          </button>
-
-          <button
-            type="button"
-            className="header-toggle basket-toggle"
-            onClick={() => navigate("/enquiry")}
-            aria-label={`Enquiry basket, ${basket.count} items`}
-          >
-            <ShoppingBag size={15} />
-            {basket.count > 0 && <span className="basket-count">{basket.count}</span>}
-          </button>
-
-          <button
-            type="button"
-            className="header-toggle mobile-menu-toggle"
-            onClick={() => setMobileOpen((o) => !o)}
-            aria-label="Toggle menu"
-            aria-expanded={mobileOpen}
-          >
-            {mobileOpen ? <X size={18} /> : <Menu size={18} />}
-          </button>
         </div>
       </div>
 
-      {mobileOpen && (
-        <motion.div
-          className="mobile-nav"
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          exit={{ opacity: 0, height: 0 }}
-        >
-          <div className="container">
-            <NavLink to="/" end className="mobile-nav-link" onClick={() => setMobileOpen(false)}>Home</NavLink>
-            <NavLink to="/products" className="mobile-nav-link" onClick={() => setMobileOpen(false)}>All Products</NavLink>
-            {MASTER_CATEGORIES.map((mc) => (
-              <NavLink
-                key={mc}
-                to={`/products?department=${mc}`}
-                className="mobile-nav-link"
-                onClick={() => setMobileOpen(false)}
-              >
-                {mc}
-              </NavLink>
-            ))}
-            <NavLink to="/about" className="mobile-nav-link" onClick={() => setMobileOpen(false)}>About</NavLink>
-            <NavLink to="/contact" className="mobile-nav-link" onClick={() => setMobileOpen(false)}>Contact</NavLink>
+      <div className="container nav-shell">
+        <SmartLink to="/" className="brand" aria-label="Fakhri Mart home">
+          <img id="navbar-logo" src="/assets/fakhri-mart-logo.webp" alt="Fakhri Mart logo" />
+          <span>
+            <strong>{businessInfo.shortName}</strong>
+            <small>{businessInfo.descriptor}</small>
+          </span>
+        </SmartLink>
+
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          {/* Mobile Favorites Shortcut */}
+          <SmartLink to="/wishlist" className="mobile-basket-btn" aria-label="Wishlist">
+            <Heart size={21} />
+            {wishlistCount > 0 && <span className="basket-badge-floating bg-rose">{wishlistCount}</span>}
+          </SmartLink>
+
+          {/* Mobile-only Enquiry Basket Shortcut */}
+          <SmartLink to="/enquiry" className="mobile-basket-btn" aria-label="Enquiry Basket">
+            <ShoppingBag size={21} />
+            {itemsCount > 0 && <span className="basket-badge-floating">{itemsCount}</span>}
+          </SmartLink>
+
+          <button
+            className="menu-toggle"
+            type="button"
+            aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            {menuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
+
+        <nav className={`main-nav ${menuOpen ? "main-nav--open" : ""}`} aria-label="Primary navigation">
+          <div className="mobile-nav-header">
+            <img src="/assets/fakhri-mart-logo.webp" alt="Fakhri Mart logo" className="mobile-nav-logo" />
+            <div className="mobile-nav-text">
+              <strong>{businessInfo.shortName}</strong>
+              <small>{businessInfo.descriptor}</small>
+            </div>
           </div>
-        </motion.div>
-      )}
+
+          {navItems.map((item) => (
+            <NavItem
+              key={item.href}
+              item={item}
+              activePath={location.pathname}
+              onClick={() => setMenuOpen(false)}
+            />
+          ))}
+
+          {/* Desktop Favorites Link → Wishlist page */}
+          <SmartLink
+            to="/wishlist"
+            className="favorites-nav-link"
+            onClick={() => setMenuOpen(false)}
+            style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+          >
+            <Heart size={16} />
+            <span>Wishlist</span>
+            {wishlistCount > 0 && <span className="basket-badge wishlist-badge">{wishlistCount}</span>}
+          </SmartLink>
+
+          {/* Desktop Enquiry Basket Link */}
+          <SmartLink
+            to="/enquiry"
+            className={location.pathname === "/enquiry" ? "active enquiry-basket-nav" : "enquiry-basket-nav"}
+            onClick={() => setMenuOpen(false)}
+            style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+          >
+            <span>Enquiry</span>
+            {itemsCount > 0 && <span className="basket-badge">{itemsCount}</span>}
+          </SmartLink>
+
+          {/* Compare Count Indicator */}
+          {compareCount > 0 && (
+            <span className="compare-count-nav-item" style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+              <ArrowUpDown size={15} />
+              <span>Compare ({compareCount})</span>
+            </span>
+          )}
+
+          {/* Theme + Language toggles (desktop) */}
+          <div className="header-toggles" style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+            <ThemeToggle />
+            <HindiToggle />
+          </div>
+
+          <a
+            className="btn btn-small btn-whatsapp"
+            href={createWhatsAppLink()}
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => setMenuOpen(false)}
+          >
+            <WhatsAppIcon size={17} />
+            WhatsApp
+          </a>
+        </nav>
+      </div>
     </header>
   );
 }
+

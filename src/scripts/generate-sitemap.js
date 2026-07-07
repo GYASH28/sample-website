@@ -1,5 +1,5 @@
 // src/scripts/generate-sitemap.js
-// Generate public/sitemap.xml at build time. Covers static routes + every product slug.
+// Phase 1.4 — generate public/sitemap.xml at build time.
 
 import { writeFileSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -7,11 +7,12 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const { businessInfo, products } = await import("../data/catalogue.js");
+const { businessInfo, featuredProducts, blogPosts } = await import("../data/siteData.js");
 
-const staticRoutes = ["/", "/products", "/about", "/contact", "/wishlist", "/enquiry"];
-const productRoutes = products.map((p) => `/products/${p.slug}`);
-const allRoutes = [...staticRoutes, ...productRoutes];
+const staticRoutes = ["/", "/products", "/gallery", "/about", "/contact", "/blog"];
+const productRoutes = featuredProducts.map((p) => `/products/${p.slug}`);
+const blogRoutes = blogPosts.map((p) => `/blog/${p.slug}`);
+const allRoutes = [...staticRoutes, ...productRoutes, ...blogRoutes];
 
 const today = new Date().toISOString().split("T")[0];
 

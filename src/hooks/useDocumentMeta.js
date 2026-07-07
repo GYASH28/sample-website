@@ -1,42 +1,63 @@
-// src/hooks/useDocumentMeta.js
-// Per-route document metadata. Sets title/description/OG/canonical.
-
 import { useEffect } from "react";
-import { businessInfo } from "../data/catalogue.js";
 
-function upsertMeta(attr, key, content) {
-  if (!content) return;
-  let el = document.head.querySelector(`meta[${attr}="${key}"]`);
+const defaults = {
+  title: "Fakhri Mart | Yarn Store & Craft Supplier",
+  description:
+    "Fakhri Mart offers yarns, crochet threads, macrame cords, embroidery threads, beads, purse accessories, bases, handles and craft essentials with all-India delivery and bulk enquiry support.",
+};
+
+function setMeta(name, content, attr = "name") {
+  let el = document.querySelector(`meta[${attr}="${name}"]`);
   if (!el) {
     el = document.createElement("meta");
-    el.setAttribute(attr, key);
+    el.setAttribute(attr, name);
     document.head.appendChild(el);
   }
   el.setAttribute("content", content);
 }
 
-function upsertLink(rel, href) {
-  if (!href) return;
-  let el = document.head.querySelector(`link[rel="${rel}"]`);
+function setCanonical(pathname) {
+  let el = document.querySelector('link[rel="canonical"]');
   if (!el) {
     el = document.createElement("link");
-    el.setAttribute("rel", rel);
+    el.setAttribute("rel", "canonical");
     document.head.appendChild(el);
   }
-  el.setAttribute("href", href);
+  el.setAttribute("href", `${window.location.origin}${pathname}`);
 }
 
-export function useDocumentMeta({ title, description, image, canonical, type = "website" }) {
+/**
+ * Sets document title, meta description, OG tags, and canonical link.
+ * Resets to defaults on unmount.
+ */
+export default function useDocumentMeta({ title, description, pathname } = {}) {
   useEffect(() => {
-    const fullTitle = title ? `${title} · ${businessInfo.shortName}` : businessInfo.shortName;
+    // Phase 5 — avoid double-suffix when callers already include "| Fakhri Mart"
+    const suffix = " | Fakhri Mart";
+    const trimmed = (title || "").trim();
+    const fullTitle = trimmed
+      ? trimmed.toLowerCase().endsWith("fakhri mart")
+        ? trimmed
+        : trimmed + suffix
+      : defaults.title;
+    const desc = description || defaults.description;
+    const path = pathname || window.location.pathname;
+
     document.title = fullTitle;
-    upsertMeta("name", "description", description);
-    upsertMeta("property", "og:title", fullTitle);
-    upsertMeta("property", "og:description", description);
-    upsertMeta("property", "og:type", type);
-    upsertMeta("property", "og:site_name", businessInfo.name);
-    upsertMeta("property", "og:image", image || "/assets/og-default.png");
-    upsertMeta("name", "twitter:card", "summary_large_image");
-    upsertLink("canonical", canonical || window.location.href);
-  }, [title, description, image, canonical, type]);
+    setMeta("description", desc);
+    setMeta("og:title", fullTitle, "property");
+    setMeta("og:description", desc, "property");
+    setMeta("twitter:title", fullTitle, "property");
+    setMeta("twitter:description", desc, "property");
+    setCanonical(path);
+
+    return () => {
+      document.title = defaults.title;
+      setMeta("description", defaults.description);
+      setMeta("og:title", defaults.title, "property");
+      setMeta("og:description", defaults.description, "property");
+      setMeta("twitter:title", defaults.title, "property");
+      setMeta("twitter:description", defaults.description, "property");
+    };
+  }, [title, description, pathname]);
 }

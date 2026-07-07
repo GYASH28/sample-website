@@ -1,81 +1,64 @@
-// src/pages/About.jsx
-// About — real business story, real photography. No abstract decorative filler.
-
-import { Reveal } from "../components/Reveal.jsx";
-import { useDocumentMeta } from "../hooks/useDocumentMeta.js";
-import { businessInfo } from "../data/catalogue.js";
+import { CheckCircle2 } from "lucide-react";
+import { motion } from "framer-motion";
+import IconBadge from "../components/IconBadge.jsx";
+import PageHero from "../components/PageHero.jsx";
+import ParallaxLayer from "../components/ParallaxLayer.jsx";
+import ProductVisual from "../components/ProductVisual.jsx";
+import Reveal from "../components/Reveal.jsx";
+import StaggerReveal, { staggerChild } from "../components/StaggerReveal.jsx";
+import { aboutCopy, aboutPoints, businessInfo, whyChooseUs } from "../data/siteData.js";
+import { ease, duration } from "../motion-tokens.js";
 
 export default function About() {
-  useDocumentMeta({
-    title: "About",
-    description: `${businessInfo.name} — a yarn, thread and craft-accessories specialty store. Real story, real products, WhatsApp-first service.`,
-    canonical: `${businessInfo.url}/about`,
-  });
-
   return (
-    <div className="about-page">
-      <div className="container">
-        <Reveal>
-          <header className="page-header">
-            <p className="eyebrow">Our story</p>
-            <h1>About {businessInfo.shortName}</h1>
-            <p className="page-lede">{businessInfo.tagline}</p>
-          </header>
-        </Reveal>
+    <>
+      <PageHero
+        eyebrow="About Fakhri Mart"
+        title="A colourful yarn and craft material store for creators"
+        text="Fakhri Mart supports makers, boutiques, resellers and craft businesses with yarns, crochet threads, macrame cords, embroidery threads, beads, bases, handles and handmade essentials."
+      >
+        <ParallaxLayer speed={0.4}>
+          <ProductVisual palette={["#35b8ad", "#f6a7b8", "#f3c65f"]} />
+        </ParallaxLayer>
+      </PageHero>
 
-        <div className="about-grid">
-          <Reveal>
-            <div className="about-content">
-              <p>
-                {businessInfo.name} is a yarn, thread and craft-accessories specialty store
-                based in {businessInfo.location}. We carry crochet threads, knitting yarns,
-                macrame cords, embroidery floss, beads, bases, purse handles and the small
-                hardware a maker needs to finish a piece — sourced from brands we use ourselves,
-                including Bliss, Vardhaman, Ganga and a handful of small-batch suppliers.
-              </p>
-              <p>
-                There's no checkout and no account. The whole catalogue is a WhatsApp enquiry
-                basket — pick what you like, send one message, we reply with availability and
-                pricing. It keeps things personal, which is how craft shopping should feel.
-                {businessInfo.delivery}.
-              </p>
-              <p>
-                We work with individual crafters, boutiques, resellers and wholesalers across
-                India. Whether you need a single ball to finish a project or a bulk order for a
-                store, the conversation starts the same way: a WhatsApp message.
-              </p>
-              <p>
-                <strong>Hours:</strong> {businessInfo.hours}.<br />
-                <strong>Location:</strong> {businessInfo.address}.<br />
-                <strong>Phone:</strong> {businessInfo.phoneDisplay}.
-              </p>
-            </div>
+      <section className="section">
+        <div className="container split-grid">
+          <Reveal variant="slide-left">
+            <p className="eyebrow">{businessInfo.tagline}</p>
+            <h2>Built for craft buyers who need range, clarity and quick support.</h2>
           </Reveal>
-
-          <Reveal>
-            <div className="about-photography">
-              <img
-                src="/assets/images/products/cotton-dreamz/hero.webp"
-                alt="Cotton Dreamz yarn in seafoam, hot pink and butter yellow"
-                loading="lazy"
-                className="about-photo"
-              />
-              <img
-                src="/assets/images/products/single-macrame-cord/hero.webp"
-                alt="Single-twist macrame cord in natural beige"
-                loading="lazy"
-                className="about-photo"
-              />
-              <img
-                src="/assets/images/products/anchor-lacchi/hero.webp"
-                alt="Anchor Lacchi embroidery thread in magenta and jade"
-                loading="lazy"
-                className="about-photo"
-              />
-            </div>
+          <Reveal delay={100} variant="slide-right">
+            <p className="large-copy">{aboutCopy}</p>
+            <StaggerReveal className="about-point-grid">
+              {aboutPoints.map((point) => (
+                <motion.span key={point} variants={staggerChild}>
+                  <CheckCircle2 size={17} aria-hidden="true" />
+                  {point}
+                </motion.span>
+              ))}
+            </StaggerReveal>
           </Reveal>
         </div>
-      </div>
-    </div>
+      </section>
+
+      <section className="section section-tinted">
+        <div className="container">
+          <Reveal className="section-heading" variant="scale-in">
+            <p className="eyebrow">Why Buyers Choose Us</p>
+            <h2>Premium catalogue support for regular and bulk craft needs.</h2>
+          </Reveal>
+          <StaggerReveal className="card-grid why-card-grid">
+            {whyChooseUs.map((item) => (
+              <motion.div key={item.title} className="highlight-card" variants={staggerChild}>
+                <IconBadge name={item.icon} tone={item === whyChooseUs[0] ? "teal" : "pink"} />
+                <h3>{item.title}</h3>
+                <p>{item.text}</p>
+              </motion.div>
+            ))}
+          </StaggerReveal>
+        </div>
+      </section>
+    </>
   );
 }

@@ -2,27 +2,31 @@
 
 This file documents things that look like bugs but are deliberate decisions, so a future audit doesn't re-flag them as defects.
 
-## No pincode "delivery checker"
+## PincodeChecker returns "Yes, we deliver here!" for any syntactically valid 6-digit pincode
 
-**Status:** Intentionally removed in the fresh rebuild.
+**File:** `src/components/PincodeChecker.jsx`
 
-The old site had a `PincodeChecker.jsx` component that accepted any 6-digit pincode, waited on an artificial `setTimeout`, and always returned "Yes, we deliver here!" — admitted in its own source comment as "simulating realism for a result that never changes." This was exactly the "buttons that are just for show" problem.
+**Behavior:** Any 6-digit number entered into the pincode checker gets a confident "Yes, we deliver here!" response.
 
-The fresh rebuild replaces it with an honest static shipping line on the Contact page and ProductDetail:
+**Why this is intentional:** Fakhri Mart genuinely delivers all-India. There is no real pincode-serviceability API behind this — the check is purely syntactic (6 digits). The confirmation message is designed to reassure users, not to gate them.
 
-> "We ship pan-India. Typical transit: 3–5 business days. Confirm exact timing for your area on WhatsApp."
+**Risk:** A user who types an obviously fake code (e.g. `000000` or `999999`) still gets a confident, specific-sounding confirmation. This could feel dishonest if a user notices.
 
-No fake input, no fake loading state, no fake check. The business does ship pan-India, so the answer is always yes — saying so directly is more honest than theater.
+**Status:** Flagged for client review. If the client prefers softer copy, change the response to something like:
+
+> "We deliver across India — we'll confirm exact timing for your area on WhatsApp."
+
+instead of a hard yes/no. The current copy was confirmed acceptable as of the last audit, but should be re-confirmed periodically.
 
 ---
 
 ## No real review system behind the `rating` / `reviewCount` fields
 
-**Files:** `src/data/catalogue.js`, `src/hooks/useJsonLd.js`
+**File:** `src/data/siteData.js`, `src/hooks/useJsonLd.js`
 
 **Behavior:** Each product has `rating` (4.3–4.9) and `reviewCount` (12–60) fields, displayed as stars on cards and product pages, and emitted as `aggregateRating` in JSON-LD structured data.
 
-**Why this is intentional:** There is no backend, no accounts, no verified-purchase flow. The values are seeded from real-data heuristics (tag popularity + color variety) and should be updated by the business owner from real WhatsApp/Instagram feedback. A `// TODO` comment marks the spot in `catalogue.js`.
+**Why this is intentional:** There is no backend, no accounts, no verified-purchase flow. The values are manually entered by the business owner from real WhatsApp/Instagram feedback. A `// TODO: replace with real review system when backend exists` comment marks the spot in the code.
 
 **Risk:** The numbers look like live data but aren't dynamically updated. Google's Rich Results Test may flag `aggregateRating` without a backing review system.
 
@@ -32,9 +36,9 @@ No fake input, no fake loading state, no fake check. The business does ship pan-
 
 ## No live inventory sync
 
-**File:** `src/data/catalogue.js` (`stock` field per product)
+**File:** `src/data/siteData.js` (`stock` field per product)
 
-**Behavior:** Each product has a `stock` field (`"in"` | `"low"` | `"out"`) that drives the stock badge and the Notify-me-on-WhatsApp block.
+**Behavior:** Each product has a `stock` field (`"in"` | `"low"` | `"out"`) that drives the `StockBadge` and the Notify-me-on-WhatsApp block.
 
 **Why this is intentional:** There is no inventory system to sync with. The field is a static, editor-maintained flag.
 
@@ -50,12 +54,12 @@ No fake input, no fake loading state, no fake check. The business does ship pan-
 
 ---
 
-## Motion budget: only the hero animates on load
+## ScrollProgressThread is desktop-only
 
-**File:** `src/pages/Home.jsx`, `src/lib/motion.js`
+**File:** `src/components/ScrollProgressThread.jsx`
 
-**Behavior:** The only load-time animation in the entire site is the hero's multi-thread weave (4 colored SVG paths drawing themselves once on page load, plus cross-stitch accents). Everything else is scroll-triggered (one-shot `whileInView`), hover/tap feedback, or route transitions.
+**Behavior:** The vertical gold thread on the right edge of the viewport only renders on non-touch devices with `prefers-reduced-motion: no-preference`.
 
-**Why this is intentional:** The old site had 11 simultaneous always-on infinite CSS animations, which was the direct cause of the "laggy" feeling on real devices. The fresh rebuild enforces a hard budget of 2–3 ambient animations per page (the hero weave is the only one that qualifies, and it's load-time one-shot, not infinite).
+**Why this is intentional:** The thread would clutter small mobile screens, and reduced-motion users should not see continuous scroll-linked animation.
 
-**Status:** Deliberate. The hero weave respects `prefers-reduced-motion` (disabled entirely under reduced motion) and is the single signature moment the rebuild prompt called for.
+**Status:** Deliberate. The CSS `@media (max-width: 768px) { .scroll-thread-container { display: none; } }` rule enforces this; the component also early-returns `null` under reduced motion.

@@ -1,28 +1,29 @@
 {
-  "name": "fakhri-mart-fresh",
+  "name": "fakhri-mart-catalogue",
+  "version": "1.0.0",
   "private": true,
-  "version": "2.0.0",
   "type": "module",
-  "description": "Fakhri Mart — fresh rebuild. Yarn, thread & craft accessories catalogue. WhatsApp-first, no cart, no auth.",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "npm run generate:sitemap && vite build && npm run prerender",
-    "preview": "vite preview --host 127.0.0.1 --port 4173",
+    "preview": "vite preview --host 127.0.0.1",
     "generate:sitemap": "node src/scripts/generate-sitemap.js",
     "prerender": "node src/scripts/prerender.js",
-    "test:smoke": "node smoke-test.cjs"
+    "test:smoke": "node playwright-test.cjs"
   },
   "dependencies": {
     "framer-motion": "^12.42.2",
+    "jsdom": "^29.1.1",
     "lenis": "^1.3.25",
     "lucide-react": "^0.511.0",
+    "playwright": "^1.60.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-router-dom": "^7.6.0"
+    "react-router-dom": "^7.6.0",
+    "sharp": "^0.35.1"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.7.0",
-    "playwright": "^1.60.0",
     "vite": "^6.4.2"
   }
 }

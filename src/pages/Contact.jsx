@@ -1,104 +1,85 @@
-// src/pages/Contact.jsx
-// Contact — WhatsApp message-building interaction. NO fake pincode checker.
-// Honest static shipping line replaces the old theater.
-
-import { Reveal } from "../components/Reveal.jsx";
-import { useDocumentMeta } from "../hooks/useDocumentMeta.js";
-import {
-  businessInfo,
-  createWhatsAppLink,
-  DEFAULT_ENQUIRY_MESSAGE,
-  SHIPPING_NOTE,
-} from "../data/catalogue.js";
-import { Phone, Mail, MapPin, Clock, MessageCircle, Instagram, Truck } from "lucide-react";
+import { Clock, Instagram, Mail, MapPin, MessageCircle, Phone, Truck } from "lucide-react";
+import PageHero from "../components/PageHero.jsx";
+import ProductVisual from "../components/ProductVisual.jsx";
+import Reveal from "../components/Reveal.jsx";
+import { businessInfo, createWhatsAppLink } from "../data/siteData.js";
 
 export default function Contact() {
-  useDocumentMeta({
-    title: "Contact",
-    description: `Get in touch with ${businessInfo.name}. WhatsApp is fastest — we reply with availability and pricing during shop hours.`,
-    canonical: `${businessInfo.url}/contact`,
-  });
-
   return (
-    <div className="contact-page">
-      <div className="container">
-        <Reveal>
-          <header className="page-header">
-            <p className="eyebrow">Get in touch</p>
-            <h1>Contact us</h1>
-            <p className="page-lede">
-              We're a small team — fastest replies come through WhatsApp during shop hours.
-            </p>
-          </header>
-        </Reveal>
+    <>
+      <PageHero
+        eyebrow="Contact"
+        title="Connect for catalogue, shade card and bulk order support"
+        text="Reach out for yarns, crochet threads, macrame cords, embroidery threads, beads, bases, purse accessories, delivery details and product availability."
+      >
+        <ProductVisual palette={["#35b8ad", "#f6a7b8", "#c99b6b"]} />
+      </PageHero>
 
-        <div className="contact-grid">
-          <Reveal>
-            <div className="contact-methods">
-              <a href={createWhatsAppLink(DEFAULT_ENQUIRY_MESSAGE)} target="_blank" rel="noreferrer noopener" className="contact-method whatsapp">
-                <MessageCircle size={24} aria-hidden="true" />
-                <div>
-                  <strong>WhatsApp</strong>
-                  <span>{businessInfo.whatsappDisplay}</span>
-                  <small>Tap to start an enquiry</small>
-                </div>
-              </a>
-              <a href={businessInfo.phoneHref} className="contact-method">
-                <Phone size={20} aria-hidden="true" />
-                <div>
-                  <strong>Phone</strong>
-                  <span>{businessInfo.phoneDisplay}</span>
-                </div>
-              </a>
-              <a href={`mailto:${businessInfo.email}`} className="contact-method">
-                <Mail size={20} aria-hidden="true" />
-                <div>
-                  <strong>Email</strong>
-                  <span>{businessInfo.email}</span>
-                </div>
-              </a>
-              <div className="contact-method">
-                <MapPin size={20} aria-hidden="true" />
-                <div>
-                  <strong>Address</strong>
-                  <span>{businessInfo.address}</span>
-                </div>
+      <section className="section">
+        <div className="container contact-layout">
+          <Reveal className="contact-details" variant="slide-left">
+            <div className="contact-card">
+              <MapPin size={24} aria-hidden="true" />
+              <div>
+                <h3>Business Name</h3>
+                <p>{businessInfo.name}</p>
               </div>
-              <div className="contact-method">
-                <Clock size={20} aria-hidden="true" />
-                <div>
-                  <strong>Hours</strong>
-                  <span>{businessInfo.hours}</span>
-                </div>
+            </div>
+            <div className="contact-card">
+              <Phone size={24} aria-hidden="true" />
+              <div>
+                <h3>Phone</h3>
+                <a href={businessInfo.phoneHref} aria-label={`Call Fakhri Mart at ${businessInfo.phoneDisplay}`}>{businessInfo.phoneDisplay}</a>
               </div>
-              <a href={businessInfo.instagramUrl} target="_blank" rel="noreferrer noopener" className="contact-method">
-                <Instagram size={20} aria-hidden="true" />
-                <div>
-                  <strong>Instagram</strong>
-                  <span>@{businessInfo.instagram}</span>
-                </div>
-              </a>
+            </div>
+            <div className="contact-card">
+              <MessageCircle size={24} aria-hidden="true" />
+              <div>
+                <h3>WhatsApp</h3>
+                <a href={createWhatsAppLink()} target="_blank" rel="noreferrer" aria-label={`Message Fakhri Mart on WhatsApp at ${businessInfo.whatsappDisplay}`}>
+                  {businessInfo.whatsappDisplay}
+                </a>
+              </div>
+            </div>
+            <div className="contact-card">
+              <Mail size={24} aria-hidden="true" />
+              <div>
+                <h3>Email</h3>
+                <a href={businessInfo.emailHref} aria-label={`Email Fakhri Mart at ${businessInfo.email}`}>{businessInfo.email}</a>
+              </div>
+            </div>
+            <div className="contact-card">
+              <Instagram size={24} aria-hidden="true" />
+              <div>
+                <h3>Instagram</h3>
+                <a href={businessInfo.instagramUrl} target="_blank" rel="noreferrer" aria-label={`Visit Fakhri Mart on Instagram @${businessInfo.instagram}`}>
+                  @{businessInfo.instagram}
+                </a>
+              </div>
+            </div>
+            <div className="contact-card">
+              <Clock size={24} aria-hidden="true" />
+              <div>
+                <h3>Business Hours</h3>
+                <p>{businessInfo.hours}</p>
+              </div>
             </div>
           </Reveal>
 
-          <Reveal>
-            <div className="contact-shipping">
-              <Truck size={28} aria-hidden="true" />
-              <h3>Shipping</h3>
-              <p>{SHIPPING_NOTE}</p>
-              <p>
-                We ship pan-India. Bulk orders may take longer to dispatch — confirm lead time
-                on WhatsApp before placing a wholesale enquiry.
-              </p>
-              <p className="contact-shipping-note">
-                <strong>Note:</strong> This page intentionally has no pincode "delivery checker."
-                We ship everywhere in India — the answer is yes, regardless of which pincode you
-                enter. If you need exact transit time for your area, ask on WhatsApp.
-              </p>
+          <Reveal className="map-panel" delay={130} variant="slide-right">
+            <div className="map-pin" aria-hidden="true">
+              <MapPin size={28} />
+            </div>
+            <h3>{businessInfo.location}</h3>
+            <p>{businessInfo.address}</p>
+            <span>Visit or message us to request catalogue, shade details and delivery support.</span>
+            <div className="delivery-chip">
+              <Truck size={18} aria-hidden="true" />
+              {businessInfo.delivery}
             </div>
           </Reveal>
         </div>
-      </div>
-    </div>
+      </section>
+    </>
   );
 }

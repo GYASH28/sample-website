@@ -1,9 +1,9 @@
 // src/hooks/useJsonLd.js
-// JSON-LD structured data injection. Mirrors useDocumentMeta pattern.
-// Builders: productJsonLd, localBusinessJsonLd, breadcrumbJsonLd, articleJsonLd.
+// Phase 1 — JSON-LD structured data injection.
+// Mirrors useDocumentMeta.js pattern: append <script type="application/ld+json"> on mount,
+// remove on unmount, so per-page schema is always fresh.
 
 import { useEffect } from "react";
-import { businessInfo } from "../data/catalogue.js";
 
 export function useJsonLd(data) {
   useEffect(() => {
@@ -13,21 +13,25 @@ export function useJsonLd(data) {
     el.textContent = JSON.stringify(data);
     el.setAttribute("data-jsonld", "managed");
     document.head.appendChild(el);
-    return () => el.remove();
+    return () => {
+      el.remove();
+    };
   }, [JSON.stringify(data)]);
 }
 
+// ── Builders ────────────────────────────────────────────────────────────────
 export function productJsonLd(product, canonicalUrl) {
   return {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
     description: product.description,
-    image: [new URL(product.images.hero, canonicalUrl).href],
+    image: product.image ? [new URL(product.image, canonicalUrl).href] : undefined,
     brand: { "@type": "Brand", name: product.brand || product.category },
     offers: {
       "@type": "Offer",
       priceCurrency: "INR",
+      // No public price — contact-for-price via WhatsApp. Availability only.
       availability:
         product.stock === "out"
           ? "https://schema.org/OutOfStock"
@@ -44,7 +48,7 @@ export function productJsonLd(product, canonicalUrl) {
   };
 }
 
-export function localBusinessJsonLd() {
+export function localBusinessJsonLd(businessInfo) {
   return {
     "@context": "https://schema.org",
     "@type": "Store",
@@ -64,6 +68,7 @@ export function localBusinessJsonLd() {
 }
 
 export function breadcrumbJsonLd(trail) {
+  // trail = [{ name, url }, ...]
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -73,18 +78,5 @@ export function breadcrumbJsonLd(trail) {
       name: item.name,
       item: item.url,
     })),
-  };
-}
-
-export function articleJsonLd(post, canonicalUrl) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: post.title,
-    description: post.excerpt,
-    datePublished: post.date,
-    author: { "@type": "Organization", name: businessInfo.name },
-    publisher: { "@type": "Organization", name: businessInfo.name },
-    mainEntityOfPage: canonicalUrl,
   };
 }
