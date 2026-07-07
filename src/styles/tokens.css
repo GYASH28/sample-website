@@ -1,0 +1,116 @@
+// src/styles/tokens.css
+// Design tokens — locked palette (do NOT change hex values), dark mode parity,
+// typography, spacing, motion budget. These are the brand. Everything else flows from here.
+
+:root {
+  /* ── Light mode palette (LOCKED — brand identity) ─────────────────────── */
+  --bg: #FFF7EC;            /* warm cream */
+  --bg-warm: #F7EFE0;       /* warm sand */
+  --surface: #FFFFFF;
+  --surface-soft: #FFF2EF;
+  --ink: #1F1B16;           /* deep charcoal */
+  --muted: #544C43;
+
+  --teal: #2A8C82;          /* primary accent */
+  --teal-dark: #14766F;
+  --teal-soft: #DFF6F3;
+
+  --pink: #D9A5B3;          /* dusty rose, secondary accent */
+  --pink-dark: #B95776;
+  --pink-soft: #FFE3EA;
+
+  --gold: #8F7422;          /* antique gold — signature accent, use sparingly */
+  --gold-soft: #C9B36A;
+  --craft: #826E33;         /* bronze */
+
+  /* ── Typography ───────────────────────────────────────────────────────── */
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+  --text-3xl: 2.5rem;
+  --text-4xl: clamp(2.5rem, 5vw, 4rem);
+  --text-5xl: clamp(3rem, 7vw, 5.5rem);
+
+  --leading-tight: 1.15;
+  --leading-snug: 1.35;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.75;
+
+  /* ── Spacing (4px base) ───────────────────────────────────────────────── */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* ── Layout ───────────────────────────────────────────────────────────── */
+  --maxw: 1240px;
+  --maxw-prose: 720px;
+  --radius-sm: 4px;
+  --radius: 8px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
+
+  /* ── Motion budget ────────────────────────────────────────────────────── */
+  /* HARD CONSTRAINT: max 2–3 ambient/looping animations per page, all viewport-gated. */
+  --duration-instant: 0.1s;
+  --duration-quick: 0.2s;
+  --duration-standard: 0.4s;
+  --duration-slow: 0.7s;
+  --duration-cinematic: 1.2s;
+
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-precise: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-emphasis: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+
+  --z-base: 1;
+  --z-sticky: 40;
+  --z-header: 50;
+  --z-dropdown: 60;
+  --z-modal: 100;
+  --z-toast: 110;
+
+  --shadow-soft: 0 4px 12px rgba(31, 27, 22, 0.06);
+  --shadow-medium: 0 8px 24px rgba(31, 27, 22, 0.1);
+  --shadow-strong: 0 16px 40px rgba(31, 27, 22, 0.15);
+
+  --header-height: 72px;
+}
+
+[data-theme="dark"] {
+  --bg: #2A2520;
+  --bg-warm: #322C26;
+  --surface: #3A3530;
+  --surface-soft: #3F3833;
+  --ink: #F5F0E8;
+  --muted: #B8AEA4;
+
+  --teal: #3AA89D;
+  --teal-dark: #2A8C82;
+  --teal-soft: #1F3F3B;
+
+  --pink: #E4B5C3;
+  --pink-dark: #C97090;
+  --pink-soft: #3F2A30;
+
+  --gold: #C9B36A;
+  --gold-soft: #8F7422;
+  --craft: #B8A06A;
+
+  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-strong: 0 16px 40px rgba(0, 0, 0, 0.5);
+}
