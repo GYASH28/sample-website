@@ -1,13 +1,11 @@
-import { Menu, X, ShoppingBag, Heart, ArrowUpDown } from "lucide-react";
+import { Menu, X, ShoppingBag, Heart } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { announcementItems, businessInfo, createWhatsAppLink, navItems } from "../data/siteData.js";
 import { useEnquiryBasket } from "../hooks/useEnquiryBasket.js";
 import { useWishlist } from "../hooks/useWishlist.js";
-import { useCompare } from "../hooks/useCompare.js";
 import SmartLink from "./SmartLink.jsx";
 import WhatsAppIcon from "./WhatsAppIcon.jsx";
-import ThemeToggle from "./ThemeToggle.jsx";
 
 function NavItem({ item, activePath, onClick }) {
   const isAnchor = item.href.includes("#");
@@ -27,7 +25,6 @@ export default function Header() {
   const location = useLocation();
   const { itemsCount } = useEnquiryBasket();
   const { count: wishlistCount } = useWishlist();
-  const { count: compareCount } = useCompare();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 18);
@@ -129,17 +126,10 @@ export default function Header() {
             {itemsCount > 0 && <span className="basket-badge">{itemsCount}</span>}
           </SmartLink>
 
-          {/* Compare Count Indicator */}
-          {compareCount > 0 && (
-            <span className="compare-count-nav-item" style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
-              <ArrowUpDown size={15} />
-              <span>Compare ({compareCount})</span>
-            </span>
-          )}
+          {/* Phase 2: Compare indicator + ThemeToggle removed */}
 
-          {/* Theme toggle (desktop) — HindiToggle removed in Phase 1 */}
+          {/* Header toggles area — kept for spacing, ThemeToggle removed in Phase 2 */}
           <div className="header-toggles" style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
-            <ThemeToggle />
           </div>
 
           <a

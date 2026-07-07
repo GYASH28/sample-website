@@ -5,7 +5,6 @@ import {
   Truck,
   ShieldCheck,
   Percent,
-  Copy,
   Check,
   ShoppingBag,
   Plus,
@@ -16,7 +15,6 @@ import {
   ChevronUp,
   Tags,
   Heart,
-  ArrowUpDown,
   Maximize2,
   Bell
 } from "lucide-react";
@@ -24,11 +22,8 @@ import { useMemo, useState, useEffect } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import CatalogueCta from "../components/CatalogueCta.jsx";
 import ProductCard from "../components/ProductCard.jsx";
-import StockBadge from "../components/StockBadge.jsx";
 import ShadeCardButton from "../components/ShadeCardButton.jsx";
-import PincodeChecker from "../components/PincodeChecker.jsx";
 import ShareButton from "../components/ShareButton.jsx";
-import StarRating from "../components/StarRating.jsx";
 import ColorSwatchPicker from "../components/ColorSwatchPicker.jsx";
 import QuantitySelector from "../components/QuantitySelector.jsx";
 import { Lightbox } from "../components/ImageZoom.jsx";
@@ -36,7 +31,6 @@ import StickyBreadcrumb from "../components/StickyBreadcrumb.jsx";
 import { createWhatsAppLink, featuredProducts, productCategories, businessInfo } from "../data/siteData.js";
 import { useEnquiryBasket } from "../hooks/useEnquiryBasket.js";
 import { useWishlist } from "../hooks/useWishlist.js";
-import { useCompare } from "../hooks/useCompare.js";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
 import { useJsonLd, productJsonLd, breadcrumbJsonLd } from "../hooks/useJsonLd.js";
 import { useRecentlyViewed, formatTimeAgo } from "../hooks/useRecentlyViewed.js";
@@ -68,10 +62,8 @@ export default function ProductDetail() {
 
   const { add: addToBasket } = useEnquiryBasket();
   const { has: isInWishlist, toggle: toggleWishlist } = useWishlist();
-  const { has: isInCompare, toggle: toggleCompare } = useCompare();
 
   const isFavorited = isInWishlist(product.slug);
-  const isCompared = isInCompare(product.slug);
 
   const [activeColor, setActiveColor] = useState(product.colors?.[0] || null);
   
@@ -412,27 +404,7 @@ export default function ProductDetail() {
                 </div>
 
                 <div className="detail-header-actions" style={{ display: "flex", gap: "8px" }}>
-                  {/* Compare Toggle */}
-                  <button
-                    type="button"
-                    className={`btn-detail-action-circle ${isCompared ? "active" : ""}`}
-                    onClick={() => toggleCompare(product.slug)}
-                    title={isCompared ? "Remove from comparison list" : "Add to comparison list"}
-                    style={{
-                      width: "36px",
-                      height: "36px",
-                      borderRadius: "50%",
-                      border: "1px solid rgba(0,0,0,0.1)",
-                      background: isCompared ? "var(--primary-light, #eaf6f5)" : "#fff",
-                      color: isCompared ? "var(--primary)" : "currentColor",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      cursor: "pointer"
-                    }}
-                  >
-                    <ArrowUpDown size={16} />
-                  </button>
+                  {/* Phase 2: Compare button removed */}
 
                   {/* Favorite Toggle */}
                   <button
@@ -461,10 +433,8 @@ export default function ProductDetail() {
               <h1 className="product-detail-title-new">{product.name}</h1>
               <p className="product-detail-variant-info">{product.variants}</p>
 
-              {/* Stock badge + shade card request row */}
+              {/* Phase 2: StockBadge removed. Shade card request row kept. */}
               <div className="product-detail-stock-row" style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap", marginBottom: "20px", padding: "12px 0", borderBottom: "1px solid var(--line)", borderTop: "1px solid var(--line)" }}>
-                <StockBadge product={product} size="lg" />
-                <span style={{ width: "1px", height: "24px", background: "var(--line)" }} aria-hidden="true" />
                 <ShadeCardButton product={product} shade={activeColor} size="lg" />
               </div>
 
@@ -482,11 +452,9 @@ export default function ProductDetail() {
               </div>
 
               {/* Pincode delivery checker */}
+              {/* Phase 2: PincodeChecker removed — replaced with honest static shipping line */}
               <div style={{ margin: "16px 0" }}>
-                <p style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--charcoal)", marginBottom: "8px" }}>
-                  📍 Check delivery to your area:
-                </p>
-                <PincodeChecker />
+                <p style={{ color: 'var(--muted, #544C43)', fontSize: '0.9rem' }}>We deliver across India — confirm exact timing on WhatsApp.</p>
               </div>
 
               <div className="product-detail-desc-box">

@@ -19,16 +19,13 @@
 // ── Phase 1: Rating display ──────────────────────────────────────────
 //   - Compact StarRating + count next to the product title
 
-import { MessageCircle, Tags, Heart, ArrowUpDown, Check } from "lucide-react";
+import { MessageCircle, Tags, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { productCategories } from "../data/siteData.js";
 import { useWishlist } from "../hooks/useWishlist.js";
-import { useCompare } from "../hooks/useCompare.js";
 import { smartWhatsAppLink } from "../i18n.jsx";
-import StockBadge from "./StockBadge.jsx";
 import ShadeCardButton from "./ShadeCardButton.jsx";
-import StarRating from "./StarRating.jsx";
 
 const MAX_SWATCHES_ON_CARD = 5;
 
@@ -37,10 +34,8 @@ export default function ProductCard({ product, compact = false }) {
   const productBaseImage = product.image || categoryData?.image;
 
   const { has: isInWishlist, toggle: toggleWishlist } = useWishlist();
-  const { has: isInCompare, toggle: toggleCompare } = useCompare();
 
   const isFavorited = isInWishlist(product.slug);
-  const isCompared = isInCompare(product.slug);
 
   // Smart pre-filled WhatsApp link
   const enquireLink = smartWhatsAppLink({
@@ -90,7 +85,7 @@ export default function ProductCard({ product, compact = false }) {
   return (
     <article
       ref={cardRef}
-      className={`product-card ${compact ? "product-card--compact" : ""} ${isCompared ? "product-card--compared" : ""}`}
+      className={`product-card ${compact ? "product-card--compact" : ""}`}
     >
       {/* ── Prompt 2 Part 1.1 — Palette identity strip (top edge) ─────── */}
       <div
@@ -106,22 +101,6 @@ export default function ProductCard({ product, compact = false }) {
       <div className="product-card-link-wrapper-container">
         {/* Floating Quick Action Buttons on Image */}
         <div className="product-card-floating-actions">
-          {/* Compare Toggle */}
-          <button
-            type="button"
-            className={`card-floating-btn compare-toggle-btn-card ${isCompared ? "active" : ""}`}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              toggleCompare(product.slug);
-            }}
-            title={isCompared ? "Remove from comparison" : "Add to comparison"}
-            aria-label={isCompared ? `Remove ${product.name} from comparison` : `Add ${product.name} to comparison`}
-            aria-pressed={isCompared}
-          >
-            {isCompared ? <Check size={15} aria-hidden="true" /> : <ArrowUpDown size={15} aria-hidden="true" />}
-          </button>
-
           {/* Favorite Toggle */}
           <button
             type="button"
@@ -156,8 +135,6 @@ export default function ProductCard({ product, compact = false }) {
                 style={colorFilterStyle ? { filter: colorFilterStyle, transition: "filter 0.3s ease" } : undefined}
               />
               <span className="product-card-badge-floating" aria-hidden="true">{product.category}</span>
-              {/* Stock badge — bottom-left of image */}
-              <StockBadge product={product} />
             </div>
           )}
           <div className="product-content">
@@ -167,10 +144,6 @@ export default function ProductCard({ product, compact = false }) {
                   <span key={badge} className="badge-highlight">{badge}</span>
                 ))}
               </div>
-              {/* Phase 1 — compact StarRating */}
-              {product.rating > 0 && (
-                <StarRating value={product.rating} count={product.reviewCount} size={11} />
-              )}
             </div>
             <h3 className="product-card-title">{product.name}</h3>
 

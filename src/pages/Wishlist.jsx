@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useWishlist } from "../hooks/useWishlist.js";
 import { featuredProducts, createWhatsAppLink } from "../data/siteData.js";
-import { smartWhatsAppLink, phrases } from "../i18n.jsx";
+import { smartWhatsAppLink } from "../i18n.jsx";
 import Reveal from "../components/Reveal.jsx";
 import ProductCard from "../components/ProductCard.jsx";
 import { ease, duration } from "../motion-tokens.js";
@@ -35,7 +35,7 @@ export default function Wishlist() {
                   Now state-dependent — shows "saved favourites" copy when populated. */}
               {wishlistProducts.length > 0
                 ? "Yahan aapke saved favourites hain — sab ko ek WhatsApp message mein enquire karo, ya individual products ke liye detail page kholo."
-                : phrases.emptyWishlist}
+                : "Abhi tak koi favourite nahi — heart icon dabao aur save karo."}
             </p>
           </Reveal>
         </div>
@@ -59,7 +59,7 @@ export default function Wishlist() {
                   Abhi tak koi favourite nahi
                 </h2>
                 <p style={{ color: "var(--muted)", marginBottom: "24px" }}>
-                  {phrases.emptyWishlist} Har product pe heart icon dabao aur yahan save karo.
+                  {"Abhi tak koi favourite nahi — heart icon dabao aur save karo."} Har product pe heart icon dabao aur yahan save karo.
                 </p>
                 <Link to="/products" className="btn btn-primary">
                   Products Browse Karo

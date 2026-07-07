@@ -1,95 +1,14 @@
 /**
- * Fakhri Mart — i18n + Hinglish Phrases
+ * Fakhri Mart — i18n + WhatsApp helpers
  * ═══════════════════════════════════════════════════════════════
- * Phase 1 BUG 4 fix: the dead language system (strings, t, LangProvider,
- * useLang, useLangControls) has been removed — HindiToggle did nothing.
+ * Phase 2 item 14: the dead phrases object has been removed. Only 3 of 30
+ * entries were used (boutiquePride, heroCallout, emptyWishlist) — those
+ * usages have been inlined directly into the JSX (Home.jsx, Wishlist.jsx).
+ * Phase 4 will rewrite those inlined values to the bilingual-split tone.
  *
  * What remains:
- *   - phrases: Hinglish phrase bank (will be trimmed in Phase 2)
  *   - smartWhatsAppLink: context-aware WhatsApp deep-link builder
- *   - getStockStatus: stock status helper
  */
-
-// ─── Hinglish Catchy Phrases ───────────────────────────────────────────────
-// Warm, local, engaging — sprinkled throughout the site to make it feel
-// like a real Indian craft store, not a corporate catalogue.
-export const phrases = {
-  // Hero / brand
-  boutiquePride: "Har shade mein creativity, har thread mein story.",
-  boutiqueSubtext: "Pune ki yarn store — ab poore India ke liye.",
-  heroCallout: "Aapki next handmade creation ka start yahin se hota hai.",
-
-  // Trust / social proof
-  trustLine: "Trusted by boutiques, resellers aur craft lovers across India.",
-  trustBadge1: "Har order ke saath — care, quality aur quick response.",
-  trustBadge2: "Wholesale? Retail? Dono ke liye best rates, har baar.",
-
-  // Product discovery
-  discoveryHook: "Apne project ke liye perfect yarn dhundo — 12+ categories mein.",
-  bestSellerHook: "Resellers ki pasand — ye products sabse zyada enquire hote hain.",
-  newArrivalsHook: "Naya stock aaya hai — pehle dekho, pehle pucho.",
-  bulkHook: "Bulk mein chahiye? Ek WhatsApp message aur best quote aapke paas.",
-  galleryHook: "Ek Nazariya dekho — organized, clear aur inspiring.",
-
-  // Enquiry / conversion
-  enquiryHook: "Bina login, bina payment — bas WhatsApp pe message karo.",
-  enquiryReassure: "Hum 4 ghante ke andar reply karte hain — promise.",
-  shadeCardHook: "Shade confirm karne ke liye digital shade card maango — free.",
-  quickEnquireHook: "Detail padhne ki zaroorat nahi — seedha WhatsApp pe poocho.",
-  basketHook: "Ek saath multiple products enquire karo — basket mein add karo, ek hi message mein bhejo.",
-
-  // About / brand story
-  aboutHook: "Fakhri Mart — 2019 se yarn aur craft materials ki trusted store.",
-  aboutStory: "Shuruwat ek choti dukaan se hui thi. Aaj poore India mein delivery karte hain.",
-  aboutPromise: "Har customer ko wahi milta hai jo hum khud use karte hain — best quality.",
-
-  // Contact / support
-  contactHook: "Catalogue, shade card, bulk pricing — sab kuch ek message mein.",
-  responsePromise: "Mon-Sat, 10am-8pm — turant response.",
-  whatsappPreferred: "WhatsApp pe baat karna sabse easy hai — hum bhi yahi prefer karte hain.",
-
-  // 404
-  notFoundHook: "Ye thread ulajh gayi — wapas workshop mein aao.",
-  notFoundReassure: "Page nahi mila, par yarn zaroor milega.",
-
-  // Mobile / app feel
-  scrollHint: "Scroll karo aur explore karo",
-  tapToCall: "Tap karke call karein",
-  tapToWhatsApp: "Tap karke WhatsApp karein",
-
-  // Footer
-  footerTagline: "Colourful threads, endless creation — har maker ke liye.",
-  footerMadeIn: "Pune se, poore India ke liye — banaya gaya pyaar se.",
-
-  // Empty states
-  emptyWishlist: "Abhi tak koi favourite nahi — heart icon dabao aur save karo.",
-  emptyBasket: "Basket khaali hai — products add karo aur ek saath enquire karo.",
-  emptySearch: "Kuch nahi mila — spelling check karo ya popular searches try karo.",
-
-  // Categories
-  catBliss: "Soft cotton threads — har crochet project ke liye perfect.",
-  catVardhaman: "Trusted Vardhaman yarns — boutiques aur resellers ki pasand.",
-  catMacrame: "Macrame cords — wall decor se leke plant hangers tak.",
-  catEmbroidery: "Embroidery threads — fine needlework ke liye best.",
-  catBeads: "Beads collection — purse aur jewelry banane ke liye.",
-  catHandles: "Purse handles — premium finishing ke liye zaroori.",
-
-  // Testimonial intro
-  testimonialIntro: "Hamare customers ke dil ki baat —",
-};
-
-// ─── Stock Status Helper ───────────────────────────────────────────────────
-// Derives a stock status from product properties — no need to edit every
-// product in siteData.js. Stable per-slug (hash-based).
-export function getStockStatus(product) {
-  if (product.stockStatus) return product.stockStatus; // explicit override
-  // Derive stable pseudo-status from slug hash
-  const hash = product.slug.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
-  const mod = hash % 10;
-  if (mod < 6) return "in-stock";      // 60% in stock
-  if (mod < 9) return "limited";       // 30% limited
-  return "on-request";                  // 10% on request
-}
 
 // ─── Smart WhatsApp Link Helper ────────────────────────────────────────────
 // Builds context-aware pre-filled WhatsApp messages.

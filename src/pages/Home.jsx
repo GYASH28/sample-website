@@ -8,11 +8,7 @@ import {
   Wand2,
   Sparkles,
   ShoppingBag,
-  Heart,
-  HelpCircle,
-  Truck,
-  Percent,
-  Check
+  Heart
 } from "lucide-react";
 import { useMemo, useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -23,16 +19,13 @@ import CategoryCard from "../components/CategoryCard.jsx";
 import EnquiryForm from "../components/EnquiryForm.jsx";
 import GalleryVisual from "../components/GalleryVisual.jsx";
 import IconBadge from "../components/IconBadge.jsx";
-import MagneticButton from "../components/MagneticButton.jsx";
-import ParallaxLayer from "../components/ParallaxLayer.jsx";
 import ProductCard from "../components/ProductCard.jsx";
 import ProductVisual from "../components/ProductVisual.jsx";
 import Reveal from "../components/Reveal.jsx";
-import SectionThreadDivider from "../components/SectionThreadDivider.jsx";
 import StaggerReveal, { staggerChild } from "../components/StaggerReveal.jsx";
 import WhatsAppIcon from "../components/WhatsAppIcon.jsx";
-import { ease, duration, prefersReducedMotion, isTouchDevice, spring } from "../motion-tokens.js";
-import { phrases, smartWhatsAppLink } from "../i18n.jsx";
+import { ease, duration, prefersReducedMotion, isTouchDevice } from "../motion-tokens.js";
+import { smartWhatsAppLink } from "../i18n.jsx";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
 import { useJsonLd, localBusinessJsonLd } from "../hooks/useJsonLd.js";
 import {
@@ -265,7 +258,7 @@ export default function Home() {
               transition={{ duration: duration.standard, ease: ease.soft, delay: 0.2 }}
             >
               <span className="hero-cinematic-eyebrow-line" aria-hidden="true" />
-              {phrases.boutiquePride}
+              {"Har shade mein creativity, har thread mein story."}
             </motion.p>
 
             <h1 className="hero-cinematic-title" aria-label="Colourful Yarns and Craft Essentials" style={{ position: "relative" }}>
@@ -321,7 +314,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: duration.standard, ease: ease.soft, delay: 1.2 }}
             >
-              {phrases.heroCallout} Explore quality yarns, crochet threads, macrame cords, beads, bases and accessories
+              {"Aapki next handmade creation ka start yahin se hota hai."} Explore quality yarns, crochet threads, macrame cords, beads, bases and accessories
               with all-India delivery and easy WhatsApp enquiry.
             </motion.p>
 
@@ -335,17 +328,16 @@ export default function Home() {
                 Explore Catalogue
                 <ArrowRight size={18} aria-hidden="true" />
               </SmartLink>
-              <MagneticButton
+              <a
                 href={smartWhatsAppLink({ type: "bulk" })}
                 target="_blank"
                 rel="noreferrer"
-                strength={0.25}
                 className="btn btn-whatsapp btn-cinematic"
-                ariaLabel="Send a bulk enquiry message on WhatsApp"
+                aria-label="Send a bulk enquiry message on WhatsApp"
               >
                 <WhatsAppIcon size={18} />
                 WhatsApp Enquiry
-              </MagneticButton>
+              </a>
             </motion.div>
 
             <motion.div
@@ -409,7 +401,7 @@ export default function Home() {
       </section>
 
       {/* Thread divider into next section */}
-      <SectionThreadDivider variant="wave" />
+      <hr style={{ border: 'none', borderTop: '1px solid #826E33', opacity: 0.2, margin: '2rem 0' }} />
 
       {/* Category Section */}
       <section className="section" id="categories">
@@ -438,7 +430,7 @@ export default function Home() {
         </div>
       </section>
 
-      <SectionThreadDivider variant="diagonal" />
+      <hr style={{ border: 'none', borderTop: '1px solid #826E33', opacity: 0.2, margin: '2rem 0' }} />
 
       {/* Shop by Craft / Use Case Section */}
       <section className="section section-tinted" id="shop-by-craft">
@@ -467,7 +459,7 @@ export default function Home() {
         </div>
       </section>
 
-      <SectionThreadDivider variant="wave" />
+      <hr style={{ border: 'none', borderTop: '1px solid #826E33', opacity: 0.2, margin: '2rem 0' }} />
 
       {/* Curated Best Sellers Row */}
       <section className="section" id="best-sellers">
@@ -487,7 +479,7 @@ export default function Home() {
         </div>
       </section>
 
-      <SectionThreadDivider variant="stitch" />
+      <hr style={{ border: 'none', borderTop: '1px solid #826E33', opacity: 0.2, margin: '2rem 0' }} />
 
       {/* How Enquiry Works Stepper */}
       <section className="section bg-dark text-light enquiry-how-it-works-home">
@@ -525,7 +517,7 @@ export default function Home() {
         </div>
       </section>
 
-      <SectionThreadDivider variant="wave" />
+      <hr style={{ border: 'none', borderTop: '1px solid #826E33', opacity: 0.2, margin: '2rem 0' }} />
 
       {/* Featured Catalogue Grid */}
       <section className="section" id="products">
@@ -574,7 +566,7 @@ export default function Home() {
         </div>
       </section>
 
-      <SectionThreadDivider variant="diagonal" />
+      <hr style={{ border: 'none', borderTop: '1px solid #826E33', opacity: 0.2, margin: '2rem 0' }} />
 
       {/* New Arrivals Section */}
       <section className="section section-tinted" id="new-arrivals">
@@ -600,7 +592,7 @@ export default function Home() {
         </div>
       </section>
 
-      <SectionThreadDivider variant="stitch" />
+      <hr style={{ border: 'none', borderTop: '1px solid #826E33', opacity: 0.2, margin: '2rem 0' }} />
 
       <section className="section bulk-section" id="bulk-orders">
         <div className="container bulk-layout">
@@ -632,7 +624,7 @@ export default function Home() {
         <CatalogueCta />
       </div>
 
-      <SectionThreadDivider variant="wave" />
+      <hr style={{ border: 'none', borderTop: '1px solid #826E33', opacity: 0.2, margin: '2rem 0' }} />
 
       <section className="section section-tinted" id="gallery">
         <div className="container">
@@ -655,7 +647,7 @@ export default function Home() {
         </div>
       </section>
 
-      <SectionThreadDivider variant="diagonal" />
+      <hr style={{ border: 'none', borderTop: '1px solid #826E33', opacity: 0.2, margin: '2rem 0' }} />
 
       <section className="section about-band" id="about">
         <div className="container split-grid">
@@ -677,7 +669,7 @@ export default function Home() {
         </div>
       </section>
 
-      <SectionThreadDivider variant="stitch" />
+      <hr style={{ border: 'none', borderTop: '1px solid #826E33', opacity: 0.2, margin: '2rem 0' }} />
 
       <section className="section section-tinted" id="why-choose">
         <div className="container">
@@ -697,7 +689,7 @@ export default function Home() {
         </div>
       </section>
 
-      <SectionThreadDivider variant="wave" />
+      <hr style={{ border: 'none', borderTop: '1px solid #826E33', opacity: 0.2, margin: '2rem 0' }} />
 
       <section className="section testimonials-section">
         <div className="container">
@@ -717,7 +709,7 @@ export default function Home() {
         </div>
       </section>
 
-      <SectionThreadDivider variant="diagonal" />
+      <hr style={{ border: 'none', borderTop: '1px solid #826E33', opacity: 0.2, margin: '2rem 0' }} />
 
       <section className="section enquiry-section" id="enquiry">
         <div className="container enquiry-layout">

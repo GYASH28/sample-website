@@ -2,7 +2,6 @@ import { CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
 import IconBadge from "../components/IconBadge.jsx";
 import PageHero from "../components/PageHero.jsx";
-import ParallaxLayer from "../components/ParallaxLayer.jsx";
 import ProductVisual from "../components/ProductVisual.jsx";
 import Reveal from "../components/Reveal.jsx";
 import StaggerReveal, { staggerChild } from "../components/StaggerReveal.jsx";
@@ -17,9 +16,7 @@ export default function About() {
         title="A colourful yarn and craft material store for creators"
         text="Fakhri Mart supports makers, boutiques, resellers and craft businesses with yarns, crochet threads, macrame cords, embroidery threads, beads, bases, handles and handmade essentials."
       >
-        <ParallaxLayer speed={0.4}>
-          <ProductVisual palette={["#35b8ad", "#f6a7b8", "#f3c65f"]} />
-        </ParallaxLayer>
+        <ProductVisual palette={["#35b8ad", "#f6a7b8", "#f3c65f"]} />
       </PageHero>
 
       <section className="section">
