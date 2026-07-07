@@ -11,6 +11,7 @@ import { featuredProducts, productCategories, newArrivals, MASTER_CATEGORIES } f
 import { useRecentlyViewed } from "../hooks/useRecentlyViewed.js";
 import { Search, SlidersHorizontal, ArrowUpDown, XCircle, Grid, List, HelpCircle, Check, ArrowRight } from "lucide-react";
 import { ease, duration, spring } from "../motion-tokens.js";
+import useDocumentMeta from "../hooks/useDocumentMeta.js";
 
 const PRODUCT_TYPES = [
   { label: "All Types", value: "All" },
@@ -36,6 +37,11 @@ const USE_CASES = [
 const POPULAR_SEARCHES = ["Yarn", "Macrame", "Hook", "Cotton", "Soft", "Embroidery"];
 
 export default function Products() {
+  useDocumentMeta({
+    title: "Products — Fakhri Mart",
+    description: "Browse our full range of yarns, crochet threads, macrame cords, and craft accessories.",
+    canonical: "/products",
+  });
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeDepartment, setActiveDepartment] = useState("All"); // Prompt 2 Part 2.2 — 'All' | 'Yarns' | 'Threads' | 'Accessories'

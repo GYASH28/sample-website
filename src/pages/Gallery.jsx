@@ -4,8 +4,14 @@ import PageHero from "../components/PageHero.jsx";
 import ProductVisual from "../components/ProductVisual.jsx";
 import Reveal from "../components/Reveal.jsx";
 import { galleryItems } from "../data/siteData.js";
+import useDocumentMeta from "../hooks/useDocumentMeta.js";
 
 export default function Gallery() {
+  useDocumentMeta({
+    title: "Gallery — Fakhri Mart",
+    description: "See projects made with Fakhri Mart yarns and craft supplies.",
+    canonical: "/gallery",
+  });
   return (
     <>
       <PageHero

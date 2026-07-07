@@ -7,8 +7,14 @@ import Reveal from "../components/Reveal.jsx";
 import StaggerReveal, { staggerChild } from "../components/StaggerReveal.jsx";
 import { aboutCopy, aboutPoints, businessInfo, whyChooseUs } from "../data/siteData.js";
 import { ease, duration } from "../motion-tokens.js";
+import useDocumentMeta from "../hooks/useDocumentMeta.js";
 
 export default function About() {
+  useDocumentMeta({
+    title: "About Us — Fakhri Mart",
+    description: "Pune-based yarn and craft supply store shipping across India. Learn about our story and range.",
+    canonical: "/about",
+  });
   return (
     <>
       <PageHero

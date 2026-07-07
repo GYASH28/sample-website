@@ -4,6 +4,7 @@
 // remove on unmount, so per-page schema is always fresh.
 
 import { useEffect } from "react";
+import { businessInfo } from "../data/siteData.js";
 
 export function useJsonLd(data) {
   useEffect(() => {
@@ -38,13 +39,9 @@ export function productJsonLd(product, canonicalUrl) {
           : "https://schema.org/InStock",
       url: canonicalUrl,
     },
-    aggregateRating: product.rating
-      ? {
-          "@type": "AggregateRating",
-          ratingValue: product.rating,
-          reviewCount: product.reviewCount || 0,
-        }
-      : undefined,
+    // Phase 2 item 7: aggregateRating block removed — StarRating was deleted,
+    // and rating/reviewCount fields are not real (no backend review system).
+    // Re-add only when a real review API exists.
   };
 }
 
@@ -78,5 +75,19 @@ export function breadcrumbJsonLd(trail) {
       name: item.name,
       item: item.url,
     })),
+  };
+}
+
+// Phase 5 item 6: WebSite schema with SearchAction — enables sitelinks search box in Google results.
+export function websiteJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "url": businessInfo.url,
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": `${businessInfo.url}/products?q={search_term_string}`,
+      "query-input": "required name=search_term_string",
+    },
   };
 }

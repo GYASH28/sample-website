@@ -27,7 +27,7 @@ import WhatsAppIcon from "../components/WhatsAppIcon.jsx";
 import { ease, duration, prefersReducedMotion, isTouchDevice } from "../motion-tokens.js";
 import { smartWhatsAppLink } from "../i18n.jsx";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
-import { useJsonLd, localBusinessJsonLd } from "../hooks/useJsonLd.js";
+import { useJsonLd, localBusinessJsonLd, websiteJsonLd } from "../hooks/useJsonLd.js";
 import {
   aboutCopy,
   aboutPoints,
@@ -70,6 +70,7 @@ export default function Home() {
       "Premium yarns, crochet threads, macrame cords, beads, bases and purse-making essentials. All-India delivery, WhatsApp enquiry catalogue for resellers and crafters.",
   });
   useJsonLd(localBusinessJsonLd(businessInfo));
+  useJsonLd(websiteJsonLd());
 
   // Scroll-driven hero parallax + opacity fade
   const { scrollYProgress: heroScroll } = useScroll({

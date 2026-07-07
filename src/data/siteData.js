@@ -38,6 +38,7 @@ export const navItems = [
   { label: "Gallery", href: "/gallery" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
+  { label: "Blog", href: "/blog" },
 ];
 
 export const trustBadges = [

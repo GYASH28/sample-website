@@ -3,8 +3,14 @@ import PageHero from "../components/PageHero.jsx";
 import ProductVisual from "../components/ProductVisual.jsx";
 import Reveal from "../components/Reveal.jsx";
 import { businessInfo, createWhatsAppLink } from "../data/siteData.js";
+import useDocumentMeta from "../hooks/useDocumentMeta.js";
 
 export default function Contact() {
+  useDocumentMeta({
+    title: "Contact — Fakhri Mart",
+    description: "Reach Fakhri Mart on WhatsApp, phone, or Instagram. Pune, Maharashtra. Mon–Sat 10am–8pm.",
+    canonical: "/contact",
+  });
   return (
     <>
       <PageHero

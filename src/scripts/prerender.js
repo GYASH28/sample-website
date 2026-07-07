@@ -26,11 +26,8 @@ const productRoutes = featuredProducts.map((p) => `/products/${p.slug}`);
 const blogRoutes = blogPosts.map((p) => `/blog/${p.slug}`);
 const allRoutes = [...staticRoutes, ...productRoutes, ...blogRoutes];
 
-// Bypass on Vercel or CI environment where running headless browser during build is unsupported/unreliable
-if (process.env.VERCEL || process.env.CI) {
-  console.log("⚠️ Vercel or CI environment detected. Skipping Playwright prerendering to prevent build crashes.");
-  process.exit(0);
-}
+// Phase 5 item 5: Vercel/CI skip condition REMOVED — prerender must ALWAYS run during build
+// so crawlers and link-preview bots see real HTML with JSON-LD + meta tags.
 
 let preview;
 try {

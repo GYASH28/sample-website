@@ -7,8 +7,14 @@ import { smartWhatsAppLink } from "../i18n.jsx";
 import Reveal from "../components/Reveal.jsx";
 import ProductCard from "../components/ProductCard.jsx";
 import { ease, duration } from "../motion-tokens.js";
+import useDocumentMeta from "../hooks/useDocumentMeta.js";
 
 export default function Wishlist() {
+  useDocumentMeta({
+    title: "Wishlist — Fakhri Mart",
+    description: "Your saved favourite yarns and craft products.",
+    canonical: "/wishlist",
+  });
   const { wishlist, remove, clear, count } = useWishlist();
 
   const wishlistProducts = wishlist
