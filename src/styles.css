@@ -174,6 +174,9 @@ h3 {
   color: var(--charcoal);
   line-height: 1.1;
   letter-spacing: 0;
+  /* Phase 3: text reflow — prevent overflow on narrow viewports */
+  overflow-wrap: anywhere;
+  hyphens: auto;
 }
 
 /* Display headings use Playfair serif */
@@ -1435,7 +1438,7 @@ textarea:focus-visible {
 .filter-chip {
   position: relative;
   overflow: hidden;
-  min-height: 42px;
+  min-height: 44px; /* Phase 3: was 42px, bumped to 44px touch target */
   border: 1px solid rgba(50, 48, 45, 0.12);
   border-radius: 999px;
   background: #ffffff;
@@ -2065,6 +2068,8 @@ textarea:focus {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding: 14px 20px;
   text-align: center;
+  /* Phase 3: safe-area padding for iOS notch/home indicator */
+  padding-bottom: calc(14px + env(safe-area-inset-bottom, 0));
 }
 
 .footer-bottom p {
@@ -2076,8 +2081,9 @@ textarea:focus {
 .floating-whatsapp {
   position: fixed;
   z-index: 80;
-  right: 20px;
-  bottom: 20px;
+  /* Phase 3: safe-area for iOS notch/home indicator */
+  right: max(20px, env(safe-area-inset-right, 0));
+  bottom: max(20px, env(safe-area-inset-bottom, 0));
   display: grid;
   width: 58px;
   height: 58px;
@@ -3194,8 +3200,11 @@ body.intro-running .announcement-bar {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  /* Phase 3: 44x44 min touch target (was 40x40) */
+  min-width: 44px;
+  min-height: 44px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: none;
   cursor: pointer;
@@ -4371,6 +4380,9 @@ body.intro-running .announcement-bar {
 .testimonial-card strong {
   position: relative;
   display: inline-block;
+  /* Phase 3: text reflow — prevent overflow on narrow viewports */
+  overflow-wrap: anywhere;
+  hyphens: auto;
 }
 
 .product-card .product-card-title::after,
@@ -4584,6 +4596,8 @@ html[data-theme="warm"] .enquiry-how-it-works-home {
     right: 12px !important;
     bottom: 12px !important;
     max-width: none !important;
+    /* Phase 3: safe-area padding for iOS home indicator */
+    padding-bottom: env(safe-area-inset-bottom, 0) !important;
   }
 }
 
@@ -4769,6 +4783,8 @@ html[data-theme="warm"] .enquiry-how-it-works-home {
 .product-actions .btn-small {
   flex: 1 1 auto;
   min-width: 0;
+  /* Phase 3: 44px min touch target (was implicit ~34px) */
+  min-height: 44px;
   font-size: 0.72rem;
   padding: 8px 10px;
   gap: 4px;
@@ -5020,4 +5036,9 @@ html[data-theme="warm"] .enquiry-how-it-works-home {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* Phase 3 item 6: Floating element stacking — bump FloatingWhatsApp up when toast is visible */
+body.toast-visible .floating-whatsapp {
+  bottom: max(88px, env(safe-area-inset-bottom, 0)) !important;
 }

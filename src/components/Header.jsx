@@ -1,5 +1,5 @@
 import { Menu, X, ShoppingBag, Heart } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { announcementItems, businessInfo, createWhatsAppLink, navItems } from "../data/siteData.js";
 import { useEnquiryBasket } from "../hooks/useEnquiryBasket.js";
@@ -23,6 +23,8 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const hamburgerRef = useRef(null);
+  const navDrawerRef = useRef(null);
   const { itemsCount } = useEnquiryBasket();
   const { count: wishlistCount } = useWishlist();
 
@@ -41,6 +43,48 @@ export default function Header() {
   useEffect(() => {
     setMenuOpen(false);
   }, [location.pathname, location.hash]);
+
+  // Phase 3 item 4: Mobile nav drawer accessibility — focus trap + Escape close + focus restore
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const drawer = navDrawerRef.current;
+    if (!drawer) return;
+
+    // Move focus to the first focusable link in the drawer
+    const focusable = drawer.querySelectorAll('a, button, [tabindex]:not([tabindex="-1"])');
+    const firstFocusable = focusable[0];
+    const lastFocusable = focusable[focusable.length - 1];
+    if (firstFocusable) firstFocusable.focus();
+
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setMenuOpen(false);
+        return;
+      }
+      if (e.key === "Tab") {
+        // Focus trap: wrap from last to first, and first to last on Shift+Tab
+        if (e.shiftKey) {
+          if (document.activeElement === firstFocusable) {
+            e.preventDefault();
+            if (lastFocusable) lastFocusable.focus();
+          }
+        } else {
+          if (document.activeElement === lastFocusable) {
+            e.preventDefault();
+            if (firstFocusable) firstFocusable.focus();
+          }
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      // Restore focus to the hamburger button when drawer closes
+      if (hamburgerRef.current) hamburgerRef.current.focus();
+    };
+  }, [menuOpen]);
 
   return (
     <header className={`site-header ${scrolled ? "site-header--scrolled" : ""}`}>
@@ -75,6 +119,7 @@ export default function Header() {
           </SmartLink>
 
           <button
+            ref={hamburgerRef}
             className="menu-toggle"
             type="button"
             aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
@@ -85,7 +130,13 @@ export default function Header() {
           </button>
         </div>
 
-        <nav className={`main-nav ${menuOpen ? "main-nav--open" : ""}`} aria-label="Primary navigation">
+        <nav
+          ref={navDrawerRef}
+          className={`main-nav ${menuOpen ? "main-nav--open" : ""}`}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Main navigation"
+        >
           <div className="mobile-nav-header">
             <img src="/assets/fakhri-mart-logo.webp" alt="Fakhri Mart logo" className="mobile-nav-logo" />
             <div className="mobile-nav-text">
