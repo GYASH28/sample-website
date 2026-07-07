@@ -1746,3 +1746,181 @@
   color: var(--text-muted);
   margin: 0;
 }
+
+/* BUG 3 fix: QuantitySelector + ColorSwatchPicker CSS — were never defined.
+   Matches existing site aesthetic: cream bg #FFF7EC, teal accent #2A8C82,
+   Playfair Display headings, Inter body, 8px border-radius. */
+
+/* ── QuantitySelector ───────────────────────────────────────────────── */
+.quantity-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: var(--bg-warm, #F7EFE0);
+  border-radius: 8px;
+  border: 1px solid rgba(31, 27, 22, 0.06);
+}
+
+.quantity-label {
+  font-family: "Inter", sans-serif;
+  font-size: 0.9rem;
+  color: var(--muted, #544C43);
+}
+.quantity-label strong {
+  color: var(--ink, #1F1B16);
+  font-weight: 600;
+}
+
+.quantity-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.quantity-preset {
+  min-height: 44px;
+  padding: 8px 16px;
+  background: var(--surface, #FFFFFF);
+  border: 1px solid rgba(31, 27, 22, 0.15);
+  border-radius: 999px;
+  font-family: "Inter", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ink, #1F1B16);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.quantity-preset:hover {
+  border-color: var(--teal, #2A8C82);
+  color: var(--teal-dark, #14766F);
+}
+.quantity-preset--active {
+  background: var(--teal-dark, #14766F);
+  border-color: var(--teal-dark, #14766F);
+  color: #FFFFFF;
+}
+.quantity-preset--active:hover {
+  background: var(--teal, #2A8C82);
+  border-color: var(--teal, #2A8C82);
+  color: #FFFFFF;
+}
+
+.quantity-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid rgba(31, 27, 22, 0.15);
+  border-radius: 8px;
+  overflow: hidden;
+  width: fit-content;
+  background: var(--surface, #FFFFFF);
+}
+
+.stepper-btn {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface, #FFFFFF);
+  border: none;
+  color: var(--ink, #1F1B16);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.stepper-btn:hover:not(:disabled) {
+  background: var(--teal-soft, #DFF6F3);
+  color: var(--teal-dark, #14766F);
+}
+.stepper-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.stepper-input-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 12px;
+  border-left: 1px solid rgba(31, 27, 22, 0.1);
+  border-right: 1px solid rgba(31, 27, 22, 0.1);
+  min-height: 44px;
+}
+
+.stepper-input {
+  width: 48px;
+  text-align: center;
+  border: none;
+  background: transparent;
+  font-family: "Inter", sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink, #1F1B16);
+  outline: none;
+}
+.stepper-input:focus {
+  color: var(--teal-dark, #14766F);
+}
+
+.stepper-unit {
+  font-family: "Inter", sans-serif;
+  font-size: 0.8rem;
+  color: var(--muted, #544C43);
+}
+
+/* ── ColorSwatchPicker ──────────────────────────────────────────────── */
+.color-swatch-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  background: var(--bg-warm, #F7EFE0);
+  border-radius: 8px;
+  border: 1px solid rgba(31, 27, 22, 0.06);
+}
+
+.swatch-label {
+  font-family: "Inter", sans-serif;
+  font-size: 0.9rem;
+  color: var(--muted, #544C43);
+}
+.swatch-label strong {
+  color: var(--ink, #1F1B16);
+  font-weight: 600;
+}
+
+.swatch-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.swatch-btn {
+  min-width: 44px;
+  min-height: 44px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background-color: var(--swatch-color, #ccc);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 0 1px rgba(31, 27, 22, 0.15);
+  padding: 0;
+}
+.swatch-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 2px var(--teal, #2A8C82);
+}
+.swatch-btn--active {
+  border-color: var(--ink, #1F1B16);
+  box-shadow: 0 0 0 2px var(--gold, #8F7422);
+}
+.swatch-btn--light {
+  /* Light colors get a subtle inner border so they're visible on cream bg */
+  box-shadow: inset 0 0 0 1px rgba(31, 27, 22, 0.2), 0 0 0 1px rgba(31, 27, 22, 0.15);
+}
+.swatch-btn--light.swatch-btn--active {
+  box-shadow: inset 0 0 0 1px rgba(31, 27, 22, 0.3), 0 0 0 2px var(--gold, #8F7422);
+}

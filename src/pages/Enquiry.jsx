@@ -72,7 +72,7 @@ export default function Enquiry() {
       </PageHero>
 
       {/* Tabs Selector Bar */}
-      <section className="tabs-navigation-strip" style={{ background: "#fff", borderBottom: "1px solid rgba(0,0,0,0.08)", sticky: "top" }}>
+      <section className="tabs-navigation-strip" style={{ background: "#fff", borderBottom: "1px solid rgba(0,0,0,0.08)", position: "sticky", top: "var(--header-offset, 104px)", zIndex: 40 }}>
         <div className="container" style={{ display: "flex", gap: "24px" }}>
           <button
             type="button"

@@ -8,7 +8,6 @@ import { useCompare } from "../hooks/useCompare.js";
 import SmartLink from "./SmartLink.jsx";
 import WhatsAppIcon from "./WhatsAppIcon.jsx";
 import ThemeToggle from "./ThemeToggle.jsx";
-import HindiToggle from "./HindiToggle.jsx";
 
 function NavItem({ item, activePath, onClick }) {
   const isAnchor = item.href.includes("#");
@@ -138,10 +137,9 @@ export default function Header() {
             </span>
           )}
 
-          {/* Theme + Language toggles (desktop) */}
+          {/* Theme toggle (desktop) — HindiToggle removed in Phase 1 */}
           <div className="header-toggles" style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
             <ThemeToggle />
-            <HindiToggle />
           </div>
 
           <a

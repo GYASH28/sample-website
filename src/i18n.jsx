@@ -1,98 +1,14 @@
 /**
  * Fakhri Mart — i18n + Hinglish Phrases
  * ═══════════════════════════════════════════════════════════════
- * Bilingual (English + Hindi) strings for CTAs, navigation, and key UI.
- * Plus a bank of catchy Hinglish phrases sprinkled throughout the site
- * to make it feel warm, local, and engaging — not corporate.
+ * Phase 1 BUG 4 fix: the dead language system (strings, t, LangProvider,
+ * useLang, useLangControls) has been removed — HindiToggle did nothing.
  *
- * Usage:
- *   import { t, phrases } from "../i18n.jsx";
- *   const lang = useLang(); // "en" or "hi"
- *   t(lang, "exploreCatalogue")  // → "Explore Catalogue" or "सूची देखें"
- *   phrases.boutiquePride        // → "Har shade mein creativity, har thread mein story."
+ * What remains:
+ *   - phrases: Hinglish phrase bank (will be trimmed in Phase 2)
+ *   - smartWhatsAppLink: context-aware WhatsApp deep-link builder
+ *   - getStockStatus: stock status helper
  */
-
-// ─── Bilingual UI Strings (English + Hindi) ────────────────────────────────
-export const strings = {
-  // Navigation
-  home: { en: "Home", hi: "होम" },
-  categories: { en: "Categories", hi: "श्रेणियाँ" },
-  products: { en: "Products", hi: "उत्पाद" },
-  newArrivals: { en: "New Arrivals", hi: "नई आवक" },
-  bulkOrders: { en: "Bulk Orders", hi: "बल्क ऑर्डर" },
-  gallery: { en: "Gallery", hi: "गैलरी" },
-  about: { en: "About", hi: "हमारे बारे में" },
-  contact: { en: "Contact", hi: "संपर्क" },
-  wishlist: { en: "Wishlist", hi: "पसंदीदा" },
-  enquiry: { en: "Enquiry", hi: "पूछताछ" },
-
-  // CTAs
-  exploreCatalogue: { en: "Explore Catalogue", hi: "सूची देखें" },
-  whatsappEnquiry: { en: "WhatsApp Enquiry", hi: "व्हाट्सएप पूछताछ" },
-  addToBasket: { en: "Add to Enquiry Basket", hi: "टोकरी में जोड़ें" },
-  addedToBasket: { en: "Added to Basket", hi: "टोकरी में जोड़ा गया" },
-  requestShadeCard: { en: "Request Shade Card", hi: "शेड कार्ड माँगें" },
-  requestCatalogue: { en: "Request Catalogue", hi: "सूची माँगें" },
-  getBulkPrice: { en: "Get Bulk Price on WhatsApp", hi: "बल्क भाव पाएँ" },
-  sendEnquiry: { en: "Send Enquiry on WhatsApp", hi: "पूछताछ भेजें" },
-  continueWhatsApp: { en: "Continue on WhatsApp", hi: "व्हाट्सएप पर जारी रखें" },
-  browseProducts: { en: "Browse Products", hi: "उत्पाद देखें" },
-  backToHome: { en: "Back to Home", hi: "होम पर जाएँ" },
-  clearAll: { en: "Clear All", hi: "सब हटाएँ" },
-  viewAll: { en: "View All", hi: "सब देखें" },
-  quickEnquire: { en: "Quick Enquire", hi: "तुरंत पूछें" },
-  shareProduct: { en: "Share", hi: "शेयर" },
-  copyLink: { en: "Copy Link", hi: "लिंक कॉपी" },
-  linkCopied: { en: "Link Copied!", hi: "लिंक कॉपी हो गया!" },
-
-  // Search
-  searchPlaceholder: { en: "Search by product name, category or uses...", hi: "उत्पाद, श्रेणी या उपयोग खोजें..." },
-  recentSearches: { en: "Recent Searches", hi: "हाल की खोजें" },
-  trendingSearches: { en: "Trending", hi: "ट्रेंडिंग" },
-  noResults: { en: "No products match your filters", hi: "कोई उत्पाद नहीं मिला" },
-
-  // Product
-  inStock: { en: "In Stock", hi: "स्टॉक में" },
-  limitedStock: { en: "Limited Stock", hi: "सीमित स्टॉक" },
-  onRequest: { en: "Available on Request", hi: "माँग पर उपलब्ध" },
-  shades: { en: "Shades", hi: "शेड्स" },
-  bestFor: { en: "Best for", hi: "बेस्ट फॉर" },
-  variants: { en: "Variants", hi: "वैरिएंट" },
-  quantity: { en: "Quantity", hi: "मात्रा" },
-  peopleAlsoEnquired: { en: "People Also Enquired", hi: "लोग ये भी पूछते हैं" },
-  recentlyViewed: { en: "Recently Viewed", hi: "हाल में देखा" },
-  relatedProducts: { en: "Related Products", hi: "संबंधित उत्पाद" },
-  specifications: { en: "Specifications", hi: "विशेषताएँ" },
-  careGuide: { en: "Care & Usage", hi: "देखभाल गाइड" },
-
-  // Delivery
-  checkDelivery: { en: "Check delivery to your area", hi: "अपने इलाके में डिलीवरी चेक करें" },
-  deliversHere: { en: "Yes, we deliver here!", hi: "हाँ, यहाँ डिलीवरी होती है!" },
-  enterPincode: { en: "Enter pincode", hi: "पिनकोड डालें" },
-  transitTime: { en: "Typical transit: 3-5 business days", hi: "सामान्य समय: 3-5 दिन" },
-
-  // Basket toast
-  addedToast: { en: "added to enquiry", hi: "टोकरी में जोड़ा" },
-  itemsInBasket: { en: "items in basket", hi: "आइटम टोकरी में" },
-  review: { en: "Review", hi: "देखें" },
-
-  // Theme
-  lightMode: { en: "Light", hi: "लाइट" },
-  warmMode: { en: "Warm", hi: "वॉर्म" },
-  systemMode: { en: "System", hi: "सिस्टम" },
-
-  // Footer
-  allRightsReserved: { en: "All rights reserved", hi: "सर्वाधिकार सुरक्षित" },
-  quickLinks: { en: "Quick Links", hi: "क्विक लिंक" },
-  contactUs: { en: "Contact", hi: "संपर्क" },
-};
-
-// ─── Helper: get string for current language ───────────────────────────────
-export function t(lang, key) {
-  const entry = strings[key];
-  if (!entry) return key;
-  return entry[lang] || entry.en;
-}
 
 // ─── Hinglish Catchy Phrases ───────────────────────────────────────────────
 // Warm, local, engaging — sprinkled throughout the site to make it feel
@@ -162,45 +78,6 @@ export const phrases = {
   testimonialIntro: "Hamare customers ke dil ki baat —",
 };
 
-// ─── Language Context (simple React context) ───────────────────────────────
-import { createContext, useContext, useState, useEffect } from "react";
-
-const LangContext = createContext({ lang: "en", setLang: () => {}, toggle: () => {} });
-
-export function LangProvider({ children }) {
-  const [lang, setLangState] = useState(() => {
-    try {
-      return localStorage.getItem("fakhri_lang") || "en";
-    } catch {
-      return "en";
-    }
-  });
-
-  const setLang = (newLang) => {
-    setLangState(newLang);
-    try {
-      localStorage.setItem("fakhri_lang", newLang);
-    } catch {}
-  };
-
-  const toggle = () => setLang(lang === "en" ? "hi" : "en");
-
-  return (
-    <LangContext.Provider value={{ lang, setLang, toggle }}>
-      {children}
-    </LangContext.Provider>
-  );
-}
-
-export function useLang() {
-  const ctx = useContext(LangContext);
-  return ctx.lang || "en";
-}
-
-export function useLangControls() {
-  return useContext(LangContext);
-}
-
 // ─── Stock Status Helper ───────────────────────────────────────────────────
 // Derives a stock status from product properties — no need to edit every
 // product in siteData.js. Stable per-slug (hash-based).
@@ -214,7 +91,7 @@ export function getStockStatus(product) {
   return "on-request";                  // 10% on request
 }
 
-// ─── Smart WhatsApp Link Helper (#4) ───────────────────────────────────────
+// ─── Smart WhatsApp Link Helper ────────────────────────────────────────────
 // Builds context-aware pre-filled WhatsApp messages.
 import { businessInfo } from "./data/siteData.js";
 
