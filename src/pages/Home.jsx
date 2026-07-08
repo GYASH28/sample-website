@@ -154,104 +154,85 @@ export default function Home() {
   return (
     <>
       {/* ═══════════════════════════════════════════════════════════════
-          CINEMATIC HERO — Full viewport, massive type, single subtle thread
+          CINEMATIC HERO — Full-viewport, layered depth, real photography,
+          multi-thread weave signature, cursor-as-needle, scroll parallax.
+          ONE ambient animation (Ken Burns on hero image, viewport-gated).
           ═══════════════════════════════════════════════════════════════ */}
       <section className="hero-cinematic" id="home" ref={(el) => { heroRef.current = el; heroSectionRef.current = el; }}>
-        {/* Layer 0: Background gradient */}
+        {/* Layer 0: Warm radial-gradient background */}
         <div className="hero-cinematic-bg" aria-hidden="true" />
 
-        {/* Layer 0.5: Loom/weave SVG texture (Phase 2.3) — very faint, slow drift */}
+        {/* Layer 0.5: Faint loom/weave texture — very slow drift, very low opacity */}
         {!reduce && (
-          <div
-            className="hero-loom-texture"
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              inset: 0,
-              zIndex: 0,
-              opacity: 0.05,
-              backgroundImage:
-                "linear-gradient(90deg, transparent 49.5%, var(--pink-dark, #4A141C) 49.5%, var(--pink-dark, #4A141C) 50.5%, transparent 50.5%), linear-gradient(0deg, transparent 49.5%, var(--gold-deep, #8E6824) 49.5%, var(--gold-deep, #8E6824) 50.5%, transparent 50.5%)",
-              backgroundSize: "28px 28px",
-              animation: "loom-drift 60s linear infinite",
-            }}
-          />
+          <div className="hero-loom-texture" aria-hidden="true" />
         )}
-        <style>{`@keyframes loom-drift { from { background-position: 0 0; } to { background-position: 28px 28px; } }`}</style>
 
-        {/* Layer 1: Multi-thread weave (Phase 2.1 primary) — replaces single thread */}
-        <svg
-          className="hero-cinematic-thread-accent"
-          viewBox="0 0 1200 800"
-          preserveAspectRatio="xMidYMid slice"
-          aria-hidden="true"
-        >
-          {threadColors.map((c, i) => (
-            <motion.path
-              key={i}
-              d={`M ${-50 + i * 30}, ${120 + i * 120} Q 400, ${40 + i * 90}, 700, ${200 + i * 80} T 1250, ${120 + i * 90}`}
-              fill="none"
-              stroke={c}
-              strokeWidth="1.4"
-              strokeLinecap="round"
-              opacity="0.55"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.55 }}
-              transition={{
-                pathLength: { duration: 1.8, ease: ease.soft, delay: 0.4 + i * 0.18 },
-                opacity: { duration: 0.3, ease: ease.soft, delay: 0.4 + i * 0.18 },
-              }}
-            />
-          ))}
-          {/* Cross-stitch accents — small X marks along the weave */}
-          {threadColors.map((c, i) => (
-            <motion.path
-              key={`x-${i}`}
-              d={`M ${200 + i * 250}, ${320 + (i % 2) * 60} L ${220 + i * 250}, ${340 + (i % 2) * 60} M ${220 + i * 250}, ${320 + (i % 2) * 60} L ${200 + i * 250}, ${340 + (i % 2) * 60}`}
-              fill="none"
-              stroke={c}
-              strokeWidth="1.2"
-              opacity="0.4"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ duration: 0.6, ease: ease.soft, delay: 1.0 + i * 0.15 }}
-            />
-          ))}
-        </svg>
+        {/* Layer 1: Multi-thread weave — THE signature moment. Load-time, one-shot. */}
+        {!reduce && (
+          <svg
+            className="hero-cinematic-thread-accent"
+            viewBox="0 0 1200 800"
+            preserveAspectRatio="xMidYMid slice"
+            aria-hidden="true"
+          >
+            {threadColors.map((c, i) => (
+              <motion.path
+                key={i}
+                d={`M ${-50 + i * 30},${120 + i * 120} Q 400,${40 + i * 90} 700,${200 + i * 80} T 1250,${120 + i * 90}`}
+                fill="none"
+                stroke={c}
+                strokeWidth="1.4"
+                strokeLinecap="round"
+                opacity="0.5"
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ pathLength: 1, opacity: 0.5 }}
+                transition={{
+                  pathLength: { duration: 1.8, ease: ease.soft, delay: 0.4 + i * 0.18 },
+                  opacity: { duration: 0.3, ease: ease.soft, delay: 0.4 + i * 0.18 },
+                }}
+              />
+            ))}
+            {threadColors.map((c, i) => (
+              <motion.path
+                key={`x-${i}`}
+                d={`M ${200 + i * 250},${320 + (i % 2) * 60} L ${220 + i * 250},${340 + (i % 2) * 60} M ${220 + i * 250},${320 + (i % 2) * 60} L ${200 + i * 250},${340 + (i % 2) * 60}`}
+                fill="none"
+                stroke={c}
+                strokeWidth="1.2"
+                opacity="0.35"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 0.6, ease: ease.soft, delay: 1.0 + i * 0.15 }}
+              />
+            ))}
+          </svg>
+        )}
 
-        {/* Layer 1.5: Cursor-as-needle (Phase 2.1 secondary) — hero only, spring-lagged */}
+        {/* Layer 1.5: Cursor-as-needle — desktop only, spring-lagged, disabled on touch/reduced-motion */}
         {!touch && !reduce && needleActive && (
           <>
             <motion.svg
               className="cursor-needle"
               style={{ x: needleX, y: needleY, translateX: "-50%", translateY: "-50%", position: "fixed", pointerEvents: "none", zIndex: 60, mixBlendMode: "multiply" }}
-              width="36"
-              height="36"
-              viewBox="0 0 36 36"
-              aria-hidden="true"
+              width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"
             >
-              <path d="M18 4 L22 18 L18 32 L14 18 Z" fill="var(--gold, #B8893C)" stroke="var(--pink-dark, #4A141C)" strokeWidth="0.8" />
+              <path d="M18 4 L22 18 L18 32 L14 18 Z" fill="var(--gold, #76591A)" stroke="var(--pink-dark, #4A141C)" strokeWidth="0.8" />
               <circle cx="18" cy="18" r="2" fill="var(--pink-dark, #4A141C)" />
             </motion.svg>
             <motion.svg
               className="cursor-needle-trail"
-              style={{ x: trailX, y: trailY, translateX: "-50%", translateY: "-50%", position: "fixed", pointerEvents: "none", zIndex: 59, opacity: 0.55 }}
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              aria-hidden="true"
+              style={{ x: trailX, y: trailY, translateX: "-50%", translateY: "-50%", position: "fixed", pointerEvents: "none", zIndex: 59, opacity: 0.5 }}
+              width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"
             >
-              <circle cx="10" cy="10" r="3" fill="var(--gold, #B8893C)" />
+              <circle cx="10" cy="10" r="3" fill="var(--gold, #76591A)" />
             </motion.svg>
           </>
         )}
 
-        {/* Layer 2: Hero content — massive type + parallax image */}
-        <motion.div
-          className="hero-cinematic-content"
-          style={{ y: heroCopyY, opacity: heroCopyOpacity }}
-        >
-          <div className="container">
+        {/* Layer 2: Hero content — massive type + real photography with parallax */}
+        <div className="hero-cinematic-content">
+          {/* Left: Copy column */}
+          <motion.div style={{ y: heroCopyY, opacity: heroCopyOpacity }} className="hero-copy-column">
             <motion.p
               className="hero-cinematic-eyebrow"
               initial={{ opacity: 0, y: 20 }}
@@ -263,7 +244,7 @@ export default function Home() {
             </motion.p>
 
             <h1 className="hero-cinematic-title" aria-label="Colourful Yarns and Craft Essentials" style={{ position: "relative" }}>
-              {/* Phase 2.1 tertiary — Stitched headline needle traveling L→R */}
+              {/* Stitched headline needle traveling L→R */}
               {!reduce && (
                 <motion.span
                   className="stitch-needle"
@@ -274,7 +255,7 @@ export default function Home() {
                     top: "-12px",
                     width: "28px",
                     height: "28px",
-                    color: "var(--gold, #B8893C)",
+                    color: "var(--gold, #76591A)",
                     pointerEvents: "none",
                     zIndex: 3,
                   }}
@@ -285,15 +266,18 @@ export default function Home() {
                 </motion.span>
               )}
               {heroWords.map((word, index) => {
-                // Sync word visibility to stitchProgress — word i appears when needle passes its position
                 const wordThreshold = (index + 1) / heroWords.length;
                 const visible = reduce || stitchProgress >= wordThreshold * 0.85;
                 return (
                   <motion.span
                     key={`${word}-${index}`}
                     className="hero-cinematic-word"
-                    initial={{ opacity: 0, y: 60 }}
-                    animate={{ opacity: visible ? 1 : 0, y: visible ? 0 : 60 }}
+                    initial={{ opacity: 0, y: 60, filter: "blur(8px)" }}
+                    animate={{
+                      opacity: visible ? 1 : 0,
+                      y: visible ? 0 : 60,
+                      filter: visible ? "blur(0px)" : "blur(8px)",
+                    }}
                     transition={{
                       delay: reduce ? 0.4 + index * 0.1 : 0,
                       duration: reduce ? 0.9 : 0.6,
@@ -315,8 +299,8 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: duration.standard, ease: ease.soft, delay: 1.2 }}
             >
-              {"12+ categories, 70+ shades — aapke next project ka starting point."} Explore quality yarns, crochet threads, macrame cords, beads, bases and accessories
-              with all-India delivery and easy WhatsApp enquiry.
+              {"12+ categories, 70+ shades — aapke next project ka starting point."} Explore quality yarns, crochet
+              threads, macrame cords, beads, bases and accessories with all-India delivery and easy WhatsApp enquiry.
             </motion.p>
 
             <motion.div
@@ -347,31 +331,28 @@ export default function Home() {
               animate={{ opacity: 1 }}
               transition={{ duration: duration.standard, ease: ease.soft, delay: 1.7 }}
             >
-              {[
-                "All India Delivery",
-                "12+ Categories",
-                "Wholesale Friendly",
-                "WhatsApp Catalogue",
-              ].map((badge) => (
+              {["All India Delivery", "12+ Categories", "Wholesale Friendly", "WhatsApp Catalogue"].map((badge) => (
                 <span key={badge}>
                   <CheckCircle2 size={14} aria-hidden="true" />
                   {badge}
                 </span>
               ))}
             </motion.div>
-          </div>
+          </motion.div>
 
-          {/* Hero image — Ken Burns + parallax */}
+          {/* Right: Real photography with parallax + floating accent card */}
           <motion.div
             className="hero-cinematic-image-wrap"
             style={{ y: heroImageY, scale: heroImageScale }}
           >
             <div className="hero-cinematic-image">
               <img
-                src="/assets/images/hero_banner.webp"
-                alt="Vibrant yarn balls and craft accessories"
+                src="/assets/images/products/cotton-dreamz/hero.webp"
+                alt="Cotton Dreamz yarn in seafoam, hot pink and butter yellow — Fakhri Mart"
                 fetchPriority="high"
               />
+              {/* Subtle gradient overlay for text legibility if needed */}
+              <div className="hero-image-overlay" aria-hidden="true" />
             </div>
             {/* Floating accent card */}
             <motion.div
@@ -383,8 +364,20 @@ export default function Home() {
               <strong>12+ Categories</strong>
               <span>Yarns, threads, beads, bases &amp; more</span>
             </motion.div>
+            {/* Floating shade dots — real palette colors from Cotton Dreamz */}
+            <motion.div
+              className="hero-shade-dots"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: duration.slow, ease: ease.emphasis, delay: 1.8 }}
+              aria-hidden="true"
+            >
+              {["#94d4c9", "#ed7fa2", "#f9d976", "#c4a8e0", "#87ceeb"].map((hex, i) => (
+                <span key={i} style={{ backgroundColor: hex }} />
+              ))}
+            </motion.div>
           </motion.div>
-        </motion.div>
+        </div>
 
         {/* Scroll cue */}
         <motion.div
