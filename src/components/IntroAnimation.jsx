@@ -168,8 +168,8 @@ export default function IntroAnimation({ onComplete }) {
             {isPast(PHASES.BALL) && (
               <motion.div
                 className="intro-yarn-ball"
-                initial={{ scale: 0, opacity: 0, rotate: -180 }}
-                animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                initial={{ x: "-50%", y: "-50%", scale: 0, opacity: 0, rotate: -180 }}
+                animate={{ x: "-50%", y: "-50%", scale: 1, opacity: 1, rotate: 0 }}
                 transition={{ duration: 0.7, ease: [0.34, 1.56, 0.64, 1] }}
                 aria-hidden="true"
               >
@@ -188,8 +188,8 @@ export default function IntroAnimation({ onComplete }) {
             {isPast(PHASES.BALL) && (
               <motion.div
                 className="intro-logo-wrapper"
-                initial={{ scale: 0, opacity: 0, rotate: -90 }}
-                animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                initial={{ x: "-50%", y: "-50%", scale: 0, opacity: 0, rotate: -90 }}
+                animate={{ x: "-50%", y: "-50%", scale: 1, opacity: 1, rotate: 0 }}
                 transition={{ duration: 0.8, ease: [0.34, 1.56, 0.64, 1] }}
                 aria-hidden="true"
               >
