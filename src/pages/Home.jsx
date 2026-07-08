@@ -24,7 +24,7 @@ import ProductVisual from "../components/ProductVisual.jsx";
 import Reveal from "../components/Reveal.jsx";
 import StaggerReveal, { staggerChild } from "../components/StaggerReveal.jsx";
 import WhatsAppIcon from "../components/WhatsAppIcon.jsx";
-import { ease, duration, prefersReducedMotion, isTouchDevice } from "../motion-tokens.js";
+import { ease, duration, prefersReducedMotion, isTouchDevice, spring } from "../motion-tokens.js";
 import { smartWhatsAppLink } from "../i18n.jsx";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
 import { useJsonLd, localBusinessJsonLd, websiteJsonLd } from "../hooks/useJsonLd.js";
