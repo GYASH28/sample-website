@@ -184,6 +184,19 @@ export default function IntroAnimation({ onComplete }) {
               </motion.div>
             )}
 
+            {/* Logo — the real Fakhri Mart logo, appears center with spring overshoot */}
+            {isPast(PHASES.BALL) && (
+              <motion.div
+                className="intro-logo-wrapper"
+                initial={{ scale: 0, opacity: 0, rotate: -90 }}
+                animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                transition={{ duration: 0.8, ease: [0.34, 1.56, 0.64, 1] }}
+                aria-hidden="true"
+              >
+                <img src="/assets/fakhri-mart-logo.webp" alt="" className="intro-logo-img" />
+              </motion.div>
+            )}
+
             {/* Title — letter-by-letter 3D reveal */}
             {isPast(PHASES.TITLE) && (
               <div className="intro-text">

@@ -5246,3 +5246,32 @@ body.intro-running .announcement-bar {
     font-size: 0.75rem;
   }
 }
+
+/* Intro logo — the real Fakhri Mart logo, centered */
+.intro-logo-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.intro-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+  box-shadow: 0 8px 32px rgba(67, 52, 43, 0.2);
+}
+
+@media (max-width: 600px) {
+  .intro-logo-wrapper {
+    width: 90px;
+    height: 90px;
+  }
+}
