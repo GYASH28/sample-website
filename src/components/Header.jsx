@@ -3,7 +3,6 @@ import {
   List,
   MagnifyingGlass,
   MapPin,
-  Package,
   Phone,
   ShoppingBagOpen,
   X,
@@ -106,11 +105,12 @@ export default function Header() {
         <div className="container nav-shell">
           <Link className="brand" to="/" aria-label="Fakhri Mart home">
             <span className="brand-mark" aria-hidden="true">
-              <svg viewBox="0 0 44 44">
-                <path d="M8 22c4-11 24-11 28 0-4 11-24 11-28 0Z" />
-                <path d="M13 22c3-6 15-6 18 0-3 6-15 6-18 0Z" />
-                <path d="M22 8c-5 4-5 24 0 28" />
-              </svg>
+              <img
+                src="/assets/brand/fakhri-logo-96.webp"
+                alt=""
+                width="96"
+                height="96"
+              />
             </span>
             <span>
               <strong>Fakhri Mart</strong>
@@ -233,7 +233,14 @@ export default function Header() {
       >
         <div className="mobile-drawer-header">
           <Link className="brand" to="/" onClick={closeMenu}>
-            <span className="brand-mark" aria-hidden="true"><Package size={22} /></span>
+            <span className="brand-mark" aria-hidden="true">
+              <img
+                src="/assets/brand/fakhri-logo-96.webp"
+                alt=""
+                width="96"
+                height="96"
+              />
+            </span>
             <span><strong>Fakhri Mart</strong><small>Pune · all-India delivery</small></span>
           </Link>
           <button className="icon-button" type="button" onClick={closeMenu} aria-label={t("close")}>

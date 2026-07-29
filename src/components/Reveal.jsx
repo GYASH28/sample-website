@@ -46,10 +46,7 @@ export default function Reveal({
   children,
 }) {
   const ref = useRef(null);
-  // Content is visible before hydration and before intersection callbacks so
-  // full-page captures, prerendered HTML and reduced-motion users never see
-  // large blank sections.
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const element = ref.current;

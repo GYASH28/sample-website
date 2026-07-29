@@ -9,6 +9,10 @@ import "@fontsource-variable/jetbrains-mono";
 import "./styles.css";
 import "./atelier.css";
 
+if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  document.documentElement.classList.add("motion-ready");
+}
+
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>

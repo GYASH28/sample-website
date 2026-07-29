@@ -8,6 +8,14 @@ export default function Footer() {
     <footer className="site-footer">
       <div className="container footer-main">
         <div className="footer-statement">
+          <img
+            className="footer-brand-seal"
+            src="/assets/brand/fakhri-logo-256.webp"
+            alt="Fakhri Mart Yarn Store"
+            width="256"
+            height="256"
+            loading="lazy"
+          />
           <span className="eyebrow">Fakhri Mart · Pune</span>
           <h2>Good materials make the making easier.</h2>
           <p>Yarn, thread, cord and craft supplies for makers, boutiques, resellers and wholesale buyers across India.</p>

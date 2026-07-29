@@ -64,6 +64,54 @@ export default function ProductCard({ product, compact = false }) {
     return () => obs.disconnect();
   }, []);
 
+  useEffect(() => {
+    const card = cardRef.current;
+    if (
+      !card ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      !window.matchMedia("(pointer: fine)").matches
+    ) {
+      return undefined;
+    }
+
+    let frame = 0;
+    let clearWillChangeTimer = 0;
+
+    const onPointerMove = (event) => {
+      if (frame) cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const bounds = card.getBoundingClientRect();
+        const x = (event.clientX - bounds.left) / bounds.width;
+        const y = (event.clientY - bounds.top) / bounds.height;
+        const rotateY = (x - 0.5) * 6;
+        const rotateX = (0.5 - y) * 5;
+        card.style.willChange = "transform";
+        card.style.setProperty("--card-light-x", `${x * 100}%`);
+        card.style.setProperty("--card-light-y", `${y * 100}%`);
+        card.style.transform = `perspective(1100px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-7px)`;
+      });
+    };
+
+    const onPointerLeave = () => {
+      if (frame) cancelAnimationFrame(frame);
+      card.style.transform =
+        "perspective(1100px) rotateX(0deg) rotateY(0deg) translateY(0)";
+      clearTimeout(clearWillChangeTimer);
+      clearWillChangeTimer = window.setTimeout(() => {
+        card.style.willChange = "auto";
+      }, 360);
+    };
+
+    card.addEventListener("pointermove", onPointerMove, { passive: true });
+    card.addEventListener("pointerleave", onPointerLeave);
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      clearTimeout(clearWillChangeTimer);
+      card.removeEventListener("pointermove", onPointerMove);
+      card.removeEventListener("pointerleave", onPointerLeave);
+    };
+  }, []);
+
   const colorsToShow = (product.colors || []).slice(0, MAX_SWATCHES_ON_CARD);
   const overflowCount = (product.colors?.length || 0) - MAX_SWATCHES_ON_CARD;
 

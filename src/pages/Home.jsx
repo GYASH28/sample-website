@@ -6,7 +6,7 @@ import {
   Swatches,
   Truck,
 } from "@phosphor-icons/react";
-import { useMemo, useState } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import ProductCard from "../components/ProductCard.jsx";
 import Reveal from "../components/Reveal.jsx";
@@ -25,6 +25,10 @@ import {
   useJsonLd,
   websiteJsonLd,
 } from "../hooks/useJsonLd.js";
+
+const YarnAtelier3D = lazy(
+  () => import("../components/YarnAtelier3D.jsx"),
+);
 
 const categoryNames = [
   "Bliss Threads",
@@ -88,14 +92,14 @@ export default function Home() {
       <section className="fm-hero" aria-labelledby="home-title">
         <div className="container fm-hero__grid">
           <div className="fm-hero__copy">
-            <p className="fm-kicker">Fibre, cord and craft hardware</p>
+            <p className="fm-kicker">A yarn store for joyful making</p>
             <h1 id="home-title">
-              Choose by feel.
-              <span>Order by shade.</span>
+              <span>Colour you can feel.</span>
+              <span>Craft you can build.</span>
             </h1>
             <p className="fm-hero__intro">
-              Yarn, thread, cord and bag-making supplies for makers, boutiques
-              and resellers across India.
+              Explore yarn, cord, thread and bag-making materials, then confirm
+              live shades with Fakhri Mart.
             </p>
             <div className="fm-hero__actions">
               <SmartLink to="/products" className="btn btn-primary">
@@ -109,41 +113,76 @@ export default function Home() {
                 rel="noreferrer"
               >
                 <WhatsAppIcon size={18} />
-                Ask for shades
+                Ask for live shades
               </a>
+            </div>
+            <div className="fm-hero__proof" aria-label="Store benefits">
+              <span><strong>15+</strong> material families</span>
+              <span><strong>India-wide</strong> delivery</span>
+              <span><strong>Live</strong> shade confirmation</span>
             </div>
           </div>
 
           <div className="fm-hero__media">
-            <picture>
-              <source
-                srcSet="/assets/images/editorial/atelier-hero-640.avif 640w, /assets/images/editorial/atelier-hero-960.avif 960w, /assets/images/editorial/atelier-hero.avif 1280w"
-                sizes="(max-width: 48rem) calc(100vw - 1.25rem), 55vw"
-                type="image/avif"
-              />
-              <img
-                src="/assets/images/editorial/atelier-hero.webp"
-                srcSet="/assets/images/editorial/atelier-hero-640.webp 640w, /assets/images/editorial/atelier-hero-960.webp 960w, /assets/images/editorial/atelier-hero.webp 1280w"
-                sizes="(max-width: 48rem) calc(100vw - 1.25rem), 55vw"
-                alt="Cotton yarn, crochet thread, macrame cord, hooks, beads and purse handles arranged on a worktable"
-                width="1536"
-                height="1024"
-                fetchPriority="high"
-                decoding="async"
-              />
-            </picture>
-            <p>
-              A representative material edit. Ask for current shade photos
-              before ordering.
-            </p>
+            <Suspense
+              fallback={
+                <picture className="yarn-atelier yarn-atelier--loading">
+                  <source
+                    srcSet="/assets/brand/fakhri-logo-640.avif"
+                    type="image/avif"
+                  />
+                  <img
+                    src="/assets/brand/fakhri-logo-640.webp"
+                    alt="Fakhri Mart Yarn Store logo"
+                    width="640"
+                    height="640"
+                    fetchPriority="high"
+                  />
+                </picture>
+              }
+            >
+              <YarnAtelier3D />
+            </Suspense>
+            <span className="fm-hero__orbit-label" aria-hidden="true">
+              Yarn · thread · cord · craft
+            </span>
           </div>
         </div>
       </section>
 
+      <div
+        className="fm-material-loop"
+        aria-label="Material categories"
+        tabIndex="0"
+      >
+        <div className="fm-material-loop__track">
+          {[
+            "Cotton yarn",
+            "Crochet thread",
+            "Macrame cord",
+            "Embroidery floss",
+            "Bag handles",
+            "Beads and findings",
+            "Cotton yarn",
+            "Crochet thread",
+            "Macrame cord",
+            "Embroidery floss",
+            "Bag handles",
+            "Beads and findings",
+          ].map((label, index) => (
+            <span key={`${label}-${index}`} aria-hidden={index > 5}>
+              {label}
+              <i />
+            </span>
+          ))}
+        </div>
+      </div>
+
       <section className="fm-home-section fm-material-index" aria-labelledby="material-title">
         <div className="container fm-material-index__grid">
           <Reveal className="fm-material-index__intro" variant="fade-up">
-            <h2 id="material-title">Start with the material</h2>
+            <p className="fm-kicker">The tactile library</p>
+            <h2 id="material-title">Find the material that fits the idea</h2>
             <p>
               Browse by fibre, finish or the part your project still needs.
               Each category opens into the full searchable catalogue.
@@ -164,6 +203,7 @@ export default function Home() {
                 loading="lazy"
               />
             </picture>
+            <span className="fm-image-note">Built for makers, boutiques and resale shelves</span>
           </Reveal>
 
           <div className="fm-category-index" aria-label="Featured material categories">
@@ -217,7 +257,7 @@ export default function Home() {
 
             <Reveal className="fm-shade-desk__content" delay={80} variant="slide-right">
               <p className="fm-kicker">The shade desk</p>
-              <h2 id="shade-title">Compare a colour family before you enquire</h2>
+              <h2 id="shade-title">Turn colour decisions into confidence</h2>
               <p>
                 Select a material to preview its listed shade family. Current
                 stock and dye lots are confirmed on WhatsApp.
@@ -241,6 +281,7 @@ export default function Home() {
               </div>
 
               <div
+                key={activeShadeProduct.slug}
                 className="fm-shade-panel"
                 role="tabpanel"
                 aria-live="polite"
@@ -293,10 +334,13 @@ export default function Home() {
       <section className="fm-home-section fm-featured-edit" aria-labelledby="featured-title">
         <div className="container">
           <Reveal className="fm-section-heading" variant="fade-up">
-            <h2 id="featured-title">A focused catalogue edit</h2>
+            <div>
+              <p className="fm-kicker">The material edit</p>
+              <h2 id="featured-title">Four tactile ways to begin</h2>
+            </div>
             <p>
-              Four useful starting points across thread, yarn, cord and bag
-              hardware.
+              Useful starting points across thread, yarn, cord and bag
+              hardware, selected to make browsing feel effortless.
             </p>
           </Reveal>
           <div className="fm-featured-grid">
@@ -320,7 +364,8 @@ export default function Home() {
       <section className="fm-home-section fm-process" aria-labelledby="process-title">
         <div className="container fm-process__grid">
           <Reveal className="fm-process__heading" variant="slide-left">
-            <h2 id="process-title">From shortlist to confirmed order</h2>
+            <p className="fm-kicker">Simple by design</p>
+            <h2 id="process-title">From creative spark to confirmed order</h2>
             <p>
               Prices depend on quantity, shade, size and availability, so every
               order finishes with a direct confirmation.
@@ -375,7 +420,8 @@ export default function Home() {
           </Reveal>
           <Reveal className="fm-trade-panel__copy" delay={80} variant="slide-right">
             <Truck size={34} aria-hidden="true" />
-            <h2 id="trade-title">Planning for a boutique or resale shelf?</h2>
+            <p className="fm-kicker">Made to move in volume</p>
+            <h2 id="trade-title">Planning a boutique or resale shelf?</h2>
             <p>
               Send the material, quantity, shade and destination. Fakhri Mart
               will reply with current pack details and delivery options.
