@@ -1,14 +1,20 @@
 import { useMemo, useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
 import CatalogueCta from "../components/CatalogueCta.jsx";
 import PageHero from "../components/PageHero.jsx";
 import ProductCard from "../components/ProductCard.jsx";
 import Reveal from "../components/Reveal.jsx";
 import { featuredProducts, productCategories, newArrivals, MASTER_CATEGORIES } from "../data/siteData.js";
 import { useRecentlyViewed } from "../hooks/useRecentlyViewed.js";
-import { Search, SlidersHorizontal, ArrowUpDown, XCircle, Grid, List, HelpCircle, Check, ArrowRight } from "lucide-react";
-import { ease, duration, spring } from "../motion-tokens.js";
+import {
+  ArrowsDownUp,
+  ListBullets,
+  MagnifyingGlass,
+  Question,
+  SlidersHorizontal,
+  SquaresFour,
+  XCircle,
+} from "@phosphor-icons/react";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
 
 const PRODUCT_TYPES = [
@@ -36,7 +42,7 @@ const POPULAR_SEARCHES = ["Yarn", "Macrame", "Hook", "Cotton", "Soft", "Embroide
 
 export default function Products() {
   useDocumentMeta({
-    title: "Products — Fakhri Mart",
+    title: "Products | Fakhri Mart",
     description: "Browse our full range of yarns, crochet threads, macrame cords, and craft accessories.",
     canonical: "/products",
   });
@@ -327,7 +333,7 @@ export default function Products() {
                 gap: "6px",
               }}
             >
-              All <span style={{ fontSize: "0.7rem", opacity: 0.7 }}>({departmentCounts.All})</span>
+                All <span style={{ fontSize: "0.7rem" }}>({departmentCounts.All})</span>
             </button>
             {MASTER_CATEGORIES.map((mc) => {
               const isActive = activeDepartment === mc;
@@ -353,7 +359,7 @@ export default function Products() {
                     gap: "6px",
                   }}
                 >
-                  {mc} <span style={{ fontSize: "0.7rem", opacity: 0.7 }}>({departmentCounts[mc]})</span>
+                  {mc} <span style={{ fontSize: "0.7rem" }}>({departmentCounts[mc]})</span>
                 </button>
               );
             })}
@@ -376,7 +382,7 @@ export default function Products() {
               {/* Premium Search Box with suggestions */}
               <div className="search-box-premium-wrapper" ref={searchContainerRef} style={{ position: "relative", flexGrow: 1 }}>
                 <div className="search-box-premium">
-                  <Search size={18} className="search-icon-inside" />
+                  <MagnifyingGlass size={18} className="search-icon-inside" />
                   <input
                     type="search"
                     placeholder="Search by product name, category or uses..."
@@ -439,11 +445,11 @@ export default function Products() {
                   onChange={(e) => setSortBy(e.target.value)}
                 >
                   <option value="featured">Featured Order</option>
-                  <option value="name-asc">Alphabetical (A–Z)</option>
+                  <option value="name-asc">Alphabetical (A-Z)</option>
                   <option value="category-asc">Sort by Category</option>
                   <option value="newest">Newest Arrivals</option>
                 </select>
-                <ArrowUpDown size={15} className="select-arrow-icon" />
+                <ArrowsDownUp size={15} className="select-arrow-icon" />
               </div>
 
               {/* Grid / List view toggle */}
@@ -455,7 +461,7 @@ export default function Products() {
                   title="Grid View"
                   aria-label="Switch to Grid View"
                 >
-                  <Grid size={18} />
+                  <SquaresFour size={18} />
                 </button>
                 <button
                   type="button"
@@ -464,7 +470,7 @@ export default function Products() {
                   title="List View"
                   aria-label="Switch to List View"
                 >
-                  <List size={18} />
+                  <ListBullets size={18} />
                 </button>
               </div>
             </div>
@@ -489,8 +495,8 @@ export default function Products() {
               </div>
               {/* Category selector */}
               <div className="filter-select-box">
-                <span className="filter-label" style={{ display: "block", marginBottom: "6px", fontSize: "12px", fontWeight: "600", color: "var(--text-muted)", textTransform: "uppercase" }}>Category</span>
-                <select value={activeCategory} onChange={(e) => setActiveCategory(e.target.value)} className="filter-inner-select" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid rgba(0,0,0,0.1)", background: "#fafafa" }}>
+                <label htmlFor="catalogue-category" className="filter-label" style={{ display: "block", marginBottom: "6px", fontSize: "12px", fontWeight: "600", color: "var(--text-muted)", textTransform: "uppercase" }}>Category</label>
+                <select id="catalogue-category" value={activeCategory} onChange={(e) => setActiveCategory(e.target.value)} className="filter-inner-select" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid rgba(0,0,0,0.1)", background: "#fafafa" }}>
                   <option value="All">All Categories</option>
                   {productCategories.map(c => (
                     <option key={c.name} value={c.name}>{c.name}</option>
@@ -500,8 +506,8 @@ export default function Products() {
 
               {/* Product Type selector */}
               <div className="filter-select-box">
-                <span className="filter-label" style={{ display: "block", marginBottom: "6px", fontSize: "12px", fontWeight: "600", color: "var(--text-muted)", textTransform: "uppercase" }}>Product Type</span>
-                <select value={activeType} onChange={(e) => setActiveType(e.target.value)} className="filter-inner-select" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid rgba(0,0,0,0.1)", background: "#fafafa" }}>
+                <label htmlFor="catalogue-product-type" className="filter-label" style={{ display: "block", marginBottom: "6px", fontSize: "12px", fontWeight: "600", color: "var(--text-muted)", textTransform: "uppercase" }}>Product Type</label>
+                <select id="catalogue-product-type" value={activeType} onChange={(e) => setActiveType(e.target.value)} className="filter-inner-select" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid rgba(0,0,0,0.1)", background: "#fafafa" }}>
                   {PRODUCT_TYPES.map(t => (
                     <option key={t.value} value={t.value}>{t.label}</option>
                   ))}
@@ -510,8 +516,8 @@ export default function Products() {
 
               {/* Tag / Use Case selector */}
               <div className="filter-select-box">
-                <span className="filter-label" style={{ display: "block", marginBottom: "6px", fontSize: "12px", fontWeight: "600", color: "var(--text-muted)", textTransform: "uppercase" }}>Craft Use Case</span>
-                <select value={activeTag} onChange={(e) => setActiveTag(e.target.value)} className="filter-inner-select" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid rgba(0,0,0,0.1)", background: "#fafafa" }}>
+                <label htmlFor="catalogue-use-case" className="filter-label" style={{ display: "block", marginBottom: "6px", fontSize: "12px", fontWeight: "600", color: "var(--text-muted)", textTransform: "uppercase" }}>Craft Use Case</label>
+                <select id="catalogue-use-case" value={activeTag} onChange={(e) => setActiveTag(e.target.value)} className="filter-inner-select" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid rgba(0,0,0,0.1)", background: "#fafafa" }}>
                   {USE_CASES.map(tag => (
                     <option key={tag} value={tag}>{tag === "All" ? "All Use Cases" : tag}</option>
                   ))}
@@ -539,15 +545,9 @@ export default function Products() {
 
             {/* Active Chips / Count row */}
             <div className="active-chips-summary-row" style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
-              <motion.span
-                className="result-count-text"
-                key={sortedProducts.length}
-                initial={{ opacity: 0.5, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: duration.quick, ease: ease.soft }}
-              >
+              <span className="result-count-text">
                 Showing <strong>{sortedProducts.length}</strong> of <strong>{featuredProducts.length}</strong> products
-              </motion.span>
+              </span>
 
               {hasActiveFilters && (
                 <div className="active-chips-flex" style={{ display: "flex", flexWrap: "wrap", gap: "8px", alignItems: "center" }}>
@@ -599,7 +599,7 @@ export default function Products() {
                 ) : (
                   /* Upgraded No Results Box with recommendations */
                   <div className="empty-results-box" style={{ gridColumn: "1 / -1", textAlign: "center", padding: "60px 20px", background: "#fff", borderRadius: "12px", border: "1px solid rgba(0,0,0,0.05)" }}>
-                    <HelpCircle size={52} className="empty-state-icon" style={{ marginInline: "auto", marginBottom: "18px", color: "var(--accent-rose, #e05c75)" }} />
+                    <Question size={52} className="empty-state-icon" style={{ marginInline: "auto", marginBottom: "18px", color: "var(--accent-rose, #e05c75)" }} />
                     <h3 style={{ fontSize: "20px", marginBottom: "8px" }}>No products match your filters</h3>
                     <p style={{ color: "var(--text-muted)", maxWidth: "460px", marginInline: "auto", fontSize: "15px" }}>
                       We couldn't find any yarns or craft tools matching your exact selections. Try clearing some filters or searching popular terms.

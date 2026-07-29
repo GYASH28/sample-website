@@ -1,4 +1,4 @@
-import { Palette } from "lucide-react";
+import { Palette } from "@phosphor-icons/react";
 import { smartWhatsAppLink } from "../i18n.jsx";
 
 /**

@@ -39,7 +39,7 @@ export default function InformationPage() {
   const { pathname } = useLocation();
   const page = content[pathname] || content["/delivery-enquiries"];
   useDocumentMeta({
-    title: `${page.eyebrow} — Fakhri Mart`,
+    title: `${page.eyebrow} | Fakhri Mart`,
     description: page.intro,
     canonical: pathname,
   });

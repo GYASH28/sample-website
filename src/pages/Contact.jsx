@@ -1,24 +1,39 @@
-import { Clock, Instagram, Mail, MapPin, MessageCircle, Phone, Truck } from "lucide-react";
+import {
+  ChatCircleDots,
+  Clock,
+  Envelope,
+  InstagramLogo,
+  MapPin,
+  Phone,
+  Truck,
+} from "@phosphor-icons/react";
 import PageHero from "../components/PageHero.jsx";
-import ProductVisual from "../components/ProductVisual.jsx";
 import Reveal from "../components/Reveal.jsx";
 import { businessInfo, createWhatsAppLink } from "../data/siteData.js";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
 
 export default function Contact() {
   useDocumentMeta({
-    title: "Contact — Fakhri Mart",
-    description: "Reach Fakhri Mart on WhatsApp, phone, or Instagram. Pune, Maharashtra. Mon–Sat 10am–8pm.",
+    title: "Contact Fakhri Mart",
+    description: "Reach Fakhri Mart on WhatsApp, phone, or Instagram. Pune, Maharashtra. Monday to Saturday, 10 AM to 8 PM.",
     canonical: "/contact",
   });
   return (
     <>
       <PageHero
         eyebrow="Contact"
-        title="Connect for catalogue, shade card and bulk order support"
-        text="Reach out for yarns, crochet threads, macrame cords, embroidery threads, beads, bases, purse accessories, delivery details and product availability."
+        title="Talk through the material before you order"
+        text="Ask about current shades, quantities, delivery, sample cards or a repeat supply requirement."
       >
-        <ProductVisual palette={["#35b8ad", "#f6a7b8", "#c99b6b"]} />
+        <picture className="catalogue-hero-photo">
+          <source srcSet="/assets/images/editorial/craft-stock-room.avif" type="image/avif" />
+          <img
+            src="/assets/images/editorial/craft-stock-room.webp"
+            alt="Organised yarn, cord, thread and bag-making supplies in the Fakhri Mart stock room"
+            width="1536"
+            height="1024"
+          />
+        </picture>
       </PageHero>
 
       <section className="section">
@@ -39,7 +54,7 @@ export default function Contact() {
               </div>
             </div>
             <div className="contact-card">
-              <MessageCircle size={24} aria-hidden="true" />
+              <ChatCircleDots size={24} aria-hidden="true" />
               <div>
                 <h3>WhatsApp</h3>
                 <a href={createWhatsAppLink()} target="_blank" rel="noreferrer" aria-label={`Message Fakhri Mart on WhatsApp at ${businessInfo.whatsappDisplay}`}>
@@ -48,14 +63,14 @@ export default function Contact() {
               </div>
             </div>
             <div className="contact-card">
-              <Mail size={24} aria-hidden="true" />
+              <Envelope size={24} aria-hidden="true" />
               <div>
                 <h3>Email</h3>
                 <a href={businessInfo.emailHref} aria-label={`Email Fakhri Mart at ${businessInfo.email}`}>{businessInfo.email}</a>
               </div>
             </div>
             <div className="contact-card">
-              <Instagram size={24} aria-hidden="true" />
+              <InstagramLogo size={24} aria-hidden="true" />
               <div>
                 <h3>Instagram</h3>
                 <a href={businessInfo.instagramUrl} target="_blank" rel="noreferrer" aria-label={`Visit Fakhri Mart on Instagram @${businessInfo.instagram}`}>

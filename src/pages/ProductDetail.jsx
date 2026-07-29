@@ -1,23 +1,22 @@
 import {
   ArrowRight,
-  ChevronRight,
-  MessageCircle,
-  Truck,
-  ShieldCheck,
-  Percent,
+  Bell,
+  CaretDown,
+  CaretUp,
+  ChatCircleDots,
   Check,
-  ShoppingBag,
-  Plus,
-  Minus,
-  HelpCircle,
-  Info,
-  ChevronDown,
-  ChevronUp,
-  Tags,
+  ArrowsOut,
   Heart,
-  Maximize2,
-  Bell
-} from "lucide-react";
+  Info,
+  Minus,
+  Percent,
+  Plus,
+  Question,
+  ShieldCheck,
+  ShoppingBag,
+  Tag,
+  Truck,
+} from "@phosphor-icons/react";
 import { useMemo, useState, useEffect } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import CatalogueCta from "../components/CatalogueCta.jsx";
@@ -324,7 +323,7 @@ export default function ProductDetail() {
                     style={{ position: "relative", zIndex: 1, width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.4s ease" }}
                   />
                   <div className="image-zoom-overlay-badge" style={{ position: "absolute", bottom: "16px", right: "16px", zIndex: 5, background: "rgba(0,0,0,0.5)", color: "#fff", padding: "8px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <Maximize2 size={16} />
+                    <ArrowsOut size={16} />
                   </div>
                 </div>
 
@@ -382,6 +381,7 @@ export default function ProductDetail() {
                     className={`btn-detail-action-circle ${isFavorited ? "active" : ""}`}
                     onClick={() => toggleWishlist(product.slug)}
                     title={isFavorited ? "Remove from Favorites" : "Save to Favorites"}
+                    aria-label={isFavorited ? "Remove from favorites" : "Save to favorites"}
                     style={{
                       width: "36px",
                       height: "36px",
@@ -395,7 +395,7 @@ export default function ProductDetail() {
                       cursor: "pointer"
                     }}
                   >
-                    <Heart size={16} fill={isFavorited ? "currentColor" : "none"} />
+                    <Heart size={16} weight={isFavorited ? "fill" : "regular"} />
                   </button>
                 </div>
               </div>
@@ -425,7 +425,7 @@ export default function ProductDetail() {
               {/* Pincode delivery checker */}
               {/* Phase 2: PincodeChecker removed — replaced with honest static shipping line */}
               <div style={{ margin: "16px 0" }}>
-                <p style={{ color: 'var(--muted, #544C43)', fontSize: '0.9rem' }}>We deliver across India — confirm exact timing on WhatsApp.</p>
+                <p style={{ color: 'var(--muted, #544C43)', fontSize: '0.9rem' }}>We deliver across India. Confirm exact timing on WhatsApp.</p>
               </div>
 
               <div className="product-detail-desc-box">
@@ -514,7 +514,7 @@ export default function ProductDetail() {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    <MessageCircle size={20} />
+                    <ChatCircleDots size={20} />
                     WhatsApp Enquiry
                   </a>
 
@@ -532,7 +532,7 @@ export default function ProductDetail() {
                 <div className="utility-buttons-row">
                   <ShareButton
                     url={typeof window !== "undefined" ? window.location.href : ""}
-                    title={`${product.name} — Fakhri Mart`}
+                    title={`${product.name} | Fakhri Mart`}
                     text={`${product.name} from Fakhri Mart`}
                   />
                   <a
@@ -541,7 +541,7 @@ export default function ProductDetail() {
                     rel="noreferrer"
                     className="utility-action-link-btn"
                   >
-                    <Tags size={14} />
+                    <Tag size={14} />
                     Ask Bulk Price
                   </a>
                 </div>
@@ -618,7 +618,7 @@ export default function ProductDetail() {
             {/* Wholesale Info / FAQ */}
             <div className="detail-info-block shadow-card-premium">
               <h3 className="info-block-title">
-                <HelpCircle size={18} /> Product FAQs
+                <Question size={18} /> Product FAQs
               </h3>
               <div className="faq-accordions-group">
                 {productFaqs.map((faq, index) => {
@@ -632,7 +632,7 @@ export default function ProductDetail() {
                         aria-expanded={isOpen}
                       >
                         <span>{faq.q}</span>
-                        {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                        {isOpen ? <CaretUp size={16} /> : <CaretDown size={16} />}
                       </button>
                       <div className={`faq-answer-collapsible ${isOpen ? "open" : ""}`}>
                         <div className="faq-answer-content-inner">
@@ -655,7 +655,7 @@ export default function ProductDetail() {
             <div className="section-head text-center" style={{ marginBottom: "32px" }}>
               <p className="eyebrow" style={{ display: "inline-block" }}>Bundle</p>
               <h2>Frequently Enquired Together</h2>
-              <p>Makers often pair these — add them all to your enquiry at once.</p>
+              <p>Makers often pair these. Add them all to your enquiry at once.</p>
             </div>
             <div className="card-grid product-grid">
               {bundleProducts.map((bProduct) => (
@@ -730,7 +730,7 @@ export default function ProductDetail() {
                 rel="noreferrer noopener"
                 className="btn btn-whatsapp btn-small"
               >
-                <MessageCircle size={16} aria-hidden="true" />
+                <ChatCircleDots size={16} aria-hidden="true" />
                 Notify Me
               </a>
             </div>
@@ -745,7 +745,7 @@ export default function ProductDetail() {
             <div className="section-head text-center" style={{ marginBottom: "32px" }}>
               <p className="eyebrow" style={{ display: "inline-block" }}>Cross-sell</p>
               <h2>People Also Enquired</h2>
-              <p>Related products — you might also like these.</p>
+              <p>Explore related materials from the catalogue.</p>
             </div>
             <div className="card-grid product-grid">
               {relatedProducts.map((relProduct) => (
@@ -763,7 +763,7 @@ export default function ProductDetail() {
             <div className="section-head text-center" style={{ marginBottom: "32px" }}>
               <p className="eyebrow" style={{ display: "inline-block" }}>History</p>
               <h2>Recently Viewed</h2>
-              <p>Recently viewed — phir se dekhna chahenge?</p>
+              <p>Return to materials you viewed recently.</p>
             </div>
             <div className="card-grid product-grid">
               {recentlyViewedProducts.map((recentProduct) => (

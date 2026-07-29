@@ -1,17 +1,20 @@
-import { Heart, Trash2, MessageCircle, ArrowRight } from "lucide-react";
+import {
+  ArrowRight,
+  ChatCircleDots,
+  Heart,
+  Trash,
+} from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
 import { useWishlist } from "../hooks/useWishlist.js";
 import { featuredProducts, createWhatsAppLink } from "../data/siteData.js";
 import { smartWhatsAppLink } from "../i18n.jsx";
 import Reveal from "../components/Reveal.jsx";
 import ProductCard from "../components/ProductCard.jsx";
-import { ease, duration } from "../motion-tokens.js";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
 
 export default function Wishlist() {
   useDocumentMeta({
-    title: "Wishlist — Fakhri Mart",
+    title: "Wishlist | Fakhri Mart",
     description: "Your saved favourite yarns and craft products.",
     canonical: "/wishlist",
   });
@@ -40,7 +43,7 @@ export default function Wishlist() {
               {/* A2 fix: hero copy was unconditionally showing empty-state text.
                   Now state-dependent — shows "saved favourites" copy when populated. */}
               {wishlistProducts.length > 0
-                ? "Your saved favourites — enquire all at once on WhatsApp, or open a product detail page."
+                ? "Your saved favourites are ready. Enquire all at once on WhatsApp, or open a product detail page."
                 : "Your wishlist is empty. Browse products and save your favourites."}
             </p>
           </Reveal>
@@ -87,7 +90,7 @@ export default function Wishlist() {
                     {count} {count === 1 ? "product" : "products"} saved
                   </strong>
                   <p style={{ fontSize: "0.85rem", color: "var(--muted)", margin: "2px 0 0" }}>
-                    Enquire all on WhatsApp — ek message mein.
+                    Enquire all on WhatsApp in one message.
                   </p>
                 </div>
                 <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
@@ -98,7 +101,7 @@ export default function Wishlist() {
                     className="btn btn-whatsapp btn-small"
                     aria-label="Enquire about all wishlist items on WhatsApp"
                   >
-                    <MessageCircle size={16} aria-hidden="true" />
+                    <ChatCircleDots size={16} aria-hidden="true" />
                     Enquire About All
                   </a>
                   <button
@@ -108,7 +111,7 @@ export default function Wishlist() {
                     style={{ color: "var(--pink-dark)" }}
                     aria-label="Clear all wishlist items"
                   >
-                    <Trash2 size={14} aria-hidden="true" />
+                    <Trash size={14} aria-hidden="true" />
                     Clear All
                   </button>
                 </div>
@@ -116,20 +119,11 @@ export default function Wishlist() {
 
               {/* Product grid */}
               <div className="card-grid product-grid">
-                <AnimatePresence>
-                  {wishlistProducts.map((product, index) => (
-                    <motion.div
-                      key={product.slug}
-                      layout
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      transition={{ duration: duration.standard, ease: ease.soft, delay: index * 0.05 }}
-                    >
+                  {wishlistProducts.map((product) => (
+                    <div key={product.slug}>
                       <ProductCard product={product} />
-                    </motion.div>
+                    </div>
                   ))}
-                </AnimatePresence>
               </div>
             </>
           )}

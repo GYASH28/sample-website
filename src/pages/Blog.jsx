@@ -12,7 +12,7 @@ const guideImages = [
 
 export default function Blog() {
   useDocumentMeta({
-    title: "Craft Guides — Fakhri Mart",
+    title: "Craft Guides | Fakhri Mart",
     description: "Practical guides to yarn, macrame, crochet and choosing craft materials.",
     canonical: "/blog",
   });
@@ -29,7 +29,11 @@ export default function Blog() {
         <div className="container blog-editorial-list">
           {blogPosts.map((post, index) => (
             <article key={post.slug} className={index === 0 ? "blog-featured" : ""}>
-              <Link to={`/blog/${post.slug}`} className="blog-image-link">
+              <Link
+                to={`/blog/${post.slug}`}
+                className="blog-image-link"
+                aria-label={`Read ${post.title}`}
+              >
                 <img
                   src={guideImages[index % guideImages.length]}
                   alt=""

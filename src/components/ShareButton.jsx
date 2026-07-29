@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Share2, Check, Link2 } from "lucide-react";
+import { Check, LinkSimple, ShareNetwork } from "@phosphor-icons/react";
 
 /**
  * ShareButton — uses native Web Share API on mobile, falls back to copy-link on desktop.
@@ -69,12 +69,12 @@ export default function ShareButton({ url, title, text, className = "" }) {
         </>
       ) : canShare ? (
         <>
-          <Share2 size={14} aria-hidden="true" />
+          <ShareNetwork size={14} aria-hidden="true" />
           Share
         </>
       ) : (
         <>
-          <Link2 size={14} aria-hidden="true" />
+          <LinkSimple size={14} aria-hidden="true" />
           Copy Link
         </>
       )}

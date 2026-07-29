@@ -132,18 +132,24 @@ export default function ProductCard({ product, compact = false }) {
           </button>
         </div>
 
-        <Link to={`/products/${product.slug}`} className="product-card-link-wrapper" aria-label={`View details for ${product.name}`}>
+        <div className="product-card-link-wrapper">
           {productBaseImage && (
-            <div className="product-image-wrapper">
-              <img
-                src={productBaseImage}
-                alt={`Representative ${product.category} material photograph for ${product.name}`}
-                loading="lazy"
-                decoding="async"
-                className="product-image"
-              />
-              <span className="product-card-badge-floating">Representative photo</span>
-            </div>
+            <Link
+              to={`/products/${product.slug}`}
+              className="product-card-image-link"
+              aria-label={`Representative photo for ${product.name}`}
+            >
+              <div className="product-image-wrapper">
+                <img
+                  src={productBaseImage}
+                  alt={`Representative ${product.category} material photograph for ${product.name}`}
+                  loading="lazy"
+                  decoding="async"
+                  className="product-image"
+                />
+                <span className="product-card-badge-floating">Representative photo</span>
+              </div>
+            </Link>
           )}
           <div className="product-content">
             <div className="product-card-topline">
@@ -153,7 +159,9 @@ export default function ProductCard({ product, compact = false }) {
                 ))}
               </div>
             </div>
-            <h3 className="product-card-title">{product.name}</h3>
+            <h3 className="product-card-title">
+              <Link to={`/products/${product.slug}`}>{product.name}</Link>
+            </h3>
 
             {/* ── Prompt 2 Part 1.2–1.6 — Interactive swatches ─────────── */}
             {product.colors && product.colors.length > 0 && (
@@ -215,7 +223,7 @@ export default function ProductCard({ product, compact = false }) {
               </div>
             </dl>
           </div>
-        </Link>
+        </div>
       </div>
       <div className="product-actions" onClick={(e) => e.stopPropagation()}>
         <Link to={`/products/${product.slug}`} className="btn btn-outline btn-small">
@@ -231,7 +239,7 @@ export default function ProductCard({ product, compact = false }) {
           href={enquireLink}
           target="_blank"
           rel="noreferrer"
-          aria-label={`Enquire about ${product.name} on WhatsApp`}
+          aria-label={`Ask price for ${product.name} on WhatsApp`}
         >
           <ChatCircle size={16} aria-hidden="true" />
           Ask price
@@ -252,8 +260,8 @@ function SwatchButton({ color, isActive, isHovered, onSelect, onHover }) {
       className={`swatch-dot swatch-dot-button ${isActive ? "selected" : ""}`}
       style={{
         backgroundColor: color.hex,
-        width: "16px",
-        height: "16px",
+        width: "24px",
+        height: "24px",
         padding: 0,
         border: `1px solid ${isActive ? "var(--pink-dark, #6B1F2A)" : "rgba(58,43,36,0.2)"}`,
         borderRadius: "50%",

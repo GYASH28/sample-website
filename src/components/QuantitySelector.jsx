@@ -1,4 +1,4 @@
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus } from "@phosphor-icons/react";
 import { useCallback } from "react";
 
 export default function QuantitySelector({ options, value, onChange }) {

@@ -37,7 +37,6 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [megaOpen, setMegaOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const menuButtonRef = useRef(null);
   const drawerRef = useRef(null);
   const location = useLocation();
@@ -46,13 +45,6 @@ export default function Header() {
   const { count: wishlistCount } = useWishlist();
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   useEffect(() => {
     closeMenu();
@@ -104,7 +96,7 @@ export default function Header() {
 
   return (
     <>
-      <header className={`site-header ${scrolled ? "site-header--scrolled" : ""}`}>
+      <header className="site-header">
         <div className="announcement-bar" aria-label="Store information">
           <span>{t("allIndia")}</span>
           <span>{t("wholesale")}</span>

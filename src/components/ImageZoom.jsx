@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { CaretLeft, CaretRight, X } from "@phosphor-icons/react";
 
 /**
  * Lightbox — fullscreen image gallery modal with prev/next navigation and keyboard support.
@@ -57,7 +57,7 @@ export function Lightbox({ images = [], activeIndex = 0, onIndexChange, onClose 
         }}
         aria-label="Previous Image"
       >
-        <ChevronLeft size={36} />
+        <CaretLeft size={36} />
       </button>
 
       <div className="lightbox-image-wrapper" onClick={(e) => e.stopPropagation()}>
@@ -67,7 +67,7 @@ export function Lightbox({ images = [], activeIndex = 0, onIndexChange, onClose 
           className="lightbox-active-img"
         />
         <span className="lightbox-index-label">
-          {activeIndex + 1} / {images.length} — {images[activeIndex]?.label}
+          {activeIndex + 1} / {images.length}: {images[activeIndex]?.label}
         </span>
       </div>
 
@@ -80,7 +80,7 @@ export function Lightbox({ images = [], activeIndex = 0, onIndexChange, onClose 
         }}
         aria-label="Next Image"
       >
-        <ChevronRight size={36} />
+        <CaretRight size={36} />
       </button>
     </div>
   );

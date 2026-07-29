@@ -46,7 +46,7 @@ const gallery = [
 
 export default function Gallery() {
   useDocumentMeta({
-    title: "Craft Material Gallery — Fakhri Mart",
+    title: "Craft Material Gallery | Fakhri Mart",
     description: "Yarn, crochet, macrame, embroidery and bag-making material inspiration from Fakhri Mart.",
     canonical: "/gallery",
   });

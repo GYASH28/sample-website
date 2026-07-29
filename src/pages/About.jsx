@@ -5,7 +5,7 @@ import useDocumentMeta from "../hooks/useDocumentMeta.js";
 
 export default function About() {
   useDocumentMeta({
-    title: "About Fakhri Mart — Yarn & Craft Supplier in Pune",
+    title: "About Fakhri Mart | Yarn & Craft Supplier in Pune",
     description: "Meet Fakhri Mart, a Pune-based yarn and craft-material supplier serving makers, boutiques, resellers and wholesale buyers across India.",
     canonical: "/about",
   });
@@ -19,7 +19,7 @@ export default function About() {
             <h1>A material partner for makers who need more than a pretty shade.</h1>
             <p className="large-copy">
               We help individual crafters, small labels, resellers and craft stores find workable
-              yarns, cords, threads and finishing supplies—then confirm the practical details on WhatsApp.
+              yarns, cords, threads and finishing supplies, then confirm the practical details on WhatsApp.
             </p>
             <Link className="text-link" to="/products">Explore the material library <ArrowRight size={18} /></Link>
           </div>

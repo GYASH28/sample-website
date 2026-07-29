@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Check, X } from "lucide-react";
+import { Check, X } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
-import { ease, duration } from "../motion-tokens.js";
 
 /**
  * BasketToast — slides in when items are added to the enquiry basket.
@@ -60,15 +58,9 @@ export default function BasketToast() {
     };
   }, []);
 
-  return (
-    <AnimatePresence>
-      {toast && (
-        <motion.div
+  return toast ? (
+        <div
           className="basket-toast"
-          initial={{ opacity: 0, y: 60, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 60, scale: 0.95 }}
-          transition={{ duration: duration.standard, ease: ease.soft }}
           style={{
             position: "fixed",
             bottom: "20px",
@@ -148,8 +140,6 @@ export default function BasketToast() {
           >
             <X size={16} />
           </button>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
+        </div>
+  ) : null;
 }

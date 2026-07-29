@@ -1,5 +1,3 @@
-// Confirm before final publishing: replace these editable values with the
-// client's verified phone number, WhatsApp number, full address, and hours.
 export const businessInfo = {
   shortName: "Fakhri Mart",
   name: "Fakhri Mart",
@@ -19,7 +17,7 @@ export const businessInfo = {
   instagram: "fakhrimart53",
   instagramUrl: "https://www.instagram.com/fakhrimart53/",
   hours: "Monday to Saturday, 10:00 AM to 8:00 PM",
-  url: "https://fakhrimart.in",
+  url: "https://fakhriyarns.vercel.app",
 };
 
 export const announcementItems = [
@@ -990,8 +988,8 @@ export const blogPosts = [
     slug: "how-to-choose-yarn-weight",
     title: "How to Choose Yarn Weight for Your Next Project",
     titleHi: "अपने अगले प्रोजेक्ट के लिए यार्न वेट कैसे चुनें",
-    excerpt: "A practical guide to lace, fingering, DK, worsted, and bulky weights — and what each is best for.",
-    body: "Yarn weight is the single most important decision after pattern selection. A 4-ply acrylic is excellent for baby garments but will collapse under its own weight in a market bag. Conversely, a 5-ply cotton will hold a market bag beautifully but feel like cardboard in a baby blanket.\n\nThis guide walks through the five most common weights available at Fakhri Mart — lace, fingering, DK, worsted, and bulky — and recommends the project types each is best suited for, with examples from the catalogue.",
+    excerpt: "A practical guide to lace, fingering, DK, worsted, and bulky weights, plus what each is best for.",
+    body: "Yarn weight is the single most important decision after pattern selection. A 4-ply acrylic is excellent for baby garments but will collapse under its own weight in a market bag. Conversely, a 5-ply cotton will hold a market bag beautifully but feel like cardboard in a baby blanket.\n\nThis guide walks through five common yarn weights: lace, fingering, DK, worsted, and bulky. It recommends the project types each is best suited for, with examples from the catalogue.",
     date: "2026-01-12",
     readMinutes: 6,
   },
@@ -999,7 +997,7 @@ export const blogPosts = [
     slug: "macrame-basics-for-beginners",
     title: "Macrame Basics for Beginners: 5 Knots to Start With",
     titleHi: "शुरुआती लोगों के लिए मैक्रमे की मूल बातें: 5 गाँठ",
-    excerpt: "Square knot, half-hitch, lark's head — master these five and you can make any wall hanging.",
+    excerpt: "Master five foundational knots for wall hangings, plant holders and simple macrame projects.",
     body: "Macrame looks intimidating, but every pattern you will ever see is built from five foundational knots. Learn these five and you can tackle any wall hanging, plant hanger, or curtain pattern in our catalogue.\n\nWe cover the lark's head mounting knot, the square knot, the half-hitch, the double half-hitch, and the gathering knot, with photo references and common mistakes for each.",
     date: "2026-01-20",
     readMinutes: 8,
@@ -1009,7 +1007,7 @@ export const blogPosts = [
     title: "Crochet vs Knitting: Which to Learn First?",
     titleHi: "क्रोशिया बनाम निटिंग: पहले कौन सी सीखें?",
     excerpt: "Both are wonderful. We help you decide which fits your hands, your patience, and your project goals.",
-    body: "The crochet-vs-knitting debate is older than either craft. We don't take sides — instead, we walk through the practical differences: how fast each is, how forgiving of mistakes, what kinds of fabric each produces, and which suits a complete beginner better.\n\nWe also recommend three starter projects from the Fakhri Mart catalogue for whichever craft you choose.",
+    body: "The crochet-vs-knitting debate is older than either craft. We do not take sides. Instead, we walk through the practical differences: how fast each is, how forgiving of mistakes, what kinds of fabric each produces, and which suits a complete beginner better.\n\nWe also recommend three starter projects from the Fakhri Mart catalogue for whichever craft you choose.",
     date: "2026-02-04",
     readMinutes: 5,
   },

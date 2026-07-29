@@ -1,4 +1,9 @@
-import { MessageCircle, Send, Copy, Check } from "lucide-react";
+import {
+  ChatCircleDots,
+  Check,
+  Copy,
+  PaperPlaneTilt,
+} from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 import {
   businessTypes,
@@ -182,7 +187,7 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
         </label>
 
         <button className="btn btn-primary submit-button" type="submit" disabled={submitting}>
-          {submitting ? <span className="button-spinner" aria-hidden="true" /> : <Send size={18} />}
+          {submitting ? <span className="button-spinner" aria-hidden="true" /> : <PaperPlaneTilt size={18} />}
           {submitting ? "Preparing WhatsApp..." : "Send Enquiry on WhatsApp"}
         </button>
       </form>
@@ -194,7 +199,7 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
           </span>
           <div className="success-actions-flex">
             <a className="btn btn-whatsapp" href={whatsappLink} target="_blank" rel="noreferrer">
-              <MessageCircle size={18} aria-hidden="true" />
+              <ChatCircleDots size={18} aria-hidden="true" />
               Continue on WhatsApp
             </a>
             <button
