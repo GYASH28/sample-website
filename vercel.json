@@ -1,4 +1,5 @@
 {
+  "buildCommand": "npx playwright install chromium && npm run build",
   "rewrites": [
     {
       "source": "/(.*)",
