@@ -6,6 +6,7 @@ import ProductCard from "../components/ProductCard.jsx";
 import Reveal from "../components/Reveal.jsx";
 import { featuredProducts, productCategories, newArrivals, MASTER_CATEGORIES } from "../data/siteData.js";
 import { useRecentlyViewed } from "../hooks/useRecentlyViewed.js";
+import { useFlipList } from "../hooks/useFlipList.js";
 import {
   ArrowsDownUp,
   ListBullets,
@@ -257,6 +258,9 @@ export default function Products() {
 
     return result;
   }, [filteredProducts, sortBy]);
+  const resultGridRef = useFlipList(
+    sortedProducts.map((product) => product.slug),
+  );
 
   const recentSlugs = useRecentlyViewed(null);
   const recentlyViewedProducts = useMemo(() => {
@@ -281,6 +285,7 @@ export default function Products() {
     <>
       <PageHero
         className="catalogue-page-hero"
+        motif="weave"
         eyebrow="Products"
         title="Find a material by craft, fibre or finish"
         text="Search the catalogue, refine the results, then ask for current shades and quantity-based price."
@@ -584,17 +589,22 @@ export default function Products() {
             </div>
 
             {/* Product Cards Grid / List */}
-            <div key={`${activeCategory}-${activeType}-${activeTag}-${filterHasShades}-${filterBulkOnly}-${searchQuery}-${sortBy}`} className={`product-gallery-view-wrapper view-mode-${viewMode}`}>
+            <div className={`product-gallery-view-wrapper view-mode-${viewMode}`}>
               <div 
+                ref={resultGridRef}
                 className={viewMode === "grid" ? "card-grid product-grid product-grid--filtered" : "list-layout product-list-layout--filtered"} 
                 aria-live="polite"
                 style={viewMode === "list" ? { display: "flex", flexDirection: "column", gap: "16px" } : {}}
               >
                 {sortedProducts.length > 0 ? (
-                  sortedProducts.map((product, index) => (
-                    <Reveal key={product.slug} delay={(index % 6) * 45} variant="scale-in">
+                  sortedProducts.map((product) => (
+                    <div
+                      key={product.slug}
+                      className="motion-grid-item"
+                      data-product-key={product.slug}
+                    >
                       <ProductCard product={product} compact={viewMode === "list"} />
-                    </Reveal>
+                    </div>
                   ))
                 ) : (
                   /* Upgraded No Results Box with recommendations */

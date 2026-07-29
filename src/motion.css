@@ -1,0 +1,469 @@
+/* Canonical motion layer.
+   Component-specific timelines live in CSS modules; shared motion lives here. */
+
+:root {
+  --motion-duration-instant: 120ms;
+  --motion-duration-fast: 180ms;
+  --motion-duration-direct: 240ms;
+  --motion-duration-route: 460ms;
+  --motion-duration-reveal: 640ms;
+  --motion-duration-slow: 860ms;
+  --motion-duration-cinematic: 1200ms;
+
+  --motion-ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-ease-direct: cubic-bezier(0.2, 0.78, 0.2, 1);
+  --motion-ease-emphasis: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-ease-exit: cubic-bezier(0.4, 0, 1, 1);
+
+  --motion-distance-xs: 0.35rem;
+  --motion-distance-sm: 0.8rem;
+  --motion-distance-md: 1.6rem;
+  --motion-distance-lg: 2.5rem;
+  --motion-stagger-step: 45ms;
+  --motion-stagger-cap: 270ms;
+}
+
+/* Route motion never captures pointer input. Replacing the keyed element makes
+   rapid navigation interrupt the old phrase without timers or stale classes. */
+.route-thread-transition {
+  position: fixed;
+  z-index: calc(var(--z-sticky) - 1);
+  top: var(--header-offset, 6.8rem);
+  right: 0;
+  left: 0;
+  height: 0.2rem;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.route-thread-transition::before {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0 4%,
+      var(--brass-400) 17%,
+      var(--rose-400) 49%,
+      var(--teal-700) 78%,
+      transparent 96%
+    );
+  content: "";
+  transform: translateX(-104%) scaleX(0.72);
+  transform-origin: left;
+}
+
+.motion-ready .route-thread-transition {
+  animation: route-thread-visibility var(--motion-duration-route)
+    var(--motion-ease-standard) both;
+}
+
+.motion-ready .route-thread-transition::before {
+  animation: route-thread-sweep var(--motion-duration-route)
+    var(--motion-ease-standard) both;
+}
+
+.motion-ready .route-stage {
+  animation-duration: var(--motion-duration-route);
+  animation-timing-function: var(--motion-ease-standard);
+  animation-fill-mode: both;
+}
+
+.motion-ready .route-stage[data-route-family="catalogue"] {
+  animation-name: route-weave-in;
+}
+
+.motion-ready .route-stage[data-route-family="detail"] {
+  animation-name: route-focus-in;
+}
+
+.motion-ready .route-stage[data-route-family="editorial"] {
+  animation-name: route-editorial-in;
+}
+
+.motion-ready .route-stage[data-route-family="utility"],
+.motion-ready .route-stage[data-route-family="home"] {
+  animation-name: route-surface-in;
+}
+
+@keyframes route-thread-visibility {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  12%,
+  72% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes route-thread-sweep {
+  to {
+    transform: translateX(104%) scaleX(1);
+  }
+}
+
+@keyframes route-weave-in {
+  from {
+    opacity: 0;
+    transform: translateX(var(--motion-distance-sm));
+  }
+}
+
+@keyframes route-focus-in {
+  from {
+    opacity: 0;
+    transform: scale(0.993);
+  }
+}
+
+@keyframes route-editorial-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--motion-distance-sm));
+  }
+}
+
+@keyframes route-surface-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Essential content is visible by default. It is hidden only after JavaScript
+   has selected a motion profile and an observer is ready to reveal it. */
+.reveal {
+  --reveal-x: 0;
+  --reveal-y: var(--motion-distance-md);
+  --reveal-scale: 1;
+  opacity: 1;
+  transform: none;
+}
+
+.motion-ready .reveal:not(.is-visible) {
+  opacity: 0;
+  transform:
+    translate3d(var(--reveal-x), var(--reveal-y), 0)
+    scale(var(--reveal-scale));
+}
+
+.motion-ready .reveal {
+  transition:
+    opacity var(--motion-duration-reveal) var(--motion-ease-standard)
+      var(--reveal-delay, 0ms),
+    transform var(--motion-duration-reveal) var(--motion-ease-standard)
+      var(--reveal-delay, 0ms);
+}
+
+.motion-ready .reveal-slide-left {
+  --reveal-x: calc(var(--motion-distance-md) * -1);
+  --reveal-y: 0;
+}
+
+.motion-ready .reveal-slide-right {
+  --reveal-x: var(--motion-distance-md);
+  --reveal-y: 0;
+}
+
+.motion-ready .reveal-scale-in {
+  --reveal-y: var(--motion-distance-sm);
+  --reveal-scale: 0.975;
+}
+
+.motion-ready .reveal-clip-reveal,
+.motion-ready .reveal-clip-reveal-left {
+  overflow: hidden;
+}
+
+.motion-ready .reveal-clip-reveal:not(.is-visible) {
+  clip-path: inset(100% 0 0);
+}
+
+.motion-ready .reveal-clip-reveal-left:not(.is-visible) {
+  clip-path: inset(0 100% 0 0);
+}
+
+.motion-ready :is(.reveal-clip-reveal, .reveal-clip-reveal-left) {
+  transition:
+    clip-path var(--motion-duration-reveal) var(--motion-ease-standard)
+      var(--reveal-delay, 0ms),
+    opacity var(--motion-duration-reveal) var(--motion-ease-standard)
+      var(--reveal-delay, 0ms),
+    transform var(--motion-duration-reveal) var(--motion-ease-standard)
+      var(--reveal-delay, 0ms);
+}
+
+.motion-ready .reveal-thread-draw:not(.is-visible) {
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.motion-ready .reveal.is-visible {
+  opacity: 1;
+  clip-path: inset(0);
+  transform: none;
+}
+
+/* Page-hero details use the same thread vocabulary without delaying content. */
+.page-hero-grid {
+  position: relative;
+}
+
+.page-hero-grid::after {
+  position: absolute;
+  right: 0;
+  bottom: calc(clamp(1.8rem, 4vw, 3.5rem) * -1);
+  left: 0;
+  height: 1px;
+  background:
+    linear-gradient(
+      90deg,
+      var(--rose-400),
+      var(--brass-400) 38%,
+      var(--teal-700) 72%,
+      transparent
+    );
+  content: "";
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+[data-hero-motif="shutter"] .page-hero-grid::after {
+  transform-origin: right;
+}
+
+[data-hero-motif="line"] .page-hero-grid::after {
+  right: 18%;
+  left: 18%;
+  transform-origin: center;
+}
+
+[data-hero-motif="focus"] .page-hero-grid::after {
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      var(--brass-400) 28%,
+      var(--teal-700) 72%,
+      transparent
+    );
+  transform-origin: center;
+}
+
+.motion-ready .page-hero-grid::after {
+  animation: motion-line-draw var(--motion-duration-slow)
+    var(--motion-ease-standard) both;
+}
+
+@keyframes motion-line-draw {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* Catalogue result motion is applied by a measured FLIP hook. */
+.motion-grid-item {
+  display: flex;
+  height: 100%;
+  min-width: 0;
+}
+
+.motion-grid-item > * {
+  width: 100%;
+  flex: 1;
+}
+
+.motion-grid-item[data-motion-entering="true"] {
+  animation: grid-item-enter var(--motion-duration-direct)
+    var(--motion-ease-standard) both;
+}
+
+@keyframes grid-item-enter {
+  from {
+    opacity: 0;
+    transform: translateY(var(--motion-distance-xs));
+  }
+}
+
+/* Shared tactile interactions. Paint-heavy filters and moving shadows are
+   intentionally excluded from cards. */
+.product-card {
+  transition:
+    transform var(--motion-duration-direct) var(--motion-ease-standard),
+    border-color var(--motion-duration-direct) var(--motion-ease-direct),
+    background-color var(--motion-duration-direct) var(--motion-ease-direct);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .product-card:is(:hover, :focus-within) {
+    transform: translateY(-0.3rem);
+  }
+
+  .product-card:is(:hover, :focus-within) .product-image {
+    transform: scale(1.045);
+  }
+}
+
+.product-image {
+  transition: transform var(--motion-duration-slow)
+    var(--motion-ease-standard);
+}
+
+.product-card :is(button, .btn):active,
+.quantity-stepper button:active,
+.swatch-btn:active,
+.variant-pill-btn:active,
+.mode-btn:active {
+  transform: scale(0.96);
+}
+
+.swatch-dot,
+.swatch-btn,
+.variant-pill-btn,
+.mode-btn,
+.quantity-stepper button {
+  transition:
+    transform var(--motion-duration-fast) var(--motion-ease-emphasis),
+    border-color var(--motion-duration-direct) var(--motion-ease-direct),
+    background-color var(--motion-duration-direct) var(--motion-ease-direct),
+    color var(--motion-duration-direct) var(--motion-ease-direct);
+}
+
+.product-detail-hero-image {
+  animation: gallery-handoff var(--motion-duration-direct)
+    var(--motion-ease-standard) both;
+}
+
+@keyframes gallery-handoff {
+  from {
+    opacity: 0.28;
+    transform: translateX(var(--motion-distance-xs)) scale(0.995);
+  }
+}
+
+.quantity-value-feedback {
+  display: inline-block;
+  animation: quantity-feedback var(--motion-duration-fast)
+    var(--motion-ease-emphasis) both;
+}
+
+@keyframes quantity-feedback {
+  50% {
+    color: var(--teal-900);
+    transform: translateY(-0.12rem) scale(1.05);
+  }
+}
+
+/* Overlays share opacity + transform choreography. Hidden instances are inert
+   and cannot block the page while their exit state settles. */
+.drawer-backdrop,
+.search-dialog-backdrop {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition:
+    opacity var(--motion-duration-direct) var(--motion-ease-direct),
+    visibility 0s linear var(--motion-duration-direct);
+}
+
+.drawer-backdrop.is-open,
+.search-dialog-backdrop.is-open {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.search-dialog {
+  opacity: 0;
+  transform: translateY(calc(var(--motion-distance-sm) * -1)) scale(0.985);
+  transition:
+    opacity var(--motion-duration-direct) var(--motion-ease-standard),
+    transform var(--motion-duration-route) var(--motion-ease-emphasis);
+}
+
+.search-dialog-backdrop.is-open .search-dialog {
+  opacity: 1;
+  transform: none;
+}
+
+.basket-toast {
+  animation: toast-enter var(--motion-duration-route)
+    var(--motion-ease-emphasis) both;
+}
+
+.basket-toast.is-exiting {
+  animation: toast-exit 220ms var(--motion-ease-exit) both;
+  pointer-events: none;
+}
+
+@keyframes toast-enter {
+  from {
+    opacity: 0;
+    transform: translateY(var(--motion-distance-md)) scale(0.98);
+  }
+}
+
+@keyframes toast-exit {
+  to {
+    opacity: 0;
+    transform: translateY(var(--motion-distance-sm)) scale(0.99);
+  }
+}
+
+[data-motion-profile="compact"] {
+  --motion-distance-md: 1rem;
+  --motion-distance-lg: 1.5rem;
+  --motion-duration-reveal: 520ms;
+}
+
+[data-motion-profile="lite"] {
+  --motion-distance-md: 0.65rem;
+  --motion-distance-lg: 0.8rem;
+  --motion-duration-route: 260ms;
+  --motion-duration-reveal: 360ms;
+}
+
+[data-motion-profile="lite"] .route-thread-transition,
+[data-motion-profile="lite"] body::before {
+  display: none;
+}
+
+[data-motion-profile="lite"] .reveal {
+  clip-path: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  .route-thread-transition {
+    display: none;
+  }
+
+  .reveal,
+  .route-stage,
+  .product-detail-hero-image {
+    opacity: 1;
+    clip-path: none;
+    transform: none;
+  }
+}
+
+@media print {
+  .route-thread-transition {
+    display: none;
+  }
+}

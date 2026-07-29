@@ -24,6 +24,7 @@ export default function HeroSignature() {
     const stage = stageRef.current;
     if (
       !stage ||
+      document.documentElement.dataset.motionProfile !== "full" ||
       !window.matchMedia("(hover: hover) and (pointer: fine)").matches ||
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {

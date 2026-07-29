@@ -47,6 +47,7 @@ export default function Reveal({
 }) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
+  const cappedDelay = Math.min(Math.max(Number(delay) || 0, 0), 270);
 
   useEffect(() => {
     const element = ref.current;
@@ -72,7 +73,8 @@ export default function Reveal({
     <Tag
       ref={ref}
       className={`reveal reveal-${variant} ${visible ? "is-visible" : ""} ${className}`}
-      style={{ "--reveal-delay": `${delay}ms` }}
+      data-reveal={variant}
+      style={{ "--reveal-delay": `${cappedDelay}ms` }}
     >
       {children}
     </Tag>

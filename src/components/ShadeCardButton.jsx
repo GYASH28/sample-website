@@ -36,7 +36,7 @@ export default function ShadeCardButton({ product, shade = null, size = "sm", cl
         borderRadius: "var(--radius)",
         textDecoration: "none",
         cursor: "pointer",
-        transition: "all var(--duration-quick) var(--ease-soft)",
+        transition: "all var(--motion-duration-direct) var(--motion-ease-standard)",
       }}
       aria-label={`Request digital shade card for ${product.name}`}
     >

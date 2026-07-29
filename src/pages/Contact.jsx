@@ -21,6 +21,7 @@ export default function Contact() {
   return (
     <>
       <PageHero
+        motif="line"
         eyebrow="Contact"
         title="Talk through the material before you order"
         text="Ask about current shades, quantities, delivery, sample cards or a repeat supply requirement."

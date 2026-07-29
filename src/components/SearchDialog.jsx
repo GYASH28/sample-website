@@ -88,8 +88,6 @@ export default function SearchDialog({ open, onClose }) {
     };
   }, [open, onClose]);
 
-  if (!open) return null;
-
   const remember = (value) => {
     const clean = value.trim();
     if (!clean) return;
@@ -104,13 +102,18 @@ export default function SearchDialog({ open, onClose }) {
   };
 
   return (
-    <div className="search-dialog-backdrop" onMouseDown={onClose}>
+    <div
+      className={`search-dialog-backdrop ${open ? "is-open" : ""}`}
+      onMouseDown={onClose}
+      aria-hidden={!open}
+    >
       <section
         ref={panelRef}
         className="search-dialog"
         role="dialog"
-        aria-modal="true"
+        aria-modal={open ? "true" : undefined}
         aria-labelledby="catalogue-search-title"
+        inert={!open}
         onMouseDown={(event) => event.stopPropagation()}
       >
         <div className="search-dialog-heading">

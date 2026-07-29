@@ -20,6 +20,7 @@ export default function Blog() {
   return (
     <>
       <PageHero
+        motif="editorial"
         eyebrow="Material notes"
         title="Useful answers before you choose a yarn"
         text="Short, practical guides on fibre, weight, cord, colour and the tools that make a project easier."

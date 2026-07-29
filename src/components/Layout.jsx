@@ -22,8 +22,24 @@ function ScrollToTop() {
   return null;
 }
 
+function getRouteFamily(pathname) {
+  if (pathname === "/") return "home";
+  if (pathname === "/products") return "catalogue";
+  if (pathname.startsWith("/products/")) return "detail";
+  if (
+    pathname === "/gallery" ||
+    pathname === "/about" ||
+    pathname === "/blog" ||
+    pathname.startsWith("/blog/")
+  ) {
+    return "editorial";
+  }
+  return "utility";
+}
+
 export default function Layout() {
   const location = useLocation();
+  const routeFamily = getRouteFamily(location.pathname);
 
   return (
     <>
@@ -32,7 +48,16 @@ export default function Layout() {
       <ScrollToTop />
       <Header />
       <main id="main-content">
-        <div key={location.pathname} className="route-stage">
+        <div
+          key={`thread-${location.pathname}`}
+          className="route-thread-transition"
+          aria-hidden="true"
+        />
+        <div
+          key={location.pathname}
+          className="route-stage"
+          data-route-family={routeFamily}
+        >
           <Outlet />
         </div>
       </main>

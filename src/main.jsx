@@ -3,14 +3,14 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
 import { LanguageProvider } from "./context/LanguageContext.jsx";
+import { applyMotionProfile } from "./lib/motionProfile.js";
 import "@fontsource-variable/archivo";
 import "@fontsource-variable/manrope";
 import "./styles.css";
 import "./atelier.css";
+import "./motion.css";
 
-if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-  document.documentElement.classList.add("motion-ready");
-}
+applyMotionProfile();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

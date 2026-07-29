@@ -54,6 +54,7 @@ export default function Gallery() {
   return (
     <>
       <PageHero
+        motif="shutter"
         eyebrow="Made with the materials"
         title="Colour, fibre and the work in between"
         text="A closer look at the yarns, cords, threads, tools and bag-making details that move through our catalogue."

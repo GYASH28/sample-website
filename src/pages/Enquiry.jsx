@@ -80,6 +80,7 @@ export default function Enquiry() {
   return (
     <>
       <PageHero
+        motif="focus"
         eyebrow="Your material list"
         title={activeTab === "basket" ? "Review your enquiry details" : "Your saved materials"}
         text="Check quantities and shades, then send one organised WhatsApp enquiry for current stock and an exact quote."

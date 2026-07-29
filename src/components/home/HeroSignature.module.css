@@ -95,7 +95,7 @@
   place-items: center;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.2);
-  transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform var(--motion-duration-route) var(--motion-ease-standard);
 }
 
 .secondaryAction .actionIcon {
@@ -156,7 +156,7 @@
   overflow: hidden;
   border-radius: 1.85rem 0.45rem 1.85rem 0.45rem;
   background: #e9ded7;
-  transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform var(--motion-duration-reveal) var(--motion-ease-standard);
 }
 
 .photoFrame picture,
@@ -205,7 +205,7 @@
   height: 100%;
   overflow: visible;
   pointer-events: none;
-  transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform var(--motion-duration-reveal) var(--motion-ease-standard);
 }
 
 .thread {
@@ -214,8 +214,8 @@
   stroke-width: 3.2;
   vector-effect: non-scaling-stroke;
   transition:
-    opacity 320ms cubic-bezier(0.22, 1, 0.36, 1),
-    stroke-width 320ms cubic-bezier(0.22, 1, 0.36, 1);
+    opacity var(--motion-duration-direct) var(--motion-ease-standard),
+    stroke-width var(--motion-duration-direct) var(--motion-ease-standard);
 }
 
 .threadGold {
@@ -256,7 +256,7 @@
   border-radius: 50%;
   background: #fffdf9;
   box-shadow: 0 1.2rem 3.2rem rgba(69, 39, 53, 0.12);
-  transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform var(--motion-duration-reveal) var(--motion-ease-standard);
 }
 
 .brandSeal img {
@@ -277,7 +277,7 @@
   border-radius: 1rem;
   background: #fffdf9;
   box-shadow: 0 1rem 2.7rem rgba(69, 39, 53, 0.1);
-  transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform var(--motion-duration-reveal) var(--motion-ease-standard);
 }
 
 .swatchLabel {
@@ -303,8 +303,8 @@
   border-radius: 50%;
   box-shadow: 0 0 0 1px rgba(69, 39, 53, 0.18);
   transition:
-    transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 260ms cubic-bezier(0.22, 1, 0.36, 1);
+    transform var(--motion-duration-direct) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-direct) var(--motion-ease-standard);
 }
 
 .swatches button:is(:hover, :focus-visible),
@@ -345,7 +345,7 @@
 }
 
 :global(.motion-ready) .copy > * {
-  animation: copy-enter 760ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: copy-enter var(--motion-duration-reveal) var(--motion-ease-standard) both;
 }
 
 :global(.motion-ready) .copy > :nth-child(2) {
@@ -365,13 +365,13 @@
 }
 
 :global(.motion-ready) .frameShell {
-  animation: photo-enter 980ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: photo-enter var(--motion-duration-slow) var(--motion-ease-standard) both;
 }
 
 :global(.motion-ready) .thread {
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
-  animation: thread-draw 1050ms cubic-bezier(0.65, 0, 0.35, 1) 180ms both;
+  animation: thread-draw var(--motion-duration-cinematic) var(--motion-ease-standard) 180ms both;
 }
 
 :global(.motion-ready) .threadTeal {
@@ -391,12 +391,21 @@
 }
 
 :global(.motion-ready) .brandSeal {
-  animation: logo-reveal 720ms cubic-bezier(0.22, 1, 0.36, 1) 620ms both;
+  animation: logo-reveal var(--motion-duration-reveal) var(--motion-ease-standard) 620ms both;
 }
 
 :global(.motion-ready) .swatchPanel,
 :global(.motion-ready) .artNote {
-  animation: detail-enter 620ms cubic-bezier(0.22, 1, 0.36, 1) 820ms both;
+  animation: detail-enter var(--motion-duration-reveal) var(--motion-ease-standard) 820ms both;
+}
+
+:global(body.intro-hold-hero) .copy > *,
+:global(body.intro-hold-hero) .frameShell,
+:global(body.intro-hold-hero) .thread,
+:global(body.intro-hold-hero) .brandSeal,
+:global(body.intro-hold-hero) .swatchPanel,
+:global(body.intro-hold-hero) .artNote {
+  animation-play-state: paused;
 }
 
 @keyframes copy-enter {

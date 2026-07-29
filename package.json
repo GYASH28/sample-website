@@ -10,7 +10,8 @@
     "generate:sitemap": "node src/scripts/generate-sitemap.js",
     "prerender": "node src/scripts/prerender.js",
     "test:smoke": "node playwright-test.cjs",
-    "test:a11y": "node accessibility-audit.cjs"
+    "test:a11y": "node accessibility-audit.cjs",
+    "test:motion": "node motion-lifecycle-test.cjs"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.3.0",

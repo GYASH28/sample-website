@@ -222,7 +222,15 @@ export default function Header() {
         </div>
       </header>
 
-      {menuOpen && <button className="drawer-backdrop" type="button" onClick={closeMenu} aria-label="Close navigation" />}
+      <button
+        className={`drawer-backdrop ${menuOpen ? "is-open" : ""}`}
+        type="button"
+        onClick={closeMenu}
+        aria-label="Close navigation"
+        aria-hidden={!menuOpen}
+        disabled={!menuOpen}
+        tabIndex={menuOpen ? 0 : -1}
+      />
       <aside
         ref={drawerRef}
         className={`mobile-nav-drawer ${menuOpen ? "is-open" : ""}`}
@@ -230,6 +238,7 @@ export default function Header() {
         aria-modal="true"
         aria-label="Mobile navigation"
         aria-hidden={!menuOpen}
+        inert={!menuOpen}
       >
         <div className="mobile-drawer-header">
           <Link className="brand" to="/" onClick={closeMenu}>

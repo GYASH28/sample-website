@@ -317,10 +317,11 @@ export default function ProductDetail() {
                   onClick={() => setLightboxOpen(true)}
                 >
                   <img
+                    key={productImages[activeGalleryIndex]?.src}
                     src={productImages[activeGalleryIndex]?.src}
                     alt={productImages[activeGalleryIndex]?.label || product.name}
                     className="product-detail-hero-image"
-                    style={{ position: "relative", zIndex: 1, width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.4s ease" }}
+                    style={{ position: "relative", zIndex: 1, width: "100%", height: "100%", objectFit: "cover" }}
                   />
                   <div className="image-zoom-overlay-badge" style={{ position: "absolute", bottom: "16px", right: "16px", zIndex: 5, background: "rgba(0,0,0,0.5)", color: "#fff", padding: "8px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <ArrowsOut size={16} />

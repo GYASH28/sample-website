@@ -60,16 +60,6 @@
   --space-8: 96px;
 
   /* ── Motion Tokens ── */
-  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-precise: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-emphasis: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
-
-  --duration-instant: 100ms;
-  --duration-quick: 200ms;
-  --duration-standard: 400ms;
-  --duration-slow: 700ms;
-  --duration-cinematic: 1200ms;
 }
 
 * {
@@ -119,22 +109,6 @@ svg {
 
 main {
   overflow-x: hidden;
-}
-
-.motion-ready .route-stage {
-  animation: route-settle 480ms var(--ease-soft) both;
-}
-
-@keyframes route-settle {
-  from {
-    opacity: 0;
-    transform: translateY(0.65rem);
-  }
-
-  to {
-    opacity: 1;
-    transform: none;
-  }
 }
 
 .container {
@@ -256,7 +230,7 @@ p {
   font-weight: 600;
   font-size: 0.9rem;
   border-radius: 0 0 8px 8px;
-  transition: top var(--duration-quick) var(--ease-soft);
+  transition: top var(--motion-duration-direct) var(--motion-ease-standard);
 }
 
 .skip-link:focus {
@@ -286,11 +260,11 @@ p {
   font-weight: 600;
   line-height: 1.1;
   transition:
-    transform var(--duration-quick) var(--ease-soft),
-    box-shadow var(--duration-quick) var(--ease-soft),
-    border-color var(--duration-quick) var(--ease-soft),
-    background var(--duration-quick) var(--ease-soft),
-    color var(--duration-quick) var(--ease-soft);
+    transform var(--motion-duration-direct) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-direct) var(--motion-ease-standard),
+    border-color var(--motion-duration-direct) var(--motion-ease-standard),
+    background var(--motion-duration-direct) var(--motion-ease-standard),
+    color var(--motion-duration-direct) var(--motion-ease-standard);
 }
 
 .btn::before {
@@ -300,7 +274,7 @@ p {
   background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.35), transparent);
   content: "";
   transform: translateX(-120%);
-  transition: transform 420ms var(--ease-soft);
+  transition: transform 420ms var(--motion-ease-standard);
 }
 
 
@@ -416,17 +390,6 @@ textarea:focus-visible {
   top: 0;
   border-bottom: 1px solid rgba(50, 48, 45, 0.08);
   background: rgba(255, 250, 243, 0.82);
-  backdrop-filter: blur(18px);
-  transition:
-    box-shadow 180ms ease,
-    background 180ms ease,
-    border-color 180ms ease;
-}
-
-.site-header--scrolled {
-  border-bottom-color: rgba(42, 167, 156, 0.18);
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 16px 36px rgba(67, 52, 43, 0.1);
 }
 
 .announcement-bar {
@@ -654,7 +617,6 @@ textarea:focus-visible {
   background: rgba(255, 255, 255, 0.9);
   padding: 13px 15px;
   box-shadow: 0 16px 35px rgba(67, 52, 43, 0.12);
-  backdrop-filter: blur(10px);
 }
 
 .stock-card strong {
@@ -723,7 +685,6 @@ textarea:focus-visible {
 }
 
 .category-card,
-.product-card,
 .arrival-card,
 .highlight-card,
 .enquiry-card,
@@ -744,14 +705,12 @@ textarea:focus-visible {
 }
 
 .category-card,
-.product-card,
 .arrival-card,
 .gallery-card {
   overflow: hidden;
 }
 
 .category-card:hover,
-.product-card:hover,
 .arrival-card:hover,
 .highlight-card:hover,
 .gallery-card:hover,
@@ -1684,76 +1643,6 @@ textarea:focus {
   transform: translateX(0);
 }
 
-.reveal {
-  opacity: 0.96;
-  transform: translateY(8px);
-  transition:
-    opacity 280ms ease,
-    transform 280ms ease;
-  transition-delay: var(--reveal-delay, 0ms);
-}
-
-.reveal-fade-up {
-  transform: translateY(14px);
-}
-
-.reveal-slide-left {
-  transform: translateX(-10px);
-}
-
-.reveal-slide-right {
-  transform: translateX(10px);
-}
-
-.reveal-scale-in {
-  transform: translateY(10px) scale(0.975);
-}
-
-/* Phase 2 new variants */
-.reveal-clip-reveal {
-  clip-path: inset(100% 0 0 0);
-  transform: scale(1.05);
-  transition:
-    clip-path var(--duration-slow, 700ms) var(--ease-soft, cubic-bezier(0.22, 1, 0.36, 1)),
-    opacity var(--duration-slow, 700ms) var(--ease-soft, cubic-bezier(0.22, 1, 0.36, 1)),
-    transform var(--duration-slow, 700ms) var(--ease-soft, cubic-bezier(0.22, 1, 0.36, 1));
-  transition-delay: var(--reveal-delay, 0ms);
-}
-
-.reveal-clip-reveal-left {
-  clip-path: inset(0 100% 0 0);
-  transition:
-    clip-path var(--duration-slow, 700ms) var(--ease-soft, cubic-bezier(0.22, 1, 0.36, 1)),
-    opacity var(--duration-slow, 700ms) var(--ease-soft, cubic-bezier(0.22, 1, 0.36, 1));
-  transition-delay: var(--reveal-delay, 0ms);
-}
-
-.reveal-thread-draw {
-  opacity: 0;
-  transform: scale(0.96);
-  transition:
-    opacity var(--duration-slow, 700ms) var(--ease-soft, cubic-bezier(0.22, 1, 0.36, 1)),
-    transform var(--duration-slow, 700ms) var(--ease-soft, cubic-bezier(0.22, 1, 0.36, 1));
-  transition-delay: var(--reveal-delay, 0ms);
-}
-
-.reveal.is-visible {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-
-.reveal-clip-reveal.is-visible,
-.reveal-clip-reveal-left.is-visible {
-  clip-path: inset(0 0 0 0);
-  opacity: 1;
-  transform: none;
-}
-
-.reveal-thread-draw.is-visible {
-  opacity: 1;
-  transform: scale(1);
-}
-
 @keyframes marquee {
   from {
     transform: translateX(0);
@@ -1824,11 +1713,6 @@ textarea:focus {
     animation-duration: 1ms !important;
     scroll-behavior: auto !important;
     transition-duration: 1ms !important;
-  }
-
-  .reveal {
-    opacity: 1 !important;
-    transform: none !important;
   }
 
   .floating-whatsapp,
@@ -1969,11 +1853,6 @@ textarea:focus {
     justify-content: flex-start;
     width: 100%;
     font-size: 0.96rem;
-  }
-
-  .reveal-slide-left,
-  .reveal-slide-right {
-    transform: translateY(10px);
   }
 
   .hero {
@@ -2129,19 +2008,6 @@ textarea:focus {
 
 /* Intro Animation Overlay & Keyframes */
 
-@keyframes logoIntroduce {
-  0% {
-    opacity: 0;
-    filter: blur(10px);
-    transform: translate(-50%, -50%) scale(0.5);
-  }
-  100% {
-    opacity: 1;
-    filter: none;
-    transform: translate(-50%, -50%) scale(1);
-  }
-}
-
 /* Intro Running Class Behavior on Navbar and Content */
 
 .main-nav,
@@ -2196,12 +2062,7 @@ textarea:focus {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s cubic-bezier(0.33, 1, 0.68, 1);
   display: block;
-}
-
-.product-card-link-wrapper:hover .product-image {
-  transform: scale(1.05);
 }
 
 .product-detail-hero-image {
@@ -2238,24 +2099,7 @@ textarea:focus {
 /* ── Hero Thread-Draw SVG ── */
 
 /* ── Magnetic CTA ── */
-.magnetic-cta {
-  position: relative;
-  will-change: transform;
-}
-
-.magnetic-cta-inner {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  color: inherit;
-  text-decoration: none;
-}
-
 /* ── Hero Visual Parallax wrapper ── */
-.home-hero-visual-parallax {
-  will-change: transform;
-}
-
 /* ── Craft Discovery Cards (cleaned up — no more inline styles) ── */
 .craft-discovery-card {
   display: block;
@@ -2267,9 +2111,9 @@ textarea:focus {
   color: inherit;
   height: 100%;
   transition:
-    transform var(--duration-quick) var(--ease-soft),
-    box-shadow var(--duration-quick) var(--ease-soft),
-    border-color var(--duration-quick) var(--ease-soft);
+    transform var(--motion-duration-direct) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-direct) var(--motion-ease-standard),
+    border-color var(--motion-duration-direct) var(--motion-ease-standard);
 }
 
 .craft-discovery-card:hover {
@@ -2285,7 +2129,7 @@ textarea:focus {
 .craft-card-icon {
   margin-bottom: var(--space-4);
   color: var(--teal);
-  transition: color var(--duration-quick) var(--ease-soft);
+  transition: color var(--motion-duration-direct) var(--motion-ease-standard);
 }
 
 .craft-discovery-card h3 {
@@ -2448,15 +2292,13 @@ textarea:focus {
   border: none;
   cursor: pointer;
   background: rgba(255, 247, 236, 0.92);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   color: var(--charcoal);
   box-shadow: 0 4px 12px rgba(67, 52, 43, 0.12);
   transition:
-    transform var(--duration-quick) var(--ease-soft),
-    background var(--duration-quick) var(--ease-soft),
-    color var(--duration-quick) var(--ease-soft),
-    box-shadow var(--duration-quick) var(--ease-soft);
+    transform var(--motion-duration-direct) var(--motion-ease-standard),
+    background var(--motion-duration-direct) var(--motion-ease-standard),
+    color var(--motion-duration-direct) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-direct) var(--motion-ease-standard);
 }
 
 .card-floating-btn:hover {
@@ -2485,15 +2327,6 @@ textarea:focus {
   overflow: hidden;
 }
 
-.product-card:hover .product-image {
-  transform: scale(1.08);
-  transition: transform var(--duration-slow) var(--ease-soft);
-}
-
-.product-card .product-image {
-  transition: transform var(--duration-slow) var(--ease-soft);
-}
-
 /* Shade swatch bloom on hover */
 .product-card-swatches {
   position: relative;
@@ -2513,7 +2346,7 @@ textarea:focus {
   border: 1.5px solid rgba(255, 255, 255, 0.8);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
   cursor: pointer;
-  transition: transform var(--duration-quick) var(--ease-soft);
+  transition: transform var(--motion-duration-direct) var(--motion-ease-standard);
 }
 
 .product-card:hover .swatch-dot {
@@ -2541,24 +2374,14 @@ textarea:focus {
 }
 
 /* Product card lift on hover */
-.product-card {
-  transition:
-    transform var(--duration-standard) var(--ease-soft),
-    box-shadow var(--duration-standard) var(--ease-soft);
-}
-
-.product-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-elevated);
-}
 
 /* Card actions slide-up on hover (desktop) */
 .product-actions {
   opacity: 1;
   transform: translateY(0);
   transition:
-    opacity var(--duration-standard) var(--ease-soft),
-    transform var(--duration-standard) var(--ease-soft);
+    opacity var(--motion-duration-route) var(--motion-ease-standard),
+    transform var(--motion-duration-route) var(--motion-ease-standard);
 }
 
 @media (hover: hover) {
@@ -2581,19 +2404,10 @@ textarea:focus {
   top: var(--header-offset);
   z-index: 50;
   background: rgba(255, 247, 236, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: var(--space-3) var(--space-4);
   box-shadow: var(--shadow-soft);
-  transition:
-    box-shadow var(--duration-quick) var(--ease-soft),
-    border-color var(--duration-quick) var(--ease-soft);
-}
-
-.catalogue-controls-sticky:hover {
-  box-shadow: var(--shadow);
 }
 
 /* Search suggestions dropdown — cleaned up */
@@ -2628,7 +2442,7 @@ textarea:focus {
   cursor: pointer;
   font-size: 0.875rem;
   font-family: var(--font-body);
-  transition: background var(--duration-quick) var(--ease-soft);
+  transition: background var(--motion-duration-direct) var(--motion-ease-standard);
 }
 
 .suggestion-item-btn:hover,
@@ -2692,8 +2506,8 @@ textarea:focus {
   font-size: 0.9rem;
   cursor: pointer;
   transition:
-    border-color var(--duration-quick) var(--ease-soft),
-    box-shadow var(--duration-quick) var(--ease-soft);
+    border-color var(--motion-duration-direct) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-direct) var(--motion-ease-standard);
 }
 
 .filter-inner-select:focus-visible {
@@ -2775,7 +2589,7 @@ textarea:focus {
   padding: 0 0 0 4px;
   display: inline-flex;
   align-items: center;
-  transition: color var(--duration-quick) var(--ease-soft);
+  transition: color var(--motion-duration-direct) var(--motion-ease-standard);
 }
 
 .active-filter-chip button:hover {
@@ -2801,8 +2615,8 @@ textarea:focus {
   padding: 4px 8px;
   border-radius: var(--radius);
   transition:
-    color var(--duration-quick) var(--ease-soft),
-    background var(--duration-quick) var(--ease-soft);
+    color var(--motion-duration-direct) var(--motion-ease-standard),
+    background var(--motion-duration-direct) var(--motion-ease-standard);
 }
 
 .clear-filters-btn:hover {
@@ -2896,7 +2710,7 @@ textarea:focus {
   background: var(--teal-soft);
   border-radius: var(--radius);
   border: 1px solid rgba(42, 140, 130, 0.2);
-  animation: success-reveal var(--duration-standard) var(--ease-emphasis);
+  animation: success-reveal var(--motion-duration-route) var(--motion-ease-emphasis);
 }
 
 @keyframes success-reveal {
@@ -2957,8 +2771,8 @@ textarea:focus {
   overflow: hidden;
   border-radius: var(--radius-lg);
   transition:
-    transform var(--duration-standard) var(--ease-soft),
-    box-shadow var(--duration-standard) var(--ease-soft);
+    transform var(--motion-duration-route) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-route) var(--motion-ease-standard);
 }
 
 .gallery-card:hover {
@@ -2969,7 +2783,7 @@ textarea:focus {
 .gallery-card .gallery-visual {
   position: relative;
   overflow: hidden;
-  transition: transform var(--duration-slow) var(--ease-soft);
+  transition: transform var(--motion-duration-slow) var(--motion-ease-standard);
 }
 
 .gallery-card:hover .gallery-visual {
@@ -2985,7 +2799,7 @@ textarea:focus {
   border-radius: var(--radius-lg);
   opacity: 0;
   pointer-events: none;
-  transition: opacity var(--duration-quick) var(--ease-soft);
+  transition: opacity var(--motion-duration-direct) var(--motion-ease-standard);
 }
 
 .gallery-card:hover::after {
@@ -3001,26 +2815,18 @@ textarea:focus {
   background: rgba(143, 116, 34, 0.85);
   padding: 4px 10px;
   border-radius: var(--radius-pill);
-  backdrop-filter: blur(4px);
 }
 
 /* ════════════════════════════════════════════════════════════════════
    HEADER — SCROLL-AWARE BACKDROP (Phase 3)
    ════════════════════════════════════════════════════════════════════ */
 
-.site-header--scrolled {
-  background: rgba(255, 247, 236, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 4px 20px rgba(67, 52, 43, 0.08);
-}
-
 /* Mobile nav drawer slide-in animation */
 @media (max-width: 900px) {
   .main-nav {
     transition:
-      transform var(--duration-standard) var(--ease-soft),
-      opacity var(--duration-standard) var(--ease-soft);
+      transform var(--motion-duration-route) var(--motion-ease-standard),
+      opacity var(--motion-duration-route) var(--motion-ease-standard);
     transform: translateX(100%);
     opacity: 0;
     pointer-events: none;
@@ -3163,18 +2969,20 @@ textarea:focus {
   position: absolute;
   bottom: -4px;
   left: 0;
-  width: 0;
+  width: 40px;
   height: 1px;
   background: var(--gold);
   opacity: 0.6;
-  transition: width var(--duration-standard) var(--ease-soft);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--motion-duration-route) var(--motion-ease-standard);
 }
 
 .product-card:hover .product-card-title::after,
 .craft-discovery-card:hover h3::after,
 .category-card:hover h3::after,
 .highlight-card:hover h3::after {
-  width: 40px;
+  transform: scaleX(1);
 }
 
 /* Eyebrow accent line — already exists, reinforcing subtlety */
@@ -3207,17 +3015,17 @@ textarea:focus {
   position: absolute;
   bottom: 4px;
   left: 50%;
-  width: 0;
+  width: 60%;
   height: 1px;
   background: currentColor;
   opacity: 0.4;
-  transform: translateX(-50%);
-  transition: width var(--duration-standard) var(--ease-soft);
+  transform: translateX(-50%) scaleX(0);
+  transition: transform var(--motion-duration-route) var(--motion-ease-standard);
 }
 
 .btn-primary:hover::after,
 .btn-whatsapp:hover::after {
-  width: 60%;
+  transform: translateX(-50%) scaleX(1);
 }
 
 /* Reduced motion: disable thread drawing */
@@ -3369,9 +3177,6 @@ html[data-theme="warm"] .enquiry-how-it-works-home {
   to { transform: rotate(360deg); }
 }
 
-.spin {
-}
-
 /* ════════════════════════════════════════════════════════════════════
    IMAGE ZOOM — hint badge show on hover
    ════════════════════════════════════════════════════════════════════ */
@@ -3475,8 +3280,6 @@ html[data-theme="warm"] .enquiry-how-it-works-home {
   z-index: 5;
   font-size: 0.65rem !important;
   padding: 3px 8px !important;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
   background: rgba(255, 247, 236, 0.92) !important;
 }
 
@@ -3493,7 +3296,6 @@ html[data-theme="warm"] .enquiry-how-it-works-home {
   font-size: 0.68rem;
   font-weight: 600;
   letter-spacing: 0.02em;
-  backdrop-filter: blur(4px);
   pointer-events: none;
   z-index: 4;
 }

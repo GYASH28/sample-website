@@ -251,7 +251,6 @@ function SwatchButton({ color, isActive, isHovered, onSelect, onHover }) {
         borderRadius: "50%",
         cursor: "pointer",
         position: "relative",
-        transition: "transform 0.15s, border-color 0.15s",
       }}
       aria-label={`Preview ${color.name}`}
       aria-pressed={isActive}
