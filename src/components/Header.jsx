@@ -1,201 +1,297 @@
-import { Menu, X, ShoppingBag, Heart } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
-import { announcementItems, businessInfo, createWhatsAppLink, navItems } from "../data/siteData.js";
+import {
+  Heart,
+  List,
+  MagnifyingGlass,
+  MapPin,
+  Package,
+  Phone,
+  ShoppingBagOpen,
+  X,
+} from "@phosphor-icons/react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Link, NavLink, useLocation } from "react-router-dom";
+import { useLanguage } from "../context/LanguageContext.jsx";
 import { useEnquiryBasket } from "../hooks/useEnquiryBasket.js";
 import { useWishlist } from "../hooks/useWishlist.js";
-import SmartLink from "./SmartLink.jsx";
+import {
+  businessInfo,
+  createWhatsAppLink,
+  productCategories,
+} from "../data/siteData.js";
+import SearchDialog from "./SearchDialog.jsx";
 import WhatsAppIcon from "./WhatsAppIcon.jsx";
 
-function NavItem({ item, activePath, onClick }) {
-  const isAnchor = item.href.includes("#");
-  const isActive = !isAnchor && activePath === item.href;
-  const className = isActive ? "active" : undefined;
+const primaryLinks = [
+  { to: "/products", key: "catalogue" },
+  { to: "/gallery", key: "gallery" },
+  { to: "/about", key: "about" },
+  { to: "/blog", key: "guides" },
+  { to: "/contact", key: "contact" },
+];
 
-  return (
-    <SmartLink to={item.href} className={className} onClick={onClick}>
-      {item.label}
-    </SmartLink>
-  );
+function Counter({ value }) {
+  return value > 0 ? <span className="nav-count" aria-hidden="true">{value}</span> : null;
 }
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [megaOpen, setMegaOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const menuButtonRef = useRef(null);
+  const drawerRef = useRef(null);
   const location = useLocation();
-  const hamburgerRef = useRef(null);
-  const navDrawerRef = useRef(null);
+  const { language, setLanguage, t } = useLanguage();
   const { itemsCount } = useEnquiryBasket();
   const { count: wishlistCount } = useWishlist();
 
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 18);
+    const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
-    document.body.classList.toggle("menu-lock", menuOpen);
-    return () => document.body.classList.remove("menu-lock");
-  }, [menuOpen]);
+    closeMenu();
+    setMegaOpen(false);
+  }, [location.pathname, closeMenu]);
 
   useEffect(() => {
-    setMenuOpen(false);
-  }, [location.pathname, location.hash]);
-
-  // Phase 3 item 4: Mobile nav drawer accessibility — focus trap + Escape close + focus restore
-  useEffect(() => {
-    if (!menuOpen) return;
-
-    const drawer = navDrawerRef.current;
-    if (!drawer) return;
-
-    // Move focus to the first focusable link in the drawer
-    const focusable = drawer.querySelectorAll('a, button, [tabindex]:not([tabindex="-1"])');
-    const firstFocusable = focusable[0];
-    const lastFocusable = focusable[focusable.length - 1];
-    if (firstFocusable) firstFocusable.focus();
-
-    const handleKeyDown = (e) => {
-      if (e.key === "Escape") {
-        setMenuOpen(false);
-        return;
+    const openSearch = (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLocaleLowerCase() === "k") {
+        event.preventDefault();
+        setSearchOpen(true);
       }
-      if (e.key === "Tab") {
-        // Focus trap: wrap from last to first, and first to last on Shift+Tab
-        if (e.shiftKey) {
-          if (document.activeElement === firstFocusable) {
-            e.preventDefault();
-            if (lastFocusable) lastFocusable.focus();
-          }
-        } else {
-          if (document.activeElement === lastFocusable) {
-            e.preventDefault();
-            if (firstFocusable) firstFocusable.focus();
-          }
-        }
+    };
+    document.addEventListener("keydown", openSearch);
+    return () => document.removeEventListener("keydown", openSearch);
+  }, []);
+
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+    document.body.classList.add("menu-lock");
+    const previous = document.activeElement;
+    window.requestAnimationFrame(() => drawerRef.current?.querySelector("input")?.focus());
+
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") closeMenu();
+      if (event.key !== "Tab") return;
+      const focusable = drawerRef.current?.querySelectorAll(
+        'a, button, input, [tabindex]:not([tabindex="-1"])',
+      );
+      if (!focusable?.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keydown", onKeyDown);
     return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      // Restore focus to the hamburger button when drawer closes
-      if (hamburgerRef.current) hamburgerRef.current.focus();
+      document.body.classList.remove("menu-lock");
+      document.removeEventListener("keydown", onKeyDown);
+      previous?.focus?.();
     };
-  }, [menuOpen]);
+  }, [menuOpen, closeMenu]);
 
   return (
-    <header className={`site-header ${scrolled ? "site-header--scrolled" : ""}`}>
-      <div className="announcement-bar" aria-label="Store highlights">
-        <div className="announcement-track">
-          {[...announcementItems, ...announcementItems].map((item, index) => (
-            <span key={`${item}-${index}`}>{item}</span>
-          ))}
+    <>
+      <header className={`site-header ${scrolled ? "site-header--scrolled" : ""}`}>
+        <div className="announcement-bar" aria-label="Store information">
+          <span>{t("allIndia")}</span>
+          <span>{t("wholesale")}</span>
+          <span>{t("shades")}</span>
         </div>
-      </div>
 
-      <div className="container nav-shell">
-        <SmartLink to="/" className="brand" aria-label="Fakhri Mart home">
-          <img id="navbar-logo" src="/assets/fakhri-mart-logo.webp" alt="Fakhri Mart logo" />
-          <span>
-            <strong>{businessInfo.shortName}</strong>
-            <small>{businessInfo.descriptor}</small>
-          </span>
-        </SmartLink>
+        <div className="container nav-shell">
+          <Link className="brand" to="/" aria-label="Fakhri Mart home">
+            <span className="brand-mark" aria-hidden="true">
+              <svg viewBox="0 0 44 44">
+                <path d="M8 22c4-11 24-11 28 0-4 11-24 11-28 0Z" />
+                <path d="M13 22c3-6 15-6 18 0-3 6-15 6-18 0Z" />
+                <path d="M22 8c-5 4-5 24 0 28" />
+              </svg>
+            </span>
+            <span>
+              <strong>Fakhri Mart</strong>
+              <small>Yarn & craft materials</small>
+            </span>
+          </Link>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          {/* Mobile Favorites Shortcut */}
-          <SmartLink to="/wishlist" className="mobile-basket-btn" aria-label="Wishlist">
-            <Heart size={21} />
-            {wishlistCount > 0 && <span className="basket-badge-floating bg-rose">{wishlistCount}</span>}
-          </SmartLink>
+          <nav className="desktop-nav" aria-label="Primary navigation">
+            <div
+              className="catalogue-nav-item"
+              onMouseEnter={() => setMegaOpen(true)}
+              onMouseLeave={() => setMegaOpen(false)}
+            >
+              <NavLink to="/products" onFocus={() => setMegaOpen(true)}>
+                {t("catalogue")}
+              </NavLink>
+              <button
+                type="button"
+                className="mega-toggle"
+                onClick={() => setMegaOpen((value) => !value)}
+                aria-expanded={megaOpen}
+                aria-label="Show catalogue categories"
+              >
+                <span aria-hidden="true">⌄</span>
+              </button>
+              {megaOpen && (
+                <div className="category-mega-menu" onBlur={(event) => {
+                  if (!event.currentTarget.contains(event.relatedTarget)) setMegaOpen(false);
+                }}>
+                  <div className="mega-intro">
+                    <span className="eyebrow">Material library</span>
+                    <strong>Find the right fibre, finish and hardware.</strong>
+                    <Link to="/products">Browse all {productCategories.length} categories</Link>
+                  </div>
+                  <div className="mega-category-grid">
+                    {productCategories.slice(0, 8).map((category) => (
+                      <Link
+                        key={category.name}
+                        to={`/products?category=${encodeURIComponent(category.name)}`}
+                      >
+                        <span>{category.shortName}</span>
+                        <small>{category.items?.length || 0} material lines</small>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            {primaryLinks.slice(1).map((item) => (
+              <NavLink key={item.to} to={item.to}>{t(item.key)}</NavLink>
+            ))}
+          </nav>
 
-          {/* Mobile-only Enquiry Basket Shortcut */}
-          <SmartLink to="/enquiry" className="mobile-basket-btn" aria-label="Enquiry Basket">
-            <ShoppingBag size={21} />
-            {itemsCount > 0 && <span className="basket-badge-floating">{itemsCount}</span>}
-          </SmartLink>
+          <div className="header-actions">
+            <button
+              className="header-search-trigger"
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              aria-label={t("search")}
+            >
+              <MagnifyingGlass size={19} />
+              <span>{t("search")}</span>
+              <kbd>⌘K</kbd>
+            </button>
 
-          <button
-            ref={hamburgerRef}
-            className="menu-toggle"
-            type="button"
-            aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
-            aria-expanded={menuOpen}
-            onClick={() => setMenuOpen((open) => !open)}
-          >
-            {menuOpen ? <X size={22} /> : <Menu size={22} />}
+            <div className="language-control" aria-label="Language">
+              <button
+                type="button"
+                className={language === "en" ? "active" : ""}
+                onClick={() => setLanguage("en")}
+                aria-pressed={language === "en"}
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                className={language === "hi" ? "active" : ""}
+                onClick={() => setLanguage("hi")}
+                aria-pressed={language === "hi"}
+              >
+                हिं
+              </button>
+            </div>
+
+            <Link className="icon-button desktop-icon-action" to="/wishlist" aria-label={`${t("wishlist")}: ${wishlistCount}`}>
+              <Heart size={21} />
+              <Counter value={wishlistCount} />
+            </Link>
+            <Link className="icon-button desktop-icon-action" to="/enquiry" aria-label={`${t("enquiry")}: ${itemsCount}`}>
+              <ShoppingBagOpen size={22} />
+              <Counter value={itemsCount} />
+            </Link>
+            <a className="header-whatsapp" href={createWhatsAppLink()} target="_blank" rel="noreferrer">
+              <WhatsAppIcon size={17} />
+              <span>{t("whatsapp")}</span>
+            </a>
+
+            <button
+              ref={menuButtonRef}
+              className="menu-toggle"
+              type="button"
+              onClick={() => setMenuOpen(true)}
+              aria-label={t("menu")}
+              aria-expanded={menuOpen}
+            >
+              <List size={25} />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {menuOpen && <button className="drawer-backdrop" type="button" onClick={closeMenu} aria-label="Close navigation" />}
+      <aside
+        ref={drawerRef}
+        className={`mobile-nav-drawer ${menuOpen ? "is-open" : ""}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Mobile navigation"
+        aria-hidden={!menuOpen}
+      >
+        <div className="mobile-drawer-header">
+          <Link className="brand" to="/" onClick={closeMenu}>
+            <span className="brand-mark" aria-hidden="true"><Package size={22} /></span>
+            <span><strong>Fakhri Mart</strong><small>Pune · all-India delivery</small></span>
+          </Link>
+          <button className="icon-button" type="button" onClick={closeMenu} aria-label={t("close")}>
+            <X size={24} />
           </button>
         </div>
 
-        <nav
-          ref={navDrawerRef}
-          className={`main-nav ${menuOpen ? "main-nav--open" : ""}`}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Main navigation"
-        >
-          <div className="mobile-nav-header">
-            <img src="/assets/fakhri-mart-logo.webp" alt="Fakhri Mart logo" className="mobile-nav-logo" />
-            <div className="mobile-nav-text">
-              <strong>{businessInfo.shortName}</strong>
-              <small>{businessInfo.descriptor}</small>
-            </div>
-          </div>
+        <button className="mobile-search-button" type="button" onClick={() => {
+          closeMenu();
+          setSearchOpen(true);
+        }}>
+          <MagnifyingGlass size={20} />
+          <span>{t("searchHint")}</span>
+        </button>
 
-          {navItems.map((item) => (
-            <NavItem
-              key={item.href}
-              item={item}
-              activePath={location.pathname}
-              onClick={() => setMenuOpen(false)}
-            />
+        <nav className="mobile-primary-links" aria-label="Mobile primary">
+          {primaryLinks.map((item) => (
+            <NavLink key={item.to} to={item.to} onClick={closeMenu}>
+              {t(item.key)}
+            </NavLink>
           ))}
-
-          {/* Desktop Favorites Link → Wishlist page */}
-          <SmartLink
-            to="/wishlist"
-            className="favorites-nav-link"
-            onClick={() => setMenuOpen(false)}
-            style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
-          >
-            <Heart size={16} />
-            <span>Wishlist</span>
-            {wishlistCount > 0 && <span className="basket-badge wishlist-badge">{wishlistCount}</span>}
-          </SmartLink>
-
-          {/* Desktop Enquiry Basket Link */}
-          <SmartLink
-            to="/enquiry"
-            className={location.pathname === "/enquiry" ? "active enquiry-basket-nav" : "enquiry-basket-nav"}
-            onClick={() => setMenuOpen(false)}
-            style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
-          >
-            <span>Enquiry</span>
-            {itemsCount > 0 && <span className="basket-badge">{itemsCount}</span>}
-          </SmartLink>
-
-          {/* Phase 2: Compare indicator + ThemeToggle removed */}
-
-          {/* Header toggles area — kept for spacing, ThemeToggle removed in Phase 2 */}
-          <div className="header-toggles" style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
-          </div>
-
-          <a
-            className="btn btn-small btn-whatsapp"
-            href={createWhatsAppLink()}
-            target="_blank"
-            rel="noreferrer"
-            onClick={() => setMenuOpen(false)}
-          >
-            <WhatsAppIcon size={17} />
-            WhatsApp
-          </a>
         </nav>
-      </div>
-    </header>
+
+        <div className="mobile-category-group">
+          <span className="eyebrow">{t("discover")}</span>
+          <div>
+            {productCategories.map((category) => (
+              <Link
+                key={category.name}
+                to={`/products?category=${encodeURIComponent(category.name)}`}
+                onClick={closeMenu}
+              >
+                {category.shortName}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="mobile-saved-actions">
+          <Link to="/wishlist" onClick={closeMenu}><Heart size={20} /> {t("wishlist")} <Counter value={wishlistCount} /></Link>
+          <Link to="/enquiry" onClick={closeMenu}><ShoppingBagOpen size={20} /> {t("enquiry")} <Counter value={itemsCount} /></Link>
+        </div>
+
+        <address className="mobile-business-details">
+          <span><MapPin size={18} /> {businessInfo.location}</span>
+          <a href={businessInfo.phoneHref}><Phone size={18} /> {businessInfo.phoneDisplay}</a>
+        </address>
+      </aside>
+
+      <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} />
+    </>
   );
 }
-

@@ -9,7 +9,19 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const { businessInfo, featuredProducts, blogPosts } = await import("../data/siteData.js");
 
-const staticRoutes = ["/", "/products", "/gallery", "/about", "/contact", "/wishlist", "/enquiry", "/blog"];
+const staticRoutes = [
+  "/",
+  "/products",
+  "/gallery",
+  "/about",
+  "/contact",
+  "/wishlist",
+  "/enquiry",
+  "/blog",
+  "/privacy",
+  "/terms",
+  "/delivery-enquiries",
+];
 const productRoutes = featuredProducts.map((p) => `/products/${p.slug}`);
 const blogRoutes = blogPosts.map((p) => `/blog/${p.slug}`);
 const allRoutes = [...staticRoutes, ...productRoutes, ...blogRoutes];
@@ -36,4 +48,4 @@ ${urls}
 const outPath = resolve(__dirname, "../../public/sitemap.xml");
 mkdirSync(dirname(outPath), { recursive: true });
 writeFileSync(outPath, xml, "utf-8");
-console.log(`✓ sitemap.xml written: ${allRoutes.length} URLs → ${outPath}`);
+console.log(`Sitemap written: ${allRoutes.length} URLs → ${outPath}`);

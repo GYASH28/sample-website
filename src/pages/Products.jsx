@@ -2,10 +2,8 @@ import { useMemo, useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import CatalogueCta from "../components/CatalogueCta.jsx";
-import CategoryCard from "../components/CategoryCard.jsx";
 import PageHero from "../components/PageHero.jsx";
 import ProductCard from "../components/ProductCard.jsx";
-import ProductVisual from "../components/ProductVisual.jsx";
 import Reveal from "../components/Reveal.jsx";
 import { featuredProducts, productCategories, newArrivals, MASTER_CATEGORIES } from "../data/siteData.js";
 import { useRecentlyViewed } from "../hooks/useRecentlyViewed.js";
@@ -43,13 +41,14 @@ export default function Products() {
     canonical: "/products",
   });
   const [searchParams, setSearchParams] = useSearchParams();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeDepartment, setActiveDepartment] = useState("All"); // Prompt 2 Part 2.2 — 'All' | 'Yarns' | 'Threads' | 'Accessories'
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [activeType, setActiveType] = useState("All");
-  const [activeTag, setActiveTag] = useState("All");
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get("q") || "");
+  const [activeDepartment, setActiveDepartment] = useState(() => searchParams.get("department") || "All");
+  const [activeCategory, setActiveCategory] = useState(() => searchParams.get("category") || "All");
+  const [activeType, setActiveType] = useState(() => searchParams.get("type") || "All");
+  const [activeTag, setActiveTag] = useState(() => searchParams.get("tag") || "All");
   const [filterHasShades, setFilterHasShades] = useState(false);
   const [filterBulkOnly, setFilterBulkOnly] = useState(false);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   
   const [sortBy, setSortBy] = useState("featured");
   const [viewMode, setViewMode] = useState("grid"); // "grid" or "list"
@@ -60,11 +59,25 @@ export default function Products() {
     const category = searchParams.get("category");
     const type = searchParams.get("type");
     const department = searchParams.get("department");
+    const query = searchParams.get("q");
     if (tag) setActiveTag(tag);
     if (category) setActiveCategory(category);
     if (type) setActiveType(type);
     if (department) setActiveDepartment(department);
+    if (query !== null) setSearchQuery(query);
   }, [searchParams]);
+
+  useEffect(() => {
+    const next = new URLSearchParams();
+    if (searchQuery.trim()) next.set("q", searchQuery.trim());
+    if (activeDepartment !== "All") next.set("department", activeDepartment);
+    if (activeCategory !== "All") next.set("category", activeCategory);
+    if (activeType !== "All") next.set("type", activeType);
+    if (activeTag !== "All") next.set("tag", activeTag);
+    if (next.toString() !== searchParams.toString()) {
+      setSearchParams(next, { replace: true });
+    }
+  }, [searchQuery, activeDepartment, activeCategory, activeType, activeTag, searchParams, setSearchParams]);
 
   // Search Auto-Suggestions State
   const [suggestions, setSuggestions] = useState([]);
@@ -167,7 +180,12 @@ export default function Products() {
         (product) =>
           product.name.toLowerCase().includes(q) ||
           product.category.toLowerCase().includes(q) ||
+          product.brand?.toLowerCase().includes(q) ||
+          product.type?.toLowerCase().includes(q) ||
+          product.masterCategory?.toLowerCase().includes(q) ||
           product.suitableFor.toLowerCase().includes(q) ||
+          product.colors?.some((shade) => shade.name.toLowerCase().includes(q)) ||
+          product.filters?.some((filter) => filter.toLowerCase().includes(q)) ||
           product.tags?.some(t => t.toLowerCase().includes(q))
       );
     }
@@ -256,11 +274,20 @@ export default function Products() {
   return (
     <>
       <PageHero
+        className="catalogue-page-hero"
         eyebrow="Products"
-        title="Yarns, Crochet Threads & Craft Essentials"
-        text="Browse the Fakhri Mart catalogue by category. Ask for prices, availability, shade details and bulk options directly through WhatsApp."
+        title="Find a material by craft, fibre or finish"
+        text="Search the catalogue, refine the results, then ask for current shades and quantity-based price."
       >
-        <ProductVisual palette={["#35b8ad", "#f6a7b8", "#f3c65f"]} />
+        <picture className="catalogue-hero-photo">
+          <source srcSet="/assets/images/editorial/shade-library.avif" type="image/avif" />
+          <img
+            src="/assets/images/editorial/shade-library.webp"
+            alt="A curated library of yarn shades and material textures"
+            width="1536"
+            height="1024"
+          />
+        </picture>
       </PageHero>
 
       {/* Prompt 2 Part 2.2 — Department switcher (All / Yarns / Threads / Accessories) */}
@@ -334,24 +361,6 @@ export default function Products() {
         </div>
       </section>
 
-      {/* Category Section */}
-      <section className="section" id="categories">
-        <div className="container">
-          <Reveal className="section-heading" variant="scale-in">
-            <p className="eyebrow">Categories</p>
-            <h2>Product categories available for enquiry</h2>
-            <p>Each category is ready for catalogue, shade card, availability and bulk order enquiries.</p>
-          </Reveal>
-          <div className="card-grid category-grid">
-            {productCategories.map((category, index) => (
-              <Reveal key={category.name} delay={(index % 4) * 65} variant="fade-up">
-                <CategoryCard category={category} />
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Main Browse & Advanced Filters Section */}
       <section className="section section-tinted" id="catalogue-browser">
         <div className="container">
@@ -407,6 +416,18 @@ export default function Products() {
                 )}
               </div>
 
+              <button
+                className="mobile-filter-trigger"
+                type="button"
+                onClick={() => setMobileFiltersOpen(true)}
+                aria-expanded={mobileFiltersOpen}
+                aria-controls="catalogue-filter-sheet"
+              >
+                <SlidersHorizontal size={18} />
+                Filters
+                {hasActiveFilters && <span aria-label="Active filters">•</span>}
+              </button>
+
               {/* Sorting controls */}
               <div className="sorting-controls-wrapper">
                 <SlidersHorizontal size={16} className="control-icon-grey" />
@@ -453,7 +474,19 @@ export default function Products() {
           <div className="products-layout-flex" style={{ display: "flex", gap: "28px", marginTop: "24px", flexDirection: "column" }}>
             
             {/* Filter controls row */}
-            <Reveal variant="fade-up" className="filter-controls-flex-row" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px", background: "#fff", padding: "16px", borderRadius: "8px", border: "1px solid rgba(0,0,0,0.05)" }}>
+            <Reveal
+              variant="fade-up"
+              className={`filter-controls-flex-row ${mobileFiltersOpen ? "is-open" : ""}`}
+            >
+              <div className="mobile-filter-sheet-header" id="catalogue-filter-sheet">
+                <div>
+                  <span className="eyebrow">Refine catalogue</span>
+                  <strong>{sortedProducts.length} materials</strong>
+                </div>
+                <button type="button" className="icon-button" onClick={() => setMobileFiltersOpen(false)} aria-label="Close filters">
+                  <XCircle size={22} />
+                </button>
+              </div>
               {/* Category selector */}
               <div className="filter-select-box">
                 <span className="filter-label" style={{ display: "block", marginBottom: "6px", fontSize: "12px", fontWeight: "600", color: "var(--text-muted)", textTransform: "uppercase" }}>Category</span>
@@ -495,6 +528,12 @@ export default function Products() {
                   <input type="checkbox" checked={filterBulkOnly} onChange={(e) => setFilterBulkOnly(e.target.checked)} />
                   <span>Wholesale/Bulk Only</span>
                 </label>
+              </div>
+              <div className="mobile-filter-sheet-actions">
+                <button type="button" className="btn btn-outline" onClick={handleResetFilters}>Clear all</button>
+                <button type="button" className="btn btn-primary" onClick={() => setMobileFiltersOpen(false)}>
+                  Show {sortedProducts.length} materials
+                </button>
               </div>
             </Reveal>
 

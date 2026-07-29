@@ -41,11 +41,10 @@ import {
   newArrivals,
   productCategories,
   productFilters,
-  testimonials,
   whyChooseUs,
 } from "../data/siteData.js";
 
-const heroWords = ["Colourful", "Yarns", "&", "Craft", "Essentials"];
+const heroWords = ["Materials", "worth", "making", "with"];
 
 const CRAFT_USE_CASES = [
   { name: "Crochet", tag: "Crochet", desc: "Hooks, yarns, cotton threads, and amigurumi supplies.", icon: "Sparkles" },
@@ -65,7 +64,7 @@ export default function Home() {
 
   // Phase 1 + Phase 5 — LocalBusiness JSON-LD on the home page
   useDocumentMeta({
-    title: "Fakhri Mart | Colourful Yarns, Crochet Threads & Craft Essentials",
+    title: "Fakhri Mart | Yarn, Threads & Craft Materials from Pune",
     description:
       "Premium yarns, crochet threads, macrame cords, beads, bases and purse-making essentials. All-India delivery, WhatsApp enquiry catalogue for resellers and crafters.",
   });
@@ -240,10 +239,10 @@ export default function Home() {
               transition={{ duration: duration.standard, ease: ease.soft, delay: 0.2 }}
             >
               <span className="hero-cinematic-eyebrow-line" aria-hidden="true" />
-              {"Yarns, threads & craft supplies — Pune se, poore India ke liye."}
+              Yarn, thread and craft materials — from Pune to makers across India.
             </motion.p>
 
-            <h1 className="hero-cinematic-title" aria-label="Colourful Yarns and Craft Essentials" style={{ position: "relative" }}>
+            <h1 className="hero-cinematic-title" aria-label="Materials worth making with" style={{ position: "relative" }}>
               {/* Stitched headline needle traveling L→R */}
               {!reduce && (
                 <motion.span
@@ -299,8 +298,8 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: duration.standard, ease: ease.soft, delay: 1.2 }}
             >
-              {"12+ categories, 70+ shades — aapke next project ka starting point."} Explore quality yarns, crochet
-              threads, macrame cords, beads, bases and accessories with all-India delivery and easy WhatsApp enquiry.
+              Yarn, crochet thread, macrame cord and bag-making supplies for one-off projects,
+              boutiques and wholesale shelves. Ask for today’s shades, pack sizes and quantity-based price on WhatsApp.
             </motion.p>
 
             <motion.div
@@ -346,11 +345,16 @@ export default function Home() {
             style={{ y: heroImageY, scale: heroImageScale }}
           >
             <div className="hero-cinematic-image">
-              <img
-                src="/assets/images/products/cotton-dreamz/hero.webp"
-                alt="Cotton Dreamz yarn in seafoam, hot pink and butter yellow — Fakhri Mart"
-                fetchPriority="high"
-              />
+              <picture>
+                <source srcSet="/assets/images/editorial/atelier-hero.avif" type="image/avif" />
+                <img
+                  src="/assets/images/editorial/atelier-hero.webp"
+                  alt="Cotton yarn, crochet thread, macrame cord, crochet hooks, beads and purse handles on a wooden craft table"
+                  width="1536"
+                  height="1024"
+                  fetchPriority="high"
+                />
+              </picture>
               {/* Subtle gradient overlay for text legibility if needed */}
               <div className="hero-image-overlay" aria-hidden="true" />
             </div>
@@ -505,7 +509,7 @@ export default function Home() {
             <motion.div className="timeline-step" variants={staggerChild}>
               <span className="step-badge">4</span>
               <h3>Confirm & Deliver</h3>
-              <p>We will confirm exact stock availability, share verified digital shade cards on request, calculate final shipping quotes, and complete the order.</p>
+              <p>We will confirm exact stock availability, share current shade photos on request, calculate final shipping quotes, and complete the order.</p>
             </motion.div>
           </StaggerReveal>
         </div>
@@ -526,11 +530,6 @@ export default function Home() {
           </Reveal>
 
           <Reveal className="filter-bar" variant="fade-up">
-            <img
-              src="/assets/fakhri-mart-logo.webp"
-              alt="Fakhri Mart brand mark"
-              className="hero-logo-medallion"
-            />
             {productFilters.map((filter) => (
               <button
                 key={filter}
@@ -669,7 +668,7 @@ export default function Home() {
         <div className="container">
           <Reveal className="section-heading" variant="scale-in">
             <p className="eyebrow">Why Choose Fakhri Mart</p>
-            <h2>Why shop with us — quick WhatsApp replies, all-India delivery</h2>
+            <h2>Product variety, enquiry support and all-India delivery</h2>
           </Reveal>
           <div className="card-grid why-card-grid">
             {whyChooseUs.map((item, index) => (
@@ -677,26 +676,6 @@ export default function Home() {
                 <IconBadge name={item.icon} tone={index % 2 === 0 ? "teal" : "pink"} />
                 <h3>{item.title}</h3>
                 <p>{item.text}</p>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <hr style={{ border: 'none', borderTop: '1px solid #826E33', opacity: 0.2, margin: '2rem 0' }} />
-
-      <section className="section testimonials-section">
-        <div className="container">
-          <Reveal className="section-heading" variant="scale-in">
-            <p className="eyebrow">Customer Notes</p>
-            <h2>Customer notes — WhatsApp pe aaye hue feedback</h2>
-          </Reveal>
-          <div className="testimonial-grid">
-            {testimonials.map((testimonial, index) => (
-              <Reveal key={testimonial.quote} className="testimonial-card" delay={index * 75} variant="fade-up">
-                <p>"{testimonial.quote}"</p>
-                <strong>{testimonial.name}</strong>
-                <span>{testimonial.detail}</span>
               </Reveal>
             ))}
           </div>

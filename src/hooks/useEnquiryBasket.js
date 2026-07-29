@@ -53,6 +53,14 @@ export function updateBasketItemQuantity(index, quantity) {
   }
 }
 
+export function updateBasketItem(index, updates) {
+  const basket = getEnquiryBasket();
+  if (basket[index]) {
+    basket[index] = { ...basket[index], ...updates };
+    saveEnquiryBasket(basket);
+  }
+}
+
 export function clearEnquiryBasket() {
   saveEnquiryBasket([]);
 }
@@ -75,6 +83,7 @@ export function useEnquiryBasket() {
     add: addToEnquiryBasket,
     remove: removeFromEnquiryBasket,
     updateQuantity: updateBasketItemQuantity,
+    updateItem: updateBasketItem,
     clear: clearEnquiryBasket,
     count: basket.reduce((acc, item) => acc + item.quantity, 0),
     itemsCount: basket.length,

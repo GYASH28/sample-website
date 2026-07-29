@@ -191,7 +191,7 @@ export function slugify(name) {
     .replace(/(^-|-$)/g, "");
 }
 
-export const featuredProducts = [
+const rawProducts = [
   {
     name: "Makhhi Thread",
     slug: "makhhi-thread",
@@ -468,7 +468,7 @@ export const featuredProducts = [
     filters: ["Yarns", "Crochet Threads"],
     variants: "Ganga Superstitch line",
     description:
-      "Superstitch by Ganga is a versatile thread suitable for crochet, craft finishing, and decorative stitching. Its reliable twist and colour fastness make it a dependable choice for both beginners and experienced makers.",
+      "Superstitch by Ganga is listed for crochet, craft finishing, and decorative stitching. Ask for the current pack label, material details, care instructions, and available shades before ordering.",
     suitableFor: "Crochet, craft finishing, decorative stitching",
     image: "/assets/images/products/superstitch/hero.webp",
     galleryImages: [
@@ -728,7 +728,67 @@ export const featuredProducts = [
     masterCategory: "Accessories",
     stock: "in",
   },
-];;
+];
+
+const representativeImages = {
+  "makhhi-thread": "/assets/images/editorial/shade-library.webp",
+  "4-ply-cotton-thread": "/assets/images/editorial/shade-library.webp",
+  "cotton-dreamz": "/assets/images/editorial/shade-library.webp",
+  "cool-knit": "/assets/images/editorial/shade-library.webp",
+  cotone: "/assets/images/editorial/shade-library.webp",
+  "baby-soft": "/assets/images/editorial/shade-library.webp",
+  blankie: "/assets/images/editorial/shade-library.webp",
+  spectrum: "/assets/images/editorial/shade-library.webp",
+  superstitch: "/assets/images/editorial/shade-library.webp",
+  "t-shirt-yarn": "/assets/images/cat_tshirt.webp",
+  "single-macrame-cord": "/assets/images/cat_macrame.webp",
+  "twisted-macrame-cord": "/assets/images/cat_macrame.webp",
+  "anchor-lacchi": "/assets/images/cat_embroidery.webp",
+  "doli-lacchi": "/assets/images/cat_embroidery.webp",
+  "crochet-hook": "/assets/images/cat_accessories.webp",
+  "purse-handles": "/assets/images/cat_purse_handles.webp",
+};
+
+const galleryByMasterCategory = {
+  Yarns: [
+    "/assets/images/editorial/craft-stock-room.webp",
+    "/assets/images/editorial/atelier-hero.webp",
+  ],
+  Threads: [
+    "/assets/images/editorial/craft-stock-room.webp",
+    "/assets/images/editorial/atelier-hero.webp",
+  ],
+  Accessories: [
+    "/assets/images/cat_accessories.webp",
+    "/assets/images/editorial/crochet-bag-worktable.webp",
+  ],
+};
+
+export const featuredProducts = rawProducts.map(
+  ({ rating: _rating, reviewCount: _reviewCount, ...product }) => ({
+    ...product,
+    image: representativeImages[product.slug],
+    galleryImages:
+      product.masterCategory === "Accessories" && product.slug === "purse-handles"
+        ? [
+            "/assets/images/cat_purse_handles.webp",
+            "/assets/images/editorial/crochet-bag-worktable.webp",
+          ]
+        : product.type?.includes("macrame")
+          ? [
+              "/assets/images/cat_macrame.webp",
+              "/assets/images/editorial/craft-stock-room.webp",
+            ]
+          : product.type?.includes("embroidery") || product.slug.includes("lacchi")
+            ? [
+                "/assets/images/cat_embroidery.webp",
+                "/assets/images/editorial/shade-library.webp",
+              ]
+            : galleryByMasterCategory[product.masterCategory],
+    imageNote:
+      "Representative material-family image. Ask on WhatsApp for current stock, packaging and live shade photos.",
+  }),
+);
 
 export const newArrivals = [
   "Vardhaman Baby Soft",
@@ -865,24 +925,6 @@ export const whyChooseUs = [
   },
 ];
 
-export const testimonials = [
-  {
-    quote: "Great range of cotton threads — exactly what I needed for my boutique orders.",
-    name: "Boutique owner, Pune",
-    detail: "Cotton Dreamz and Cotne in the shades my customers ask for.",
-  },
-  {
-    quote: "Quick WhatsApp reply and fast delivery to Mumbai. Will order again.",
-    name: "Reseller, Mumbai",
-    detail: "Bulk enquiry replied within the same day, delivery in 3 days.",
-  },
-  {
-    quote: "Best yarn selection in Pune for macrame. Shade details shared immediately on WhatsApp.",
-    name: "Macrame artist, Pune",
-    detail: "Single and twisted cords in 3MM and 4MM, natural and coloured.",
-  },
-];
-
 export const businessTypes = [
   "Individual Crafter",
   "Boutique",
@@ -934,9 +976,9 @@ export const MASTER_CATEGORIES = ["Yarns", "Threads", "Accessories"];
 // Seasonal banner (Phase 6 — data-driven, not hardcoded in component).
 // Owner flips `active` and edits strings here; component renders nothing when false.
 export const seasonalBanner = {
-  active: true,
-  title: "Diwali Maker Sale · 10% off enquiry baskets over ₹2,000",
-  titleHi: "दिवाली मेकर सेल · ₹2,000 से अधिक की पूछताठ पर 10% छूट",
+  active: false,
+  title: "",
+  titleHi: "",
   ctaLabel: "Shop now",
   ctaLabelHi: "अभी खरीदें",
   ctaHref: "/products",

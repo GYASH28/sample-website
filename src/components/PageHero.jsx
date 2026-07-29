@@ -1,8 +1,8 @@
 import Reveal from "./Reveal.jsx";
 
-export default function PageHero({ eyebrow, title, text, children }) {
+export default function PageHero({ eyebrow, title, text, children, className = "" }) {
   return (
-    <section className="page-hero">
+    <section className={`page-hero ${className}`}>
       <div className="container page-hero-grid">
         <Reveal variant="slide-left">
           <p className="eyebrow">{eyebrow}</p>

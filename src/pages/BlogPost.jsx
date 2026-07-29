@@ -1,98 +1,90 @@
-// src/pages/BlogPost.jsx
-// Phase 6 — single blog post page.
-
-import { useParams, Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
-import Reveal from "../components/Reveal.jsx";
+import { ArrowLeft, ShareNetwork } from "@phosphor-icons/react";
+import { Link, useParams } from "react-router-dom";
+import { blogPosts, businessInfo } from "../data/siteData.js";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
 import { useJsonLd } from "../hooks/useJsonLd.js";
-import { blogPosts, businessInfo } from "../data/siteData.js";
+
+const guideImages = [
+  "/assets/images/editorial/shade-library.webp",
+  "/assets/images/cat_macrame.webp",
+  "/assets/images/editorial/atelier-hero.webp",
+];
 
 export default function BlogPost() {
   const { slug } = useParams();
-  const post = blogPosts.find((p) => p.slug === slug);
+  const postIndex = blogPosts.findIndex((item) => item.slug === slug);
+  const post = blogPosts[postIndex];
 
   useDocumentMeta({
-    title: post ? `${post.title} | Fakhri Mart` : "Post not found",
-    description: post ? post.excerpt : "",
+    title: post ? `${post.title} | Fakhri Mart` : "Guide not found | Fakhri Mart",
+    description: post?.excerpt || "Browse practical craft-material guides from Fakhri Mart.",
+    canonical: post ? `/blog/${post.slug}` : "/blog",
   });
 
-  // Phase 5 — Article JSON-LD
-  useJsonLd(
-    post
-      ? {
-          "@context": "https://schema.org",
-          "@type": "Article",
-          headline: post.title,
-          description: post.excerpt,
-          datePublished: post.date,
-          author: { "@type": "Organization", name: businessInfo.name },
-          publisher: { "@type": "Organization", name: businessInfo.name },
-          mainEntityOfPage: `${businessInfo.url}/blog/${post.slug}`,
-        }
-      : null
-  );
+  useJsonLd(post ? {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.excerpt,
+    image: new URL(guideImages[postIndex % guideImages.length], businessInfo.url).href,
+    datePublished: post.date,
+    author: { "@type": "Organization", name: businessInfo.name },
+    publisher: { "@type": "Organization", name: businessInfo.name },
+    mainEntityOfPage: `${businessInfo.url}/blog/${post.slug}`,
+  } : null);
 
   if (!post) {
     return (
-      <div className="container" style={{ padding: "60px 0", textAlign: "center" }}>
-        <h1>Post not found</h1>
-        <Link to="/blog">← Back to guides</Link>
-      </div>
+      <main className="empty-page-state">
+        <h1>This guide could not be found.</h1>
+        <Link className="btn btn-primary" to="/blog">Browse all guides</Link>
+      </main>
     );
   }
 
-  const paragraphs = post.body.split(/\n\n+/);
+  const related = blogPosts.filter((item) => item.slug !== post.slug).slice(0, 2);
 
   return (
-    <>
-      <section className="section">
-        <div className="container" style={{ maxWidth: 720, margin: "0 auto" }}>
-          <Reveal variant="fade-up">
-            <Link
-              to="/blog"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                fontSize: "0.82rem",
-                color: "var(--muted, #6B5749)",
-                marginBottom: "16px",
-                textDecoration: "none",
-              }}
+    <article className="article-page">
+      <header className="article-header">
+        <div className="container article-header-grid">
+          <div>
+            <Link className="text-link" to="/blog"><ArrowLeft size={17} /> All guides</Link>
+            <p className="eyebrow">{post.category || "Craft guide"} · {post.readMinutes} min read</p>
+            <h1>{post.title}</h1>
+            <p className="large-copy">{post.excerpt}</p>
+            <button
+              type="button"
+              className="btn btn-outline btn-small"
+              onClick={() => navigator.share?.({ title: post.title, url: window.location.href })
+                ?? navigator.clipboard.writeText(window.location.href)}
             >
-              <ArrowLeft size={14} /> All guides
-            </Link>
-            <div
-              style={{
-                fontSize: "0.78rem",
-                color: "var(--gold-deep, #8E6824)",
-                letterSpacing: "0.16em",
-                textTransform: "uppercase",
-                marginBottom: "8px",
-              }}
-            >
-              {post.readMinutes} min read ·{" "}
-              {new Date(post.date).toLocaleDateString("en-IN", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              })}
-            </div>
-            <h1 style={{ marginBottom: "16px" }}>{post.title}</h1>
-          </Reveal>
-          <Reveal variant="fade-up">
-            {paragraphs.map((p, i) => (
-              <p
-                key={i}
-                style={{ marginBottom: "16px", color: "var(--text, #3A2B24)", lineHeight: 1.75 }}
-              >
-                {p}
-              </p>
-            ))}
-          </Reveal>
+              <ShareNetwork size={17} /> Share guide
+            </button>
+          </div>
+          <img
+            src={guideImages[postIndex % guideImages.length]}
+            alt=""
+            width="900"
+            height="620"
+          />
         </div>
-      </section>
-    </>
+      </header>
+
+      <div className="container article-layout">
+        <div className="article-body">
+          {post.body.split(/\n\n+/).map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+        </div>
+        <aside>
+          <span className="eyebrow">Keep reading</span>
+          {related.map((item) => (
+            <Link key={item.slug} to={`/blog/${item.slug}`}>
+              <strong>{item.title}</strong>
+              <small>{item.readMinutes} min read</small>
+            </Link>
+          ))}
+        </aside>
+      </div>
+    </article>
   );
 }

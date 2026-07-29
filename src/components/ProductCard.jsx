@@ -19,13 +19,13 @@
 // ── Phase 1: Rating display ──────────────────────────────────────────
 //   - Compact StarRating + count next to the product title
 
-import { MessageCircle, Tags, Heart } from "lucide-react";
+import { ChatCircle, ClipboardText, Heart, Tag } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { productCategories } from "../data/siteData.js";
 import { useWishlist } from "../hooks/useWishlist.js";
+import { useEnquiryBasket } from "../hooks/useEnquiryBasket.js";
 import { smartWhatsAppLink } from "../i18n.jsx";
-import ShadeCardButton from "./ShadeCardButton.jsx";
 
 const MAX_SWATCHES_ON_CARD = 5;
 
@@ -34,6 +34,7 @@ export default function ProductCard({ product, compact = false }) {
   const productBaseImage = product.image || categoryData?.image;
 
   const { has: isInWishlist, toggle: toggleWishlist } = useWishlist();
+  const { add: addToBasket } = useEnquiryBasket();
 
   const isFavorited = isInWishlist(product.slug);
 
@@ -77,10 +78,19 @@ export default function ProductCard({ product, compact = false }) {
   // /assets/images/products/{slug}/color-{colorSlug}.webp path convention, the
   // detail page can swap <img src> directly; here we keep it CSS-only to avoid
   // broken-image flashes on cards where the asset doesn't exist yet.
-  const activeColorHex = activeColor?.hex;
-  const colorFilterStyle = activeColorHex
-    ? computeColorFilter(activeColorHex)
-    : undefined;
+  const addDefaultToBasket = () => {
+    addToBasket({
+      slug: product.slug,
+      name: product.name,
+      category: product.category,
+      image: productBaseImage,
+      shade: activeColor,
+      quantity: 1,
+      unit: product.quantityOptions?.unit || "pcs",
+      variant: null,
+      note: "",
+    });
+  };
 
   return (
     <article
@@ -116,9 +126,8 @@ export default function ProductCard({ product, compact = false }) {
           >
             <Heart
               size={16}
+              weight={isFavorited ? "fill" : "regular"}
               aria-hidden="true"
-              fill={isFavorited ? "var(--pink-dark)" : "none"}
-              stroke={isFavorited ? "var(--pink-dark)" : "currentColor"}
             />
           </button>
         </div>
@@ -128,13 +137,12 @@ export default function ProductCard({ product, compact = false }) {
             <div className="product-image-wrapper">
               <img
                 src={productBaseImage}
-                alt={activeColor ? `${product.name} — ${activeColor.name}` : `${product.name} — ${product.category}`}
+                alt={`Representative ${product.category} material photograph for ${product.name}`}
                 loading="lazy"
                 decoding="async"
                 className="product-image"
-                style={colorFilterStyle ? { filter: colorFilterStyle, transition: "filter 0.3s ease" } : undefined}
               />
-              <span className="product-card-badge-floating" aria-hidden="true">{product.category}</span>
+              <span className="product-card-badge-floating">Representative photo</span>
             </div>
           )}
           <div className="product-content">
@@ -211,10 +219,13 @@ export default function ProductCard({ product, compact = false }) {
       </div>
       <div className="product-actions" onClick={(e) => e.stopPropagation()}>
         <Link to={`/products/${product.slug}`} className="btn btn-outline btn-small">
-          <Tags size={16} aria-hidden="true" />
+          <Tag size={16} aria-hidden="true" />
           Details
         </Link>
-        <ShadeCardButton product={product} size="sm" />
+        <button className="btn btn-primary btn-small" type="button" onClick={addDefaultToBasket}>
+          <ClipboardText size={16} aria-hidden="true" />
+          Add to enquiry
+        </button>
         <a
           className="btn btn-whatsapp btn-small"
           href={enquireLink}
@@ -222,8 +233,8 @@ export default function ProductCard({ product, compact = false }) {
           rel="noreferrer"
           aria-label={`Enquire about ${product.name} on WhatsApp`}
         >
-          <MessageCircle size={16} aria-hidden="true" />
-          Enquire
+          <ChatCircle size={16} aria-hidden="true" />
+          Ask price
         </a>
       </div>
     </article>
@@ -300,33 +311,3 @@ function SwatchButton({ color, isActive, isHovered, onSelect, onHover }) {
 // per-color image assets exist at /assets/images/products/{slug}/color-{slug}.webp,
 // the detail page swaps <img src> directly. On the card we use a CSS filter to
 // avoid broken-image flashes for products that don't have full color coverage yet.
-function computeColorFilter(targetHex) {
-  const { h: targetH, s: targetS } = hexToHsl(targetHex);
-  // Reference hue/saturation: a neutral mid-tone (the average product photo).
-  // We shift hue by (target - 0) and bump saturation toward target.
-  const hueShift = Math.round(targetH); // 0-360
-  const satMult = 0.5 + targetS * 1.5;  // 0.5x to 2x
-  return `hue-rotate(${hueShift}deg) saturate(${satMult.toFixed(2)})`;
-}
-
-function hexToHsl(hex) {
-  const m = hex.replace("#", "").match(/.{2}/g);
-  if (!m) return { h: 0, s: 0, l: 0 };
-  let [r, g, b] = m.map((x) => parseInt(x, 16) / 255);
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  const l = (max + min) / 2;
-  const d = max - min;
-  let h = 0;
-  let s = 0;
-  if (d !== 0) {
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-    switch (max) {
-      case r: h = ((g - b) / d + (g < b ? 6 : 0)); break;
-      case g: h = ((b - r) / d + 2); break;
-      default: h = ((r - g) / d + 4);
-    }
-    h *= 60;
-  }
-  return { h, s, l };
-}

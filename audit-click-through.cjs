@@ -19,7 +19,7 @@ const { chromium } = require('playwright');
   // 1. Visit every route defined in App.jsx
   const routes = [
     '/', '/products', '/gallery', '/about', '/contact', '/enquiry', '/wishlist',
-    '/yarn-calculator', '/blog',
+    '/yarn-calculator', '/blog', '/privacy', '/terms', '/delivery-enquiries',
     '/products/makhhi-thread', '/products/single-macrame-cord', '/products/purse-handles',
     '/blog/how-to-choose-yarn-weight',
     '/nonexistent-route-test-404'

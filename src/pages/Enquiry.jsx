@@ -16,7 +16,14 @@ export default function Enquiry() {
     description: "Submit your enquiry basket details or view your favorited yarns and craft supplies.",
   });
 
-  const { basket, remove: removeFromBasket, updateQuantity, clear: clearBasket, count: basketCount } = useEnquiryBasket();
+  const {
+    basket,
+    remove: removeFromBasket,
+    updateQuantity,
+    updateItem,
+    clear: clearBasket,
+    count: basketCount,
+  } = useEnquiryBasket();
   const { wishlist, remove: removeFromWishlist, count: wishlistCount } = useWishlist();
   
   const [searchParams] = useSearchParams();
@@ -171,6 +178,16 @@ export default function Enquiry() {
                               </span>
                             )}
                           </div>
+                          <label className="basket-item-note">
+                            <span>Note for this item</span>
+                            <input
+                              type="text"
+                              value={item.note || ""}
+                              onChange={(event) => updateItem(index, { note: event.target.value })}
+                              placeholder="Shade code, packing or use"
+                              maxLength={160}
+                            />
+                          </label>
                         </div>
 
                         {/* Quantity control */}

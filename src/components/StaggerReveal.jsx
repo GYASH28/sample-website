@@ -33,7 +33,7 @@ export default function StaggerReveal({
   return (
     <MotionTag
       className={className}
-      initial="hidden"
+      initial={false}
       whileInView="visible"
       viewport={{ once: true, margin: "-80px 0px" }}
       variants={{

@@ -110,9 +110,10 @@ export default function ProductDetail() {
   const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
-  // Compile all images available for the product
+  // Use only verified material-family and editorial images. Current shade
+  // photos are confirmed on WhatsApp instead of being synthesized.
   const productImages = useMemo(() => {
-    const images = [
+    return [
       { type: "hero", src: baseImageUrl, label: "Hero View" },
       ...(product.galleryImages || []).map((img, i) => ({
         type: `gallery-${i + 1}`,
@@ -120,30 +121,7 @@ export default function ProductDetail() {
         label: `Gallery View ${i + 1}`
       }))
     ];
-
-    if (product.colors && product.colors.length > 0) {
-      product.colors.forEach((color) => {
-        const colorSlug = color.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-        images.push({
-          type: `color-${colorSlug}`,
-          src: `/assets/images/products/${product.slug}/color-${colorSlug}.webp`,
-          label: `${color.name} Shade`
-        });
-      });
-    }
-    return images;
   }, [product, baseImageUrl]);
-
-  // Update gallery index when active color changes
-  useEffect(() => {
-    if (activeColor) {
-      const colorSlug = activeColor.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-      const index = productImages.findIndex(img => img.type === `color-${colorSlug}`);
-      if (index > -1) {
-        setActiveGalleryIndex(index);
-      }
-    }
-  }, [activeColor, productImages]);
 
   // Share link feedback
   const [copied, setCopied] = useState(false);
@@ -218,46 +196,46 @@ export default function ProductDetail() {
   const specs = useMemo(() => {
     const defaultSpecs = [
       { label: "Category", value: product.category },
-      { label: "Availability", value: "Ready Stock (Confirm on Enquiry)" },
-      { label: "Shipping Support", value: "All India Shipping Available" }
+      { label: "Availability", value: "Confirmed when you enquire" },
+      { label: "Delivery", value: "Available across India; timing confirmed by location" }
     ];
 
     if (product.category === "Bliss Threads") {
       return [
-        { label: "Material Composition", value: "Premium Soft Cotton" },
-        { label: "Texture Feel", value: "Extremely Soft, non-fraying" },
-        { label: "Recommended Crochet Hooks", value: "1.0mm - 2.5mm" },
+        { label: "Product family", value: "Bliss Threads" },
+        { label: "Shade guidance", value: "Current shade card available on request" },
+        { label: "Needle or hook size", value: "Confirm from the current pack label" },
         ...defaultSpecs
       ];
     }
     if (product.category === "Vardhaman Products") {
       return [
-        { label: "Brand", value: "Vardhaman (Genuine Quality)" },
-        { label: "Primary Use", value: "Wearables, Baby garments, amigurumi, and craft work" },
-        { label: "Care Instructions", value: "Gentle hand wash cold, dry flat in shade" },
+        { label: "Brand", value: "Vardhaman" },
+        { label: "Product details", value: "Current pack specifications shared on request" },
+        { label: "Care", value: "Follow the instructions on the supplied pack label" },
         ...defaultSpecs
       ];
     }
     if (product.category === "Ganga Products") {
       return [
         { label: "Brand", value: "Ganga Yarns" },
-        { label: "Texture Feel", value: "Plush, high durability threads" },
+        { label: "Product details", value: "Current pack specifications shared on request" },
         ...defaultSpecs
       ];
     }
     if (product.category === "Macrame Cord") {
       return [
-        { label: "Material Composition", value: "100% Natural Organic Cotton" },
+        { label: "Material", value: "Confirm composition from the current product label" },
         { label: "Structure", value: product.slug.includes("twisted") ? "Multi-strand twisted rope" : "Single-strand twist cord" },
-        { label: "Recommended Craft", value: "Macrame wall hanger, plant holder, woven bags" },
+        { label: "Project guidance", value: "Ask us about cord structure for your intended project" },
         ...defaultSpecs
       ];
     }
     if (product.category === "T-Shirt Yarn") {
       return [
-        { label: "Material", value: "Jersey Fabric Strips (Cotton Blend)" },
-        { label: "Recommended Crochet Hooks", value: "6.0mm - 9.0mm" },
-        { label: "Structure", value: "Chunky, flat structure for quick knitting" },
+        { label: "Material", value: "Confirm composition from the current product label" },
+        { label: "Needle or hook size", value: "Confirm from the current pack label" },
+        { label: "Product details", value: "Current width and weight shared on request" },
         ...defaultSpecs
       ];
     }
@@ -275,11 +253,11 @@ export default function ProductDetail() {
     const defaultFaqs = [
       {
         q: "Do you provide bulk wholesale pricing?",
-        a: "Yes! While we do not display prices publicly on the website, we offer competitive wholesale prices for bulk quantities. Click the 'WhatsApp Enquiry' or 'Add to Basket' buttons to discuss pricing options directly."
+        a: "Yes. Prices are confirmed against quantity, shade, size, packaging, and current availability. Add the items to your enquiry basket to request a wholesale quote."
       },
       {
         q: "Is shipping available all over India?",
-        a: "Absolutely. We ship yarns, cords, handles, and accessories all across India. Delivery times typically range between 3 to 7 business days depending on your delivery location."
+        a: "We support delivery across India. Share your postcode in the enquiry and we will confirm availability, delivery timing, and applicable charges."
       },
       {
         q: "Can I mix different shades in a single bulk order?",
@@ -292,11 +270,11 @@ export default function ProductDetail() {
         ...defaultFaqs,
         {
           q: "What is the recommended hook or needle size?",
-          a: `For ${product.name}, we recommend using hooks ranging from ${product.category.includes("T-Shirt") ? "6.0mm to 9.0mm" : "1.5mm to 3.0mm"}. Gauge guidance can be confirmed on WhatsApp.`
+          a: `The best size depends on the current ${product.name} pack specifications, your gauge, and the fabric you want. Ask us to share the current label details before ordering.`
         },
         {
-          q: "Are these yarns colour-fast and washable?",
-          a: "Yes, our yarns are carefully dyed. We recommend gentle hand washing in cold water and drying flat in the shade to maintain thread structure and colour vibrance."
+          q: "How should I wash and care for this yarn?",
+          a: "Please follow the care instructions on the supplied pack label. We can share a current label photo through WhatsApp before you order."
         }
       ];
     }
@@ -305,7 +283,7 @@ export default function ProductDetail() {
         ...defaultFaqs,
         {
           q: "Can I comb or fringe this macrame cord?",
-          a: "Yes! The single-twist macrame cord fringes out beautifully for feathers, tassels, and leaves. The twisted cord offers more structural strength for large plant hangers."
+          a: "Fringing depends on the cord construction. Tell us the finish you need and we will confirm the current cord structure before you order."
         }
       ];
     }
@@ -314,7 +292,7 @@ export default function ProductDetail() {
         ...defaultFaqs,
         {
           q: "Are these handles durable for regular handbag use?",
-          a: "Yes, our wooden, chain, and pearl handles are designed with reinforced attachments, making them sturdy enough for premium boutiques and everyday handmade purses."
+          a: "Suitability depends on the bag weight, attachment method, and current handle specification. Share your project details so we can help you choose."
         }
       ];
     }
@@ -352,7 +330,7 @@ export default function ProductDetail() {
 
                 {/* Gallery Thumbnails Carousel Strip */}
                 <div className="gallery-thumbnail-strip" style={{ marginTop: "16px" }}>
-                  <span className="thumbnail-label" style={{ display: "block", marginBottom: "8px", fontWeight: "600", fontSize: "14px", color: "var(--text-muted)" }}>Gallery & Shade Options:</span>
+                  <span className="thumbnail-label" style={{ display: "block", marginBottom: "8px", fontWeight: "600", fontSize: "14px", color: "var(--text-muted)" }}>Material and project views</span>
                   <div className="thumbnail-grid-row" style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "6px" }}>
                     {productImages.map((img, i) => {
                       const isSelected = activeGalleryIndex === i;
@@ -361,15 +339,7 @@ export default function ProductDetail() {
                           key={i}
                           type="button"
                           className={`thumbnail-rect-btn ${isSelected ? "active" : ""}`}
-                          onClick={() => {
-                            setActiveGalleryIndex(i);
-                            if (img.type.startsWith("color-")) {
-                              const matchingColor = product.colors.find(c => 
-                                img.type.endsWith(c.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"))
-                              );
-                              if (matchingColor) setActiveColor(matchingColor);
-                            }
-                          }}
+                          onClick={() => setActiveGalleryIndex(i)}
                           style={{
                             width: "60px",
                             height: "60px",
@@ -432,6 +402,7 @@ export default function ProductDetail() {
 
               <h1 className="product-detail-title-new">{product.name}</h1>
               <p className="product-detail-variant-info">{product.variants}</p>
+              <p className="product-image-note">{product.imageNote}</p>
 
               {/* Phase 2: StockBadge removed. Shade card request row kept. */}
               <div className="product-detail-stock-row" style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap", marginBottom: "20px", padding: "12px 0", borderBottom: "1px solid var(--line)", borderTop: "1px solid var(--line)" }}>
@@ -447,7 +418,7 @@ export default function ProductDetail() {
                   <Percent size={15} /> Wholesale Friendly
                 </span>
                 <span>
-                  <ShieldCheck size={15} /> Verified Quality
+                  <ShieldCheck size={15} /> Details Confirmed on Enquiry
                 </span>
               </div>
 

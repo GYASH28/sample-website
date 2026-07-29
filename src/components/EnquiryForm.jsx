@@ -34,7 +34,7 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
     text += `*Name:* ${name}\n`;
     text += `*Phone:* ${phone}\n`;
     if (businessType) text += `*Business Type:* ${businessType}\n`;
-    if (city) text += `*Delivery City:* ${city}\n`;
+    if (city) text += `*City / State:* ${city}\n`;
 
     if (hasBasket) {
       text += `\n*Enquiry Items in Basket:*\n`;
@@ -43,6 +43,7 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
         const variantText = item.variant ? ` (${item.variant})` : "";
         text += `${index + 1}. *${item.name}*${variantText}${shadeText}\n`;
         text += `   Quantity: ${item.quantity} ${item.unit}\n`;
+        if (item.note) text += `   Notes: ${item.note}\n`;
       });
     } else {
       const product = formData.get("product") || "";
@@ -53,8 +54,8 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
       if (shade) text += `*Colour/Shade:* ${shade}\n`;
     }
 
-    if (message) text += `\n*Message:* ${message}\n`;
-    text += `\nPlease share availability, catalogue, and bulk pricing. Thank you!`;
+    if (message) text += `\n*Delivery question / notes:* ${message}\n`;
+    text += `\nPlease share availability, current shade photos, quantity-based price and delivery timing. Thank you.`;
 
     return text;
   }
@@ -145,7 +146,7 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
             </label>
           ) : (
             <label>
-              Delivery City
+              City / State
               <input type="text" name="city" autoComplete="address-level2" required />
             </label>
           )}
@@ -159,7 +160,7 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
                 <input type="text" name="quantity" />
               </label>
               <label>
-                Delivery City
+                City / State
                 <input type="text" name="city" autoComplete="address-level2" />
               </label>
             </div>
@@ -172,7 +173,7 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
         ) : null}
 
         <label>
-          Message / Notes
+          Delivery question / notes
           <textarea
             name="message"
             placeholder="Any specific requests, delivery directions or custom shade codes..."
