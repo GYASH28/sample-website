@@ -1,6 +1,6 @@
 const { chromium } = require("playwright");
 
-const baseUrl = "http://127.0.0.1:4173";
+const baseUrl = process.env.MOTION_BASE_URL || "http://127.0.0.1:4173";
 const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE;
 
 function check(condition, message) {
@@ -59,6 +59,23 @@ async function expectHidden(page, selector, timeout = 1200) {
       booting: document.documentElement.classList.contains("intro-booting"),
     }));
     check(!cleanup.bodyLocked && !cleanup.booting, "intro left a page lock behind");
+    await context.close();
+  });
+
+  await run("legacy playback marker does not suppress the cinematic intro", async () => {
+    const context = await browser.newContext({
+      viewport: { width: 1440, height: 900 },
+    });
+    await context.addInitScript(() => {
+      sessionStorage.setItem("fakhri_intro_v3", "played");
+    });
+    const page = await context.newPage();
+    await page.goto(`${baseUrl}/`, { waitUntil: "domcontentloaded" });
+    await page
+      .locator('[aria-label="Fakhri Mart introduction"]')
+      .waitFor({ state: "visible", timeout: 5000 });
+    await page.getByRole("button", { name: "Skip intro" }).click();
+    await expectHidden(page, '[aria-label="Fakhri Mart introduction"]');
     await context.close();
   });
 
@@ -139,7 +156,7 @@ async function expectHidden(page, selector, timeout = 1200) {
       viewport: { width: 1440, height: 900 },
     });
     await context.addInitScript(() => {
-      sessionStorage.setItem("fakhri_intro_v3", "played");
+      sessionStorage.setItem("fakhri_intro_cinematic_v1", "played");
     });
     const page = await context.newPage();
     const errors = [];
@@ -172,7 +189,9 @@ async function expectHidden(page, selector, timeout = 1200) {
     const desktop = await browser.newContext({
       viewport: { width: 1440, height: 900 },
     });
-    await desktop.addInitScript(() => sessionStorage.setItem("fakhri_intro_v3", "played"));
+    await desktop.addInitScript(() =>
+      sessionStorage.setItem("fakhri_intro_cinematic_v1", "played"),
+    );
     const page = await desktop.newPage();
     await page.goto(`${baseUrl}/`, { waitUntil: "networkidle" });
     await page.getByRole("button", { name: /search/i }).click();
@@ -193,7 +212,9 @@ async function expectHidden(page, selector, timeout = 1200) {
       isMobile: true,
       hasTouch: true,
     });
-    await mobile.addInitScript(() => sessionStorage.setItem("fakhri_intro_v3", "played"));
+    await mobile.addInitScript(() =>
+      sessionStorage.setItem("fakhri_intro_cinematic_v1", "played"),
+    );
     const mobilePage = await mobile.newPage();
     await mobilePage.goto(`${baseUrl}/`, { waitUntil: "networkidle" });
     await mobilePage.getByRole("button", { name: "Menu", exact: true }).click();
@@ -211,7 +232,9 @@ async function expectHidden(page, selector, timeout = 1200) {
     const context = await browser.newContext({
       viewport: { width: 1440, height: 900 },
     });
-    await context.addInitScript(() => sessionStorage.setItem("fakhri_intro_v3", "played"));
+    await context.addInitScript(() =>
+      sessionStorage.setItem("fakhri_intro_cinematic_v1", "played"),
+    );
     const page = await context.newPage();
     await page.goto(`${baseUrl}/products`, { waitUntil: "networkidle" });
     const firstBefore = await page.locator("[data-product-key]").first().getAttribute("data-product-key");

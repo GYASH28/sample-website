@@ -42,7 +42,7 @@ try {
       page.on("pageerror", (error) => errors.push(error.message));
 
       await page.addInitScript(() => {
-        sessionStorage.setItem("fakhri_intro_v3", "played");
+        sessionStorage.setItem("fakhri_intro_cinematic_v1", "played");
         window.__motionAudit = { cls: 0, lcp: 0 };
 
         new PerformanceObserver((list) => {

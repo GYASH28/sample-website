@@ -7,7 +7,8 @@
       (() => {
         try {
           const force = new URLSearchParams(window.location.search).get("intro") === "1";
-          const seen = window.sessionStorage.getItem("fakhri_intro_v3") === "played";
+          const seen =
+            window.sessionStorage.getItem("fakhri_intro_cinematic_v1") === "played";
           const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
           if (!reduced && (force || !seen)) {
             document.documentElement.classList.add("intro-booting");
