@@ -21,7 +21,7 @@
 
 import { ChatCircle, ClipboardText, Heart, Tag } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { productCategories } from "../data/siteData.js";
 import { useWishlist } from "../hooks/useWishlist.js";
 import { useEnquiryBasket } from "../hooks/useEnquiryBasket.js";
@@ -48,69 +48,6 @@ export default function ProductCard({ product, compact = false }) {
   // ── Prompt 2 Part 1.4 — Local swatch state, resets on scroll-out ──
   const [activeColor, setActiveColor] = useState(null); // { name, hex } or null
   const [hoveredSwatch, setHoveredSwatch] = useState(null); // color name (for tooltip)
-  const cardRef = useRef(null);
-
-  useEffect(() => {
-    if (!cardRef.current || typeof IntersectionObserver === "undefined") return;
-    const obs = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (!e.isIntersecting) setActiveColor(null);
-        }
-      },
-      { threshold: 0 }
-    );
-    obs.observe(cardRef.current);
-    return () => obs.disconnect();
-  }, []);
-
-  useEffect(() => {
-    const card = cardRef.current;
-    if (
-      !card ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
-      !window.matchMedia("(pointer: fine)").matches
-    ) {
-      return undefined;
-    }
-
-    let frame = 0;
-    let clearWillChangeTimer = 0;
-
-    const onPointerMove = (event) => {
-      if (frame) cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        const bounds = card.getBoundingClientRect();
-        const x = (event.clientX - bounds.left) / bounds.width;
-        const y = (event.clientY - bounds.top) / bounds.height;
-        const rotateY = (x - 0.5) * 6;
-        const rotateX = (0.5 - y) * 5;
-        card.style.willChange = "transform";
-        card.style.setProperty("--card-light-x", `${x * 100}%`);
-        card.style.setProperty("--card-light-y", `${y * 100}%`);
-        card.style.transform = `perspective(1100px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-7px)`;
-      });
-    };
-
-    const onPointerLeave = () => {
-      if (frame) cancelAnimationFrame(frame);
-      card.style.transform =
-        "perspective(1100px) rotateX(0deg) rotateY(0deg) translateY(0)";
-      clearTimeout(clearWillChangeTimer);
-      clearWillChangeTimer = window.setTimeout(() => {
-        card.style.willChange = "auto";
-      }, 360);
-    };
-
-    card.addEventListener("pointermove", onPointerMove, { passive: true });
-    card.addEventListener("pointerleave", onPointerLeave);
-    return () => {
-      if (frame) cancelAnimationFrame(frame);
-      clearTimeout(clearWillChangeTimer);
-      card.removeEventListener("pointermove", onPointerMove);
-      card.removeEventListener("pointerleave", onPointerLeave);
-    };
-  }, []);
 
   const colorsToShow = (product.colors || []).slice(0, MAX_SWATCHES_ON_CARD);
   const overflowCount = (product.colors?.length || 0) - MAX_SWATCHES_ON_CARD;
@@ -142,7 +79,6 @@ export default function ProductCard({ product, compact = false }) {
 
   return (
     <article
-      ref={cardRef}
       className={`product-card ${compact ? "product-card--compact" : ""}`}
     >
       {/* ── Prompt 2 Part 1.1 — Palette identity strip (top edge) ─────── */}

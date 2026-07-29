@@ -20,6 +20,7 @@ if (!existsSync(distDir)) {
 }
 
 const { businessInfo, featuredProducts, blogPosts } = await import("../data/siteData.js");
+const { INTRO_SESSION_KEY } = await import("../lib/introPlayback.js");
 
 const staticRoutes = ["/", "/products", "/gallery", "/about", "/contact", "/blog"];
 const productRoutes = featuredProducts.map((p) => `/products/${p.slug}`);
@@ -73,6 +74,9 @@ try {
   }
 
   const page = await browser.newPage();
+  await page.addInitScript((sessionKey) => {
+    sessionStorage.setItem(sessionKey, "played");
+  }, INTRO_SESSION_KEY);
 
   let successCount = 0;
   let failCount = 0;
@@ -82,6 +86,9 @@ try {
     try {
       await page.goto(url, { waitUntil: "networkidle", timeout: 15000 });
       await page.waitForTimeout(500); // allow hydration to write JSON-LD + meta tags
+      await page.evaluate(() => {
+        document.documentElement.classList.remove("motion-ready");
+      });
 
       const html = await page.content();
       const finalPath =

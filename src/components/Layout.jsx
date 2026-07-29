@@ -4,6 +4,7 @@ import FloatingWhatsApp from "./FloatingWhatsApp.jsx";
 import Footer from "./Footer.jsx";
 import Header from "./Header.jsx";
 import BasketToast from "./BasketToast.jsx";
+import IntroAnimation from "./IntroAnimation.jsx";
 
 function ScrollToTop() {
   const { hash, pathname } = useLocation();
@@ -27,10 +28,11 @@ export default function Layout() {
   return (
     <>
       <a href="#main-content" className="skip-link">Skip to main content</a>
+      <IntroAnimation />
       <ScrollToTop />
       <Header />
       <main id="main-content">
-        <div key={location.pathname}>
+        <div key={location.pathname} className="route-stage">
           <Outlet />
         </div>
       </main>
