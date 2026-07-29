@@ -31,12 +31,13 @@ const allRoutes = [...staticRoutes, ...productRoutes, ...blogRoutes];
 // so crawlers and link-preview bots see real HTML with JSON-LD + meta tags.
 
 let preview;
+let browser;
 try {
   console.log("▶ Starting vite preview on port 4173…");
-  preview = spawn("npx", ["vite", "preview", "--port", "4173", "--strictPort", "--host", "127.0.0.1"], {
+  const viteCli = resolve(projectRoot, "node_modules/vite/bin/vite.js");
+  preview = spawn(process.execPath, [viteCli, "preview", "--port", "4173", "--strictPort", "--host", "127.0.0.1"], {
     cwd: projectRoot,
     stdio: "pipe",
-    shell: process.platform === "win32",
   });
 
   await new Promise((res, rej) => {
@@ -63,7 +64,6 @@ try {
     preview.stderr.on("data", onStderr);
   });
 
-  let browser;
   try {
     browser = await chromium.launch();
   } catch (launchError) {
@@ -107,14 +107,22 @@ try {
   }
 
   await browser.close();
+  browser = undefined;
   console.log(`\n✓ Prerendered: ${successCount} routes succeeded, ${failCount} failed.`);
-  process.exit(failCount > 0 ? 1 : 0);
+  process.exitCode = failCount > 0 ? 1 : 0;
 
 } catch (error) {
   console.error(`✗ Prerender process failed: ${error.message}`);
-  process.exit(1);
+  process.exitCode = 1;
 } finally {
+  if (browser) {
+    await browser.close().catch(() => {});
+  }
   if (preview) {
-    preview.kill();
+    preview.stdout?.destroy();
+    preview.stderr?.destroy();
+    if (preview.exitCode === null && preview.signalCode === null) {
+      preview.kill();
+    }
   }
 }
