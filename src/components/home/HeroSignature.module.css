@@ -408,6 +408,13 @@
   animation-play-state: paused;
 }
 
+:global(html.intro-handoff) .thread,
+:global(html.intro-handoff) .brandSeal,
+:global(html.intro-handoff) .swatchPanel,
+:global(html.intro-handoff) .artNote {
+  animation-play-state: paused;
+}
+
 @keyframes copy-enter {
   from {
     opacity: 0;

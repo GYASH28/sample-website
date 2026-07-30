@@ -129,7 +129,7 @@ export default function HeroSignature() {
           className={styles.artwork}
           data-shade={activeShade.id}
         >
-          <div className={styles.frameShell}>
+          <div className={styles.frameShell} data-home-hero-frame>
             <figure ref={imageRef} className={styles.photoFrame}>
               <picture>
                 <source

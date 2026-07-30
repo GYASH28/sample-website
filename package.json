@@ -11,7 +11,11 @@
     "prerender": "node src/scripts/prerender.js",
     "test:smoke": "node playwright-test.cjs",
     "test:a11y": "node accessibility-audit.cjs",
-    "test:motion": "node motion-lifecycle-test.cjs"
+    "test:motion": "node motion-lifecycle-test.cjs",
+    "test:faq": "node faq-interaction-test.cjs",
+    "test:viewports": "node viewport-integrity-test.cjs",
+    "audit:intro": "node src/scripts/intro-performance-audit.mjs",
+    "audit:motion": "node src/scripts/motion-audit.mjs"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.3.0",

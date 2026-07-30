@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import CatalogueCta from "../components/CatalogueCta.jsx";
+import { Lightbox } from "../components/ImageZoom.jsx";
 import PageHero from "../components/PageHero.jsx";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
 
@@ -45,6 +47,8 @@ const gallery = [
 ];
 
 export default function Gallery() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   useDocumentMeta({
     title: "Craft Material Gallery | Fakhri Mart",
     description: "Yarn, crochet, macrame, embroidery and bag-making material inspiration from Fakhri Mart.",
@@ -63,13 +67,27 @@ export default function Gallery() {
       <section className="section gallery-page-section">
         <div className="container">
           <div className="gallery-editorial-grid">
-            {gallery.map((item) => (
-              <figure key={item.title} className={item.className || ""}>
-                <img src={item.src} alt={item.alt} loading="lazy" width="900" height="720" />
-                <figcaption>
-                  <span>{item.note}</span>
-                  <h2>{item.title}</h2>
-                </figcaption>
+            {gallery.map((item, index) => (
+              <figure
+                key={item.title}
+                className={item.className || ""}
+                data-selected={activeIndex === index}
+              >
+                <button
+                  type="button"
+                  className="gallery-frame-button"
+                  aria-label={`Open ${item.title} in the gallery viewer`}
+                  onClick={() => {
+                    setActiveIndex(index);
+                    setLightboxOpen(true);
+                  }}
+                >
+                  <img src={item.src} alt={item.alt} loading="lazy" width="900" height="720" />
+                  <figcaption>
+                    <span>{item.note}</span>
+                    <h2>{item.title}</h2>
+                  </figcaption>
+                </button>
               </figure>
             ))}
           </div>
@@ -81,6 +99,14 @@ export default function Gallery() {
       </section>
 
       <div className="container"><CatalogueCta /></div>
+      {lightboxOpen ? (
+        <Lightbox
+          images={gallery.map((item) => ({ src: item.src, label: item.title }))}
+          activeIndex={activeIndex}
+          onIndexChange={setActiveIndex}
+          onClose={() => setLightboxOpen(false)}
+        />
+      ) : null}
     </>
   );
 }

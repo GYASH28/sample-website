@@ -7,8 +7,12 @@ const routes = [
   "/",
   "/products",
   "/products/makhhi-thread",
-  "/enquiry",
   "/gallery",
+  "/about",
+  "/blog",
+  "/contact",
+  "/enquiry",
+  "/wishlist",
 ];
 const profiles = [
   { name: "mobile", width: 390, height: 844 },
@@ -65,7 +69,15 @@ try {
         waitUntil: "networkidle",
         timeout: 30_000,
       });
-      await page.waitForTimeout(250);
+      await page.waitForFunction(() => {
+        return (
+          document.readyState === "complete" &&
+          document.documentElement.dataset.motionProfile &&
+          document.querySelector(".route-stage") &&
+          !document.body.classList.contains("intro-running")
+        );
+      });
+      await page.evaluate(() => document.fonts.ready);
 
       const visual = await page.evaluate(async () => {
         window.scrollTo({ top: 0, behavior: "instant" });

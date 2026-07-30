@@ -10,7 +10,7 @@ import {
   Tray,
 } from "@phosphor-icons/react";
 import { Link, useSearchParams } from "react-router-dom";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import EnquiryForm from "../components/EnquiryForm.jsx";
 import PageHero from "../components/PageHero.jsx";
 import Reveal from "../components/Reveal.jsx";
@@ -58,6 +58,11 @@ export default function Enquiry() {
   // Quick action: Add favorite item to basket
   const { add: addToBasket } = useEnquiryBasket();
   const [addedItemSlugs, setAddedItemSlugs] = useState({});
+  const favoriteFeedbackTimerRef = useRef(null);
+
+  useEffect(() => {
+    return () => window.clearTimeout(favoriteFeedbackTimerRef.current);
+  }, []);
 
   const handleAddFavToBasket = (product) => {
     const basketItem = {
@@ -71,10 +76,11 @@ export default function Enquiry() {
       variant: null
     };
     addToBasket(basketItem);
-    setAddedItemSlugs(prev => ({ ...prev, [product.slug]: true }));
-    setTimeout(() => {
-      setAddedItemSlugs(prev => ({ ...prev, [product.slug]: false }));
-    }, 2000);
+    setAddedItemSlugs({ [product.slug]: true });
+    window.clearTimeout(favoriteFeedbackTimerRef.current);
+    favoriteFeedbackTimerRef.current = window.setTimeout(() => {
+      setAddedItemSlugs({});
+    }, 2_000);
   };
 
   return (

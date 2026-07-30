@@ -1,5 +1,7 @@
 import { ArrowLeft, ShareNetwork } from "@phosphor-icons/react";
 import { Link, useParams } from "react-router-dom";
+import { useState } from "react";
+import Reveal from "../components/Reveal.jsx";
 import { blogPosts, businessInfo } from "../data/siteData.js";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
 import { useJsonLd } from "../hooks/useJsonLd.js";
@@ -14,6 +16,7 @@ export default function BlogPost() {
   const { slug } = useParams();
   const postIndex = blogPosts.findIndex((item) => item.slug === slug);
   const post = blogPosts[postIndex];
+  const [shareStatus, setShareStatus] = useState("");
 
   useDocumentMeta({
     title: post ? `${post.title} | Fakhri Mart` : "Guide not found | Fakhri Mart",
@@ -44,11 +47,25 @@ export default function BlogPost() {
 
   const related = blogPosts.filter((item) => item.slug !== post.slug).slice(0, 2);
 
+  const handleShare = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: post.title, url: window.location.href });
+        setShareStatus("Shared");
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        setShareStatus("Link copied");
+      }
+    } catch (error) {
+      if (error?.name !== "AbortError") setShareStatus("Share unavailable");
+    }
+  };
+
   return (
     <article className="article-page">
       <header className="article-header">
         <div className="container article-header-grid">
-          <div>
+          <Reveal className="article-heading-copy" variant="slide-left">
             <Link className="text-link" to="/blog"><ArrowLeft size={17} /> All guides</Link>
             <p className="eyebrow">{post.category || "Craft guide"} · {post.readMinutes} min read</p>
             <h1>{post.title}</h1>
@@ -56,26 +73,29 @@ export default function BlogPost() {
             <button
               type="button"
               className="btn btn-outline btn-small"
-              onClick={() => navigator.share?.({ title: post.title, url: window.location.href })
-                ?? navigator.clipboard.writeText(window.location.href)}
+              data-confirmed={shareStatus === "Shared" || shareStatus === "Link copied"}
+              onClick={handleShare}
             >
-              <ShareNetwork size={17} /> Share guide
+              <ShareNetwork size={17} /> {shareStatus || "Share guide"}
             </button>
-          </div>
-          <img
-            src={guideImages[postIndex % guideImages.length]}
-            alt=""
-            width="900"
-            height="620"
-          />
+            <span className="sr-only" role="status" aria-live="polite">{shareStatus}</span>
+          </Reveal>
+          <Reveal className="article-hero-media" delay={90} variant="scale-in">
+            <img
+              src={guideImages[postIndex % guideImages.length]}
+              alt=""
+              width="900"
+              height="620"
+            />
+          </Reveal>
         </div>
       </header>
 
       <div className="container article-layout">
-        <div className="article-body">
+        <Reveal className="article-body reading-surface" variant="fade-up">
           {post.body.split(/\n\n+/).map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-        </div>
-        <aside>
+        </Reveal>
+        <Reveal as="aside" delay={80} variant="slide-right">
           <span className="eyebrow">Keep reading</span>
           {related.map((item) => (
             <Link key={item.slug} to={`/blog/${item.slug}`}>
@@ -83,7 +103,7 @@ export default function BlogPost() {
               <small>{item.readMinutes} min read</small>
             </Link>
           ))}
-        </aside>
+        </Reveal>
       </div>
     </article>
   );

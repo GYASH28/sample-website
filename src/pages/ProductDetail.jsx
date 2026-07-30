@@ -1,8 +1,6 @@
 import {
   ArrowRight,
   Bell,
-  CaretDown,
-  CaretUp,
   ChatCircleDots,
   Check,
   ArrowsOut,
@@ -17,7 +15,7 @@ import {
   Tag,
   Truck,
 } from "@phosphor-icons/react";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import CatalogueCta from "../components/CatalogueCta.jsx";
 import ProductCard from "../components/ProductCard.jsx";
@@ -25,6 +23,7 @@ import ShadeCardButton from "../components/ShadeCardButton.jsx";
 import ShareButton from "../components/ShareButton.jsx";
 import ColorSwatchPicker from "../components/ColorSwatchPicker.jsx";
 import QuantitySelector from "../components/QuantitySelector.jsx";
+import ProductFaq from "../components/ProductFaq.jsx";
 import { Lightbox } from "../components/ImageZoom.jsx";
 import StickyBreadcrumb from "../components/StickyBreadcrumb.jsx";
 import { createWhatsAppLink, featuredProducts, productCategories, businessInfo } from "../data/siteData.js";
@@ -122,14 +121,6 @@ export default function ProductDetail() {
     ];
   }, [product, baseImageUrl]);
 
-  // Share link feedback
-  const [copied, setCopied] = useState(false);
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   // Derive related products
   const relatedProducts = useMemo(() => {
     if (!product.relatedSlugs) return [];
@@ -175,6 +166,12 @@ export default function ProductDetail() {
 
   // Handle add to enquiry basket
   const [addedAnimation, setAddedAnimation] = useState(false);
+  const addedTimerRef = useRef(null);
+
+  useEffect(() => {
+    return () => window.clearTimeout(addedTimerRef.current);
+  }, [product.slug]);
+
   const handleAddToBasket = () => {
     const basketItem = {
       slug: product.slug,
@@ -188,7 +185,11 @@ export default function ProductDetail() {
     };
     addToBasket(basketItem);
     setAddedAnimation(true);
-    setTimeout(() => setAddedAnimation(false), 2000);
+    window.clearTimeout(addedTimerRef.current);
+    addedTimerRef.current = window.setTimeout(
+      () => setAddedAnimation(false),
+      2_000,
+    );
   };
 
   // Specs Generator
@@ -240,12 +241,6 @@ export default function ProductDetail() {
     }
     return defaultSpecs;
   }, [product]);
-
-  // FAQ state
-  const [openFaq, setOpenFaq] = useState(null);
-  const toggleFaq = (index) => {
-    setOpenFaq(openFaq === index ? null : index);
-  };
 
   // Category-specific FAQs
   const productFaqs = useMemo(() => {
@@ -621,29 +616,7 @@ export default function ProductDetail() {
               <h3 className="info-block-title">
                 <Question size={18} /> Product FAQs
               </h3>
-              <div className="faq-accordions-group">
-                {productFaqs.map((faq, index) => {
-                  const isOpen = openFaq === index;
-                  return (
-                    <div key={index} className="faq-item-accordion">
-                      <button
-                        type="button"
-                        className="faq-question-toggle-btn"
-                        onClick={() => toggleFaq(index)}
-                        aria-expanded={isOpen}
-                      >
-                        <span>{faq.q}</span>
-                        {isOpen ? <CaretUp size={16} /> : <CaretDown size={16} />}
-                      </button>
-                      <div className={`faq-answer-collapsible ${isOpen ? "open" : ""}`}>
-                        <div className="faq-answer-content-inner">
-                          <p>{faq.a}</p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              <ProductFaq productSlug={product.slug} faqs={productFaqs} />
             </div>
           </div>
         </div>

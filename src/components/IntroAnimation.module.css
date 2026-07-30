@@ -6,7 +6,7 @@
   background: #452735;
   color: #fffaf7;
   isolation: isolate;
-  transition: opacity 680ms var(--motion-ease-standard);
+  transition: opacity 360ms var(--motion-ease-standard);
 }
 
 :global(body.intro-running) {
@@ -15,38 +15,28 @@
 
 .paperField {
   position: absolute;
-  z-index: -3;
+  z-index: -2;
   inset: 0;
   background:
-    radial-gradient(circle at 12% 22%, rgba(216, 137, 161, 0.18), transparent 32rem),
+    radial-gradient(circle at 11% 18%, rgba(216, 137, 161, 0.17), transparent 30rem),
     linear-gradient(112deg, #3c202d 0 48%, #452735 48% 100%);
-  transition: opacity var(--motion-duration-slow) var(--motion-ease-standard);
-}
-
-.cinemaGrain {
-  position: absolute;
-  z-index: 8;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.075;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.23'/%3E%3C/svg%3E");
 }
 
 .reelMark {
   position: absolute;
-  z-index: 7;
+  z-index: 6;
   top: max(1.25rem, env(safe-area-inset-top));
   left: max(1.25rem, env(safe-area-inset-left));
   color: rgba(255, 250, 247, 0.62);
   font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
+  font-weight: 720;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
 }
 
 .threadRig {
   position: absolute;
-  z-index: 6;
+  z-index: 5;
   inset: 0;
   width: 100%;
   height: 100%;
@@ -54,128 +44,104 @@
   pointer-events: none;
 }
 
-.tensionThread,
-.identityThread {
-  fill: none;
-  stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
-}
-
 .tensionThread {
+  fill: none;
   stroke: #f2eadf;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  stroke-linecap: round;
   stroke-width: 2.2;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: tension-draw 640ms var(--motion-ease-emphasis) 80ms both;
-}
-
-.identityThread {
-  stroke: #c78d52;
-  stroke-width: 2.8;
-  stroke-dasharray: 1;
+  vector-effect: non-scaling-stroke;
   stroke-dashoffset: 1;
 }
 
-.editorialCut {
-  position: absolute;
-  z-index: 1;
-  top: 0;
-  bottom: 0;
-  left: 51%;
-  width: 0.16rem;
-  background: #f7f3ee;
-  box-shadow:
-    -0.42rem 0 #d889a1,
-    0.42rem 0 #40aaa7;
-  opacity: 0;
-  transform: scaleY(0);
-  transform-origin: center;
-  transition:
-    opacity var(--motion-duration-fast) var(--motion-ease-direct),
-    transform var(--motion-duration-route) var(--motion-ease-emphasis);
+.overlay[data-ready="true"] .tensionThread {
+  animation: tension-draw 430ms var(--motion-ease-emphasis) 20ms both;
 }
 
-.materialStage {
+.mediaStage {
   position: absolute;
   z-index: 2;
-  inset: 0;
+  top: 16%;
+  right: 6%;
+  width: min(44rem, 46vw);
+  aspect-ratio: 6 / 5;
+  opacity: 0;
   pointer-events: none;
+  transform: translate3d(2.2rem, 0, 0) scale(0.985);
+  transition:
+    opacity 260ms var(--motion-ease-direct),
+    transform 480ms var(--motion-ease-emphasis);
 }
 
-.shot {
+.mediaFrame {
   position: absolute;
+  inset: 0;
   margin: 0;
   overflow: hidden;
-  border: 0.35rem solid rgba(255, 253, 249, 0.9);
-  background: #d7c7bd;
-  box-shadow: 0 2rem 5rem rgba(26, 9, 18, 0.24);
-  opacity: 0;
-  transition:
-    opacity var(--motion-duration-route) var(--motion-ease-direct),
-    transform var(--motion-duration-slow) var(--motion-ease-emphasis);
+  border: 0.38rem solid rgba(255, 253, 249, 0.92);
+  border-radius: 2.25rem 0.75rem 2.25rem 0.75rem;
+  background: #d8c9c0;
+  box-shadow: 0 2rem 5rem rgba(26, 9, 18, 0.2);
 }
 
-.shot img {
+.mediaImage {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition:
+    opacity 240ms var(--motion-ease-direct),
+    transform 340ms var(--motion-ease-emphasis);
 }
 
-.shot figcaption {
+.materialImage {
+  opacity: 0;
+  transform: translate3d(1.2rem, 0, 0) scale(1.025);
+}
+
+.heroImage {
+  opacity: 0;
+  transform: translate3d(1.2rem, 0, 0) scale(1.018);
+}
+
+.mediaFrame figcaption {
   position: absolute;
-  right: 0.7rem;
-  bottom: 0.6rem;
-  left: 0.7rem;
-  color: rgba(255, 255, 255, 0.88);
-  font-size: 0.54rem;
+  z-index: 2;
+  right: 1rem;
+  bottom: 0.85rem;
+  left: 1rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.55rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-shadow: 0 1px 1rem rgba(20, 8, 14, 0.5);
+  letter-spacing: 0.055em;
+  text-shadow: 0 0.1rem 0.8rem rgba(20, 8, 14, 0.55);
   text-transform: uppercase;
 }
 
-.shadeShot {
-  top: 11%;
-  left: 7%;
-  width: min(34rem, 39vw);
-  aspect-ratio: 3 / 2;
-  border-radius: 0.65rem 2rem 0.65rem 2rem;
-  transform: translateX(-7rem) rotate(-2deg) scale(0.92);
-}
-
-.crochetShot {
-  right: 7%;
-  bottom: 6%;
-  width: min(20rem, 23vw);
-  aspect-ratio: 2 / 3;
-  border-radius: 2rem 0.65rem 2rem 0.65rem;
-  transform: translateY(7rem) rotate(2.5deg) scale(0.92);
-}
-
-.heroShot {
-  top: 15%;
-  right: 7%;
-  width: min(44rem, 46vw);
-  aspect-ratio: 6 / 5;
-  border-radius: 2.25rem 0.75rem 2.25rem 0.75rem;
-  transform: translate(-24vw, 17vh) rotate(-3deg) scale(0.54);
+.cutCopy {
+  text-align: right;
 }
 
 .identity {
   position: absolute;
-  z-index: 5;
+  z-index: 4;
   top: 50%;
-  left: clamp(2rem, 8vw, 8rem);
+  left: clamp(2rem, 7vw, 7rem);
   display: grid;
-  max-width: 34rem;
+  max-width: min(39rem, 43vw);
   grid-template-columns: auto 1fr;
-  gap: 1.1rem;
+  gap: 1.2rem;
   align-items: center;
   opacity: 0;
-  transform: translateY(-42%) translateX(-1.2rem);
+  transform: translate3d(-1rem, -50%, 0);
   transition:
-    opacity var(--motion-duration-route) var(--motion-ease-direct),
-    transform var(--motion-duration-slow) var(--motion-ease-emphasis);
+    opacity 220ms var(--motion-ease-direct),
+    transform 420ms var(--motion-ease-emphasis);
 }
 
 .prelude {
@@ -200,18 +166,32 @@
   content: "";
 }
 
-.logo {
+.sealLockup {
+  position: relative;
+  display: grid;
   width: clamp(6.8rem, 10vw, 9rem);
   height: clamp(6.8rem, 10vw, 9rem);
+  place-items: center;
+}
+
+.sealHalo {
+  position: absolute;
+  inset: -0.5rem;
+  border-block: 1px solid rgba(216, 137, 161, 0.8);
+  transform: scaleX(1);
+}
+
+.logo {
+  width: 100%;
+  height: 100%;
   margin: 0;
   overflow: hidden;
-  border: 0.3rem solid rgba(255, 255, 255, 0.88);
+  border: 0.3rem solid rgba(255, 255, 255, 0.9);
   border-radius: 50%;
   background: #fffdf9;
-  box-shadow: 0 1.5rem 4rem rgba(23, 8, 15, 0.28);
-  transform: scale(0.82) rotate(-7deg);
-  transition: transform var(--motion-duration-slow)
-    var(--motion-ease-emphasis);
+  box-shadow: 0 1.5rem 4rem rgba(23, 8, 15, 0.24);
+  transform: translate3d(-0.8rem, 0, 0) rotate(-7deg) scale(0.94);
+  transition: transform 420ms var(--motion-ease-emphasis);
 }
 
 .logo img {
@@ -222,10 +202,21 @@
 
 .wordmark {
   display: grid;
+  gap: 0.58rem;
+}
+
+.wordmarkLine {
+  display: block;
   overflow: hidden;
 }
 
-.wordmark span {
+.wordmarkLine > * {
+  display: block;
+  transform: translate3d(0, 108%, 0);
+  transition: transform 420ms var(--motion-ease-emphasis);
+}
+
+.wordmark strong {
   font-family: var(--font-display);
   font-size: clamp(2.7rem, 5.2vw, 6rem);
   font-variation-settings: "wdth" 88, "wght" 690;
@@ -233,17 +224,17 @@
   line-height: 0.88;
 }
 
-.wordmark strong {
-  margin-top: 0.65rem;
+.wordmark em {
   color: #f8dde6;
   font-size: clamp(0.78rem, 1.3vw, 1rem);
+  font-style: normal;
   font-weight: 650;
   letter-spacing: 0.05em;
 }
 
 .skip {
   position: absolute;
-  z-index: 10;
+  z-index: 8;
   right: max(1.25rem, env(safe-area-inset-right));
   bottom: max(1.25rem, env(safe-area-inset-bottom));
   display: inline-flex;
@@ -251,15 +242,13 @@
   padding: 0.35rem 0.4rem 0.35rem 1rem;
   gap: 0.75rem;
   align-items: center;
-  border: 1px solid rgba(255, 250, 247, 0.32);
+  border: 1px solid rgba(255, 250, 247, 0.34);
   border-radius: 999px;
-  background: rgba(69, 39, 53, 0.82);
+  background: rgba(69, 39, 53, 0.94);
   color: #fffaf7;
   font-size: 0.72rem;
   font-weight: 700;
-  opacity: 0;
-  animation: skip-enter var(--motion-duration-route)
-    var(--motion-ease-standard) 120ms both;
+  opacity: 1;
   transition:
     background-color var(--motion-duration-direct) var(--motion-ease-direct),
     transform var(--motion-duration-direct) var(--motion-ease-standard);
@@ -278,12 +267,12 @@
     var(--motion-ease-emphasis);
 }
 
-.skip:is(:hover, :focus-visible) {
-  background: #452735;
+.skip:hover {
+  background: #3c202d;
   transform: translateY(-0.12rem);
 }
 
-.skip:is(:hover, :focus-visible) i {
+.skip:hover i {
   transform: translate(0.12rem, -0.08rem) rotate(7deg);
 }
 
@@ -292,36 +281,37 @@
   outline-offset: 0.25rem;
 }
 
-.overlay[data-phase="material"] .editorialCut,
-.overlay[data-phase="identity"] .editorialCut {
-  opacity: 0.85;
-  transform: scaleY(1);
+.overlay[data-ready="true"][data-phase="tension"] .threadRig,
+.overlay[data-phase="material-one"] .mediaStage,
+.overlay[data-phase="material-two"] :is(.materialImage, .heroImage),
+.overlay[data-phase="identity"] .identity,
+.overlay[data-phase="handoff"] {
+  will-change: transform, opacity;
 }
 
-.overlay[data-phase="material"] .shot {
+.overlay[data-phase="material-one"] .mediaStage,
+.overlay[data-phase="material-two"] .mediaStage,
+.overlay[data-phase="identity"] .mediaStage,
+.overlay[data-phase="handoff"] .mediaStage {
   opacity: 1;
-}
-
-.overlay[data-phase="material"] .shadeShot,
-.overlay[data-phase="material"] .crochetShot {
   transform: none;
 }
 
-.overlay[data-phase="material"] .heroShot {
-  transform: translate(-22vw, 16vh) rotate(-2deg) scale(0.58);
+.overlay[data-phase="material-one"] .materialImage {
+  opacity: 1;
+  transform: none;
 }
 
-.overlay[data-phase="identity"] .shadeShot {
+.overlay[data-phase="material-two"] .materialImage,
+.overlay[data-phase="identity"] .materialImage,
+.overlay[data-phase="handoff"] .materialImage {
   opacity: 0;
-  transform: translateX(-4rem) rotate(-2deg) scale(0.94);
+  transform: translate3d(-1rem, 0, 0) scale(1.01);
 }
 
-.overlay[data-phase="identity"] .crochetShot {
-  opacity: 0;
-  transform: translateY(4rem) rotate(2deg) scale(0.94);
-}
-
-.overlay[data-phase="identity"] .heroShot {
+.overlay[data-phase="material-two"] .heroImage,
+.overlay[data-phase="identity"] .heroImage,
+.overlay[data-phase="handoff"] .heroImage {
   opacity: 1;
   transform: none;
 }
@@ -329,41 +319,35 @@
 .overlay[data-phase="identity"] .identity,
 .overlay[data-phase="handoff"] .identity {
   opacity: 1;
-  transform: translateY(-50%) translateX(0);
+  transform: translate3d(0, -50%, 0);
 }
 
 .overlay[data-phase="identity"] .logo,
 .overlay[data-phase="handoff"] .logo {
-  transform: none;
-}
-
-.overlay[data-phase="identity"] .identityThread,
-.overlay[data-phase="handoff"] .identityThread {
-  animation: identity-thread-draw var(--motion-duration-cinematic)
-    var(--motion-ease-standard) both;
-}
-
-.overlay[data-phase="identity"] .tensionThread,
-.overlay[data-phase="handoff"] .tensionThread {
-  opacity: 0.18;
-}
-
-.overlay[data-phase="handoff"] {
-  opacity: 0;
-}
-
-.overlay[data-phase="handoff"] .paperField {
-  opacity: 0;
-}
-
-.overlay[data-phase="handoff"] .heroShot {
   opacity: 1;
   transform: none;
 }
 
+.overlay[data-phase="identity"] .wordmarkLine > *,
+.overlay[data-phase="handoff"] .wordmarkLine > * {
+  transform: none;
+}
+
+.overlay[data-phase="identity"] .wordmarkLine:nth-child(2) > * {
+  transition-delay: 70ms;
+}
+
+.overlay[data-phase="handoff"],
 .overlay[data-phase="exiting"] {
   opacity: 0;
-  transition-duration: 240ms;
+}
+
+.overlay[data-profile="full"][data-phase="handoff"] {
+  transition: none;
+}
+
+.overlay[data-phase="exiting"] {
+  transition-duration: 180ms;
   transition-timing-function: var(--motion-ease-exit);
 }
 
@@ -373,141 +357,121 @@
   }
 }
 
-@keyframes identity-thread-draw {
-  to {
-    stroke-dashoffset: 0;
-  }
+/* Compact is an authored mobile cut: one image, one thread, one identity lockup. */
+.overlay[data-profile="compact"] .reelMark {
+  font-size: 0.52rem;
 }
 
-@keyframes skip-enter {
-  from {
-    opacity: 0;
-    transform: translateY(0.6rem);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+.overlay[data-profile="compact"] .threadRig {
+  left: -18%;
+  width: 136%;
 }
 
-@media (max-width: 52rem) {
-  .shadeShot {
-    top: 11%;
-    left: 5%;
-    width: 48vw;
-  }
-
-  .crochetShot {
-    right: 4%;
-    width: 30vw;
-  }
-
-  .heroShot {
-    top: 35%;
-    right: 5%;
-    width: 62vw;
-  }
-
-  .identity {
-    top: 35%;
-    left: 5%;
-    max-width: 52vw;
-    grid-template-columns: 1fr;
-    gap: 0.65rem;
-  }
-
-  .logo {
-    width: 6.4rem;
-    height: 6.4rem;
-  }
-
-  .wordmark span {
-    font-size: clamp(2.6rem, 8vw, 4.5rem);
-  }
+.overlay[data-profile="compact"] .tensionThread {
+  animation-duration: 250ms;
 }
 
-@media (max-width: 35rem) {
-  .reelMark {
-    font-size: 0.52rem;
-  }
-
-  .threadRig {
-    width: 145%;
-    left: -23%;
-  }
-
-  .shadeShot {
-    top: 12%;
-    left: 5%;
-    width: 64vw;
-  }
-
-  .crochetShot {
-    right: 5%;
-    bottom: 9%;
-    width: 42vw;
-  }
-
-  .heroShot {
-    top: 39%;
-    right: 4%;
-    width: 83vw;
-    border-radius: 1.5rem 0.55rem 1.5rem 0.55rem;
-    transform: translate(-8vw, 12vh) rotate(-2deg) scale(0.66);
-  }
-
-  .identity {
-    top: 25%;
-    left: 7%;
-    max-width: 86vw;
-    grid-template-columns: auto 1fr;
-    gap: 0.85rem;
-  }
-
-  .logo {
-    width: 5.7rem;
-    height: 5.7rem;
-  }
-
-  .wordmark span {
-    font-size: clamp(2.55rem, 13vw, 4rem);
-  }
-
-  .wordmark strong {
-    font-size: 0.7rem;
-  }
-
-  .skip {
-    right: auto;
-    left: 50%;
-    animation-name: skip-enter-mobile;
-    transform: translateX(-50%);
-  }
-
-  .skip:is(:hover, :focus-visible) {
-    transform: translateX(-50%) translateY(-0.12rem);
-  }
+.overlay[data-profile="compact"] .mediaStage {
+  top: 38%;
+  right: 5%;
+  width: 90%;
+  aspect-ratio: 6 / 5;
+  transform: translate3d(0, 1rem, 0) scale(0.99);
 }
 
-@keyframes skip-enter-mobile {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(0.6rem);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%);
-  }
+.overlay[data-profile="compact"] .mediaFrame {
+  border-width: 0.3rem;
+  border-radius: 1.5rem 0.55rem 1.5rem 0.55rem;
 }
 
-:global([data-motion-profile="lite"]) .cinemaGrain,
-:global([data-motion-profile="lite"]) .shadeShot,
-:global([data-motion-profile="lite"]) .crochetShot {
+.overlay[data-profile="compact"] .heroImage {
+  opacity: 1;
+}
+
+.overlay[data-profile="compact"] .identity {
+  top: 23%;
+  left: 7%;
+  max-width: 86vw;
+  grid-template-columns: auto 1fr;
+  gap: 0.85rem;
+}
+
+.overlay[data-profile="compact"] .sealLockup {
+  width: 5.6rem;
+  height: 5.6rem;
+}
+
+.overlay[data-profile="compact"] .wordmark strong {
+  font-size: clamp(2.45rem, 12.5vw, 3.8rem);
+}
+
+.overlay[data-profile="compact"] .wordmark em {
+  font-size: 0.7rem;
+}
+
+.overlay[data-profile="compact"] .skip {
+  right: auto;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.overlay[data-profile="compact"] .skip:hover {
+  transform: translateX(-50%) translateY(-0.12rem);
+}
+
+/* Lite is identity first: no editorial media or texture is rendered. */
+.overlay[data-profile="lite"] .reelMark {
   display: none;
 }
 
-:global([data-motion-profile="lite"]) .heroShot {
+.overlay[data-profile="lite"] .threadRig {
+  opacity: 0.52;
+}
+
+.overlay[data-profile="lite"] .tensionThread {
+  stroke-dashoffset: 0;
+  animation: none;
+}
+
+.overlay[data-profile="lite"] .identity {
+  top: 50%;
+  left: 50%;
+  width: min(88vw, 31rem);
+  max-width: none;
+  grid-template-columns: auto 1fr;
   opacity: 1;
+  transform: translate3d(-50%, -50%, 0);
+}
+
+.overlay[data-profile="lite"] .sealLockup {
+  width: 5.8rem;
+  height: 5.8rem;
+}
+
+.overlay[data-profile="lite"] .logo {
+  opacity: 1;
+  transform: none;
+}
+
+.overlay[data-profile="lite"] .sealHalo {
+  transform: scaleX(1);
+}
+
+.overlay[data-profile="lite"] .wordmarkLine > * {
+  transform: none;
+}
+
+.overlay[data-profile="lite"] .wordmark strong {
+  font-size: clamp(2.2rem, 10vw, 3.4rem);
+}
+
+@media (max-width: 48rem) {
+  .mediaFrame figcaption {
+    right: 0.75rem;
+    bottom: 0.65rem;
+    left: 0.75rem;
+    font-size: 0.48rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

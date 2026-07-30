@@ -13,50 +13,112 @@ import styles from "./IntroAnimation.module.css";
 
 const INTRO_PHASES = {
   tension: "tension",
-  material: "material",
+  materialOne: "material-one",
+  materialTwo: "material-two",
   identity: "identity",
   handoff: "handoff",
   exiting: "exiting",
 };
 
-const FULL_TIMELINE = {
-  material: 720,
-  identity: 1_760,
-  handoff: 2_780,
-  complete: 3_520,
-  safety: 4_400,
+const TIMELINES = {
+  full: {
+    initialPhase: INTRO_PHASES.tension,
+    steps: [
+      [INTRO_PHASES.materialOne, 420],
+      [INTRO_PHASES.materialTwo, 840],
+      [INTRO_PHASES.identity, 1_280],
+      [INTRO_PHASES.handoff, 2_380],
+    ],
+    complete: 2_450,
+    safety: 3_000,
+  },
+  compact: {
+    initialPhase: INTRO_PHASES.tension,
+    steps: [
+      [INTRO_PHASES.materialOne, 240],
+      [INTRO_PHASES.identity, 610],
+      [INTRO_PHASES.handoff, 1_080],
+    ],
+    complete: 1_480,
+    safety: 1_950,
+  },
+  lite: {
+    initialPhase: INTRO_PHASES.identity,
+    steps: [[INTRO_PHASES.handoff, 420]],
+    complete: 780,
+    safety: 1_200,
+  },
 };
 
-const LITE_TIMELINE = {
-  material: 340,
-  identity: 760,
-  handoff: 1_180,
-  complete: 1_720,
-  safety: 2_500,
-};
+function readMotionProfile() {
+  if (typeof document === "undefined") return "full";
+  const profile = document.documentElement.dataset.motionProfile;
+  return profile === "compact" || profile === "lite" ? profile : "full";
+}
+
+function clearIntroClasses() {
+  document.body.classList.remove("intro-running", "intro-hold-hero");
+  document.documentElement.classList.remove(
+    "intro-booting",
+    "intro-handoff",
+  );
+}
 
 export default function IntroAnimation() {
+  const [profile] = useState(readMotionProfile);
+  const timeline = TIMELINES[profile];
   const [visible, setVisible] = useState(shouldPlayIntro);
-  const [phase, setPhase] = useState(INTRO_PHASES.tension);
+  const [ready, setReady] = useState(false);
+  const [phase, setPhase] = useState(timeline.initialPhase);
   const skipRef = useRef(null);
+  const previousFocusRef = useRef(null);
   const finishedRef = useRef(false);
-  const timersRef = useRef([]);
+  const heroReleasedRef = useRef(false);
+  const timersRef = useRef(new Set());
+  const rafIdsRef = useRef(new Set());
+
+  const clearTimers = useCallback(() => {
+    for (const timer of timersRef.current) window.clearTimeout(timer);
+    timersRef.current.clear();
+  }, []);
+
+  const clearRafs = useCallback(() => {
+    for (const id of rafIdsRef.current) window.cancelAnimationFrame(id);
+    rafIdsRef.current.clear();
+  }, []);
+
+  const schedule = useCallback((callback, delay) => {
+    const timer = window.setTimeout(() => {
+      timersRef.current.delete(timer);
+      callback();
+    }, delay);
+    timersRef.current.add(timer);
+    return timer;
+  }, []);
 
   const releaseHero = useCallback(() => {
-    document.body.classList.remove("intro-hold-hero");
+    if (heroReleasedRef.current) return;
+    heroReleasedRef.current = true;
     document.documentElement.classList.add("intro-handoff");
-    window.setTimeout(() => {
-      document.documentElement.classList.remove("intro-handoff");
-    }, 1_400);
+    const heroFrame = document.querySelector("[data-home-hero-frame]");
+    for (const animation of heroFrame?.getAnimations() || []) {
+      try {
+        animation.finish();
+      } catch {
+        // A cancelled CSS animation can disappear between query and finish.
+      }
+    }
   }, []);
 
   const finish = useCallback(() => {
     if (finishedRef.current) return;
     finishedRef.current = true;
+    clearTimers();
+    clearRafs();
     rememberIntroPlayback();
-    document.body.classList.remove("intro-running", "intro-hold-hero");
+    clearIntroClasses();
     setVisible(false);
-  }, []);
+  }, [clearRafs, clearTimers]);
 
   const beginHandoff = useCallback(() => {
     if (finishedRef.current) return;
@@ -66,50 +128,76 @@ export default function IntroAnimation() {
 
   const skip = useCallback(() => {
     if (finishedRef.current) return;
-    timersRef.current.forEach((timer) => clearTimeout(timer));
-    timersRef.current = [];
+    clearTimers();
     setPhase(INTRO_PHASES.exiting);
     releaseHero();
-    timersRef.current.push(window.setTimeout(finish, 240));
-  }, [finish, releaseHero]);
+    schedule(finish, 180);
+  }, [clearTimers, finish, releaseHero, schedule]);
 
   useLayoutEffect(() => {
     document.documentElement.classList.remove("intro-booting");
-    if (!visible) return undefined;
+    if (!visible) {
+      clearIntroClasses();
+      return undefined;
+    }
+
+    previousFocusRef.current =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
     document.body.classList.add("intro-running", "intro-hold-hero");
+
+    // Refs are committed before layout effects, so focus ownership is
+    // deterministic before the browser paints the dialog.
+    skipRef.current?.focus({ preventScroll: true });
+
     return () => {
-      document.body.classList.remove("intro-running", "intro-hold-hero");
+      clearIntroClasses();
+      const previousFocus = previousFocusRef.current;
+      if (
+        previousFocus instanceof HTMLElement &&
+        previousFocus.isConnected &&
+        previousFocus !== document.body
+      ) {
+        previousFocus.focus({ preventScroll: true });
+      }
     };
   }, [visible]);
 
   useEffect(() => {
     if (!visible) return undefined;
 
-    rememberIntroPlayback();
-    const previousFocus = document.activeElement;
-    const focusFrame = window.requestAnimationFrame(() => {
-      skipRef.current?.focus({ preventScroll: true });
-    });
-    const timeline =
-      document.documentElement.dataset.motionProfile === "lite"
-        ? LITE_TIMELINE
-        : FULL_TIMELINE;
+    let previous = performance.now();
+    const startedAt = previous;
+    let stableFrames = 0;
 
-    const schedule = (callback, delay) => {
-      const timer = window.setTimeout(callback, delay);
-      timersRef.current.push(timer);
+    const sample = (now) => {
+      const gap = now - previous;
+      previous = now;
+      stableFrames = gap <= 34 ? stableFrames + 1 : 0;
+      if (stableFrames >= 2 || now - startedAt >= 700) {
+        setReady(true);
+        return;
+      }
+      const id = window.requestAnimationFrame(sample);
+      rafIdsRef.current.add(id);
     };
 
-    schedule(() => setPhase(INTRO_PHASES.material), timeline.material);
-    schedule(() => setPhase(INTRO_PHASES.identity), timeline.identity);
-    schedule(beginHandoff, timeline.handoff);
-    schedule(finish, timeline.complete);
-    schedule(finish, timeline.safety);
+    const id = window.requestAnimationFrame(sample);
+    rafIdsRef.current.add(id);
+    return clearRafs;
+  }, [clearRafs, visible]);
+
+  useEffect(() => {
+    if (!visible) return undefined;
+
+    rememberIntroPlayback();
 
     const onKeyDown = (event) => {
       if (event.key === "Escape") {
         event.preventDefault();
         skip();
+        return;
       }
 
       if (event.key === "Tab") {
@@ -118,33 +206,75 @@ export default function IntroAnimation() {
       }
     };
 
+    const onVisibilityChange = () => {
+      if (document.hidden) finish();
+    };
+
     document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
-      timersRef.current.forEach((timer) => clearTimeout(timer));
-      timersRef.current = [];
-      cancelAnimationFrame(focusFrame);
+      clearTimers();
+      clearRafs();
       document.removeEventListener("keydown", onKeyDown);
-      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) {
-        previousFocus.focus({ preventScroll: true });
-      }
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      clearIntroClasses();
     };
-  }, [beginHandoff, finish, skip, visible]);
+  }, [
+    beginHandoff,
+    clearRafs,
+    clearTimers,
+    finish,
+    schedule,
+    skip,
+    timeline,
+    visible,
+  ]);
+
+  useEffect(() => {
+    if (!visible || !ready) return undefined;
+
+    for (const [nextPhase, at] of timeline.steps) {
+      schedule(
+        nextPhase === INTRO_PHASES.handoff
+          ? beginHandoff
+          : () => setPhase(nextPhase),
+        at,
+      );
+    }
+    schedule(finish, timeline.complete);
+    schedule(finish, timeline.safety);
+
+    return clearTimers;
+  }, [
+    beginHandoff,
+    clearTimers,
+    finish,
+    ready,
+    schedule,
+    timeline,
+    visible,
+  ]);
 
   if (!visible) return null;
+
+  const showMaterialCut = profile === "full";
+  const showSharedMedia = profile !== "lite";
 
   return (
     <div
       className={styles.overlay}
       data-phase={phase}
+      data-profile={profile}
+      data-ready={ready ? "true" : "false"}
+      data-cut-duration={timeline.complete}
       role="dialog"
       aria-modal="true"
       aria-label="Fakhri Mart introduction"
     >
       <div className={styles.paperField} aria-hidden="true" />
-      <div className={styles.cinemaGrain} aria-hidden="true" />
       <span className={styles.reelMark} aria-hidden="true">
-        Material study · Pune
+        The maker’s cut · Pune
       </span>
 
       <svg
@@ -155,67 +285,64 @@ export default function IntroAnimation() {
       >
         <path
           className={styles.tensionThread}
-          d="M-60 390 C185 382 287 405 486 373 C680 342 832 366 1260 312"
-          pathLength="1"
-        />
-        <path
-          className={styles.identityThread}
-          d="M-70 448 C175 424 205 198 404 226 C582 252 480 534 692 502 C838 480 718 174 910 198 C1048 214 1036 388 1270 340"
+          d="M-80 392 C216 378 346 414 554 374 C738 338 934 372 1280 308"
           pathLength="1"
         />
       </svg>
 
-      <div className={styles.editorialCut} aria-hidden="true" />
-
-      <div className={styles.materialStage} aria-hidden="true">
-        <figure className={`${styles.shot} ${styles.shadeShot}`}>
-          <img
-            src="/assets/images/editorial/shade-library-640.webp"
-            alt=""
-            width="640"
-            height="427"
-            decoding="async"
-          />
-          <figcaption>Shade library / 01</figcaption>
-        </figure>
-
-        <figure className={`${styles.shot} ${styles.crochetShot}`}>
-          <img
-            src="/assets/images/editorial/crochet-bag-worktable-640.webp"
-            alt=""
-            width="640"
-            height="960"
-            decoding="async"
-          />
-          <figcaption>Maker’s table / 02</figcaption>
-        </figure>
-
-        <figure className={`${styles.shot} ${styles.heroShot}`}>
-          <img
-            src="/assets/images/editorial/atelier-hero-960.webp"
-            alt=""
-            width="960"
-            height="640"
-            fetchPriority="high"
-            decoding="async"
-          />
-          <figcaption>One thread, many beginnings / 03</figcaption>
-        </figure>
-      </div>
+      {showSharedMedia && (
+        <div className={styles.mediaStage} aria-hidden="true">
+          <figure className={styles.mediaFrame}>
+            {showMaterialCut && (
+              <img
+                className={`${styles.mediaImage} ${styles.materialImage}`}
+                src="/assets/images/editorial/shade-library-640.webp"
+                alt=""
+                width="640"
+                height="427"
+                loading="eager"
+                decoding="async"
+              />
+            )}
+            <img
+              className={`${styles.mediaImage} ${styles.heroImage}`}
+              src="/assets/images/editorial/atelier-hero-960.webp"
+              alt=""
+              width="960"
+              height="640"
+              fetchPriority="high"
+              decoding="async"
+            />
+            <figcaption>
+              <span className={styles.cutLabel}>Material study / 01</span>
+              <span className={styles.cutCopy}>
+                Thread, colour, and the hands that make.
+              </span>
+            </figcaption>
+          </figure>
+        </div>
+      )}
 
       <div className={styles.identity}>
         <p className={styles.prelude}>From one thread</p>
-        <figure className={styles.logo}>
-          <img
-            src="/assets/brand/fakhri-logo-256.webp"
-            alt="Fakhri Mart Yarn Store"
-            width="256"
-            height="256"
-          />
-        </figure>
+        <div className={styles.sealLockup}>
+          <span className={styles.sealHalo} aria-hidden="true" />
+          <figure className={styles.logo}>
+            <img
+              src="/assets/brand/fakhri-logo-256.webp"
+              alt="Fakhri Mart Yarn Store"
+              width="256"
+              height="256"
+            />
+          </figure>
+        </div>
         <div className={styles.wordmark}>
-          <span>Fakhri Mart</span>
-          <strong>A world of making.</strong>
+          <span className={styles.wordmarkLine}>
+            <strong>Fakhri Mart</strong>
+          </span>
+          <span className={styles.wordmarkLine}>
+            <em>A world of making.</em>
+          </span>
         </div>
       </div>
 

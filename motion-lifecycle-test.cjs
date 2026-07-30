@@ -15,6 +15,41 @@ async function expectHidden(page, selector, timeout = 1200) {
   );
 }
 
+async function waitForStablePage(page) {
+  await page.waitForLoadState("networkidle");
+  await page.waitForFunction(() => {
+    return (
+      document.documentElement.dataset.motionProfile &&
+      !document.documentElement.classList.contains("intro-booting") &&
+      !document.body.classList.contains("intro-running")
+    );
+  });
+}
+
+async function addIntroPhaseProbe(context) {
+  await context.addInitScript(() => {
+    window.__introPhaseHistory = [];
+    const record = () => {
+      const phase = document
+        .querySelector('[aria-label="Fakhri Mart introduction"]')
+        ?.getAttribute("data-phase");
+      if (
+        phase &&
+        window.__introPhaseHistory.at(-1) !== phase
+      ) {
+        window.__introPhaseHistory.push(phase);
+      }
+    };
+    new MutationObserver(record).observe(document, {
+      attributes: true,
+      attributeFilter: ["data-phase"],
+      childList: true,
+      subtree: true,
+    });
+    record();
+  });
+}
+
 (async () => {
   const browser = await chromium.launch({
     ...(executablePath ? { executablePath } : {}),
@@ -37,12 +72,16 @@ async function expectHidden(page, selector, timeout = 1200) {
     const context = await browser.newContext({
       viewport: { width: 1440, height: 900 },
     });
+    await addIntroPhaseProbe(context);
     const page = await context.newPage();
     await page.goto(`${baseUrl}/?intro=1`, { waitUntil: "domcontentloaded" });
 
     const intro = page.locator('[aria-label="Fakhri Mart introduction"]');
     await intro.waitFor({ state: "visible", timeout: 5000 });
-    check(await intro.getAttribute("data-phase") === "tension", "intro did not begin in tension phase");
+    check(
+      (await page.evaluate(() => window.__introPhaseHistory))[0] === "tension",
+      "intro did not begin in tension phase",
+    );
     check(await page.locator("body").evaluate((node) => node.classList.contains("intro-running")), "body scroll lock was not applied");
     await page.getByRole("button", { name: "Skip intro" }).waitFor({ state: "visible" });
     check(
@@ -83,29 +122,28 @@ async function expectHidden(page, selector, timeout = 1200) {
     const context = await browser.newContext({
       viewport: { width: 1440, height: 900 },
     });
+    await addIntroPhaseProbe(context);
     const page = await context.newPage();
     await page.goto(`${baseUrl}/?intro=1`, { waitUntil: "domcontentloaded" });
-    const phases = new Set();
     await page.waitForSelector('[aria-label="Fakhri Mart introduction"]', { timeout: 5000 });
-
-    const started = Date.now();
-    while (Date.now() - started < 5000) {
-      const phase = await page
-        .locator('[aria-label="Fakhri Mart introduction"]')
-        .getAttribute("data-phase")
-        .catch(() => null);
-      if (phase) phases.add(phase);
-      if (!(await page.locator('[aria-label="Fakhri Mart introduction"]').count())) break;
-      await page.waitForTimeout(90);
-    }
-
-    check(phases.has("material"), "material phase was not observed");
-    check(phases.has("identity"), "identity phase was not observed");
-    check(phases.has("handoff"), "handoff phase was not observed");
-    await expectHidden(page, '[aria-label="Fakhri Mart introduction"]', 1000);
+    await expectHidden(page, '[aria-label="Fakhri Mart introduction"]', 5000);
+    const phaseHistory = await page.evaluate(() => window.__introPhaseHistory);
+    const expectedPhases = [
+      "tension",
+      "material-one",
+      "material-two",
+      "identity",
+      "handoff",
+    ];
+    check(
+      expectedPhases.every(
+        (phase, index) => phaseHistory.indexOf(phase) === index,
+      ),
+      `intro phase order was incomplete: ${phaseHistory.join(" → ")}`,
+    );
 
     await page.goto(`${baseUrl}/`, { waitUntil: "domcontentloaded" });
-    await page.waitForTimeout(700);
+    await waitForStablePage(page);
     check(
       !(await page.locator('[aria-label="Fakhri Mart introduction"]').count()),
       "intro replayed after it had been remembered for the session",
@@ -121,7 +159,7 @@ async function expectHidden(page, selector, timeout = 1200) {
     await context.close();
   });
 
-  await run("reduced and lite profiles", async () => {
+  await run("reduced, compact and lite profile-specific cuts", async () => {
     const reduced = await browser.newContext({
       viewport: { width: 1440, height: 900 },
       reducedMotion: "reduce",
@@ -138,16 +176,57 @@ async function expectHidden(page, selector, timeout = 1200) {
     );
     await reduced.close();
 
+    const compact = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+      isMobile: true,
+      hasTouch: true,
+    });
+    const compactPage = await compact.newPage();
+    await compactPage.goto(`${baseUrl}/?intro=1`, {
+      waitUntil: "domcontentloaded",
+    });
+    const compactIntro = compactPage.locator(
+      '[aria-label="Fakhri Mart introduction"]',
+    );
+    await compactIntro.waitFor({ state: "visible" });
+    check(
+      await compactIntro.getAttribute("data-profile") === "compact",
+      "mobile intro did not use the compact cut",
+    );
+    check(
+      (await compactIntro.locator("img").count()) === 2,
+      "compact cut rendered more than one editorial image plus the logo",
+    );
+    check(
+      Number(await compactIntro.getAttribute("data-cut-duration")) <= 1700,
+      "compact cut is configured beyond the 1.2–1.7 second budget",
+    );
+    await compactIntro.waitFor({ state: "detached", timeout: 3000 });
+    await compact.close();
+
     const lite = await browser.newContext({ viewport: { width: 1440, height: 900 } });
     await lite.addInitScript(() => {
       Object.defineProperty(navigator, "deviceMemory", { configurable: true, get: () => 1 });
     });
     const litePage = await lite.newPage();
-    await litePage.goto(`${baseUrl}/`, { waitUntil: "domcontentloaded" });
+    await litePage.goto(`${baseUrl}/?intro=1`, { waitUntil: "domcontentloaded" });
+    const liteIntro = litePage.locator(
+      '[aria-label="Fakhri Mart introduction"]',
+    );
+    await liteIntro.waitFor({ state: "visible" });
     check(
       await litePage.locator("html").getAttribute("data-motion-profile") === "lite",
       "low-memory device did not select the lite profile",
     );
+    check(
+      (await liteIntro.locator("img").count()) === 1,
+      "lite cut rendered editorial media instead of identity only",
+    );
+    check(
+      Number(await liteIntro.getAttribute("data-cut-duration")) <= 1000,
+      "lite cut is configured beyond the 0.6–1.0 second budget",
+    );
+    await liteIntro.waitFor({ state: "detached", timeout: 2000 });
     await lite.close();
   });
 
@@ -202,7 +281,14 @@ async function expectHidden(page, selector, timeout = 1200) {
       "search input did not receive focus",
     );
     await page.keyboard.press("Escape");
-    await page.waitForTimeout(350);
+    await page.waitForFunction(() => {
+      return (
+        !document
+          .querySelector(".search-dialog-backdrop")
+          ?.classList.contains("is-open") &&
+        !document.body.classList.contains("dialog-lock")
+      );
+    });
     check(!(await page.locator(".search-dialog-backdrop").evaluate((node) => node.classList.contains("is-open"))), "search backdrop remained open");
     check(!(await page.locator("body").evaluate((node) => node.classList.contains("dialog-lock"))), "search dialog left body locked");
     await desktop.close();
@@ -222,10 +308,75 @@ async function expectHidden(page, selector, timeout = 1200) {
     await drawer.waitFor({ state: "visible" });
     check(await drawer.getAttribute("aria-hidden") === "false", "mobile drawer did not enter");
     await mobilePage.keyboard.press("Escape");
-    await mobilePage.waitForTimeout(350);
+    await mobilePage.waitForFunction(() => {
+      return (
+        document
+          .querySelector(".mobile-nav-drawer")
+          ?.getAttribute("aria-hidden") === "true" &&
+        !document.body.classList.contains("menu-lock")
+      );
+    });
     check(await drawer.getAttribute("aria-hidden") === "true", "mobile drawer did not exit");
     check(!(await mobilePage.locator("body").evaluate((node) => node.classList.contains("menu-lock"))), "mobile drawer left body locked");
     await mobile.close();
+  });
+
+  await run("gallery lightbox focus, navigation and cleanup", async () => {
+    const context = await browser.newContext({
+      viewport: { width: 1440, height: 900 },
+    });
+    await context.addInitScript(() =>
+      sessionStorage.setItem("fakhri_intro_cinematic_v1", "played"),
+    );
+    const page = await context.newPage();
+    await page.goto(`${baseUrl}/gallery`, { waitUntil: "networkidle" });
+    const trigger = page.getByRole("button", {
+      name: /Open From yarn to a finished bag/,
+    });
+    await trigger.click();
+    const dialog = page.getByRole("dialog", {
+      name: "Fullscreen gallery",
+    });
+    await dialog.waitFor({ state: "visible" });
+    check(
+      await dialog.evaluate((node) => node.parentElement === document.body),
+      "lightbox was trapped inside the transformed route stage",
+    );
+    check(
+      await page
+        .getByRole("button", { name: "Close Lightbox" })
+        .evaluate((node) => node === document.activeElement),
+      "lightbox close control did not receive focus",
+    );
+
+    await page.keyboard.press("ArrowRight");
+    await page.waitForFunction(() =>
+      document.body.textContent.includes("2 / 6: Colour-rich yarn ranges"),
+    );
+    await page.getByRole("button", { name: "Close Lightbox" }).focus();
+    await page.keyboard.press("Shift+Tab");
+    check(
+      await page
+        .getByRole("button", { name: "Next Image" })
+        .evaluate((node) => node === document.activeElement),
+      "lightbox focus trap did not wrap backward",
+    );
+
+    await page.keyboard.press("Escape");
+    await dialog.waitFor({ state: "detached" });
+    check(
+      await trigger.evaluate((node) => node === document.activeElement),
+      "lightbox did not restore focus to its trigger",
+    );
+    check(
+      await page.locator("body").evaluate(
+        (node) =>
+          !node.classList.contains("dialog-lock") &&
+          node.style.overflow !== "hidden",
+      ),
+      "lightbox left a body lock behind",
+    );
+    await context.close();
   });
 
   await run("catalogue filtering and detail feedback", async () => {
@@ -239,7 +390,9 @@ async function expectHidden(page, selector, timeout = 1200) {
     await page.goto(`${baseUrl}/products`, { waitUntil: "networkidle" });
     const firstBefore = await page.locator("[data-product-key]").first().getAttribute("data-product-key");
     await page.locator("#product-sort-select").selectOption("name-asc");
-    await page.waitForTimeout(500);
+    await page.waitForFunction(
+      () => document.querySelector("#product-sort-select")?.value === "name-asc",
+    );
     const firstAfter = await page.locator("[data-product-key]").first().getAttribute("data-product-key");
     check(firstBefore && firstAfter, "catalogue items disappeared after sorting");
     check(

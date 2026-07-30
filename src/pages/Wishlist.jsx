@@ -5,6 +5,7 @@ import {
   Trash,
 } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 import { useWishlist } from "../hooks/useWishlist.js";
 import { featuredProducts, createWhatsAppLink } from "../data/siteData.js";
 import { smartWhatsAppLink } from "../i18n.jsx";
@@ -18,7 +19,36 @@ export default function Wishlist() {
     description: "Your saved favourite yarns and craft products.",
     canonical: "/wishlist",
   });
-  const { wishlist, remove, clear, count } = useWishlist();
+  const { wishlist, add, remove, clear, count } = useWishlist();
+  const [recovery, setRecovery] = useState(null);
+  const recoveryTimerRef = useRef(null);
+
+  useEffect(() => {
+    return () => window.clearTimeout(recoveryTimerRef.current);
+  }, []);
+
+  const offerRecovery = (slugs, message) => {
+    window.clearTimeout(recoveryTimerRef.current);
+    setRecovery({ slugs, message });
+    recoveryTimerRef.current = window.setTimeout(() => setRecovery(null), 5_000);
+  };
+
+  const removeWithRecovery = (product) => {
+    remove(product.slug);
+    offerRecovery([product.slug], `${product.name} removed from your wishlist.`);
+  };
+
+  const clearWithRecovery = () => {
+    const removedSlugs = [...wishlist];
+    clear();
+    offerRecovery(removedSlugs, "Wishlist cleared.");
+  };
+
+  const undoRecovery = () => {
+    for (const slug of recovery?.slugs || []) add(slug);
+    window.clearTimeout(recoveryTimerRef.current);
+    setRecovery(null);
+  };
 
   const wishlistProducts = wishlist
     .map((slug) => featuredProducts.find((p) => p.slug === slug))
@@ -106,7 +136,7 @@ export default function Wishlist() {
                   </a>
                   <button
                     type="button"
-                    onClick={clear}
+                    onClick={clearWithRecovery}
                     className="btn btn-outline btn-small"
                     style={{ color: "var(--pink-dark)" }}
                     aria-label="Clear all wishlist items"
@@ -120,8 +150,17 @@ export default function Wishlist() {
               {/* Product grid */}
               <div className="card-grid product-grid">
                   {wishlistProducts.map((product) => (
-                    <div key={product.slug}>
-                      <ProductCard product={product} />
+                    <div key={product.slug} className="wishlist-card-shell">
+                      <ProductCard product={product} showWishlistAction={false} />
+                      <button
+                        type="button"
+                        className="wishlist-remove-action"
+                        onClick={() => removeWithRecovery(product)}
+                        aria-label={`Remove ${product.name} from wishlist`}
+                      >
+                        <Trash size={15} aria-hidden="true" />
+                        Remove
+                      </button>
                     </div>
                   ))}
               </div>
@@ -129,6 +168,12 @@ export default function Wishlist() {
           )}
         </div>
       </section>
+      {recovery ? (
+        <div className="wishlist-recovery-toast" role="status" aria-live="polite">
+          <span>{recovery.message}</span>
+          <button type="button" onClick={undoRecovery}>Undo</button>
+        </div>
+      ) : null}
     </>
   );
 }

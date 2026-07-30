@@ -1,6 +1,7 @@
 import { ArrowRight } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
 import PageHero from "../components/PageHero.jsx";
+import Reveal from "../components/Reveal.jsx";
 import { blogPosts } from "../data/siteData.js";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
 
@@ -29,7 +30,13 @@ export default function Blog() {
       <section className="section">
         <div className="container blog-editorial-list">
           {blogPosts.map((post, index) => (
-            <article key={post.slug} className={index === 0 ? "blog-featured" : ""}>
+            <Reveal
+              as="article"
+              key={post.slug}
+              className={`blog-story-card ${index === 0 ? "blog-featured" : ""}`}
+              delay={Math.min(index * 55, 110)}
+              variant={index === 0 ? "scale-in" : index % 2 ? "slide-right" : "slide-left"}
+            >
               <Link
                 to={`/blog/${post.slug}`}
                 className="blog-image-link"
@@ -51,7 +58,7 @@ export default function Blog() {
                   Read the guide <ArrowRight size={18} />
                 </Link>
               </div>
-            </article>
+            </Reveal>
           ))}
         </div>
       </section>

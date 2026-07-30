@@ -19,12 +19,14 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
   const [compiledMessage, setCompiledMessage] = useState("");
   const [copied, setCopied] = useState(false);
   const submitTimer = useRef(null);
+  const copyTimer = useRef(null);
 
   const hasBasket = basket && basket.length > 0;
 
   useEffect(() => {
     return () => {
       if (submitTimer.current) window.clearTimeout(submitTimer.current);
+      if (copyTimer.current) window.clearTimeout(copyTimer.current);
     };
   }, []);
 
@@ -77,26 +79,26 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
     setWhatsappLink(link);
     setCompiledMessage(message);
 
+    window.open(link, "_blank", "noopener,noreferrer");
+
     submitTimer.current = window.setTimeout(() => {
       setSubmitting(false);
       setSubmitted(true);
-      
-      // Auto-open WhatsApp with the enquiry details
-      window.open(link, "_blank");
 
       // Clear the basket if callback is present
       if (hasBasket && onClearBasket) {
         onClearBasket();
       }
       form.reset();
-    }, 650);
+    }, 240);
   }
 
   const handleCopySummary = () => {
     if (compiledMessage) {
       navigator.clipboard.writeText(compiledMessage);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      window.clearTimeout(copyTimer.current);
+      copyTimer.current = window.setTimeout(() => setCopied(false), 2_000);
     }
   };
 

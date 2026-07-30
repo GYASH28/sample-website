@@ -29,7 +29,11 @@ import { smartWhatsAppLink } from "../i18n.jsx";
 
 const MAX_SWATCHES_ON_CARD = 5;
 
-export default function ProductCard({ product, compact = false }) {
+export default function ProductCard({
+  product,
+  compact = false,
+  showWishlistAction = true,
+}) {
   const categoryData = productCategories.find((c) => c.name === product.category);
   const productBaseImage = product.image || categoryData?.image;
 
@@ -94,7 +98,8 @@ export default function ProductCard({ product, compact = false }) {
 
       <div className="product-card-link-wrapper-container">
         {/* Floating Quick Action Buttons on Image */}
-        <div className="product-card-floating-actions">
+        {showWishlistAction ? (
+          <div className="product-card-floating-actions">
           {/* Favorite Toggle */}
           <button
             type="button"
@@ -114,7 +119,8 @@ export default function ProductCard({ product, compact = false }) {
               aria-hidden="true"
             />
           </button>
-        </div>
+          </div>
+        ) : null}
 
         <div className="product-card-link-wrapper">
           {productBaseImage && (
