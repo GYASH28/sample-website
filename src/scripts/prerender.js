@@ -1,8 +1,6 @@
 // src/scripts/prerender.js
-// Phase 4.6 — Playwright-based prerendering.
-// Boots the preview server, visits each route, writes fully-rendered HTML back into
-// dist/ so crawlers and link-preview bots that don't execute JS see real content
-// + JSON-LD + meta tags.
+// Playwright-based prerendering. The __prerender flag explicitly disables the
+// client-only opening film so generated HTML always contains stable page content.
 
 import { chromium } from "playwright";
 import { existsSync, writeFileSync, mkdirSync } from "node:fs";
@@ -25,9 +23,6 @@ const staticRoutes = ["/", "/products", "/gallery", "/about", "/contact", "/blog
 const productRoutes = featuredProducts.map((p) => `/products/${p.slug}`);
 const blogRoutes = blogPosts.map((p) => `/blog/${p.slug}`);
 const allRoutes = [...staticRoutes, ...productRoutes, ...blogRoutes];
-
-// Phase 5 item 5: Vercel/CI skip condition REMOVED — prerender must ALWAYS run during build
-// so crawlers and link-preview bots see real HTML with JSON-LD + meta tags.
 
 let preview;
 try {
@@ -78,10 +73,19 @@ try {
   let failCount = 0;
 
   for (const route of allRoutes) {
-    const url = `http://localhost:4173${route}`;
+    const url = new URL(route, "http://localhost:4173");
+    url.searchParams.set("__prerender", "1");
+
     try {
-      await page.goto(url, { waitUntil: "networkidle", timeout: 15000 });
-      await page.waitForTimeout(500); // allow hydration to write JSON-LD + meta tags
+      await page.goto(url.toString(), { waitUntil: "networkidle", timeout: 15000 });
+      await page.waitForSelector("#main-content", { state: "attached", timeout: 5000 });
+      await page.waitForTimeout(150); // JSON-LD and document metadata effects
+
+      // Never persist transient boot/intro state into generated HTML.
+      await page.evaluate(() => {
+        document.documentElement.classList.remove("intro-boot-pending");
+        document.body.classList.remove("intro-video-running");
+      });
 
       const html = await page.content();
       const finalPath =
@@ -102,12 +106,9 @@ try {
   await browser.close();
   console.log(`\n✓ Prerendered: ${successCount} routes succeeded, ${failCount} failed.`);
   process.exit(failCount > 0 ? 1 : 0);
-
 } catch (error) {
   console.error(`✗ Prerender process failed: ${error.message}`);
   process.exit(1);
 } finally {
-  if (preview) {
-    preview.kill();
-  }
+  if (preview) preview.kill();
 }
