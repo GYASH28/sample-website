@@ -2,13 +2,13 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
-  Baby,
   CheckCircle2,
-  Flower2,
-  Handbag,
+  Heart,
   MessageCircle,
   Scissors,
+  ShoppingBag,
   Sparkles,
+  Wand2,
 } from "lucide-react";
 import PageHero from "../components/PageHero.jsx";
 import ProductVisual from "../components/ProductVisual.jsx";
@@ -33,7 +33,7 @@ const PROJECTS = [
     id: "knitting",
     label: "Knitting",
     tag: "Knitting",
-    icon: Baby,
+    icon: Heart,
     summary: "For babywear, scarves, sweaters, blankets and soft knitted pieces.",
     recommendations: ["Soft yarn with consistent thickness", "Ply or weight suitable for the pattern", "Enough quantity from one shade lot", "Needle-size guidance"],
     ask: "I am making a knitted project",
@@ -42,7 +42,7 @@ const PROJECTS = [
     id: "macrame",
     label: "Macrame & Baskets",
     tag: "Macrame",
-    icon: Flower2,
+    icon: Wand2,
     summary: "For plant hangers, wall decor, baskets and structured handmade pieces.",
     recommendations: ["Single or twisted macrame cord", "3 mm or 4 mm based on structure", "Natural or coloured cord", "Roll quantity for the full project"],
     ask: "I am making a macrame or basket project",
@@ -51,7 +51,7 @@ const PROJECTS = [
     id: "bags",
     label: "Bag Making",
     tag: "Bag Making",
-    icon: Handbag,
+    icon: ShoppingBag,
     summary: "For crochet bags, purses, clutches, bases, handles and finishing hardware.",
     recommendations: ["T-shirt yarn or sturdy cord", "Compatible base and handle size", "Locks, rings, magnets or charms", "Matching accessory colour"],
     ask: "I am making a bag or purse",
