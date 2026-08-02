@@ -2,238 +2,95 @@
   position: fixed;
   z-index: calc(var(--z-dialog) + 2);
   inset: 0;
+  display: grid;
+  place-items: center;
   overflow: hidden;
-  background: #452735;
-  color: #fffaf7;
+  background: #fff7ec;
+  color: #1f1b16;
   isolation: isolate;
+  opacity: 1;
   transition: opacity 360ms var(--motion-ease-standard);
+}
+
+.exiting {
+  opacity: 0;
+  pointer-events: none;
 }
 
 :global(body.intro-running) {
   overflow: hidden;
+  overscroll-behavior: none;
 }
 
-.paperField {
+.ambient {
   position: absolute;
   z-index: -2;
-  inset: 0;
+  inset: -12%;
   background:
-    radial-gradient(circle at 11% 18%, rgba(216, 137, 161, 0.17), transparent 30rem),
-    linear-gradient(112deg, #3c202d 0 48%, #452735 48% 100%);
+    radial-gradient(circle at 13% 20%, rgba(217, 165, 179, 0.34), transparent 33%),
+    radial-gradient(circle at 87% 18%, rgba(42, 140, 130, 0.25), transparent 34%),
+    linear-gradient(145deg, #fff7ec, #f7efe0 58%, #fff2ef);
 }
 
-.reelMark {
-  position: absolute;
-  z-index: 6;
-  top: max(1.25rem, env(safe-area-inset-top));
-  left: max(1.25rem, env(safe-area-inset-left));
-  color: rgba(255, 250, 247, 0.62);
-  font-size: 0.6rem;
-  font-weight: 720;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-}
-
-.threadRig {
-  position: absolute;
-  z-index: 5;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  pointer-events: none;
-}
-
-.tensionThread {
-  fill: none;
-  stroke: #f2eadf;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  stroke-linecap: round;
-  stroke-width: 2.2;
-  vector-effect: non-scaling-stroke;
-  stroke-dashoffset: 1;
-}
-
-.overlay[data-ready="true"] .tensionThread {
-  animation: tension-draw 430ms var(--motion-ease-emphasis) 20ms both;
-}
-
-.mediaStage {
-  position: absolute;
-  z-index: 2;
-  top: 16%;
-  right: 6%;
-  width: min(44rem, 46vw);
-  aspect-ratio: 6 / 5;
-  opacity: 0;
-  pointer-events: none;
-  transform: translate3d(2.2rem, 0, 0) scale(0.985);
-  transition:
-    opacity 260ms var(--motion-ease-direct),
-    transform 480ms var(--motion-ease-emphasis);
-}
-
-.mediaFrame {
-  position: absolute;
-  inset: 0;
-  margin: 0;
-  overflow: hidden;
-  border: 0.38rem solid rgba(255, 253, 249, 0.92);
-  border-radius: 2.25rem 0.75rem 2.25rem 0.75rem;
-  background: #d8c9c0;
-  box-shadow: 0 2rem 5rem rgba(26, 9, 18, 0.2);
-}
-
-.mediaImage {
+.video {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition:
-    opacity 240ms var(--motion-ease-direct),
-    transform 340ms var(--motion-ease-emphasis);
-}
-
-.materialImage {
+  object-position: center;
   opacity: 0;
-  transform: translate3d(1.2rem, 0, 0) scale(1.025);
+  transform: scale(1.005);
+  transition: opacity 320ms var(--motion-ease-standard);
 }
 
-.heroImage {
-  opacity: 0;
-  transform: translate3d(1.2rem, 0, 0) scale(1.018);
+.videoReady {
+  opacity: 1;
 }
 
-.mediaFrame figcaption {
-  position: absolute;
-  z-index: 2;
-  right: 1rem;
-  bottom: 0.85rem;
-  left: 1rem;
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  color: rgba(255, 255, 255, 0.92);
-  font-size: 0.55rem;
-  font-weight: 700;
-  letter-spacing: 0.055em;
-  text-shadow: 0 0.1rem 0.8rem rgba(20, 8, 14, 0.55);
-  text-transform: uppercase;
-}
-
-.cutCopy {
-  text-align: right;
-}
-
-.identity {
-  position: absolute;
-  z-index: 4;
-  top: 50%;
-  left: clamp(2rem, 7vw, 7rem);
-  display: grid;
-  max-width: min(39rem, 43vw);
-  grid-template-columns: auto 1fr;
-  gap: 1.2rem;
-  align-items: center;
-  opacity: 0;
-  transform: translate3d(-1rem, -50%, 0);
-  transition:
-    opacity 220ms var(--motion-ease-direct),
-    transform 420ms var(--motion-ease-emphasis);
-}
-
-.prelude {
-  position: absolute;
-  bottom: calc(100% + 1rem);
-  left: 0;
-  margin: 0;
-  color: #d8f1ee;
-  font-size: 0.62rem;
-  font-weight: 750;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-.prelude::after {
-  display: inline-block;
-  width: 3rem;
-  height: 1px;
-  margin-left: 0.7rem;
-  vertical-align: middle;
-  background: #d889a1;
-  content: "";
-}
-
-.sealLockup {
+.loading {
   position: relative;
+  z-index: 2;
   display: grid;
-  width: clamp(6.8rem, 10vw, 9rem);
-  height: clamp(6.8rem, 10vw, 9rem);
   place-items: center;
+  gap: 18px;
+  opacity: 1;
+  transition: opacity 240ms ease;
 }
 
-.sealHalo {
-  position: absolute;
-  inset: -0.5rem;
-  border-block: 1px solid rgba(216, 137, 161, 0.8);
-  transform: scaleX(1);
+.loadingHidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
-.logo {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  overflow: hidden;
-  border: 0.3rem solid rgba(255, 255, 255, 0.9);
-  border-radius: 50%;
-  background: #fffdf9;
-  box-shadow: 0 1.5rem 4rem rgba(23, 8, 15, 0.24);
-  transform: translate3d(-0.8rem, 0, 0) rotate(-7deg) scale(0.94);
-  transition: transform 420ms var(--motion-ease-emphasis);
+.loading img {
+  width: clamp(96px, 12vw, 150px);
+  height: auto;
+  filter: drop-shadow(0 18px 34px rgba(67, 52, 43, 0.16));
+  animation: logo-breath 1.6s ease-in-out infinite alternate;
 }
 
-.logo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.wordmark {
-  display: grid;
-  gap: 0.58rem;
-}
-
-.wordmarkLine {
+.loading span {
   display: block;
+  width: 84px;
+  height: 2px;
   overflow: hidden;
+  border-radius: 999px;
+  background: rgba(42, 140, 130, 0.18);
 }
 
-.wordmarkLine > * {
+.loading span::after {
   display: block;
-  transform: translate3d(0, 108%, 0);
-  transition: transform 420ms var(--motion-ease-emphasis);
-}
-
-.wordmark strong {
-  font-family: var(--font-display);
-  font-size: clamp(2.7rem, 5.2vw, 6rem);
-  font-variation-settings: "wdth" 88, "wght" 690;
-  letter-spacing: -0.065em;
-  line-height: 0.88;
-}
-
-.wordmark em {
-  color: #f8dde6;
-  font-size: clamp(0.78rem, 1.3vw, 1rem);
-  font-style: normal;
-  font-weight: 650;
-  letter-spacing: 0.05em;
+  width: 42%;
+  height: 100%;
+  border-radius: inherit;
+  background: #2a8c82;
+  content: "";
+  animation: thread-load 1.1s var(--motion-ease-emphasis) infinite;
 }
 
 .skip {
-  position: absolute;
+  position: fixed;
   z-index: 8;
   right: max(1.25rem, env(safe-area-inset-right));
   bottom: max(1.25rem, env(safe-area-inset-bottom));
@@ -242,13 +99,15 @@
   padding: 0.35rem 0.4rem 0.35rem 1rem;
   gap: 0.75rem;
   align-items: center;
-  border: 1px solid rgba(255, 250, 247, 0.34);
+  border: 1px solid rgba(31, 27, 22, 0.18);
   border-radius: 999px;
-  background: rgba(69, 39, 53, 0.94);
-  color: #fffaf7;
+  background: rgba(255, 247, 236, 0.84);
+  box-shadow: 0 12px 34px rgba(67, 52, 43, 0.13);
+  color: #32302d;
   font-size: 0.72rem;
-  font-weight: 700;
-  opacity: 1;
+  font-weight: 720;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   transition:
     background-color var(--motion-duration-direct) var(--motion-ease-direct),
     transform var(--motion-duration-direct) var(--motion-ease-standard);
@@ -260,15 +119,14 @@
   height: 2.1rem;
   place-items: center;
   border-radius: 50%;
-  background: #f8dde6;
-  color: #452735;
+  background: #2a8c82;
+  color: #fff;
   font-style: normal;
-  transition: transform var(--motion-duration-direct)
-    var(--motion-ease-emphasis);
+  transition: transform var(--motion-duration-direct) var(--motion-ease-emphasis);
 }
 
 .skip:hover {
-  background: #3c202d;
+  background: rgba(255, 247, 236, 0.98);
   transform: translateY(-0.12rem);
 }
 
@@ -277,206 +135,40 @@
 }
 
 .skip:focus-visible {
-  outline: 0.2rem solid #c78d52;
+  outline: 0.2rem solid rgba(42, 140, 130, 0.48);
   outline-offset: 0.25rem;
 }
 
-.overlay[data-ready="true"][data-phase="tension"] .threadRig,
-.overlay[data-phase="material-one"] .mediaStage,
-.overlay[data-phase="material-two"] :is(.materialImage, .heroImage),
-.overlay[data-phase="identity"] .identity,
-.overlay[data-phase="handoff"] {
-  will-change: transform, opacity;
+@keyframes logo-breath {
+  from { transform: scale(0.98); opacity: 0.82; }
+  to { transform: scale(1.02); opacity: 1; }
 }
 
-.overlay[data-phase="material-one"] .mediaStage,
-.overlay[data-phase="material-two"] .mediaStage,
-.overlay[data-phase="identity"] .mediaStage,
-.overlay[data-phase="handoff"] .mediaStage {
-  opacity: 1;
-  transform: none;
+@keyframes thread-load {
+  from { transform: translateX(-110%); }
+  to { transform: translateX(250%); }
 }
 
-.overlay[data-phase="material-one"] .materialImage {
-  opacity: 1;
-  transform: none;
-}
-
-.overlay[data-phase="material-two"] .materialImage,
-.overlay[data-phase="identity"] .materialImage,
-.overlay[data-phase="handoff"] .materialImage {
-  opacity: 0;
-  transform: translate3d(-1rem, 0, 0) scale(1.01);
-}
-
-.overlay[data-phase="material-two"] .heroImage,
-.overlay[data-phase="identity"] .heroImage,
-.overlay[data-phase="handoff"] .heroImage {
-  opacity: 1;
-  transform: none;
-}
-
-.overlay[data-phase="identity"] .identity,
-.overlay[data-phase="handoff"] .identity {
-  opacity: 1;
-  transform: translate3d(0, -50%, 0);
-}
-
-.overlay[data-phase="identity"] .logo,
-.overlay[data-phase="handoff"] .logo {
-  opacity: 1;
-  transform: none;
-}
-
-.overlay[data-phase="identity"] .wordmarkLine > *,
-.overlay[data-phase="handoff"] .wordmarkLine > * {
-  transform: none;
-}
-
-.overlay[data-phase="identity"] .wordmarkLine:nth-child(2) > * {
-  transition-delay: 70ms;
-}
-
-.overlay[data-phase="handoff"],
-.overlay[data-phase="exiting"] {
-  opacity: 0;
-}
-
-.overlay[data-profile="full"][data-phase="handoff"] {
-  transition: none;
-}
-
-.overlay[data-phase="exiting"] {
-  transition-duration: 180ms;
-  transition-timing-function: var(--motion-ease-exit);
-}
-
-@keyframes tension-draw {
-  to {
-    stroke-dashoffset: 0;
+@media (orientation: portrait), (max-width: 48rem) {
+  .video {
+    object-fit: contain;
+    transform: none;
   }
-}
 
-/* Compact is an authored mobile cut: one image, one thread, one identity lockup. */
-.overlay[data-profile="compact"] .reelMark {
-  font-size: 0.52rem;
-}
-
-.overlay[data-profile="compact"] .threadRig {
-  left: -18%;
-  width: 136%;
-}
-
-.overlay[data-profile="compact"] .tensionThread {
-  animation-duration: 250ms;
-}
-
-.overlay[data-profile="compact"] .mediaStage {
-  top: 38%;
-  right: 5%;
-  width: 90%;
-  aspect-ratio: 6 / 5;
-  transform: translate3d(0, 1rem, 0) scale(0.99);
-}
-
-.overlay[data-profile="compact"] .mediaFrame {
-  border-width: 0.3rem;
-  border-radius: 1.5rem 0.55rem 1.5rem 0.55rem;
-}
-
-.overlay[data-profile="compact"] .heroImage {
-  opacity: 1;
-}
-
-.overlay[data-profile="compact"] .identity {
-  top: 23%;
-  left: 7%;
-  max-width: 86vw;
-  grid-template-columns: auto 1fr;
-  gap: 0.85rem;
-}
-
-.overlay[data-profile="compact"] .sealLockup {
-  width: 5.6rem;
-  height: 5.6rem;
-}
-
-.overlay[data-profile="compact"] .wordmark strong {
-  font-size: clamp(2.45rem, 12.5vw, 3.8rem);
-}
-
-.overlay[data-profile="compact"] .wordmark em {
-  font-size: 0.7rem;
-}
-
-.overlay[data-profile="compact"] .skip {
-  right: auto;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.overlay[data-profile="compact"] .skip:hover {
-  transform: translateX(-50%) translateY(-0.12rem);
-}
-
-/* Lite is identity first: no editorial media or texture is rendered. */
-.overlay[data-profile="lite"] .reelMark {
-  display: none;
-}
-
-.overlay[data-profile="lite"] .threadRig {
-  opacity: 0.52;
-}
-
-.overlay[data-profile="lite"] .tensionThread {
-  stroke-dashoffset: 0;
-  animation: none;
-}
-
-.overlay[data-profile="lite"] .identity {
-  top: 50%;
-  left: 50%;
-  width: min(88vw, 31rem);
-  max-width: none;
-  grid-template-columns: auto 1fr;
-  opacity: 1;
-  transform: translate3d(-50%, -50%, 0);
-}
-
-.overlay[data-profile="lite"] .sealLockup {
-  width: 5.8rem;
-  height: 5.8rem;
-}
-
-.overlay[data-profile="lite"] .logo {
-  opacity: 1;
-  transform: none;
-}
-
-.overlay[data-profile="lite"] .sealHalo {
-  transform: scaleX(1);
-}
-
-.overlay[data-profile="lite"] .wordmarkLine > * {
-  transform: none;
-}
-
-.overlay[data-profile="lite"] .wordmark strong {
-  font-size: clamp(2.2rem, 10vw, 3.4rem);
-}
-
-@media (max-width: 48rem) {
-  .mediaFrame figcaption {
-    right: 0.75rem;
-    bottom: 0.65rem;
-    left: 0.75rem;
-    font-size: 0.48rem;
+  .skip {
+    right: max(0.9rem, env(safe-area-inset-right));
+    bottom: max(0.9rem, env(safe-area-inset-bottom));
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .overlay {
     display: none;
+  }
+
+  .loading img,
+  .loading span::after {
+    animation: none;
   }
 }
 
