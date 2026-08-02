@@ -67,9 +67,6 @@ export function localBusinessJsonLd(info = businessInfo) {
     image: `${PUBLIC_SITE_URL}/assets/images/products/cotton-dreamz/hero.webp`,
     telephone: info.phoneDisplay,
     email: info.email,
-    priceRange: "₹₹",
-    currenciesAccepted: "INR",
-    paymentAccepted: "Cash, UPI, bank transfer",
     hasMap: googlePresence.mapsUrl,
     address: {
       "@type": "PostalAddress",
@@ -137,11 +134,6 @@ export function websiteJsonLd() {
     name: businessInfo.name,
     url: PUBLIC_SITE_URL,
     publisher: { "@id": `${PUBLIC_SITE_URL}/#store` },
-    potentialAction: {
-      "@type": "SearchAction",
-      target: `${PUBLIC_SITE_URL}/products?q={search_term_string}`,
-      "query-input": "required name=search_term_string",
-    },
   };
 }
 
