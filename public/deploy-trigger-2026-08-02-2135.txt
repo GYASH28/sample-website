@@ -1,0 +1,2 @@
+Vercel deployment trigger for the verified feature/video-intro branch.
+Triggered on 2026-08-02 at 21:35 IST.
