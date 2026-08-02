@@ -4,6 +4,7 @@ const defaults = {
   title: "Fakhri Mart | Yarn Store & Craft Supplier",
   description:
     "Fakhri Mart offers yarns, crochet threads, macrame cords, embroidery threads, beads, purse accessories, bases, handles and craft essentials with all-India delivery and bulk enquiry support.",
+  image: "/assets/images/products/cotton-dreamz/hero.webp",
 };
 
 function setMeta(name, content, attr = "name") {
@@ -16,6 +17,10 @@ function setMeta(name, content, attr = "name") {
   el.setAttribute("content", content);
 }
 
+function absoluteUrl(value) {
+  return new URL(value || "/", window.location.origin).href;
+}
+
 function setCanonical(pathname) {
   let el = document.querySelector('link[rel="canonical"]');
   if (!el) {
@@ -23,16 +28,17 @@ function setCanonical(pathname) {
     el.setAttribute("rel", "canonical");
     document.head.appendChild(el);
   }
-  el.setAttribute("href", `${window.location.origin}${pathname}`);
+  const href = absoluteUrl(pathname || window.location.pathname);
+  el.setAttribute("href", href);
+  return href;
 }
 
 /**
- * Sets document title, meta description, OG tags, and canonical link.
- * Resets to defaults on unmount.
+ * Sets document title, canonical URL, meta description, Open Graph and Twitter tags.
+ * `canonical` is retained as an alias for older page components.
  */
-export default function useDocumentMeta({ title, description, pathname } = {}) {
+export default function useDocumentMeta({ title, description, pathname, canonical, image } = {}) {
   useEffect(() => {
-    // Phase 5 — avoid double-suffix when callers already include "| Fakhri Mart"
     const suffix = " | Fakhri Mart";
     const trimmed = (title || "").trim();
     const fullTitle = trimmed
@@ -41,15 +47,20 @@ export default function useDocumentMeta({ title, description, pathname } = {}) {
         : trimmed + suffix
       : defaults.title;
     const desc = description || defaults.description;
-    const path = pathname || window.location.pathname;
+    const canonicalHref = setCanonical(pathname || canonical || window.location.pathname);
+    const imageHref = absoluteUrl(image || defaults.image);
 
     document.title = fullTitle;
     setMeta("description", desc);
+    setMeta("og:type", "website", "property");
     setMeta("og:title", fullTitle, "property");
     setMeta("og:description", desc, "property");
+    setMeta("og:url", canonicalHref, "property");
+    setMeta("og:image", imageHref, "property");
+    setMeta("twitter:card", "summary_large_image");
     setMeta("twitter:title", fullTitle, "property");
     setMeta("twitter:description", desc, "property");
-    setCanonical(path);
+    setMeta("twitter:image", imageHref, "property");
 
     return () => {
       document.title = defaults.title;
@@ -59,5 +70,5 @@ export default function useDocumentMeta({ title, description, pathname } = {}) {
       setMeta("twitter:title", defaults.title, "property");
       setMeta("twitter:description", defaults.description, "property");
     };
-  }, [title, description, pathname]);
+  }, [title, description, pathname, canonical, image]);
 }
