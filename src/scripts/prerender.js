@@ -1,6 +1,3 @@
-// Playwright-based prerendering. The __prerender flag explicitly disables the
-// client-only opening film so generated HTML always contains stable page content.
-
 import { chromium } from "playwright";
 import { existsSync, writeFileSync, mkdirSync } from "node:fs";
 import { resolve, dirname } from "node:path";
@@ -32,15 +29,15 @@ try {
     shell: process.platform === "win32",
   });
 
-  await new Promise((res, rej) => {
-    const timer = setTimeout(() => rej(new Error("Preview server did not start in 30s")), 30000);
+  await new Promise((resolveReady, rejectReady) => {
+    const timer = setTimeout(() => rejectReady(new Error("Preview server did not start in 30s")), 30000);
     const onStdout = (data) => {
       const output = data.toString();
       if (output.includes("Local:") || output.includes("4173") || output.includes("ready")) {
         clearTimeout(timer);
         preview.stdout.off("data", onStdout);
         preview.stderr.off("data", onStderr);
-        setTimeout(res, 800);
+        setTimeout(resolveReady, 800);
       }
     };
     const onStderr = (data) => {
@@ -49,7 +46,7 @@ try {
         clearTimeout(timer);
         preview.stdout.off("data", onStdout);
         preview.stderr.off("data", onStderr);
-        rej(new Error(`Preview server error: ${output}`));
+        rejectReady(new Error(`Preview server error: ${output}`));
       }
     };
     preview.stdout.on("data", onStdout);
@@ -67,23 +64,15 @@ try {
   }
 
   const page = await browser.newPage();
-
   let successCount = 0;
   let failCount = 0;
 
   for (const route of allRoutes) {
-    const url = new URL(route, "http://localhost:4173");
-    url.searchParams.set("__prerender", "1");
-
+    const url = `http://localhost:4173${route}`;
     try {
-      await page.goto(url.toString(), { waitUntil: "networkidle", timeout: 15000 });
+      await page.goto(url, { waitUntil: "networkidle", timeout: 15000 });
       await page.waitForSelector("#main-content", { state: "attached", timeout: 5000 });
-      await page.waitForTimeout(150);
-
-      await page.evaluate(() => {
-        document.documentElement.classList.remove("intro-boot-pending");
-        document.body.classList.remove("intro-video-running");
-      });
+      await page.waitForTimeout(500);
 
       const html = await page.content();
       const finalPath =
