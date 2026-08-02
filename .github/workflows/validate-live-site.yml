@@ -1,0 +1,44 @@
+name: Validate live-site changes
+
+on:
+  pull_request:
+    branches:
+      - feature/video-intro
+  push:
+    branches:
+      - feature/live-site-local-growth
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-live-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-smoke-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Build and prerender
+        run: npm run build
+
+      - name: Run smoke tests
+        run: npm run test:smoke
