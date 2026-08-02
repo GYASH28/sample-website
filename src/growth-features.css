@@ -1,0 +1,315 @@
+.store-location {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.store-location__map,
+.store-location__map iframe {
+  min-height: 460px;
+}
+
+.store-location__map {
+  background: var(--bg-warm);
+}
+
+.store-location__map iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.store-location__content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(28px, 5vw, 64px);
+}
+
+.store-location__content h2 {
+  font-size: clamp(2rem, 3.2vw, 3rem);
+}
+
+.store-location__address {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin: 18px 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--charcoal);
+  font-style: normal;
+}
+
+.store-location__address svg {
+  flex: 0 0 auto;
+  color: var(--teal-dark);
+}
+
+.store-location__address span {
+  display: grid;
+  gap: 4px;
+}
+
+.store-location__address small {
+  color: var(--muted);
+}
+
+.store-location__facts {
+  display: grid;
+  gap: 9px;
+  margin-bottom: 22px;
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+
+.store-location__facts span:first-child {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--charcoal);
+  font-weight: 700;
+}
+
+.store-location__actions,
+.project-recommendation__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.store-location--compact .store-location__map,
+.store-location--compact .store-location__map iframe {
+  min-height: 360px;
+}
+
+.yarn-guide-section {
+  background:
+    radial-gradient(circle at 8% 8%, rgba(217, 165, 179, 0.18), transparent 25rem),
+    radial-gradient(circle at 94% 12%, rgba(42, 140, 130, 0.12), transparent 24rem),
+    var(--bg);
+}
+
+.project-finder {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.85fr) minmax(0, 1.15fr);
+  gap: clamp(24px, 4vw, 48px);
+  align-items: start;
+}
+
+.project-finder__options {
+  display: grid;
+  gap: 12px;
+}
+
+.project-choice {
+  display: flex;
+  width: 100%;
+  min-height: 84px;
+  gap: 14px;
+  align-items: flex-start;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--charcoal);
+  text-align: left;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.project-choice svg {
+  flex: 0 0 auto;
+  color: var(--teal-dark);
+}
+
+.project-choice span {
+  display: grid;
+  gap: 5px;
+}
+
+.project-choice small {
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.project-choice:hover {
+  transform: translateY(-2px);
+  border-color: rgba(42, 140, 130, 0.36);
+  box-shadow: var(--shadow-soft);
+}
+
+.project-choice--active {
+  border-color: var(--teal);
+  background: var(--teal-soft);
+  box-shadow: 0 12px 28px rgba(42, 140, 130, 0.13);
+}
+
+.project-recommendation {
+  position: sticky;
+  top: calc(var(--header-offset) + 22px);
+  border: 1px solid rgba(42, 140, 130, 0.2);
+  border-radius: var(--radius-lg);
+  padding: clamp(24px, 4vw, 44px);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.project-recommendation ul {
+  display: grid;
+  gap: 12px;
+  margin: 24px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.project-recommendation li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  color: var(--charcoal);
+}
+
+.project-recommendation li svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: var(--teal-dark);
+}
+
+.project-recommendation__note {
+  margin: 18px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  font-size: 0.88rem;
+}
+
+.guide-faq-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.2fr);
+  gap: clamp(28px, 5vw, 64px);
+  align-items: start;
+}
+
+.enquiry-checklist {
+  display: grid;
+  gap: 12px;
+  padding-left: 24px;
+  color: var(--charcoal);
+}
+
+.guide-faqs {
+  display: grid;
+  gap: 12px;
+}
+
+.guide-faqs details {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+}
+
+.guide-faqs summary {
+  cursor: pointer;
+  padding: 18px 20px;
+  color: var(--charcoal);
+  font-weight: 750;
+  line-height: 1.4;
+}
+
+.guide-faqs details p {
+  margin: 0;
+  padding: 0 20px 20px;
+}
+
+.footer-local-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  width: min(var(--max), calc(100% - 40px));
+  margin: 0 auto 28px;
+}
+
+.footer-local-link {
+  display: flex;
+  min-height: 72px;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+}
+
+.footer-local-link:hover {
+  transform: translateY(-2px);
+  border-color: rgba(201, 179, 106, 0.55);
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.footer-local-link svg {
+  flex: 0 0 auto;
+  color: var(--gold-soft);
+}
+
+.footer-local-link span {
+  display: grid;
+  gap: 3px;
+}
+
+.footer-local-link small {
+  color: rgba(255, 255, 255, 0.66);
+  line-height: 1.35;
+}
+
+@media (max-width: 900px) {
+  .store-location,
+  .project-finder,
+  .guide-faq-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .project-recommendation {
+    position: static;
+  }
+
+  .store-location__map {
+    order: 2;
+  }
+
+  .store-location__content {
+    order: 1;
+  }
+
+  .footer-local-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .store-location__actions,
+  .project-recommendation__actions {
+    flex-direction: column;
+  }
+
+  .store-location__actions .btn,
+  .project-recommendation__actions .btn {
+    width: 100%;
+  }
+
+  .store-location__map,
+  .store-location__map iframe,
+  .store-location--compact .store-location__map,
+  .store-location--compact .store-location__map iframe {
+    min-height: 320px;
+  }
+}
