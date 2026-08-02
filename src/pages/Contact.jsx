@@ -1,21 +1,27 @@
-import { Clock, Instagram, Mail, MapPin, MessageCircle, Phone, Truck } from "lucide-react";
+import { Clock, Instagram, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import PageHero from "../components/PageHero.jsx";
 import ProductVisual from "../components/ProductVisual.jsx";
 import Reveal from "../components/Reveal.jsx";
+import StoreLocation from "../components/StoreLocation.jsx";
 import { businessInfo, createWhatsAppLink } from "../data/siteData.js";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
+import { contactPageJsonLd, localBusinessJsonLd, useJsonLd } from "../hooks/useJsonLd.js";
 
 export default function Contact() {
   useDocumentMeta({
-    title: "Contact — Fakhri Mart",
-    description: "Reach Fakhri Mart on WhatsApp, phone, or Instagram. Pune, Maharashtra. Mon–Sat 10am–8pm.",
-    canonical: "/contact",
+    title: "Contact & Store Location — Fakhri Mart Pune",
+    description:
+      "Contact Fakhri Mart in Pune for yarn, crochet thread, macrame cord, craft accessories, catalogue, shades, bulk enquiries and all-India delivery. Get Google Maps directions.",
+    pathname: "/contact",
   });
+  useJsonLd(localBusinessJsonLd(businessInfo));
+  useJsonLd(contactPageJsonLd());
+
   return (
     <>
       <PageHero
-        eyebrow="Contact"
-        title="Connect for catalogue, shade card and bulk order support"
+        eyebrow="Contact & Location"
+        title="Catalogue support, product guidance and Google Maps directions"
         text="Reach out for yarns, crochet threads, macrame cords, embroidery threads, beads, bases, purse accessories, delivery details and product availability."
       >
         <ProductVisual palette={["#35b8ad", "#f6a7b8", "#c99b6b"]} />
@@ -27,8 +33,8 @@ export default function Contact() {
             <div className="contact-card">
               <MapPin size={24} aria-hidden="true" />
               <div>
-                <h3>Business Name</h3>
-                <p>{businessInfo.name}</p>
+                <h3>Store</h3>
+                <p>{businessInfo.name}, {businessInfo.location}</p>
               </div>
             </div>
             <div className="contact-card">
@@ -73,17 +79,26 @@ export default function Contact() {
           </Reveal>
 
           <Reveal className="map-panel" delay={130} variant="slide-right">
-            <div className="map-pin" aria-hidden="true">
-              <MapPin size={28} />
-            </div>
-            <h3>{businessInfo.location}</h3>
-            <p>{businessInfo.address}</p>
-            <span>Visit or message us to request catalogue, shade details and delivery support.</span>
-            <div className="delivery-chip">
-              <Truck size={18} aria-hidden="true" />
-              {businessInfo.delivery}
-            </div>
+            <p className="eyebrow">Before You Message</p>
+            <h2>Get a faster, more useful reply</h2>
+            <p>Include the product or project, shade or colour family, approximate quantity and delivery city.</p>
+            <ul className="enquiry-checklist">
+              <li>Product name, category or reference photo</li>
+              <li>Preferred shades or colour family</li>
+              <li>Single item, bulk order or reseller quantity</li>
+              <li>Delivery city and required timing</li>
+            </ul>
+            <a className="btn btn-whatsapp" href={createWhatsAppLink()} target="_blank" rel="noreferrer">
+              <MessageCircle size={18} aria-hidden="true" />
+              Start WhatsApp Enquiry
+            </a>
           </Reveal>
+        </div>
+      </section>
+
+      <section className="section section-tinted">
+        <div className="container">
+          <StoreLocation />
         </div>
       </section>
     </>
