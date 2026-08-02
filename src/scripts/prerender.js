@@ -1,4 +1,3 @@
-// src/scripts/prerender.js
 // Playwright-based prerendering. The __prerender flag explicitly disables the
 // client-only opening film so generated HTML always contains stable page content.
 
@@ -17,11 +16,11 @@ if (!existsSync(distDir)) {
   process.exit(1);
 }
 
-const { businessInfo, featuredProducts, blogPosts } = await import("../data/siteData.js");
+const { featuredProducts, blogPosts } = await import("../data/siteData.js");
 
-const staticRoutes = ["/", "/products", "/gallery", "/about", "/contact", "/blog"];
-const productRoutes = featuredProducts.map((p) => `/products/${p.slug}`);
-const blogRoutes = blogPosts.map((p) => `/blog/${p.slug}`);
+const staticRoutes = ["/", "/products", "/yarn-guide", "/gallery", "/about", "/contact", "/blog"];
+const productRoutes = featuredProducts.map((product) => `/products/${product.slug}`);
+const blogRoutes = blogPosts.map((post) => `/blog/${post.slug}`);
 const allRoutes = [...staticRoutes, ...productRoutes, ...blogRoutes];
 
 let preview;
@@ -35,22 +34,22 @@ try {
 
   await new Promise((res, rej) => {
     const timer = setTimeout(() => rej(new Error("Preview server did not start in 30s")), 30000);
-    const onStdout = (d) => {
-      const s = d.toString();
-      if (s.includes("Local:") || s.includes("4173") || s.includes("ready")) {
+    const onStdout = (data) => {
+      const output = data.toString();
+      if (output.includes("Local:") || output.includes("4173") || output.includes("ready")) {
         clearTimeout(timer);
         preview.stdout.off("data", onStdout);
         preview.stderr.off("data", onStderr);
         setTimeout(res, 800);
       }
     };
-    const onStderr = (d) => {
-      const s = d.toString();
-      if (s.includes("EADDRINUSE") || s.includes("Error")) {
+    const onStderr = (data) => {
+      const output = data.toString();
+      if (output.includes("EADDRINUSE") || output.includes("Error")) {
         clearTimeout(timer);
         preview.stdout.off("data", onStdout);
         preview.stderr.off("data", onStderr);
-        rej(new Error(`Preview server error: ${s}`));
+        rej(new Error(`Preview server error: ${output}`));
       }
     };
     preview.stdout.on("data", onStdout);
@@ -79,9 +78,8 @@ try {
     try {
       await page.goto(url.toString(), { waitUntil: "networkidle", timeout: 15000 });
       await page.waitForSelector("#main-content", { state: "attached", timeout: 5000 });
-      await page.waitForTimeout(150); // JSON-LD and document metadata effects
+      await page.waitForTimeout(150);
 
-      // Never persist transient boot/intro state into generated HTML.
       await page.evaluate(() => {
         document.documentElement.classList.remove("intro-boot-pending");
         document.body.classList.remove("intro-video-running");
@@ -97,8 +95,8 @@ try {
       writeFileSync(finalPath, html, "utf-8");
       successCount++;
       console.log(`  ✓ ${route}`);
-    } catch (e) {
-      console.error(`  ✗ ${route}: ${e.message}`);
+    } catch (error) {
+      console.error(`  ✗ ${route}: ${error.message}`);
       failCount++;
     }
   }
