@@ -1,6 +1,7 @@
-import { Instagram, Phone } from "lucide-react";
+import { BookOpen, ExternalLink, Instagram, MapPinned, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
 import { businessInfo, createWhatsAppLink, navItems, productCategories } from "../data/siteData.js";
+import { googlePresence } from "../data/businessProfile.js";
 import Reveal from "./Reveal.jsx";
 import SmartLink from "./SmartLink.jsx";
 import WhatsAppIcon from "./WhatsAppIcon.jsx";
@@ -19,7 +20,7 @@ export default function Footer() {
           </Link>
           <p>
             Pune ki yarn store — poore India ke liye. Colourful yarns, crochet threads, macrame
-            cords, embroidery threads, beads, bases aur purse-making essentials. Yarns, threads & craft supplies from Pune.
+            cords, embroidery threads, beads, bases aur purse-making essentials.
           </p>
           <a className="btn btn-whatsapp" href={createWhatsAppLink()} target="_blank" rel="noreferrer" aria-label="Chat with Fakhri Mart on WhatsApp for catalogue">
             <WhatsAppIcon size={18} />
@@ -30,6 +31,7 @@ export default function Footer() {
         <div>
           <h3>Quick Links</h3>
           <ul className="footer-links">
+            <li><Link to="/yarn-guide">Yarn & Project Guide</Link></li>
             {navItems.slice(0, 7).map((item) => (
               <li key={item.href}>
                 <SmartLink to={item.href}>{item.label}</SmartLink>
@@ -43,7 +45,7 @@ export default function Footer() {
           <ul className="footer-links">
             {productCategories.slice(0, 8).map((category) => (
               <li key={category.name}>
-                <Link to="/products">{category.shortName}</Link>
+                <Link to={`/products?category=${encodeURIComponent(category.name)}`}>{category.shortName}</Link>
               </li>
             ))}
           </ul>
@@ -70,6 +72,22 @@ export default function Footer() {
           </ul>
         </div>
       </Reveal>
+
+      <Reveal className="footer-local-actions" variant="fade-up" delay={70}>
+        <a className="footer-local-link" href={googlePresence.mapsUrl} target="_blank" rel="noopener noreferrer">
+          <MapPinned size={22} aria-hidden="true" />
+          <span><strong>Google Maps</strong><small>Open directions to Fakhri Mart</small></span>
+        </a>
+        <a className="footer-local-link" href={googlePresence.businessProfileUrl} target="_blank" rel="noopener noreferrer">
+          <ExternalLink size={22} aria-hidden="true" />
+          <span><strong>Google Business</strong><small>View the official business listing</small></span>
+        </a>
+        <Link className="footer-local-link" to="/yarn-guide">
+          <BookOpen size={22} aria-hidden="true" />
+          <span><strong>Yarn Guide</strong><small>Choose materials by project</small></span>
+        </Link>
+      </Reveal>
+
       <Reveal className="footer-bottom" variant="fade-up" delay={90}>
         <p>© 2026 {businessInfo.name}, Pune. All-India delivery.</p>
       </Reveal>
