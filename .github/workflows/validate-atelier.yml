@@ -40,6 +40,20 @@ jobs:
       - name: Build and prerender
         run: npm run build
 
+      - name: Start persistent preview server
+        run: |
+          npm run preview -- --port 4173 --strictPort > /tmp/fakhri-preview.log 2>&1 &
+          echo $! > /tmp/fakhri-preview.pid
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173/ > /dev/null; then
+              echo "Preview server is ready"
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/fakhri-preview.log
+          exit 1
+
       - name: Run browser smoke tests
         run: npm run test:smoke
 
@@ -48,3 +62,10 @@ jobs:
 
       - name: Run viewport integrity tests
         run: npm run test:viewports
+
+      - name: Stop preview server
+        if: always()
+        run: |
+          if [ -f /tmp/fakhri-preview.pid ]; then
+            kill "$(cat /tmp/fakhri-preview.pid)" || true
+          fi
