@@ -1,91 +1,215 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
-import "../intro-video.css";
+// src/components/IntroAnimation.jsx
+// Cinematic, optimized, reduced-motion safe opening animation.
+// Plays once per session. Skip button always visible.
 
-const INTRO_STORAGE_KEY = "fakhri_intro_video_v1";
-const INTRO_VIDEO_SRC = "/assets/videos/fakhri-intro.mp4";
-const LOAD_TIMEOUT_MS = 10000;
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { businessInfo } from "../data/siteData.js";
+import { ease } from "../motion-tokens.js";
 
-function removeBootCover() {
-  document.documentElement.classList.remove("intro-boot-pending");
-}
+const PHASES = {
+  CIRCLE_1: "circle-1",
+  CIRCLE_2: "circle-2",
+  CIRCLE_3: "circle-3",
+  BALL: "ball",
+  TITLE: "title",
+  TAGLINE: "tagline",
+  LIFT: "lift",
+  DONE: "done",
+};
+
+const TIMINGS = [
+  [PHASES.CIRCLE_2, 300],
+  [PHASES.CIRCLE_3, 550],
+  [PHASES.BALL, 800],
+  [PHASES.TITLE, 1200],
+  [PHASES.TAGLINE, 1800],
+  [PHASES.LIFT, 2400],
+  [PHASES.DONE, 3200],
+];
 
 export default function IntroAnimation({ onComplete }) {
-  const [videoReady, setVideoReady] = useState(false);
-  const [exiting, setExiting] = useState(false);
-  const completedRef = useRef(false);
-  const loadTimeoutRef = useRef(null);
-
-  const completeIntro = useCallback(() => {
-    if (completedRef.current) return;
-    completedRef.current = true;
-    window.sessionStorage.setItem(INTRO_STORAGE_KEY, "true");
-    setExiting(true);
-  }, []);
+  const [phase, setPhase] = useState(PHASES.CIRCLE_1);
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    document.body.classList.add("intro-video-running");
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isPlayed = sessionStorage.getItem("fakhri_intro_v3") === "true";
 
-    // Keep the pre-paint cream cover until this full-screen component is mounted.
-    window.requestAnimationFrame(removeBootCover);
-    loadTimeoutRef.current = window.setTimeout(completeIntro, LOAD_TIMEOUT_MS);
+    if (prefersReducedMotion || isPlayed) {
+      setVisible(false);
+      onComplete();
+      return;
+    }
+
+    document.body.classList.add("intro-running");
+
+    const timers = TIMINGS.map(([nextPhase, delay]) =>
+      setTimeout(() => {
+        setPhase(nextPhase);
+        if (nextPhase === PHASES.DONE) {
+          sessionStorage.setItem("fakhri_intro_v3", "true");
+          document.body.classList.remove("intro-running");
+          setVisible(false);
+          onComplete();
+        }
+      }, delay),
+    );
 
     return () => {
-      window.clearTimeout(loadTimeoutRef.current);
-      document.body.classList.remove("intro-video-running");
-      removeBootCover();
+      timers.forEach(clearTimeout);
+      document.body.classList.remove("intro-running");
     };
-  }, [completeIntro]);
+  }, [onComplete]);
 
-  const handlePlaying = () => {
-    setVideoReady(true);
-    window.clearTimeout(loadTimeoutRef.current);
+  const handleSkip = () => {
+    sessionStorage.setItem("fakhri_intro_v3", "true");
+    document.body.classList.remove("intro-running");
+    setVisible(false);
+    onComplete();
   };
 
+  const isPast = (targetPhase) => {
+    const order = Object.values(PHASES);
+    return order.indexOf(phase) >= order.indexOf(targetPhase);
+  };
+
+  const titleLetters = businessInfo.shortName.split("");
+
   return (
-    <motion.div
-      className="video-intro-overlay"
-      role="dialog"
-      aria-label="Fakhri Mart opening animation"
-      aria-modal="true"
-      initial={{ opacity: 1 }}
-      animate={{ opacity: exiting ? 0 : 1, scale: exiting ? 1.008 : 1 }}
-      transition={{ duration: exiting ? 0.52 : 0, ease: [0.22, 1, 0.36, 1] }}
-      onAnimationComplete={() => {
-        if (exiting) onComplete();
-      }}
-    >
-      <div className="video-intro-ambient" aria-hidden="true" />
+    <AnimatePresence>
+      {visible && (
+        <motion.div
+          className="intro-overlay"
+          initial={{ opacity: 1 }}
+          animate={{
+            opacity: phase === PHASES.LIFT || phase === PHASES.DONE ? 0 : 1,
+            y: phase === PHASES.LIFT || phase === PHASES.DONE ? "-100%" : "0%",
+          }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8, ease: ease.soft }}
+        >
+          <button
+            type="button"
+            className="intro-skip-btn"
+            onClick={handleSkip}
+            aria-label="Skip intro animation"
+          >
+            Skip Intro →
+          </button>
 
-      <div className={`video-intro-loading ${videoReady ? "is-hidden" : ""}`} aria-hidden="true">
-        <img src="/assets/fakhri-mart-logo.webp" alt="" />
-        <span />
-      </div>
+          <div className="intro-container">
+            <svg className="intro-stitch intro-stitch-1" viewBox="0 0 240 240" width="240" height="240" aria-hidden="true">
+              <motion.circle
+                cx="120" cy="120" r="108"
+                fill="none"
+                stroke="var(--gold)"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeDasharray="679"
+                initial={{ strokeDashoffset: 679, opacity: 0 }}
+                animate={{ strokeDashoffset: 0, opacity: 0.9 }}
+                transition={{ duration: 1.0, ease: ease.soft }}
+                style={{ transformOrigin: "center", transform: "rotate(-90deg)" }}
+              />
+            </svg>
 
-      <video
-        className={`video-intro-video ${videoReady ? "is-ready" : ""}`}
-        src={INTRO_VIDEO_SRC}
-        autoPlay
-        muted
-        playsInline
-        preload="auto"
-        disablePictureInPicture
-        controlsList="nodownload noplaybackrate noremoteplayback"
-        onPlaying={handlePlaying}
-        onEnded={completeIntro}
-        onError={completeIntro}
-        aria-hidden="true"
-      />
+            {isPast(PHASES.CIRCLE_2) && (
+              <svg className="intro-stitch intro-stitch-2" viewBox="0 0 240 240" width="200" height="200" aria-hidden="true">
+                <motion.circle
+                  cx="120" cy="120" r="108"
+                  fill="none"
+                  stroke="var(--teal)"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeDasharray="679"
+                  initial={{ strokeDashoffset: 679, opacity: 0 }}
+                  animate={{ strokeDashoffset: 0, opacity: 0.6 }}
+                  transition={{ duration: 0.9, ease: ease.soft }}
+                  style={{ transformOrigin: "center", transform: "rotate(-90deg)" }}
+                />
+              </svg>
+            )}
 
-      <button
-        type="button"
-        className="video-intro-skip"
-        onClick={completeIntro}
-        aria-label="Skip Fakhri Mart opening animation"
-      >
-        Skip intro
-        <span aria-hidden="true">→</span>
-      </button>
-    </motion.div>
+            {isPast(PHASES.CIRCLE_3) && (
+              <svg className="intro-stitch intro-stitch-3" viewBox="0 0 240 240" width="160" height="160" aria-hidden="true">
+                <motion.circle
+                  cx="120" cy="120" r="108"
+                  fill="none"
+                  stroke="var(--pink)"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeDasharray="679"
+                  initial={{ strokeDashoffset: 679, opacity: 0 }}
+                  animate={{ strokeDashoffset: 0, opacity: 0.5 }}
+                  transition={{ duration: 0.8, ease: ease.soft }}
+                  style={{ transformOrigin: "center", transform: "rotate(-90deg)" }}
+                />
+              </svg>
+            )}
+
+            {isPast(PHASES.BALL) && (
+              <motion.div
+                className="intro-yarn-ball"
+                initial={{ x: "-50%", y: "-50%", scale: 0, opacity: 0, rotate: -180 }}
+                animate={{ x: "-50%", y: "-50%", scale: 1, opacity: 1, rotate: 0 }}
+                transition={{ duration: 0.7, ease: [0.34, 1.56, 0.64, 1] }}
+                aria-hidden="true"
+              >
+                <svg width="100" height="100" viewBox="0 0 120 120" fill="none">
+                  <circle cx="60" cy="60" r="32" fill="var(--gold)" opacity="0.9" />
+                  <path d="M 30,60 Q 60,30 90,60" stroke="var(--gold-soft)" strokeWidth="2" fill="none" opacity="0.7" />
+                  <path d="M 30,60 Q 60,90 90,60" stroke="var(--gold-soft)" strokeWidth="2" fill="none" opacity="0.7" />
+                  <path d="M 60,28 Q 92,60 60,92" stroke="var(--gold-soft)" strokeWidth="2" fill="none" opacity="0.5" />
+                  <path d="M 60,28 Q 28,60 60,92" stroke="var(--gold-soft)" strokeWidth="2" fill="none" opacity="0.5" />
+                  <ellipse cx="50" cy="50" rx="8" ry="5" fill="var(--bg)" opacity="0.4" />
+                </svg>
+              </motion.div>
+            )}
+
+            {isPast(PHASES.BALL) && (
+              <motion.div
+                className="intro-logo-wrapper"
+                initial={{ x: "-50%", y: "-50%", scale: 0, opacity: 0, rotate: -90 }}
+                animate={{ x: "-50%", y: "-50%", scale: 1, opacity: 1, rotate: 0 }}
+                transition={{ duration: 0.8, ease: [0.34, 1.56, 0.64, 1] }}
+                aria-hidden="true"
+              >
+                <img src="/assets/fakhri-mart-logo.webp" alt="" className="intro-logo-img" />
+              </motion.div>
+            )}
+
+            {isPast(PHASES.TITLE) && (
+              <div className="intro-text">
+                <h2 className="intro-title">
+                  {titleLetters.map((letter, index) => (
+                    <motion.span
+                      key={`${letter}-${index}`}
+                      initial={{ opacity: 0, y: 20, rotateX: -90 }}
+                      animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                      transition={{ duration: 0.45, ease: [0.34, 1.56, 0.64, 1], delay: index * 0.04 }}
+                      style={{ display: "inline-block", transformOrigin: "bottom" }}
+                    >
+                      {letter === " " ? "\u00A0" : letter}
+                    </motion.span>
+                  ))}
+                </h2>
+              </div>
+            )}
+
+            {isPast(PHASES.TAGLINE) && (
+              <motion.p
+                className="intro-tagline"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: ease.soft }}
+              >
+                {businessInfo.tagline}
+              </motion.p>
+            )}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
