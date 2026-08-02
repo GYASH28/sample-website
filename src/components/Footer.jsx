@@ -1,6 +1,13 @@
-import { ArrowUpRight, InstagramLogo, MapPin, Phone } from "@phosphor-icons/react";
+import {
+  ArrowSquareOut,
+  ArrowUpRight,
+  InstagramLogo,
+  MapPin,
+  Phone,
+} from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
 import { businessInfo, createWhatsAppLink } from "../data/siteData.js";
+import { googlePresence } from "../data/businessProfile.js";
 import WhatsAppIcon from "./WhatsAppIcon.jsx";
 
 export default function Footer() {
@@ -28,6 +35,7 @@ export default function Footer() {
           <div>
             <span>Explore</span>
             <Link to="/products">Catalogue</Link>
+            <Link to="/yarn-guide">Yarn & project guide</Link>
             <Link to="/gallery">Gallery</Link>
             <Link to="/blog">Craft guides</Link>
             <Link to="/wishlist">Wishlist</Link>
@@ -50,6 +58,14 @@ export default function Footer() {
             <InstagramLogo size={18} /> @{businessInfo.instagram} <ArrowUpRight size={14} />
           </a>
           <small>{businessInfo.hours}</small>
+          <div className="footer-google-links">
+            <a href={googlePresence.mapsUrl} target="_blank" rel="noopener noreferrer">
+              <MapPin size={17} /> Google Maps <ArrowSquareOut size={14} />
+            </a>
+            <a href={googlePresence.businessProfileUrl} target="_blank" rel="noopener noreferrer">
+              Google Business Profile <ArrowSquareOut size={14} />
+            </a>
+          </div>
         </address>
       </div>
       <div className="container footer-bottom">
