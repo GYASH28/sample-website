@@ -15,38 +15,6 @@
     <link rel="canonical" href="https://fakhriyarns.vercel.app/" />
     <link rel="sitemap" type="application/xml" href="https://fakhriyarns.vercel.app/sitemap.xml" />
 
-    <!-- Prevent prerendered website content from flashing before the intro mounts. -->
-    <style>
-      #intro-boot-cover { display: none; }
-      html.intro-boot-pending #intro-boot-cover {
-        position: fixed;
-        inset: 0;
-        z-index: 2147483647;
-        display: block;
-        background: #fff7ec;
-      }
-      html.intro-boot-pending body { overflow: hidden; }
-    </style>
-    <script>
-      (() => {
-        try {
-          const path = window.location.pathname.replace(/\/+$/, "") || "/";
-          const params = new URLSearchParams(window.location.search);
-          const shouldShowIntro =
-            path === "/" &&
-            !params.has("__prerender") &&
-            window.sessionStorage.getItem("fakhri_intro_video_v1") !== "true" &&
-            !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-          if (shouldShowIntro) {
-            document.documentElement.classList.add("intro-boot-pending");
-          }
-        } catch {
-          // Never block the website if storage or media-query access fails.
-        }
-      })();
-    </script>
-
     <link rel="icon" type="image/webp" href="/assets/fakhri-mart-logo.webp" />
     <link rel="apple-touch-icon" href="/assets/fakhri-mart-logo.webp" />
     <link rel="shortcut icon" type="image/webp" href="/assets/fakhri-mart-logo.webp" />
@@ -84,7 +52,6 @@
     <meta property="twitter:image" content="https://fakhriyarns.vercel.app/assets/images/products/cotton-dreamz/hero.webp" />
   </head>
   <body>
-    <div id="intro-boot-cover" aria-hidden="true"></div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
