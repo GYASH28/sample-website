@@ -1,9 +1,3 @@
-// src/scripts/prerender.js
-// Phase 4.6 — Playwright-based prerendering.
-// Boots the preview server, visits each route, writes fully-rendered HTML back into
-// dist/ so crawlers and link-preview bots that don't execute JS see real content
-// + JSON-LD + meta tags.
-
 import { chromium } from "playwright";
 import { existsSync, writeFileSync, mkdirSync } from "node:fs";
 import { resolve, dirname } from "node:path";
@@ -19,45 +13,56 @@ if (!existsSync(distDir)) {
   process.exit(1);
 }
 
-const { businessInfo, featuredProducts, blogPosts } = await import("../data/siteData.js");
+const { featuredProducts, blogPosts } = await import("../data/siteData.js");
 const { INTRO_SESSION_KEY } = await import("../lib/introPlayback.js");
 
-const staticRoutes = ["/", "/products", "/gallery", "/about", "/contact", "/blog"];
-const productRoutes = featuredProducts.map((p) => `/products/${p.slug}`);
-const blogRoutes = blogPosts.map((p) => `/blog/${p.slug}`);
+const staticRoutes = [
+  "/",
+  "/products",
+  "/yarn-guide",
+  "/gallery",
+  "/about",
+  "/contact",
+  "/wishlist",
+  "/enquiry",
+  "/blog",
+  "/privacy",
+  "/terms",
+  "/delivery-enquiries",
+];
+const productRoutes = featuredProducts.map((product) => `/products/${product.slug}`);
+const blogRoutes = blogPosts.map((post) => `/blog/${post.slug}`);
 const allRoutes = [...staticRoutes, ...productRoutes, ...blogRoutes];
-
-// Phase 5 item 5: Vercel/CI skip condition REMOVED — prerender must ALWAYS run during build
-// so crawlers and link-preview bots see real HTML with JSON-LD + meta tags.
 
 let preview;
 let browser;
 try {
   console.log("▶ Starting vite preview on port 4173…");
   const viteCli = resolve(projectRoot, "node_modules/vite/bin/vite.js");
-  preview = spawn(process.execPath, [viteCli, "preview", "--port", "4173", "--strictPort", "--host", "127.0.0.1"], {
-    cwd: projectRoot,
-    stdio: "pipe",
-  });
+  preview = spawn(
+    process.execPath,
+    [viteCli, "preview", "--port", "4173", "--strictPort", "--host", "127.0.0.1"],
+    { cwd: projectRoot, stdio: "pipe" },
+  );
 
-  await new Promise((res, rej) => {
-    const timer = setTimeout(() => rej(new Error("Preview server did not start in 30s")), 30000);
-    const onStdout = (d) => {
-      const s = d.toString();
-      if (s.includes("Local:") || s.includes("4173") || s.includes("ready")) {
+  await new Promise((resolveReady, rejectReady) => {
+    const timer = setTimeout(() => rejectReady(new Error("Preview server did not start in 30s")), 30000);
+    const onStdout = (data) => {
+      const output = data.toString();
+      if (output.includes("Local:") || output.includes("4173") || output.includes("ready")) {
         clearTimeout(timer);
         preview.stdout.off("data", onStdout);
         preview.stderr.off("data", onStderr);
-        setTimeout(res, 800);
+        setTimeout(resolveReady, 800);
       }
     };
-    const onStderr = (d) => {
-      const s = d.toString();
-      if (s.includes("EADDRINUSE") || s.includes("Error")) {
+    const onStderr = (data) => {
+      const output = data.toString();
+      if (output.includes("EADDRINUSE") || output.includes("Error")) {
         clearTimeout(timer);
         preview.stdout.off("data", onStdout);
         preview.stderr.off("data", onStderr);
-        rej(new Error(`Preview server error: ${s}`));
+        rejectReady(new Error(`Preview server error: ${output}`));
       }
     };
     preview.stdout.on("data", onStdout);
@@ -85,24 +90,24 @@ try {
     const url = `http://localhost:4173${route}`;
     try {
       await page.goto(url, { waitUntil: "networkidle", timeout: 15000 });
-      await page.waitForTimeout(500); // allow hydration to write JSON-LD + meta tags
+      await page.waitForTimeout(500);
       await page.evaluate(() => {
-        document.documentElement.classList.remove("motion-ready");
+        document.documentElement.classList.remove("motion-ready", "intro-booting", "intro-handoff");
+        document.body.classList.remove("intro-running", "intro-hold-hero");
       });
 
       const html = await page.content();
-      const finalPath =
-        route === "/"
-          ? resolve(distDir, "index.html")
-          : resolve(distDir, route.slice(1), "index.html");
+      const finalPath = route === "/"
+        ? resolve(distDir, "index.html")
+        : resolve(distDir, route.slice(1), "index.html");
 
       mkdirSync(dirname(finalPath), { recursive: true });
       writeFileSync(finalPath, html, "utf-8");
-      successCount++;
+      successCount += 1;
       console.log(`  ✓ ${route}`);
-    } catch (e) {
-      console.error(`  ✗ ${route}: ${e.message}`);
-      failCount++;
+    } catch (error) {
+      console.error(`  ✗ ${route}: ${error.message}`);
+      failCount += 1;
     }
   }
 
@@ -110,19 +115,14 @@ try {
   browser = undefined;
   console.log(`\n✓ Prerendered: ${successCount} routes succeeded, ${failCount} failed.`);
   process.exitCode = failCount > 0 ? 1 : 0;
-
 } catch (error) {
   console.error(`✗ Prerender process failed: ${error.message}`);
   process.exitCode = 1;
 } finally {
-  if (browser) {
-    await browser.close().catch(() => {});
-  }
+  if (browser) await browser.close().catch(() => {});
   if (preview) {
     preview.stdout?.destroy();
     preview.stderr?.destroy();
-    if (preview.exitCode === null && preview.signalCode === null) {
-      preview.kill();
-    }
+    if (preview.exitCode === null && preview.signalCode === null) preview.kill();
   }
 }
