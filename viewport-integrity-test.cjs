@@ -35,7 +35,7 @@ const viewports = [
         hasTouch: viewport.mobile,
       });
       await context.addInitScript(() => {
-        sessionStorage.setItem("fakhri_intro_cinematic_v1", "played");
+        sessionStorage.setItem("fakhri_intro_cinematic_v2", "played");
       });
 
       for (const route of routes) {
