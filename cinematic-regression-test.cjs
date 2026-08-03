@@ -53,8 +53,27 @@ function assert(condition, message) {
     await mobile.goto(`${BASE_URL}/?intro=1`, { waitUntil: "networkidle" });
     const mobileIntro = mobile.locator('[aria-label="Fakhri Mart cinematic introduction"]');
     await mobileIntro.waitFor({ state: "visible", timeout: 5000 });
-    const stageBox = await mobileIntro.locator("figure").first().boundingBox();
-    assert(stageBox && stageBox.width <= 391, "Mobile intro must stay inside the viewport");
+
+    const mobileMetrics = await mobileIntro.locator("figure").first().evaluate((scene) => {
+      const stage = scene.parentElement;
+      const rect = stage.getBoundingClientRect();
+      return {
+        left: rect.left,
+        right: rect.right,
+        width: rect.width,
+        viewportWidth: window.innerWidth,
+        documentWidth: document.documentElement.scrollWidth,
+      };
+    });
+    assert(
+      mobileMetrics.left >= -1 && mobileMetrics.right <= mobileMetrics.viewportWidth + 1,
+      `Mobile cinema frame exceeds viewport: ${JSON.stringify(mobileMetrics)}`,
+    );
+    assert(
+      mobileMetrics.documentWidth <= mobileMetrics.viewportWidth + 1,
+      `Mobile intro creates horizontal page overflow: ${JSON.stringify(mobileMetrics)}`,
+    );
+
     await mobileIntro.getByRole("button", { name: /skip intro/i }).click();
     await mobileIntro.waitFor({ state: "detached", timeout: 2500 });
     await mobile.close();
