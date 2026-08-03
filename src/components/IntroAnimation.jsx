@@ -62,10 +62,17 @@ export default function IntroAnimation() {
   const [visible, setVisible] = useState(shouldPlayIntro);
   const [phase, setPhase] = useState(PHASES.opening);
   const [timeline] = useState(readTimeline);
+  const phaseRef = useRef(PHASES.opening);
   const skipRef = useRef(null);
   const previousFocusRef = useRef(null);
   const finishedRef = useRef(false);
   const timersRef = useRef(new Set());
+
+  const setIntroPhase = useCallback((nextPhase) => {
+    if (finishedRef.current) return;
+    phaseRef.current = nextPhase;
+    setPhase(nextPhase);
+  }, []);
 
   const schedule = useCallback((callback, delay) => {
     const timer = window.setTimeout(() => {
@@ -73,6 +80,7 @@ export default function IntroAnimation() {
       callback();
     }, delay);
     timersRef.current.add(timer);
+    return timer;
   }, []);
 
   const clearTimers = useCallback(() => {
@@ -102,12 +110,13 @@ export default function IntroAnimation() {
   }, [clearTimers]);
 
   const finish = useCallback(() => {
-    if (finishedRef.current || phase === PHASES.exiting) return;
+    if (finishedRef.current || phaseRef.current === PHASES.exiting) return;
     clearTimers();
+    phaseRef.current = PHASES.exiting;
     setPhase(PHASES.exiting);
     releaseHero();
     schedule(finishImmediately, 720);
-  }, [clearTimers, finishImmediately, phase, releaseHero, schedule]);
+  }, [clearTimers, finishImmediately, releaseHero, schedule]);
 
   useLayoutEffect(() => {
     document.documentElement.classList.remove("intro-booting");
@@ -140,7 +149,8 @@ export default function IntroAnimation() {
 
     timeline.steps.forEach(([nextPhase, delay]) => {
       schedule(() => {
-        setPhase(nextPhase);
+        if (finishedRef.current || phaseRef.current === PHASES.exiting) return;
+        setIntroPhase(nextPhase);
         if (nextPhase === PHASES.handoff) releaseHero();
       }, delay);
     });
@@ -172,7 +182,16 @@ export default function IntroAnimation() {
       clearTimers();
       clearIntroClasses();
     };
-  }, [clearTimers, finish, finishImmediately, releaseHero, schedule, timeline, visible]);
+  }, [
+    clearTimers,
+    finish,
+    finishImmediately,
+    releaseHero,
+    schedule,
+    setIntroPhase,
+    timeline,
+    visible,
+  ]);
 
   if (!visible) return null;
 
