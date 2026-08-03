@@ -1,25 +1,26 @@
-name: Validate atelier website
+name: Validate Fakhri Mart production
 
 on:
   pull_request:
     branches:
-      - codex/fakhri-mart-redesign
+      - main
   push:
     branches:
-      - feature/atelier-maps-seo-intro
+      - main
+      - feature/cinematic-main-consolidation
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: validate-atelier-${{ github.ref }}
+  group: validate-fakhri-production-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 24
 
     steps:
       - name: Checkout repository
@@ -56,6 +57,9 @@ jobs:
 
       - name: Run browser smoke tests
         run: npm run test:smoke
+
+      - name: Run cinematic intro and scroll tests
+        run: npm run test:cinematic
 
       - name: Run accessibility audit
         run: npm run test:a11y
