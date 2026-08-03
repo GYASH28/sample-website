@@ -3,18 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#FFF7EC" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="geo.region" content="IN-MH" />
+    <meta name="geo.placename" content="Pune" />
     <script>
       (() => {
         try {
           const force = new URLSearchParams(window.location.search).get("intro") === "1";
-          const seen =
-            window.sessionStorage.getItem("fakhri_intro_cinematic_v1") === "played";
+          const seen = window.sessionStorage.getItem("fakhri_intro_cinematic_v1") === "played";
           const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
           if (!reduced && (force || !seen)) {
             document.documentElement.classList.add("intro-booting");
             window.setTimeout(
               () => document.documentElement.classList.remove("intro-booting"),
-              6000,
+              12000,
             );
           }
         } catch {
@@ -25,7 +28,7 @@
     <style>
       html.intro-booting,
       html.intro-booting body {
-        background: #452735;
+        background: #fff7ec;
       }
 
       html.intro-booting body::before {
@@ -33,18 +36,21 @@
         z-index: 2147483646;
         inset: 0;
         background:
-          radial-gradient(circle at 12% 22%, rgba(216, 137, 161, 0.18), transparent 32rem),
-          linear-gradient(112deg, #3c202d 0 48%, #452735 48% 100%);
+          radial-gradient(circle at 12% 22%, rgba(217, 165, 179, 0.22), transparent 32rem),
+          radial-gradient(circle at 88% 18%, rgba(42, 140, 130, 0.18), transparent 30rem),
+          linear-gradient(135deg, #fff7ec, #f7efe0);
         content: "";
       }
     </style>
-    <title>Fakhri Mart | Yarn Store & Craft Supplier</title>
+
+    <title>Fakhri Mart | Yarn Store & Craft Supplier in Pune</title>
     <meta
       name="description"
-      content="Fakhri Mart offers yarns, crochet threads, macrame cords, embroidery threads, beads, purse accessories, bases, handles and craft essentials with all-India delivery and bulk enquiry support."
+      content="Fakhri Mart in Pune offers yarns, crochet threads, macrame cords, embroidery threads, beads, purse accessories and craft essentials with all-India delivery and bulk enquiry support."
     />
+    <link rel="canonical" href="https://fakhriyarns.vercel.app/" />
+    <link rel="sitemap" type="application/xml" href="https://fakhriyarns.vercel.app/sitemap.xml" />
 
-    <!-- Favicon and Icons -->
     <link rel="icon" type="image/png" href="/assets/brand/fakhri-logo-180.png" />
     <link rel="apple-touch-icon" href="/assets/brand/fakhri-logo-180.png" />
     <link rel="shortcut icon" href="/assets/brand/fakhri-logo-180.png" />
@@ -57,25 +63,24 @@
       type="image/avif"
       fetchpriority="high"
     />
-
-    <!-- Preconnect for WhatsApp (primary conversion) -->
+    <link rel="preload" as="video" href="/assets/videos/fakhri-intro.mp4" type="video/mp4" />
     <link rel="dns-prefetch" href="https://wa.me" />
+    <link rel="dns-prefetch" href="https://maps.google.com" />
 
-    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://fakhriyarns.vercel.app" />
+    <meta property="og:url" content="https://fakhriyarns.vercel.app/" />
     <meta property="og:site_name" content="Fakhri Mart" />
     <meta property="og:locale" content="en_IN" />
-    <meta property="og:title" content="Fakhri Mart | Yarn Store & Craft Supplier" />
-    <meta property="og:description" content="Fakhri Mart offers yarns, crochet threads, macrame cords, embroidery threads, beads, purse accessories, bases, handles and craft essentials with all-India delivery and bulk enquiry support." />
-    <meta property="og:image" content="https://fakhriyarns.vercel.app/assets/brand/fakhri-logo-640.webp" />
+    <meta property="og:title" content="Fakhri Mart | Yarn Store & Craft Supplier in Pune" />
+    <meta property="og:description" content="Yarns, crochet threads, macrame cords, embroidery threads, beads, purse accessories and craft essentials from Pune with all-India delivery." />
+    <meta property="og:image" content="https://fakhriyarns.vercel.app/assets/images/editorial/atelier-hero-960.webp" />
+    <meta property="og:image:alt" content="Fakhri Mart yarn and craft material atelier" />
 
-    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@fakhrimart53" />
-    <meta property="twitter:title" content="Fakhri Mart | Yarn Store & Craft Supplier" />
-    <meta property="twitter:description" content="Fakhri Mart offers yarns, crochet threads, macrame cords, embroidery threads, beads, purse accessories, bases, handles and craft essentials with all-India delivery and bulk enquiry support." />
-    <meta property="twitter:image" content="https://fakhriyarns.vercel.app/assets/brand/fakhri-logo-640.webp" />
+    <meta name="twitter:title" content="Fakhri Mart | Yarn Store & Craft Supplier in Pune" />
+    <meta name="twitter:description" content="Yarns, crochet threads, macrame cords and craft essentials from Pune with all-India delivery." />
+    <meta name="twitter:image" content="https://fakhriyarns.vercel.app/assets/images/editorial/atelier-hero-960.webp" />
   </head>
   <body>
     <div id="root"></div>
