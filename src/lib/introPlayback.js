@@ -1,4 +1,4 @@
-export const INTRO_SESSION_KEY = "fakhri_intro_cinematic_v1";
+export const INTRO_SESSION_KEY = "fakhri_intro_cinematic_v2";
 
 export function shouldPlayIntro() {
   if (typeof window === "undefined") return false;
