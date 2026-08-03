@@ -11,13 +11,13 @@
       (() => {
         try {
           const force = new URLSearchParams(window.location.search).get("intro") === "1";
-          const seen = window.sessionStorage.getItem("fakhri_intro_cinematic_v1") === "played";
+          const seen = window.sessionStorage.getItem("fakhri_intro_cinematic_v2") === "played";
           const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
           if (!reduced && (force || !seen)) {
             document.documentElement.classList.add("intro-booting");
             window.setTimeout(
               () => document.documentElement.classList.remove("intro-booting"),
-              12000,
+              15000,
             );
           }
         } catch {
@@ -28,7 +28,7 @@
     <style>
       html.intro-booting,
       html.intro-booting body {
-        background: #fff7ec;
+        background: #24131b;
       }
 
       html.intro-booting body::before {
@@ -36,9 +36,9 @@
         z-index: 2147483646;
         inset: 0;
         background:
-          radial-gradient(circle at 12% 22%, rgba(217, 165, 179, 0.22), transparent 32rem),
-          radial-gradient(circle at 88% 18%, rgba(42, 140, 130, 0.18), transparent 30rem),
-          linear-gradient(135deg, #fff7ec, #f7efe0);
+          radial-gradient(circle at 13% 18%, rgba(216, 137, 161, 0.2), transparent 34rem),
+          radial-gradient(circle at 86% 22%, rgba(42, 140, 130, 0.17), transparent 38rem),
+          linear-gradient(112deg, #24131b, #452735);
         content: "";
       }
     </style>
@@ -63,7 +63,8 @@
       type="image/avif"
       fetchpriority="high"
     />
-    <link rel="preload" as="video" href="/assets/videos/fakhri-intro.mp4" type="video/mp4" />
+    <link rel="preload" as="image" href="/assets/videos/fakhri-intro-poster.webp" type="image/webp" />
+    <link rel="preload" as="video" href="/assets/videos/fakhri-intro-premium.mp4" type="video/mp4" />
     <link rel="dns-prefetch" href="https://wa.me" />
     <link rel="dns-prefetch" href="https://maps.google.com" />
 
