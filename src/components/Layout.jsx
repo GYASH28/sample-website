@@ -5,6 +5,7 @@ import Footer from "./Footer.jsx";
 import Header from "./Header.jsx";
 import BasketToast from "./BasketToast.jsx";
 import IntroAnimation from "./IntroAnimation.jsx";
+import ScrollDirector from "./ScrollDirector.jsx";
 
 function ScrollToTop() {
   const { hash, pathname } = useLocation();
@@ -45,6 +46,7 @@ export default function Layout() {
     <>
       <a href="#main-content" className="skip-link">Skip to main content</a>
       <IntroAnimation />
+      <ScrollDirector />
       <ScrollToTop />
       <Header />
       <main id="main-content">
