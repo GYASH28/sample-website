@@ -1,5 +1,4 @@
 .overlay {
-  --intro-progress: 0;
   position: fixed;
   z-index: calc(var(--z-dialog, 120) + 8);
   inset: 0;
@@ -11,8 +10,8 @@
   isolation: isolate;
   opacity: 1;
   transition:
-    opacity 680ms var(--motion-ease-standard, cubic-bezier(0.22, 1, 0.36, 1)),
-    filter 680ms ease;
+    opacity 720ms var(--motion-ease-standard, cubic-bezier(0.22, 1, 0.36, 1)),
+    filter 720ms ease;
 }
 
 :global(body.intro-running) {
@@ -20,47 +19,48 @@
   overscroll-behavior: none;
 }
 
-.backdrop {
-  position: absolute;
-  z-index: -5;
-  inset: -3.5rem;
-  background-position: center;
-  background-size: cover;
-  filter: blur(34px) saturate(1.1) brightness(0.55);
-  opacity: 0.8;
-  transform: scale(1.1);
-}
-
 .ambient {
   position: absolute;
   z-index: -4;
   inset: 0;
   background:
-    radial-gradient(circle at 13% 18%, rgba(216, 137, 161, 0.24), transparent 34rem),
+    radial-gradient(circle at 13% 18%, rgba(216, 137, 161, 0.22), transparent 34rem),
     radial-gradient(circle at 86% 22%, rgba(42, 140, 130, 0.2), transparent 38rem),
-    linear-gradient(112deg, rgba(36, 19, 27, 0.92), rgba(69, 39, 53, 0.68));
+    linear-gradient(112deg, #24131b, #452735 58%, #2b1821);
+}
+
+.ambient::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 4rem 4rem;
+  content: "";
+  mask-image: radial-gradient(circle at center, black, transparent 78%);
+  opacity: 0.42;
 }
 
 .grain {
   position: absolute;
-  z-index: 7;
+  z-index: 12;
   inset: -50%;
   pointer-events: none;
   background-image:
     repeating-radial-gradient(circle at 17% 31%, rgba(255, 255, 255, 0.12) 0 0.55px, transparent 0.75px 3px),
-    repeating-radial-gradient(circle at 68% 62%, rgba(0, 0, 0, 0.12) 0 0.45px, transparent 0.7px 2.7px);
+    repeating-radial-gradient(circle at 68% 62%, rgba(0, 0, 0, 0.13) 0 0.45px, transparent 0.7px 2.7px);
   background-size: 5px 5px, 7px 7px;
   mix-blend-mode: soft-light;
-  opacity: 0.13;
+  opacity: 0.12;
   transform: rotate(0.01deg);
 }
 
 .reelMeta,
 .locationMeta {
   position: absolute;
-  z-index: 12;
+  z-index: 16;
   top: max(1.15rem, env(safe-area-inset-top));
-  color: rgba(255, 250, 247, 0.7);
+  color: rgba(255, 250, 247, 0.68);
   font-size: 0.61rem;
   font-weight: 760;
   letter-spacing: 0.15em;
@@ -84,120 +84,215 @@
   right: max(1.25rem, env(safe-area-inset-right));
 }
 
-.cinemaFrame {
+.threadRig {
+  position: absolute;
+  z-index: 8;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.threadPath {
+  fill: none;
+  stroke: #f4eadf;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  stroke-linecap: round;
+  stroke-width: 1.7;
+  vector-effect: non-scaling-stroke;
+  transition: stroke-dashoffset 1.2s var(--motion-ease-emphasis, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.threadNeedleEye {
+  fill: none;
+  stroke: #c9b36a;
+  stroke-width: 1.6;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    opacity 340ms ease,
+    transform 640ms var(--motion-ease-emphasis, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.overlay[data-phase="materials"] .threadPath {
+  stroke-dashoffset: 0.68;
+}
+
+.overlay[data-phase="making"] .threadPath {
+  stroke-dashoffset: 0.36;
+}
+
+.overlay[data-phase="collection"] .threadPath,
+.overlay[data-phase="brand"] .threadPath,
+.overlay[data-phase="handoff"] .threadPath,
+.overlay[data-phase="exiting"] .threadPath {
+  stroke-dashoffset: 0;
+}
+
+.overlay[data-phase="making"] .threadNeedleEye,
+.overlay[data-phase="collection"] .threadNeedleEye {
+  opacity: 0.88;
+  transform: scale(1.25) rotate(18deg);
+}
+
+.cinemaStage {
   position: relative;
   z-index: 2;
-  width: min(100vw, calc(100vh * 1.333333));
-  height: min(100vh, calc(100vw * 0.75));
+  width: min(88vw, calc(80vh * 1.5));
+  aspect-ratio: 3 / 2;
   overflow: hidden;
-  border: 1px solid rgba(255, 250, 247, 0.16);
-  background: #f4e7db;
+  border: 0.36rem solid rgba(255, 253, 249, 0.92);
+  border-radius: 2.6rem 0.85rem 2.6rem 0.85rem;
+  background: #d8c9c0;
   box-shadow:
     0 3rem 9rem rgba(0, 0, 0, 0.42),
     0 0 0 0.35rem rgba(255, 250, 247, 0.035);
   opacity: 0;
-  transform: scale(0.972) translateY(0.8rem);
+  transform: translateY(1.2rem) scale(0.965) rotate(-0.35deg);
   transition:
     opacity 520ms var(--motion-ease-standard, cubic-bezier(0.22, 1, 0.36, 1)),
-    transform 1100ms var(--motion-ease-emphasis, cubic-bezier(0.16, 1, 0.3, 1)),
+    transform 1050ms var(--motion-ease-emphasis, cubic-bezier(0.16, 1, 0.3, 1)),
     border-radius 900ms var(--motion-ease-standard, cubic-bezier(0.22, 1, 0.36, 1));
 }
 
-.overlay[data-ready="true"] .cinemaFrame,
-.overlay[data-fallback="true"] .cinemaFrame {
+.overlay:not([data-phase="opening"]) .cinemaStage {
   opacity: 1;
   transform: none;
 }
 
-.video {
+.scene {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  transform: translate3d(4%, 0, 0) scale(1.035);
+  transition:
+    opacity 520ms ease,
+    transform 1.25s var(--motion-ease-standard, cubic-bezier(0.22, 1, 0.36, 1)),
+    filter 520ms ease;
+}
+
+.scene picture,
+.scene img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  background: #f4e7db;
-  filter: saturate(1.03) contrast(1.015);
-  transform: scale(1.002);
+}
+
+.scene img {
+  object-fit: cover;
+}
+
+.scene::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, transparent 48%, rgba(31, 14, 23, 0.62)),
+    linear-gradient(110deg, rgba(255, 255, 255, 0.08), transparent 35% 72%, rgba(42, 140, 130, 0.08));
+  content: "";
+}
+
+.scene figcaption {
+  position: absolute;
+  z-index: 3;
+  right: clamp(1rem, 3vw, 2.2rem);
+  bottom: clamp(1rem, 3vw, 2rem);
+  left: clamp(1rem, 3vw, 2.2rem);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: end;
+  color: #fffaf7;
+  text-shadow: 0 0.3rem 1.5rem rgba(20, 8, 14, 0.48);
+  opacity: 0;
+  transform: translateY(0.7rem);
+  transition:
+    opacity 420ms ease 170ms,
+    transform 620ms var(--motion-ease-emphasis, cubic-bezier(0.16, 1, 0.3, 1)) 150ms;
+}
+
+.scene figcaption span {
+  font-size: 0.58rem;
+  font-weight: 780;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.scene figcaption strong {
+  max-width: 23rem;
+  font-family: var(--font-display, sans-serif);
+  font-size: clamp(1.35rem, 3vw, 2.8rem);
+  font-variation-settings: "wdth" 90, "wght" 680;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+  text-align: right;
+}
+
+.overlay[data-phase="materials"] .sceneMaterials,
+.overlay[data-phase="making"] .sceneMaking,
+.overlay[data-phase="collection"] .sceneCollection {
+  opacity: 1;
+  filter: none;
+  transform: none;
+}
+
+.overlay[data-phase="materials"] .sceneMaterials figcaption,
+.overlay[data-phase="making"] .sceneMaking figcaption,
+.overlay[data-phase="collection"] .sceneCollection figcaption {
+  opacity: 1;
+  transform: none;
+}
+
+.overlay[data-phase="making"] .sceneMaterials,
+.overlay[data-phase="collection"] :is(.sceneMaterials, .sceneMaking),
+.overlay[data-phase="brand"] .scene,
+.overlay[data-phase="handoff"] .scene,
+.overlay[data-phase="exiting"] .scene {
+  opacity: 0;
+  filter: saturate(0.85) brightness(0.82);
+  transform: translate3d(-4%, 0, 0) scale(1.015);
+}
+
+.sceneMaterials img {
+  transform: scale(1.06);
+  animation: scene-drift-left 6s var(--motion-ease-standard, ease) both;
+}
+
+.sceneMaking img {
+  transform: scale(1.04);
+  animation: scene-drift-center 6s var(--motion-ease-standard, ease) both;
+}
+
+.sceneCollection img {
+  transform: scale(1.055);
+  animation: scene-drift-right 6s var(--motion-ease-standard, ease) both;
 }
 
 .frameGlow,
 .frameVignette {
   position: absolute;
+  z-index: 5;
   inset: 0;
   pointer-events: none;
 }
 
 .frameGlow {
   background:
-    linear-gradient(115deg, rgba(255, 255, 255, 0.11), transparent 23% 70%, rgba(42, 140, 130, 0.08));
+    linear-gradient(115deg, rgba(255, 255, 255, 0.12), transparent 24% 70%, rgba(42, 140, 130, 0.09));
   mix-blend-mode: screen;
 }
 
 .frameVignette {
   box-shadow:
-    inset 0 0 7rem rgba(37, 16, 26, 0.18),
+    inset 0 0 8rem rgba(37, 16, 26, 0.2),
     inset 0 0 0 1px rgba(255, 255, 255, 0.08);
-}
-
-.loading {
-  position: absolute;
-  z-index: 10;
-  display: grid;
-  width: min(18rem, calc(100vw - 3rem));
-  place-items: center;
-  gap: 0.9rem;
-  text-align: center;
-  opacity: 1;
-  transform: translateY(0);
-  transition:
-    opacity 300ms ease,
-    transform 520ms var(--motion-ease-standard, cubic-bezier(0.22, 1, 0.36, 1));
-}
-
-.overlay[data-ready="true"] .loading {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-0.6rem);
-}
-
-.loading img {
-  width: clamp(6rem, 10vw, 8.5rem);
-  height: auto;
-  border-radius: 50%;
-  background: #fffaf7;
-  box-shadow: 0 1.4rem 4rem rgba(0, 0, 0, 0.2);
-  animation: logo-breathe 1.7s ease-in-out infinite alternate;
-}
-
-.loading p {
-  margin: 0;
-  color: rgba(255, 250, 247, 0.72);
-  font-size: 0.66rem;
-  font-weight: 760;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-}
-
-.loading span {
-  display: block;
-  width: 7.5rem;
-  height: 2px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: rgba(255, 250, 247, 0.16);
-}
-
-.loading span::after {
-  display: block;
-  width: 42%;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #d889a1, #c9b36a, #2a8c82);
-  content: "";
-  animation: thread-load 1.15s var(--motion-ease-emphasis, cubic-bezier(0.16, 1, 0.3, 1)) infinite;
 }
 
 .brandCurtain {
   position: absolute;
-  z-index: 9;
+  z-index: 10;
   inset: 0;
   display: grid;
   place-items: center;
@@ -234,8 +329,7 @@
 
 .overlay[data-phase="brand"] .brandLockup,
 .overlay[data-phase="handoff"] .brandLockup,
-.overlay[data-phase="exiting"] .brandLockup,
-.overlay[data-phase="fallback"] .brandLockup {
+.overlay[data-phase="exiting"] .brandLockup {
   opacity: 1;
   transform: none;
 }
@@ -265,8 +359,7 @@
 
 .overlay[data-phase="brand"] .brandHalo,
 .overlay[data-phase="handoff"] .brandHalo,
-.overlay[data-phase="exiting"] .brandHalo,
-.overlay[data-phase="fallback"] .brandHalo {
+.overlay[data-phase="exiting"] .brandHalo {
   transform: translate(-50%, -50%) scale(1);
 }
 
@@ -327,8 +420,7 @@
 
 .overlay[data-phase="brand"] .brandThread::after,
 .overlay[data-phase="handoff"] .brandThread::after,
-.overlay[data-phase="exiting"] .brandThread::after,
-.overlay[data-phase="fallback"] .brandThread::after {
+.overlay[data-phase="exiting"] .brandThread::after {
   transform: scaleX(1);
 }
 
@@ -345,7 +437,7 @@
 
 .progress {
   position: absolute;
-  z-index: 13;
+  z-index: 18;
   right: max(1.25rem, env(safe-area-inset-right));
   bottom: max(1.35rem, env(safe-area-inset-bottom));
   left: max(1.25rem, env(safe-area-inset-left));
@@ -379,13 +471,14 @@
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, #d889a1, #c9b36a, #2a8c82);
-  transform: scaleX(var(--intro-progress));
+  transform: scaleX(0);
   transform-origin: left;
+  animation: intro-progress 6.82s linear both;
 }
 
 .skip {
   position: absolute;
-  z-index: 15;
+  z-index: 20;
   right: max(1.25rem, env(safe-area-inset-right));
   top: max(3.15rem, calc(env(safe-area-inset-top) + 2.9rem));
   display: inline-flex;
@@ -441,8 +534,8 @@
   outline-offset: 0.25rem;
 }
 
-.overlay[data-phase="handoff"] .cinemaFrame {
-  border-radius: 2.4rem;
+.overlay[data-phase="handoff"] .cinemaStage {
+  border-radius: 3rem;
   transform: scale(0.965);
 }
 
@@ -459,27 +552,55 @@
     transform 720ms var(--motion-ease-standard, cubic-bezier(0.22, 1, 0.36, 1));
 }
 
-@keyframes logo-breathe {
-  from { transform: scale(0.975); opacity: 0.78; }
-  to { transform: scale(1.025); opacity: 1; }
+@keyframes scene-drift-left {
+  to { transform: scale(1.015) translateX(-1.2%); }
 }
 
-@keyframes thread-load {
-  from { transform: translateX(-115%); }
-  to { transform: translateX(255%); }
+@keyframes scene-drift-center {
+  to { transform: scale(1.015) translateY(-1.1%); }
+}
+
+@keyframes scene-drift-right {
+  to { transform: scale(1.02) translateX(1.2%); }
+}
+
+@keyframes intro-progress {
+  to { transform: scaleX(1); }
 }
 
 @media (max-width: 48rem), (orientation: portrait) {
-  .cinemaFrame {
+  .cinemaStage {
     width: 100vw;
-    height: min(75vw, 62vh);
-    border-block: 1px solid rgba(255, 250, 247, 0.14);
+    aspect-ratio: 4 / 5;
+    border-block: 0.28rem solid rgba(255, 253, 249, 0.92);
     border-inline: 0;
+    border-radius: 0;
+  }
+
+  .scene img {
+    object-position: center;
+  }
+
+  .scene figcaption {
+    display: grid;
+    gap: 0.55rem;
+    align-items: start;
+  }
+
+  .scene figcaption strong {
+    max-width: 18rem;
+    font-size: clamp(1.55rem, 8vw, 2.45rem);
+    text-align: left;
   }
 
   .reelMeta span:last-child,
   .locationMeta {
     display: none;
+  }
+
+  .threadRig {
+    left: -30%;
+    width: 150%;
   }
 
   .brandLockup {
@@ -526,14 +647,15 @@
     right: max(0.9rem, env(safe-area-inset-right));
     bottom: max(1rem, env(safe-area-inset-bottom));
     left: max(0.9rem, env(safe-area-inset-left));
+    grid-template-columns: 1fr auto;
   }
 
   .progress span:first-child {
     display: none;
   }
 
-  .progress {
-    grid-template-columns: 1fr auto;
+  .progress b {
+    animation-duration: 5s;
   }
 }
 
@@ -542,8 +664,8 @@
     display: none;
   }
 
-  .loading img,
-  .loading span::after {
+  .scene img,
+  .progress b {
     animation: none;
   }
 }
