@@ -1,4 +1,4 @@
-import { FileText } from "lucide-react";
+import { FileText } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
 import { catalogueMessage, createWhatsAppLink } from "../data/siteData.js";
 import Reveal from "./Reveal.jsx";

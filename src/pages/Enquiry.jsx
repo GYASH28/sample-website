@@ -1,9 +1,18 @@
-import { MessageCircle, ShoppingBag, ArrowRight, Trash2, Plus, Minus, Inbox, Heart, Eye } from "lucide-react";
+import {
+  ArrowRight,
+  ChatCircleDots,
+  Eye,
+  Heart,
+  Minus,
+  Plus,
+  ShoppingBag,
+  Trash,
+  Tray,
+} from "@phosphor-icons/react";
 import { Link, useSearchParams } from "react-router-dom";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import EnquiryForm from "../components/EnquiryForm.jsx";
 import PageHero from "../components/PageHero.jsx";
-import ProductVisual from "../components/ProductVisual.jsx";
 import Reveal from "../components/Reveal.jsx";
 import { catalogueMessage, createWhatsAppLink, featuredProducts } from "../data/siteData.js";
 import { useEnquiryBasket } from "../hooks/useEnquiryBasket.js";
@@ -16,7 +25,14 @@ export default function Enquiry() {
     description: "Submit your enquiry basket details or view your favorited yarns and craft supplies.",
   });
 
-  const { basket, remove: removeFromBasket, updateQuantity, clear: clearBasket, count: basketCount } = useEnquiryBasket();
+  const {
+    basket,
+    remove: removeFromBasket,
+    updateQuantity,
+    updateItem,
+    clear: clearBasket,
+    count: basketCount,
+  } = useEnquiryBasket();
   const { wishlist, remove: removeFromWishlist, count: wishlistCount } = useWishlist();
   
   const [searchParams] = useSearchParams();
@@ -42,6 +58,11 @@ export default function Enquiry() {
   // Quick action: Add favorite item to basket
   const { add: addToBasket } = useEnquiryBasket();
   const [addedItemSlugs, setAddedItemSlugs] = useState({});
+  const favoriteFeedbackTimerRef = useRef(null);
+
+  useEffect(() => {
+    return () => window.clearTimeout(favoriteFeedbackTimerRef.current);
+  }, []);
 
   const handleAddFavToBasket = (product) => {
     const basketItem = {
@@ -55,20 +76,30 @@ export default function Enquiry() {
       variant: null
     };
     addToBasket(basketItem);
-    setAddedItemSlugs(prev => ({ ...prev, [product.slug]: true }));
-    setTimeout(() => {
-      setAddedItemSlugs(prev => ({ ...prev, [product.slug]: false }));
-    }, 2000);
+    setAddedItemSlugs({ [product.slug]: true });
+    window.clearTimeout(favoriteFeedbackTimerRef.current);
+    favoriteFeedbackTimerRef.current = window.setTimeout(() => {
+      setAddedItemSlugs({});
+    }, 2_000);
   };
 
   return (
     <>
       <PageHero
-        eyebrow="My Account List"
-        title={activeTab === "basket" ? "Review Your Enquiry Details" : "My Saved Yarns & Tools"}
-        text="Review selected craft products, adjust wholesale quantities, manage saved favorites, and submit your list on WhatsApp for exact quotes."
+        motif="focus"
+        eyebrow="Your material list"
+        title={activeTab === "basket" ? "Review your enquiry details" : "Your saved materials"}
+        text="Check quantities and shades, then send one organised WhatsApp enquiry for current stock and an exact quote."
       >
-        <ProductVisual palette={["#35b8ad", "#f6a7b8", "#c99b6b"]} />
+        <picture className="catalogue-hero-photo">
+          <source srcSet="/assets/images/editorial/shade-library.avif" type="image/avif" />
+          <img
+            src="/assets/images/editorial/shade-library.webp"
+            alt="Yarn and cord shades arranged for comparing colour and texture"
+            width="1536"
+            height="1024"
+          />
+        </picture>
       </PageHero>
 
       {/* Tabs Selector Bar */}
@@ -171,6 +202,16 @@ export default function Enquiry() {
                               </span>
                             )}
                           </div>
+                          <label className="basket-item-note">
+                            <span>Note for this item</span>
+                            <input
+                              type="text"
+                              value={item.note || ""}
+                              onChange={(event) => updateItem(index, { note: event.target.value })}
+                              placeholder="Shade code, packing or use"
+                              maxLength={160}
+                            />
+                          </label>
                         </div>
 
                         {/* Quantity control */}
@@ -206,7 +247,7 @@ export default function Enquiry() {
                           title="Remove product"
                           aria-label="Remove item"
                         >
-                          <Trash2 size={16} />
+                          <Trash size={16} />
                         </button>
                       </div>
                     ))}
@@ -233,7 +274,7 @@ export default function Enquiry() {
                   </p>
                   <div className="empty-basket-cta-card">
                     <div className="empty-basket-icon-circle">
-                      <Inbox size={32} />
+                      <Tray size={32} />
                     </div>
                     <h3>Your Enquiry Basket is Empty</h3>
                     <p>Browse our catalogue of yarns, cords, and craft accessories to compile your bulk list.</p>
@@ -244,7 +285,7 @@ export default function Enquiry() {
                   </div>
                   <div style={{ marginTop: "24px" }}>
                     <a className="btn btn-whatsapp" href={createWhatsAppLink(catalogueMessage)} target="_blank" rel="noreferrer">
-                      <MessageCircle size={18} />
+                      <ChatCircleDots size={18} />
                       WhatsApp Catalogue Request
                     </a>
                   </div>
@@ -307,7 +348,7 @@ export default function Enquiry() {
                             title="Remove from favorites"
                             style={{ padding: "8px", border: "none", background: "none", cursor: "pointer", color: "var(--text-muted)" }}
                           >
-                            <Trash2 size={16} />
+                            <Trash size={16} />
                           </button>
                         </div>
                       </div>

@@ -1,4 +1,4 @@
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus } from "@phosphor-icons/react";
 import { useCallback } from "react";
 
 export default function QuantitySelector({ options, value, onChange }) {
@@ -27,7 +27,10 @@ export default function QuantitySelector({ options, value, onChange }) {
   return (
     <div className="quantity-selector">
       <div className="quantity-label">
-        Quantity: <strong>{value} {unit}</strong>
+        Quantity:{" "}
+        <strong key={value} className="quantity-value-feedback">
+          {value} {unit}
+        </strong>
       </div>
 
       <div className="quantity-presets" role="group" aria-label="Quick quantity selection">

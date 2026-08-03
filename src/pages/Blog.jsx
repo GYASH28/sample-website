@@ -1,69 +1,65 @@
-// src/pages/Blog.jsx
-// Phase 6 — Blog index. 3 evergreen guides (data-driven from siteData.blogPosts).
-
+import { ArrowRight } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
-import Reveal from "../components/Reveal.jsx";
 import PageHero from "../components/PageHero.jsx";
-import useDocumentMeta from "../hooks/useDocumentMeta.js";
+import Reveal from "../components/Reveal.jsx";
 import { blogPosts } from "../data/siteData.js";
+import useDocumentMeta from "../hooks/useDocumentMeta.js";
+
+const guideImages = [
+  "/assets/images/editorial/shade-library.webp",
+  "/assets/images/cat_macrame.webp",
+  "/assets/images/editorial/atelier-hero.webp",
+];
 
 export default function Blog() {
   useDocumentMeta({
-    title: "Guides & Reads | Fakhri Mart",
-    description: "Short, practical notes for makers — yarn weights, macrame basics, crochet vs knitting and more.",
+    title: "Craft Guides | Fakhri Mart",
+    description: "Practical guides to yarn, macrame, crochet and choosing craft materials.",
+    canonical: "/blog",
   });
 
   return (
     <>
       <PageHero
-        eyebrow="Guides"
-        title="Guides & Reads"
-        text="Short, practical notes for makers of all levels."
+        motif="editorial"
+        eyebrow="Material notes"
+        title="Useful answers before you choose a yarn"
+        text="Short, practical guides on fibre, weight, cord, colour and the tools that make a project easier."
       />
 
       <section className="section">
-        <div className="container">
-          <div className="card-grid" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
-            {blogPosts.map((post, index) => (
-              <Reveal key={post.slug} delay={(index % 3) * 80} variant="fade-up">
-                <Link
-                  to={`/blog/${post.slug}`}
-                  style={{
-                    display: "block",
-                    height: "100%",
-                    padding: "20px",
-                    background: "#fff",
-                    border: "1px solid rgba(0,0,0,0.05)",
-                    borderRadius: "12px",
-                    color: "inherit",
-                    textDecoration: "none",
-                    transition: "transform 0.2s, box-shadow 0.2s",
-                  }}
-                  className="blog-card"
-                >
-                  <div
-                    style={{
-                      fontSize: "0.72rem",
-                      color: "var(--gold-deep, #8E6824)",
-                      letterSpacing: "0.16em",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {post.readMinutes} min read ·{" "}
-                    {new Date(post.date).toLocaleDateString("en-IN", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </div>
-                  <h3 style={{ marginTop: "8px", marginBottom: "8px" }}>{post.title}</h3>
-                  <p style={{ color: "var(--muted, #6B5749)", fontSize: "0.9rem", marginBottom: 0 }}>
-                    {post.excerpt}
-                  </p>
+        <div className="container blog-editorial-list">
+          {blogPosts.map((post, index) => (
+            <Reveal
+              as="article"
+              key={post.slug}
+              className={`blog-story-card ${index === 0 ? "blog-featured" : ""}`}
+              delay={Math.min(index * 55, 110)}
+              variant={index === 0 ? "scale-in" : index % 2 ? "slide-right" : "slide-left"}
+            >
+              <Link
+                to={`/blog/${post.slug}`}
+                className="blog-image-link"
+                aria-label={`Read ${post.title}`}
+              >
+                <img
+                  src={guideImages[index % guideImages.length]}
+                  alt=""
+                  width="900"
+                  height="620"
+                  loading={index === 0 ? "eager" : "lazy"}
+                />
+              </Link>
+              <div>
+                <span className="eyebrow">{post.category || "Craft guide"} · {post.readMinutes} min read</span>
+                <h2><Link to={`/blog/${post.slug}`}>{post.title}</Link></h2>
+                <p>{post.excerpt}</p>
+                <Link className="text-link" to={`/blog/${post.slug}`}>
+                  Read the guide <ArrowRight size={18} />
                 </Link>
-              </Reveal>
-            ))}
-          </div>
+              </div>
+            </Reveal>
+          ))}
         </div>
       </section>
     </>

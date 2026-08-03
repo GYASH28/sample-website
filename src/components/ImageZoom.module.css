@@ -1,0 +1,144 @@
+.backdrop {
+  position: fixed;
+  z-index: calc(var(--z-dialog) + 1);
+  inset: 0;
+  display: grid;
+  padding: clamp(1rem, 4vw, 3rem);
+  place-items: center;
+  background: rgba(24, 12, 18, 0.94);
+  color: #fffaf7;
+  isolation: isolate;
+  animation: lightbox-enter var(--motion-duration-direct)
+    var(--motion-ease-direct) both;
+}
+
+.imageWrapper {
+  position: relative;
+  display: grid;
+  width: min(88vw, 76rem);
+  max-height: 86vh;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(255, 250, 247, 0.22);
+  border-radius: 0.85rem;
+  background: #1b1116;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  max-height: 82vh;
+  object-fit: contain;
+  animation: image-focus var(--motion-duration-route)
+    var(--motion-ease-standard) both;
+}
+
+.index {
+  position: absolute;
+  right: 0.8rem;
+  bottom: 0.8rem;
+  max-width: calc(100% - 1.6rem);
+  padding: 0.45rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(27, 17, 22, 0.84);
+  color: rgba(255, 250, 247, 0.9);
+  font-size: 0.7rem;
+}
+
+.close,
+.arrow {
+  position: fixed;
+  z-index: 2;
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  padding: 0;
+  place-items: center;
+  border: 1px solid rgba(255, 250, 247, 0.3);
+  border-radius: 50%;
+  background: rgba(69, 39, 53, 0.88);
+  color: #fffaf7;
+  cursor: pointer;
+  transition:
+    background-color var(--motion-duration-fast) var(--motion-ease-direct),
+    transform var(--motion-duration-fast) var(--motion-ease-emphasis);
+}
+
+.close {
+  top: max(1rem, env(safe-area-inset-top));
+  right: max(1rem, env(safe-area-inset-right));
+}
+
+.arrow {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.left {
+  left: max(1rem, env(safe-area-inset-left));
+}
+
+.right {
+  right: max(1rem, env(safe-area-inset-right));
+}
+
+.close:is(:hover, :focus-visible) {
+  background: var(--rose-600);
+  transform: rotate(5deg);
+}
+
+.arrow:is(:hover, :focus-visible) {
+  background: var(--teal-800);
+  transform: translateY(-50%) scale(1.06);
+}
+
+.close:focus-visible,
+.arrow:focus-visible {
+  outline: 0.2rem solid var(--brass-400);
+  outline-offset: 0.22rem;
+}
+
+@keyframes lightbox-enter {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes image-focus {
+  from {
+    opacity: 0.45;
+    transform: scale(0.992);
+  }
+}
+
+@media (max-width: 42rem) {
+  .backdrop {
+    padding: 4.5rem 0.75rem 5rem;
+  }
+
+  .imageWrapper {
+    width: 100%;
+  }
+
+  .arrow {
+    top: auto;
+    bottom: max(0.9rem, env(safe-area-inset-bottom));
+    transform: none;
+  }
+
+  .arrow:is(:hover, :focus-visible) {
+    transform: scale(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .image {
+    animation: none;
+  }
+
+  .close,
+  .arrow {
+    transition: none;
+  }
+}

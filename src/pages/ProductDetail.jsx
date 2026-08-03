@@ -1,24 +1,21 @@
 import {
   ArrowRight,
-  ChevronRight,
-  MessageCircle,
-  Truck,
-  ShieldCheck,
-  Percent,
+  Bell,
+  ChatCircleDots,
   Check,
-  ShoppingBag,
-  Plus,
-  Minus,
-  HelpCircle,
-  Info,
-  ChevronDown,
-  ChevronUp,
-  Tags,
+  ArrowsOut,
   Heart,
-  Maximize2,
-  Bell
-} from "lucide-react";
-import { useMemo, useState, useEffect } from "react";
+  Info,
+  Minus,
+  Percent,
+  Plus,
+  Question,
+  ShieldCheck,
+  ShoppingBag,
+  Tag,
+  Truck,
+} from "@phosphor-icons/react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import CatalogueCta from "../components/CatalogueCta.jsx";
 import ProductCard from "../components/ProductCard.jsx";
@@ -26,6 +23,7 @@ import ShadeCardButton from "../components/ShadeCardButton.jsx";
 import ShareButton from "../components/ShareButton.jsx";
 import ColorSwatchPicker from "../components/ColorSwatchPicker.jsx";
 import QuantitySelector from "../components/QuantitySelector.jsx";
+import ProductFaq from "../components/ProductFaq.jsx";
 import { Lightbox } from "../components/ImageZoom.jsx";
 import StickyBreadcrumb from "../components/StickyBreadcrumb.jsx";
 import { createWhatsAppLink, featuredProducts, productCategories, businessInfo } from "../data/siteData.js";
@@ -110,9 +108,10 @@ export default function ProductDetail() {
   const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
-  // Compile all images available for the product
+  // Use only verified material-family and editorial images. Current shade
+  // photos are confirmed on WhatsApp instead of being synthesized.
   const productImages = useMemo(() => {
-    const images = [
+    return [
       { type: "hero", src: baseImageUrl, label: "Hero View" },
       ...(product.galleryImages || []).map((img, i) => ({
         type: `gallery-${i + 1}`,
@@ -120,38 +119,7 @@ export default function ProductDetail() {
         label: `Gallery View ${i + 1}`
       }))
     ];
-
-    if (product.colors && product.colors.length > 0) {
-      product.colors.forEach((color) => {
-        const colorSlug = color.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-        images.push({
-          type: `color-${colorSlug}`,
-          src: `/assets/images/products/${product.slug}/color-${colorSlug}.webp`,
-          label: `${color.name} Shade`
-        });
-      });
-    }
-    return images;
   }, [product, baseImageUrl]);
-
-  // Update gallery index when active color changes
-  useEffect(() => {
-    if (activeColor) {
-      const colorSlug = activeColor.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-      const index = productImages.findIndex(img => img.type === `color-${colorSlug}`);
-      if (index > -1) {
-        setActiveGalleryIndex(index);
-      }
-    }
-  }, [activeColor, productImages]);
-
-  // Share link feedback
-  const [copied, setCopied] = useState(false);
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   // Derive related products
   const relatedProducts = useMemo(() => {
@@ -198,6 +166,12 @@ export default function ProductDetail() {
 
   // Handle add to enquiry basket
   const [addedAnimation, setAddedAnimation] = useState(false);
+  const addedTimerRef = useRef(null);
+
+  useEffect(() => {
+    return () => window.clearTimeout(addedTimerRef.current);
+  }, [product.slug]);
+
   const handleAddToBasket = () => {
     const basketItem = {
       slug: product.slug,
@@ -211,75 +185,73 @@ export default function ProductDetail() {
     };
     addToBasket(basketItem);
     setAddedAnimation(true);
-    setTimeout(() => setAddedAnimation(false), 2000);
+    window.clearTimeout(addedTimerRef.current);
+    addedTimerRef.current = window.setTimeout(
+      () => setAddedAnimation(false),
+      2_000,
+    );
   };
 
   // Specs Generator
   const specs = useMemo(() => {
     const defaultSpecs = [
       { label: "Category", value: product.category },
-      { label: "Availability", value: "Ready Stock (Confirm on Enquiry)" },
-      { label: "Shipping Support", value: "All India Shipping Available" }
+      { label: "Availability", value: "Confirmed when you enquire" },
+      { label: "Delivery", value: "Available across India; timing confirmed by location" }
     ];
 
     if (product.category === "Bliss Threads") {
       return [
-        { label: "Material Composition", value: "Premium Soft Cotton" },
-        { label: "Texture Feel", value: "Extremely Soft, non-fraying" },
-        { label: "Recommended Crochet Hooks", value: "1.0mm - 2.5mm" },
+        { label: "Product family", value: "Bliss Threads" },
+        { label: "Shade guidance", value: "Current shade card available on request" },
+        { label: "Needle or hook size", value: "Confirm from the current pack label" },
         ...defaultSpecs
       ];
     }
     if (product.category === "Vardhaman Products") {
       return [
-        { label: "Brand", value: "Vardhaman (Genuine Quality)" },
-        { label: "Primary Use", value: "Wearables, Baby garments, amigurumi, and craft work" },
-        { label: "Care Instructions", value: "Gentle hand wash cold, dry flat in shade" },
+        { label: "Brand", value: "Vardhaman" },
+        { label: "Product details", value: "Current pack specifications shared on request" },
+        { label: "Care", value: "Follow the instructions on the supplied pack label" },
         ...defaultSpecs
       ];
     }
     if (product.category === "Ganga Products") {
       return [
         { label: "Brand", value: "Ganga Yarns" },
-        { label: "Texture Feel", value: "Plush, high durability threads" },
+        { label: "Product details", value: "Current pack specifications shared on request" },
         ...defaultSpecs
       ];
     }
     if (product.category === "Macrame Cord") {
       return [
-        { label: "Material Composition", value: "100% Natural Organic Cotton" },
+        { label: "Material", value: "Confirm composition from the current product label" },
         { label: "Structure", value: product.slug.includes("twisted") ? "Multi-strand twisted rope" : "Single-strand twist cord" },
-        { label: "Recommended Craft", value: "Macrame wall hanger, plant holder, woven bags" },
+        { label: "Project guidance", value: "Ask us about cord structure for your intended project" },
         ...defaultSpecs
       ];
     }
     if (product.category === "T-Shirt Yarn") {
       return [
-        { label: "Material", value: "Jersey Fabric Strips (Cotton Blend)" },
-        { label: "Recommended Crochet Hooks", value: "6.0mm - 9.0mm" },
-        { label: "Structure", value: "Chunky, flat structure for quick knitting" },
+        { label: "Material", value: "Confirm composition from the current product label" },
+        { label: "Needle or hook size", value: "Confirm from the current pack label" },
+        { label: "Product details", value: "Current width and weight shared on request" },
         ...defaultSpecs
       ];
     }
     return defaultSpecs;
   }, [product]);
 
-  // FAQ state
-  const [openFaq, setOpenFaq] = useState(null);
-  const toggleFaq = (index) => {
-    setOpenFaq(openFaq === index ? null : index);
-  };
-
   // Category-specific FAQs
   const productFaqs = useMemo(() => {
     const defaultFaqs = [
       {
         q: "Do you provide bulk wholesale pricing?",
-        a: "Yes! While we do not display prices publicly on the website, we offer competitive wholesale prices for bulk quantities. Click the 'WhatsApp Enquiry' or 'Add to Basket' buttons to discuss pricing options directly."
+        a: "Yes. Prices are confirmed against quantity, shade, size, packaging, and current availability. Add the items to your enquiry basket to request a wholesale quote."
       },
       {
         q: "Is shipping available all over India?",
-        a: "Absolutely. We ship yarns, cords, handles, and accessories all across India. Delivery times typically range between 3 to 7 business days depending on your delivery location."
+        a: "We support delivery across India. Share your postcode in the enquiry and we will confirm availability, delivery timing, and applicable charges."
       },
       {
         q: "Can I mix different shades in a single bulk order?",
@@ -292,11 +264,11 @@ export default function ProductDetail() {
         ...defaultFaqs,
         {
           q: "What is the recommended hook or needle size?",
-          a: `For ${product.name}, we recommend using hooks ranging from ${product.category.includes("T-Shirt") ? "6.0mm to 9.0mm" : "1.5mm to 3.0mm"}. Gauge guidance can be confirmed on WhatsApp.`
+          a: `The best size depends on the current ${product.name} pack specifications, your gauge, and the fabric you want. Ask us to share the current label details before ordering.`
         },
         {
-          q: "Are these yarns colour-fast and washable?",
-          a: "Yes, our yarns are carefully dyed. We recommend gentle hand washing in cold water and drying flat in the shade to maintain thread structure and colour vibrance."
+          q: "How should I wash and care for this yarn?",
+          a: "Please follow the care instructions on the supplied pack label. We can share a current label photo through WhatsApp before you order."
         }
       ];
     }
@@ -305,7 +277,7 @@ export default function ProductDetail() {
         ...defaultFaqs,
         {
           q: "Can I comb or fringe this macrame cord?",
-          a: "Yes! The single-twist macrame cord fringes out beautifully for feathers, tassels, and leaves. The twisted cord offers more structural strength for large plant hangers."
+          a: "Fringing depends on the cord construction. Tell us the finish you need and we will confirm the current cord structure before you order."
         }
       ];
     }
@@ -314,7 +286,7 @@ export default function ProductDetail() {
         ...defaultFaqs,
         {
           q: "Are these handles durable for regular handbag use?",
-          a: "Yes, our wooden, chain, and pearl handles are designed with reinforced attachments, making them sturdy enough for premium boutiques and everyday handmade purses."
+          a: "Suitability depends on the bag weight, attachment method, and current handle specification. Share your project details so we can help you choose."
         }
       ];
     }
@@ -340,19 +312,20 @@ export default function ProductDetail() {
                   onClick={() => setLightboxOpen(true)}
                 >
                   <img
+                    key={productImages[activeGalleryIndex]?.src}
                     src={productImages[activeGalleryIndex]?.src}
                     alt={productImages[activeGalleryIndex]?.label || product.name}
                     className="product-detail-hero-image"
-                    style={{ position: "relative", zIndex: 1, width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.4s ease" }}
+                    style={{ position: "relative", zIndex: 1, width: "100%", height: "100%", objectFit: "cover" }}
                   />
                   <div className="image-zoom-overlay-badge" style={{ position: "absolute", bottom: "16px", right: "16px", zIndex: 5, background: "rgba(0,0,0,0.5)", color: "#fff", padding: "8px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <Maximize2 size={16} />
+                    <ArrowsOut size={16} />
                   </div>
                 </div>
 
                 {/* Gallery Thumbnails Carousel Strip */}
                 <div className="gallery-thumbnail-strip" style={{ marginTop: "16px" }}>
-                  <span className="thumbnail-label" style={{ display: "block", marginBottom: "8px", fontWeight: "600", fontSize: "14px", color: "var(--text-muted)" }}>Gallery & Shade Options:</span>
+                  <span className="thumbnail-label" style={{ display: "block", marginBottom: "8px", fontWeight: "600", fontSize: "14px", color: "var(--text-muted)" }}>Material and project views</span>
                   <div className="thumbnail-grid-row" style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "6px" }}>
                     {productImages.map((img, i) => {
                       const isSelected = activeGalleryIndex === i;
@@ -361,15 +334,7 @@ export default function ProductDetail() {
                           key={i}
                           type="button"
                           className={`thumbnail-rect-btn ${isSelected ? "active" : ""}`}
-                          onClick={() => {
-                            setActiveGalleryIndex(i);
-                            if (img.type.startsWith("color-")) {
-                              const matchingColor = product.colors.find(c => 
-                                img.type.endsWith(c.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"))
-                              );
-                              if (matchingColor) setActiveColor(matchingColor);
-                            }
-                          }}
+                          onClick={() => setActiveGalleryIndex(i)}
                           style={{
                             width: "60px",
                             height: "60px",
@@ -412,6 +377,7 @@ export default function ProductDetail() {
                     className={`btn-detail-action-circle ${isFavorited ? "active" : ""}`}
                     onClick={() => toggleWishlist(product.slug)}
                     title={isFavorited ? "Remove from Favorites" : "Save to Favorites"}
+                    aria-label={isFavorited ? "Remove from favorites" : "Save to favorites"}
                     style={{
                       width: "36px",
                       height: "36px",
@@ -425,13 +391,14 @@ export default function ProductDetail() {
                       cursor: "pointer"
                     }}
                   >
-                    <Heart size={16} fill={isFavorited ? "currentColor" : "none"} />
+                    <Heart size={16} weight={isFavorited ? "fill" : "regular"} />
                   </button>
                 </div>
               </div>
 
               <h1 className="product-detail-title-new">{product.name}</h1>
               <p className="product-detail-variant-info">{product.variants}</p>
+              <p className="product-image-note">{product.imageNote}</p>
 
               {/* Phase 2: StockBadge removed. Shade card request row kept. */}
               <div className="product-detail-stock-row" style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap", marginBottom: "20px", padding: "12px 0", borderBottom: "1px solid var(--line)", borderTop: "1px solid var(--line)" }}>
@@ -447,14 +414,14 @@ export default function ProductDetail() {
                   <Percent size={15} /> Wholesale Friendly
                 </span>
                 <span>
-                  <ShieldCheck size={15} /> Verified Quality
+                  <ShieldCheck size={15} /> Details Confirmed on Enquiry
                 </span>
               </div>
 
               {/* Pincode delivery checker */}
               {/* Phase 2: PincodeChecker removed — replaced with honest static shipping line */}
               <div style={{ margin: "16px 0" }}>
-                <p style={{ color: 'var(--muted, #544C43)', fontSize: '0.9rem' }}>We deliver across India — confirm exact timing on WhatsApp.</p>
+                <p style={{ color: 'var(--muted, #544C43)', fontSize: '0.9rem' }}>We deliver across India. Confirm exact timing on WhatsApp.</p>
               </div>
 
               <div className="product-detail-desc-box">
@@ -543,7 +510,7 @@ export default function ProductDetail() {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    <MessageCircle size={20} />
+                    <ChatCircleDots size={20} />
                     WhatsApp Enquiry
                   </a>
 
@@ -561,7 +528,7 @@ export default function ProductDetail() {
                 <div className="utility-buttons-row">
                   <ShareButton
                     url={typeof window !== "undefined" ? window.location.href : ""}
-                    title={`${product.name} — Fakhri Mart`}
+                    title={`${product.name} | Fakhri Mart`}
                     text={`${product.name} from Fakhri Mart`}
                   />
                   <a
@@ -570,7 +537,7 @@ export default function ProductDetail() {
                     rel="noreferrer"
                     className="utility-action-link-btn"
                   >
-                    <Tags size={14} />
+                    <Tag size={14} />
                     Ask Bulk Price
                   </a>
                 </div>
@@ -647,31 +614,9 @@ export default function ProductDetail() {
             {/* Wholesale Info / FAQ */}
             <div className="detail-info-block shadow-card-premium">
               <h3 className="info-block-title">
-                <HelpCircle size={18} /> Product FAQs
+                <Question size={18} /> Product FAQs
               </h3>
-              <div className="faq-accordions-group">
-                {productFaqs.map((faq, index) => {
-                  const isOpen = openFaq === index;
-                  return (
-                    <div key={index} className="faq-item-accordion">
-                      <button
-                        type="button"
-                        className="faq-question-toggle-btn"
-                        onClick={() => toggleFaq(index)}
-                        aria-expanded={isOpen}
-                      >
-                        <span>{faq.q}</span>
-                        {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                      </button>
-                      <div className={`faq-answer-collapsible ${isOpen ? "open" : ""}`}>
-                        <div className="faq-answer-content-inner">
-                          <p>{faq.a}</p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              <ProductFaq productSlug={product.slug} faqs={productFaqs} />
             </div>
           </div>
         </div>
@@ -684,7 +629,7 @@ export default function ProductDetail() {
             <div className="section-head text-center" style={{ marginBottom: "32px" }}>
               <p className="eyebrow" style={{ display: "inline-block" }}>Bundle</p>
               <h2>Frequently Enquired Together</h2>
-              <p>Makers often pair these — add them all to your enquiry at once.</p>
+              <p>Makers often pair these. Add them all to your enquiry at once.</p>
             </div>
             <div className="card-grid product-grid">
               {bundleProducts.map((bProduct) => (
@@ -759,7 +704,7 @@ export default function ProductDetail() {
                 rel="noreferrer noopener"
                 className="btn btn-whatsapp btn-small"
               >
-                <MessageCircle size={16} aria-hidden="true" />
+                <ChatCircleDots size={16} aria-hidden="true" />
                 Notify Me
               </a>
             </div>
@@ -774,7 +719,7 @@ export default function ProductDetail() {
             <div className="section-head text-center" style={{ marginBottom: "32px" }}>
               <p className="eyebrow" style={{ display: "inline-block" }}>Cross-sell</p>
               <h2>People Also Enquired</h2>
-              <p>Related products — you might also like these.</p>
+              <p>Explore related materials from the catalogue.</p>
             </div>
             <div className="card-grid product-grid">
               {relatedProducts.map((relProduct) => (
@@ -792,7 +737,7 @@ export default function ProductDetail() {
             <div className="section-head text-center" style={{ marginBottom: "32px" }}>
               <p className="eyebrow" style={{ display: "inline-block" }}>History</p>
               <h2>Recently Viewed</h2>
-              <p>Recently viewed — phir se dekhna chahenge?</p>
+              <p>Return to materials you viewed recently.</p>
             </div>
             <div className="card-grid product-grid">
               {recentlyViewedProducts.map((recentProduct) => (

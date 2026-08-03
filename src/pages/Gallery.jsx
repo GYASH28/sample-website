@@ -1,51 +1,112 @@
+import { Link } from "react-router-dom";
+import { useState } from "react";
 import CatalogueCta from "../components/CatalogueCta.jsx";
-import GalleryVisual from "../components/GalleryVisual.jsx";
+import { Lightbox } from "../components/ImageZoom.jsx";
 import PageHero from "../components/PageHero.jsx";
-import ProductVisual from "../components/ProductVisual.jsx";
-import Reveal from "../components/Reveal.jsx";
-import { galleryItems } from "../data/siteData.js";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
 
+const gallery = [
+  {
+    src: "/assets/images/editorial/crochet-bag-worktable.webp",
+    alt: "A floral crochet bag in progress with yarn, hook, beads and wooden handle",
+    title: "From yarn to a finished bag",
+    note: "Crochet · Bag making",
+    className: "gallery-feature",
+  },
+  {
+    src: "/assets/images/cat_ganga.webp",
+    alt: "Colourful yarn balls arranged in a craft shop",
+    title: "Colour-rich yarn ranges",
+    note: "Crochet · Knitting",
+  },
+  {
+    src: "/assets/images/cat_macrame.webp",
+    alt: "Natural cotton macrame cord in several twists and colours",
+    title: "Cord, knots and structure",
+    note: "Macrame",
+  },
+  {
+    src: "/assets/images/cat_embroidery.webp",
+    alt: "Organised embroidery thread skeins in vivid colours",
+    title: "Lacchi and embroidery colour",
+    note: "Embroidery",
+  },
+  {
+    src: "/assets/images/cat_purse_acc.webp",
+    alt: "Purse locks, rings and decorative metal hardware on a worktable",
+    title: "Hardware that finishes the piece",
+    note: "Bag making",
+  },
+  {
+    src: "/assets/images/editorial/craft-stock-room.webp",
+    alt: "Organised craft stock room with yarn, cord, embroidery thread, beads and hardware",
+    title: "Materials ready for retail and wholesale",
+    note: "In-store stock",
+    className: "gallery-wide",
+  },
+];
+
 export default function Gallery() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   useDocumentMeta({
-    title: "Gallery — Fakhri Mart",
-    description: "See projects made with Fakhri Mart yarns and craft supplies.",
+    title: "Craft Material Gallery | Fakhri Mart",
+    description: "Yarn, crochet, macrame, embroidery and bag-making material inspiration from Fakhri Mart.",
     canonical: "/gallery",
   });
+
   return (
     <>
       <PageHero
-        eyebrow="Gallery"
-        title="Yarns, Threads, Accessories & Purse Materials"
-        text="A polished product-range gallery for yarn collection, crochet threads, macrame cords, embroidery threads, accessories, beads, purse materials and organized stock."
-      >
-        <ProductVisual palette={["#e86f9e", "#35b8ad", "#f4cf6a"]} />
-      </PageHero>
+        motif="shutter"
+        eyebrow="Made with the materials"
+        title="Colour, fibre and the work in between"
+        text="A closer look at the yarns, cords, threads, tools and bag-making details that move through our catalogue."
+      />
 
-      <section className="section">
+      <section className="section gallery-page-section">
         <div className="container">
-          <Reveal className="section-heading" variant="scale-in">
-            <p className="eyebrow">Product Gallery</p>
-            <h2>Explore the Fakhri Mart material range.</h2>
-            <p>Organized views for product range, shade discovery, bulk stock and catalogue enquiries.</p>
-          </Reveal>
-          <div className="gallery-grid">
-            {galleryItems.map((item, index) => (
-              <Reveal key={item.title} className="gallery-card" delay={(index % 4) * 60} variant="scale-in">
-                <GalleryVisual item={item} />
-                <div>
-                  <h3>{item.title}</h3>
-                  <p>{item.label}</p>
-                </div>
-              </Reveal>
+          <div className="gallery-editorial-grid">
+            {gallery.map((item, index) => (
+              <figure
+                key={item.title}
+                className={item.className || ""}
+                data-selected={activeIndex === index}
+              >
+                <button
+                  type="button"
+                  className="gallery-frame-button"
+                  aria-label={`Open ${item.title} in the gallery viewer`}
+                  onClick={() => {
+                    setActiveIndex(index);
+                    setLightboxOpen(true);
+                  }}
+                >
+                  <img src={item.src} alt={item.alt} loading="lazy" width="900" height="720" />
+                  <figcaption>
+                    <span>{item.note}</span>
+                    <h2>{item.title}</h2>
+                  </figcaption>
+                </button>
+              </figure>
             ))}
           </div>
+          <p className="gallery-disclaimer">
+            Editorial images show material families and project inspiration. For exact packaging and current shades,
+            <Link to="/contact"> request live photos</Link>.
+          </p>
         </div>
       </section>
 
-      <div className="container">
-        <CatalogueCta />
-      </div>
+      <div className="container"><CatalogueCta /></div>
+      {lightboxOpen ? (
+        <Lightbox
+          images={gallery.map((item) => ({ src: item.src, label: item.title }))}
+          activeIndex={activeIndex}
+          onIndexChange={setActiveIndex}
+          onClose={() => setLightboxOpen(false)}
+        />
+      ) : null}
     </>
   );
 }

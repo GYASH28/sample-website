@@ -1,16 +1,21 @@
 import { useMemo, useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
 import CatalogueCta from "../components/CatalogueCta.jsx";
-import CategoryCard from "../components/CategoryCard.jsx";
 import PageHero from "../components/PageHero.jsx";
 import ProductCard from "../components/ProductCard.jsx";
-import ProductVisual from "../components/ProductVisual.jsx";
 import Reveal from "../components/Reveal.jsx";
 import { featuredProducts, productCategories, newArrivals, MASTER_CATEGORIES } from "../data/siteData.js";
 import { useRecentlyViewed } from "../hooks/useRecentlyViewed.js";
-import { Search, SlidersHorizontal, ArrowUpDown, XCircle, Grid, List, HelpCircle, Check, ArrowRight } from "lucide-react";
-import { ease, duration, spring } from "../motion-tokens.js";
+import { useFlipList } from "../hooks/useFlipList.js";
+import {
+  ArrowsDownUp,
+  ListBullets,
+  MagnifyingGlass,
+  Question,
+  SlidersHorizontal,
+  SquaresFour,
+  XCircle,
+} from "@phosphor-icons/react";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
 
 const PRODUCT_TYPES = [
@@ -38,18 +43,19 @@ const POPULAR_SEARCHES = ["Yarn", "Macrame", "Hook", "Cotton", "Soft", "Embroide
 
 export default function Products() {
   useDocumentMeta({
-    title: "Products — Fakhri Mart",
+    title: "Products | Fakhri Mart",
     description: "Browse our full range of yarns, crochet threads, macrame cords, and craft accessories.",
     canonical: "/products",
   });
   const [searchParams, setSearchParams] = useSearchParams();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeDepartment, setActiveDepartment] = useState("All"); // Prompt 2 Part 2.2 — 'All' | 'Yarns' | 'Threads' | 'Accessories'
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [activeType, setActiveType] = useState("All");
-  const [activeTag, setActiveTag] = useState("All");
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get("q") || "");
+  const [activeDepartment, setActiveDepartment] = useState(() => searchParams.get("department") || "All");
+  const [activeCategory, setActiveCategory] = useState(() => searchParams.get("category") || "All");
+  const [activeType, setActiveType] = useState(() => searchParams.get("type") || "All");
+  const [activeTag, setActiveTag] = useState(() => searchParams.get("tag") || "All");
   const [filterHasShades, setFilterHasShades] = useState(false);
   const [filterBulkOnly, setFilterBulkOnly] = useState(false);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   
   const [sortBy, setSortBy] = useState("featured");
   const [viewMode, setViewMode] = useState("grid"); // "grid" or "list"
@@ -60,11 +66,25 @@ export default function Products() {
     const category = searchParams.get("category");
     const type = searchParams.get("type");
     const department = searchParams.get("department");
+    const query = searchParams.get("q");
     if (tag) setActiveTag(tag);
     if (category) setActiveCategory(category);
     if (type) setActiveType(type);
     if (department) setActiveDepartment(department);
+    if (query !== null) setSearchQuery(query);
   }, [searchParams]);
+
+  useEffect(() => {
+    const next = new URLSearchParams();
+    if (searchQuery.trim()) next.set("q", searchQuery.trim());
+    if (activeDepartment !== "All") next.set("department", activeDepartment);
+    if (activeCategory !== "All") next.set("category", activeCategory);
+    if (activeType !== "All") next.set("type", activeType);
+    if (activeTag !== "All") next.set("tag", activeTag);
+    if (next.toString() !== searchParams.toString()) {
+      setSearchParams(next, { replace: true });
+    }
+  }, [searchQuery, activeDepartment, activeCategory, activeType, activeTag, searchParams, setSearchParams]);
 
   // Search Auto-Suggestions State
   const [suggestions, setSuggestions] = useState([]);
@@ -167,7 +187,12 @@ export default function Products() {
         (product) =>
           product.name.toLowerCase().includes(q) ||
           product.category.toLowerCase().includes(q) ||
+          product.brand?.toLowerCase().includes(q) ||
+          product.type?.toLowerCase().includes(q) ||
+          product.masterCategory?.toLowerCase().includes(q) ||
           product.suitableFor.toLowerCase().includes(q) ||
+          product.colors?.some((shade) => shade.name.toLowerCase().includes(q)) ||
+          product.filters?.some((filter) => filter.toLowerCase().includes(q)) ||
           product.tags?.some(t => t.toLowerCase().includes(q))
       );
     }
@@ -233,6 +258,9 @@ export default function Products() {
 
     return result;
   }, [filteredProducts, sortBy]);
+  const resultGridRef = useFlipList(
+    sortedProducts.map((product) => product.slug),
+  );
 
   const recentSlugs = useRecentlyViewed(null);
   const recentlyViewedProducts = useMemo(() => {
@@ -256,11 +284,21 @@ export default function Products() {
   return (
     <>
       <PageHero
+        className="catalogue-page-hero"
+        motif="weave"
         eyebrow="Products"
-        title="Yarns, Crochet Threads & Craft Essentials"
-        text="Browse the Fakhri Mart catalogue by category. Ask for prices, availability, shade details and bulk options directly through WhatsApp."
+        title="Find a material by craft, fibre or finish"
+        text="Search the catalogue, refine the results, then ask for current shades and quantity-based price."
       >
-        <ProductVisual palette={["#35b8ad", "#f6a7b8", "#f3c65f"]} />
+        <picture className="catalogue-hero-photo">
+          <source srcSet="/assets/images/editorial/shade-library.avif" type="image/avif" />
+          <img
+            src="/assets/images/editorial/shade-library.webp"
+            alt="A curated library of yarn shades and material textures"
+            width="1536"
+            height="1024"
+          />
+        </picture>
       </PageHero>
 
       {/* Prompt 2 Part 2.2 — Department switcher (All / Yarns / Threads / Accessories) */}
@@ -300,7 +338,7 @@ export default function Products() {
                 gap: "6px",
               }}
             >
-              All <span style={{ fontSize: "0.7rem", opacity: 0.7 }}>({departmentCounts.All})</span>
+                All <span style={{ fontSize: "0.7rem" }}>({departmentCounts.All})</span>
             </button>
             {MASTER_CATEGORIES.map((mc) => {
               const isActive = activeDepartment === mc;
@@ -326,28 +364,10 @@ export default function Products() {
                     gap: "6px",
                   }}
                 >
-                  {mc} <span style={{ fontSize: "0.7rem", opacity: 0.7 }}>({departmentCounts[mc]})</span>
+                  {mc} <span style={{ fontSize: "0.7rem" }}>({departmentCounts[mc]})</span>
                 </button>
               );
             })}
-          </div>
-        </div>
-      </section>
-
-      {/* Category Section */}
-      <section className="section" id="categories">
-        <div className="container">
-          <Reveal className="section-heading" variant="scale-in">
-            <p className="eyebrow">Categories</p>
-            <h2>Product categories available for enquiry</h2>
-            <p>Each category is ready for catalogue, shade card, availability and bulk order enquiries.</p>
-          </Reveal>
-          <div className="card-grid category-grid">
-            {productCategories.map((category, index) => (
-              <Reveal key={category.name} delay={(index % 4) * 65} variant="fade-up">
-                <CategoryCard category={category} />
-              </Reveal>
-            ))}
           </div>
         </div>
       </section>
@@ -367,7 +387,7 @@ export default function Products() {
               {/* Premium Search Box with suggestions */}
               <div className="search-box-premium-wrapper" ref={searchContainerRef} style={{ position: "relative", flexGrow: 1 }}>
                 <div className="search-box-premium">
-                  <Search size={18} className="search-icon-inside" />
+                  <MagnifyingGlass size={18} className="search-icon-inside" />
                   <input
                     type="search"
                     placeholder="Search by product name, category or uses..."
@@ -407,6 +427,18 @@ export default function Products() {
                 )}
               </div>
 
+              <button
+                className="mobile-filter-trigger"
+                type="button"
+                onClick={() => setMobileFiltersOpen(true)}
+                aria-expanded={mobileFiltersOpen}
+                aria-controls="catalogue-filter-sheet"
+              >
+                <SlidersHorizontal size={18} />
+                Filters
+                {hasActiveFilters && <span aria-label="Active filters">•</span>}
+              </button>
+
               {/* Sorting controls */}
               <div className="sorting-controls-wrapper">
                 <SlidersHorizontal size={16} className="control-icon-grey" />
@@ -418,11 +450,11 @@ export default function Products() {
                   onChange={(e) => setSortBy(e.target.value)}
                 >
                   <option value="featured">Featured Order</option>
-                  <option value="name-asc">Alphabetical (A–Z)</option>
+                  <option value="name-asc">Alphabetical (A-Z)</option>
                   <option value="category-asc">Sort by Category</option>
                   <option value="newest">Newest Arrivals</option>
                 </select>
-                <ArrowUpDown size={15} className="select-arrow-icon" />
+                <ArrowsDownUp size={15} className="select-arrow-icon" />
               </div>
 
               {/* Grid / List view toggle */}
@@ -434,7 +466,7 @@ export default function Products() {
                   title="Grid View"
                   aria-label="Switch to Grid View"
                 >
-                  <Grid size={18} />
+                  <SquaresFour size={18} />
                 </button>
                 <button
                   type="button"
@@ -443,7 +475,7 @@ export default function Products() {
                   title="List View"
                   aria-label="Switch to List View"
                 >
-                  <List size={18} />
+                  <ListBullets size={18} />
                 </button>
               </div>
             </div>
@@ -453,11 +485,23 @@ export default function Products() {
           <div className="products-layout-flex" style={{ display: "flex", gap: "28px", marginTop: "24px", flexDirection: "column" }}>
             
             {/* Filter controls row */}
-            <Reveal variant="fade-up" className="filter-controls-flex-row" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px", background: "#fff", padding: "16px", borderRadius: "8px", border: "1px solid rgba(0,0,0,0.05)" }}>
+            <Reveal
+              variant="fade-up"
+              className={`filter-controls-flex-row ${mobileFiltersOpen ? "is-open" : ""}`}
+            >
+              <div className="mobile-filter-sheet-header" id="catalogue-filter-sheet">
+                <div>
+                  <span className="eyebrow">Refine catalogue</span>
+                  <strong>{sortedProducts.length} materials</strong>
+                </div>
+                <button type="button" className="icon-button" onClick={() => setMobileFiltersOpen(false)} aria-label="Close filters">
+                  <XCircle size={22} />
+                </button>
+              </div>
               {/* Category selector */}
               <div className="filter-select-box">
-                <span className="filter-label" style={{ display: "block", marginBottom: "6px", fontSize: "12px", fontWeight: "600", color: "var(--text-muted)", textTransform: "uppercase" }}>Category</span>
-                <select value={activeCategory} onChange={(e) => setActiveCategory(e.target.value)} className="filter-inner-select" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid rgba(0,0,0,0.1)", background: "#fafafa" }}>
+                <label htmlFor="catalogue-category" className="filter-label" style={{ display: "block", marginBottom: "6px", fontSize: "12px", fontWeight: "600", color: "var(--text-muted)", textTransform: "uppercase" }}>Category</label>
+                <select id="catalogue-category" value={activeCategory} onChange={(e) => setActiveCategory(e.target.value)} className="filter-inner-select" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid rgba(0,0,0,0.1)", background: "#fafafa" }}>
                   <option value="All">All Categories</option>
                   {productCategories.map(c => (
                     <option key={c.name} value={c.name}>{c.name}</option>
@@ -467,8 +511,8 @@ export default function Products() {
 
               {/* Product Type selector */}
               <div className="filter-select-box">
-                <span className="filter-label" style={{ display: "block", marginBottom: "6px", fontSize: "12px", fontWeight: "600", color: "var(--text-muted)", textTransform: "uppercase" }}>Product Type</span>
-                <select value={activeType} onChange={(e) => setActiveType(e.target.value)} className="filter-inner-select" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid rgba(0,0,0,0.1)", background: "#fafafa" }}>
+                <label htmlFor="catalogue-product-type" className="filter-label" style={{ display: "block", marginBottom: "6px", fontSize: "12px", fontWeight: "600", color: "var(--text-muted)", textTransform: "uppercase" }}>Product Type</label>
+                <select id="catalogue-product-type" value={activeType} onChange={(e) => setActiveType(e.target.value)} className="filter-inner-select" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid rgba(0,0,0,0.1)", background: "#fafafa" }}>
                   {PRODUCT_TYPES.map(t => (
                     <option key={t.value} value={t.value}>{t.label}</option>
                   ))}
@@ -477,8 +521,8 @@ export default function Products() {
 
               {/* Tag / Use Case selector */}
               <div className="filter-select-box">
-                <span className="filter-label" style={{ display: "block", marginBottom: "6px", fontSize: "12px", fontWeight: "600", color: "var(--text-muted)", textTransform: "uppercase" }}>Craft Use Case</span>
-                <select value={activeTag} onChange={(e) => setActiveTag(e.target.value)} className="filter-inner-select" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid rgba(0,0,0,0.1)", background: "#fafafa" }}>
+                <label htmlFor="catalogue-use-case" className="filter-label" style={{ display: "block", marginBottom: "6px", fontSize: "12px", fontWeight: "600", color: "var(--text-muted)", textTransform: "uppercase" }}>Craft Use Case</label>
+                <select id="catalogue-use-case" value={activeTag} onChange={(e) => setActiveTag(e.target.value)} className="filter-inner-select" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid rgba(0,0,0,0.1)", background: "#fafafa" }}>
                   {USE_CASES.map(tag => (
                     <option key={tag} value={tag}>{tag === "All" ? "All Use Cases" : tag}</option>
                   ))}
@@ -496,19 +540,19 @@ export default function Products() {
                   <span>Wholesale/Bulk Only</span>
                 </label>
               </div>
+              <div className="mobile-filter-sheet-actions">
+                <button type="button" className="btn btn-outline" onClick={handleResetFilters}>Clear all</button>
+                <button type="button" className="btn btn-primary" onClick={() => setMobileFiltersOpen(false)}>
+                  Show {sortedProducts.length} materials
+                </button>
+              </div>
             </Reveal>
 
             {/* Active Chips / Count row */}
             <div className="active-chips-summary-row" style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
-              <motion.span
-                className="result-count-text"
-                key={sortedProducts.length}
-                initial={{ opacity: 0.5, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: duration.quick, ease: ease.soft }}
-              >
+              <span className="result-count-text">
                 Showing <strong>{sortedProducts.length}</strong> of <strong>{featuredProducts.length}</strong> products
-              </motion.span>
+              </span>
 
               {hasActiveFilters && (
                 <div className="active-chips-flex" style={{ display: "flex", flexWrap: "wrap", gap: "8px", alignItems: "center" }}>
@@ -545,22 +589,27 @@ export default function Products() {
             </div>
 
             {/* Product Cards Grid / List */}
-            <div key={`${activeCategory}-${activeType}-${activeTag}-${filterHasShades}-${filterBulkOnly}-${searchQuery}-${sortBy}`} className={`product-gallery-view-wrapper view-mode-${viewMode}`}>
+            <div className={`product-gallery-view-wrapper view-mode-${viewMode}`}>
               <div 
+                ref={resultGridRef}
                 className={viewMode === "grid" ? "card-grid product-grid product-grid--filtered" : "list-layout product-list-layout--filtered"} 
                 aria-live="polite"
                 style={viewMode === "list" ? { display: "flex", flexDirection: "column", gap: "16px" } : {}}
               >
                 {sortedProducts.length > 0 ? (
-                  sortedProducts.map((product, index) => (
-                    <Reveal key={product.slug} delay={(index % 6) * 45} variant="scale-in">
+                  sortedProducts.map((product) => (
+                    <div
+                      key={product.slug}
+                      className="motion-grid-item"
+                      data-product-key={product.slug}
+                    >
                       <ProductCard product={product} compact={viewMode === "list"} />
-                    </Reveal>
+                    </div>
                   ))
                 ) : (
                   /* Upgraded No Results Box with recommendations */
                   <div className="empty-results-box" style={{ gridColumn: "1 / -1", textAlign: "center", padding: "60px 20px", background: "#fff", borderRadius: "12px", border: "1px solid rgba(0,0,0,0.05)" }}>
-                    <HelpCircle size={52} className="empty-state-icon" style={{ marginInline: "auto", marginBottom: "18px", color: "var(--accent-rose, #e05c75)" }} />
+                    <Question size={52} className="empty-state-icon" style={{ marginInline: "auto", marginBottom: "18px", color: "var(--accent-rose, #e05c75)" }} />
                     <h3 style={{ fontSize: "20px", marginBottom: "8px" }}>No products match your filters</h3>
                     <p style={{ color: "var(--text-muted)", maxWidth: "460px", marginInline: "auto", fontSize: "15px" }}>
                       We couldn't find any yarns or craft tools matching your exact selections. Try clearing some filters or searching popular terms.

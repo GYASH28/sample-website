@@ -1,65 +1,66 @@
-import { CheckCircle2 } from "lucide-react";
-import { motion } from "framer-motion";
-import IconBadge from "../components/IconBadge.jsx";
-import PageHero from "../components/PageHero.jsx";
-import ProductVisual from "../components/ProductVisual.jsx";
+import { ArrowRight, Check } from "@phosphor-icons/react";
+import { Link } from "react-router-dom";
 import Reveal from "../components/Reveal.jsx";
-import StaggerReveal, { staggerChild } from "../components/StaggerReveal.jsx";
-import { aboutCopy, aboutPoints, businessInfo, whyChooseUs } from "../data/siteData.js";
-import { ease, duration } from "../motion-tokens.js";
+import { aboutCopy, aboutPoints, businessInfo } from "../data/siteData.js";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
 
 export default function About() {
   useDocumentMeta({
-    title: "About Us — Fakhri Mart",
-    description: "Pune-based yarn and craft supply store shipping across India. Learn about our story and range.",
+    title: "About Fakhri Mart | Yarn & Craft Supplier in Pune",
+    description: "Meet Fakhri Mart, a Pune-based yarn and craft-material supplier serving makers, boutiques, resellers and wholesale buyers across India.",
     canonical: "/about",
   });
+
   return (
     <>
-      <PageHero
-        eyebrow="About Fakhri Mart"
-        title="A colourful yarn and craft material store for creators"
-        text="Fakhri Mart supports makers, boutiques, resellers and craft businesses with yarns, crochet threads, macrame cords, embroidery threads, beads, bases, handles and handmade essentials."
-      >
-        <ProductVisual palette={["#35b8ad", "#f6a7b8", "#f3c65f"]} />
-      </PageHero>
-
-      <section className="section">
-        <div className="container split-grid">
-          <Reveal variant="slide-left">
-            <p className="eyebrow">{businessInfo.tagline}</p>
-            <h2>Built for craft buyers who need range, clarity and quick support.</h2>
+      <section className="about-hero">
+        <div className="container about-hero-grid">
+          <Reveal className="about-hero-copy" variant="slide-left">
+            <p className="eyebrow">Pune based · India wide</p>
+            <h1>A material partner for makers who need more than a pretty shade.</h1>
+            <p className="large-copy">
+              We help individual crafters, small labels, resellers and craft stores find workable
+              yarns, cords, threads and finishing supplies, then confirm the practical details on WhatsApp.
+            </p>
+            <Link className="text-link" to="/products">Explore the material library <ArrowRight size={18} /></Link>
           </Reveal>
-          <Reveal delay={100} variant="slide-right">
-            <p className="large-copy">{aboutCopy}</p>
-            <StaggerReveal className="about-point-grid">
-              {aboutPoints.map((point) => (
-                <motion.span key={point} variants={staggerChild}>
-                  <CheckCircle2 size={17} aria-hidden="true" />
-                  {point}
-                </motion.span>
-              ))}
-            </StaggerReveal>
+          <Reveal as="picture" className="about-hero-image" delay={90} variant="scale-in">
+            <source srcSet="/assets/images/editorial/craft-stock-room.avif" type="image/avif" />
+            <img
+              src="/assets/images/editorial/craft-stock-room.webp"
+              alt="Organised yarn, cord, embroidery thread, beads and bag hardware in a warm craft stock room"
+              width="1536"
+              height="1024"
+            />
           </Reveal>
         </div>
       </section>
 
-      <section className="section section-tinted">
-        <div className="container">
-          <Reveal className="section-heading" variant="scale-in">
-            <p className="eyebrow">Why Buyers Choose Us</p>
-            <h2>Premium catalogue support for regular and bulk craft needs.</h2>
+      <section className="section">
+        <div className="container about-story-grid">
+          <Reveal className="about-story-heading" variant="slide-left">
+            <p className="eyebrow">{businessInfo.tagline}</p>
+            <h2>Range when you are exploring. Specific answers when you are ordering.</h2>
           </Reveal>
-          <StaggerReveal className="card-grid why-card-grid">
-            {whyChooseUs.map((item) => (
-              <motion.div key={item.title} className="highlight-card" variants={staggerChild}>
-                <IconBadge name={item.icon} tone={item === whyChooseUs[0] ? "teal" : "pink"} />
-                <h3>{item.title}</h3>
-                <p>{item.text}</p>
-              </motion.div>
-            ))}
-          </StaggerReveal>
+          <Reveal className="about-story-rail" delay={80} variant="slide-right">
+            <p className="large-copy">{aboutCopy}</p>
+            <div className="about-point-list">
+              {aboutPoints.map((point) => (
+                <span key={point}><Check size={18} weight="bold" /> {point}</span>
+              ))}
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      <section className="about-principles">
+        <div className="container">
+          <Reveal as="p" className="eyebrow" variant="thread-draw">How we work</Reveal>
+          <div className="principle-list">
+            <Reveal as="article" variant="slide-left"><span>01</span><h3>Show the range honestly</h3><p>Catalogue images explain the material family. Live photos confirm the current stock and exact shade.</p></Reveal>
+            <Reveal as="article" delay={65} variant="fade-up"><span>02</span><h3>Quote for the real requirement</h3><p>Quantity, size, shade and delivery location all affect a useful quote, so prices are confirmed personally.</p></Reveal>
+            <Reveal as="article" delay={130} variant="slide-right"><span>03</span><h3>Support retail and repeat buying</h3><p>One project, a boutique run or a reseller restock can start from the same structured enquiry list.</p></Reveal>
+          </div>
         </div>
       </section>
     </>

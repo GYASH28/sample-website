@@ -1,4 +1,9 @@
-import { MessageCircle, Send, Copy, Check } from "lucide-react";
+import {
+  ChatCircleDots,
+  Check,
+  Copy,
+  PaperPlaneTilt,
+} from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 import {
   businessTypes,
@@ -14,12 +19,14 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
   const [compiledMessage, setCompiledMessage] = useState("");
   const [copied, setCopied] = useState(false);
   const submitTimer = useRef(null);
+  const copyTimer = useRef(null);
 
   const hasBasket = basket && basket.length > 0;
 
   useEffect(() => {
     return () => {
       if (submitTimer.current) window.clearTimeout(submitTimer.current);
+      if (copyTimer.current) window.clearTimeout(copyTimer.current);
     };
   }, []);
 
@@ -34,7 +41,7 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
     text += `*Name:* ${name}\n`;
     text += `*Phone:* ${phone}\n`;
     if (businessType) text += `*Business Type:* ${businessType}\n`;
-    if (city) text += `*Delivery City:* ${city}\n`;
+    if (city) text += `*City / State:* ${city}\n`;
 
     if (hasBasket) {
       text += `\n*Enquiry Items in Basket:*\n`;
@@ -43,6 +50,7 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
         const variantText = item.variant ? ` (${item.variant})` : "";
         text += `${index + 1}. *${item.name}*${variantText}${shadeText}\n`;
         text += `   Quantity: ${item.quantity} ${item.unit}\n`;
+        if (item.note) text += `   Notes: ${item.note}\n`;
       });
     } else {
       const product = formData.get("product") || "";
@@ -53,8 +61,8 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
       if (shade) text += `*Colour/Shade:* ${shade}\n`;
     }
 
-    if (message) text += `\n*Message:* ${message}\n`;
-    text += `\nPlease share availability, catalogue, and bulk pricing. Thank you!`;
+    if (message) text += `\n*Delivery question / notes:* ${message}\n`;
+    text += `\nPlease share availability, current shade photos, quantity-based price and delivery timing. Thank you.`;
 
     return text;
   }
@@ -71,26 +79,26 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
     setWhatsappLink(link);
     setCompiledMessage(message);
 
+    window.open(link, "_blank", "noopener,noreferrer");
+
     submitTimer.current = window.setTimeout(() => {
       setSubmitting(false);
       setSubmitted(true);
-      
-      // Auto-open WhatsApp with the enquiry details
-      window.open(link, "_blank");
 
       // Clear the basket if callback is present
       if (hasBasket && onClearBasket) {
         onClearBasket();
       }
       form.reset();
-    }, 650);
+    }, 240);
   }
 
   const handleCopySummary = () => {
     if (compiledMessage) {
       navigator.clipboard.writeText(compiledMessage);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      window.clearTimeout(copyTimer.current);
+      copyTimer.current = window.setTimeout(() => setCopied(false), 2_000);
     }
   };
 
@@ -145,7 +153,7 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
             </label>
           ) : (
             <label>
-              Delivery City
+              City / State
               <input type="text" name="city" autoComplete="address-level2" required />
             </label>
           )}
@@ -159,7 +167,7 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
                 <input type="text" name="quantity" />
               </label>
               <label>
-                Delivery City
+                City / State
                 <input type="text" name="city" autoComplete="address-level2" />
               </label>
             </div>
@@ -172,7 +180,7 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
         ) : null}
 
         <label>
-          Message / Notes
+          Delivery question / notes
           <textarea
             name="message"
             placeholder="Any specific requests, delivery directions or custom shade codes..."
@@ -181,7 +189,7 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
         </label>
 
         <button className="btn btn-primary submit-button" type="submit" disabled={submitting}>
-          {submitting ? <span className="button-spinner" aria-hidden="true" /> : <Send size={18} />}
+          {submitting ? <span className="button-spinner" aria-hidden="true" /> : <PaperPlaneTilt size={18} />}
           {submitting ? "Preparing WhatsApp..." : "Send Enquiry on WhatsApp"}
         </button>
       </form>
@@ -193,7 +201,7 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
           </span>
           <div className="success-actions-flex">
             <a className="btn btn-whatsapp" href={whatsappLink} target="_blank" rel="noreferrer">
-              <MessageCircle size={18} aria-hidden="true" />
+              <ChatCircleDots size={18} aria-hidden="true" />
               Continue on WhatsApp
             </a>
             <button

@@ -1,0 +1,188 @@
+:root {
+  --page-scroll: 0;
+  --thread-offset: 1;
+  --scroll-percent: 0%;
+  --pointer-x: 50vw;
+  --pointer-y: 32vh;
+}
+
+.scroll-director {
+  position: fixed;
+  z-index: calc(var(--z-sticky, 90) - 2);
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  isolation: isolate;
+}
+
+.scroll-director__aurora {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      circle 19rem at var(--pointer-x) var(--pointer-y),
+      color-mix(in srgb, var(--rose-400, #d9a5b3) 11%, transparent),
+      transparent 72%
+    );
+  opacity: 0.52;
+  mix-blend-mode: multiply;
+  transition: opacity 320ms ease;
+}
+
+.scroll-director__rail {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--bone-50, #fff7ec) 78%, transparent);
+  box-shadow: 0 1px 0 rgba(31, 27, 22, 0.06);
+}
+
+.scroll-director__rail i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background:
+    linear-gradient(
+      90deg,
+      var(--rose-400, #d9a5b3),
+      var(--brass-400, #c9b36a) 34%,
+      var(--teal-700, #2a8c82) 72%,
+      var(--mulberry-800, #452735)
+    );
+  transform: scaleX(var(--page-scroll));
+  transform-origin: left;
+}
+
+.scroll-director__thread {
+  position: absolute;
+  top: max(7.5rem, var(--header-offset, 7rem));
+  right: 0.45rem;
+  bottom: 5vh;
+  width: 2.7rem;
+  height: auto;
+  overflow: visible;
+  opacity: 0.48;
+}
+
+.scroll-director__thread path {
+  fill: none;
+  stroke: url(#scroll-thread-gradient);
+  stroke: var(--teal-700, #2a8c82);
+  stroke-dasharray: 1;
+  stroke-dashoffset: var(--thread-offset);
+  stroke-linecap: round;
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.scroll-director__needle {
+  position: absolute;
+  top: clamp(8rem, calc(var(--scroll-percent) + 6.5rem), calc(100vh - 5rem));
+  right: 0.73rem;
+  width: 0.46rem;
+  height: 1.8rem;
+  border-radius: 999px;
+  background:
+    linear-gradient(
+      180deg,
+      var(--brass-400, #c9b36a),
+      var(--mulberry-800, #452735)
+    );
+  box-shadow:
+    0 0 0 0.22rem color-mix(in srgb, var(--bone-50, #fff7ec) 82%, transparent),
+    0 0.6rem 1.4rem rgba(69, 39, 53, 0.18);
+  transform: rotate(9deg);
+}
+
+.motion-ready [data-scroll-scene="true"] {
+  position: relative;
+  isolation: isolate;
+}
+
+.motion-ready [data-scroll-scene="true"]::after {
+  position: absolute;
+  z-index: 0;
+  right: max(1.25rem, calc((100vw - var(--max, 1180px)) / 2));
+  bottom: 0;
+  left: max(1.25rem, calc((100vw - var(--max, 1180px)) / 2));
+  height: 1px;
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--rose-400, #d9a5b3) 74%, transparent),
+      color-mix(in srgb, var(--brass-400, #c9b36a) 76%, transparent),
+      color-mix(in srgb, var(--teal-700, #2a8c82) 72%, transparent),
+      transparent
+    );
+  content: "";
+  opacity: 0.46;
+  transform: scaleX(var(--scene-line, 0));
+  transform-origin: left;
+}
+
+.motion-ready [data-scroll-scene="true"] > .container {
+  translate: 0 var(--scene-shift, 0px);
+  transition: translate 90ms linear;
+}
+
+.motion-ready [data-scroll-card="true"] {
+  translate: 0 var(--scroll-lift, 0px);
+  transition:
+    translate 90ms linear,
+    border-color var(--motion-duration-direct, 240ms) var(--motion-ease-direct),
+    background-color var(--motion-duration-direct, 240ms) var(--motion-ease-direct);
+}
+
+.motion-ready [data-scroll-media="true"] {
+  translate: 0 var(--scroll-media-shift, 0px);
+  scale: var(--scroll-media-scale, 1);
+  transition:
+    translate 90ms linear,
+    scale 90ms linear;
+  transform-origin: center;
+}
+
+.motion-ready [data-scroll-scene="true"]:is(:hover, :focus-within)::after {
+  opacity: 0.82;
+}
+
+@media (max-width: 64rem) {
+  .scroll-director__thread,
+  .scroll-director__needle {
+    display: none;
+  }
+
+  .scroll-director__aurora {
+    opacity: 0.32;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .scroll-director__aurora {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-director {
+    display: none;
+  }
+
+  [data-scroll-scene="true"] > .container,
+  [data-scroll-card="true"],
+  [data-scroll-media="true"] {
+    translate: none !important;
+    scale: 1 !important;
+    transition: none !important;
+  }
+}
+
+@media print {
+  .scroll-director {
+    display: none !important;
+  }
+}

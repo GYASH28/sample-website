@@ -3,54 +3,85 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Fakhri Mart | Yarn Store & Craft Supplier</title>
+    <meta name="theme-color" content="#FFF7EC" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="geo.region" content="IN-MH" />
+    <meta name="geo.placename" content="Pune" />
+    <script>
+      (() => {
+        try {
+          const force = new URLSearchParams(window.location.search).get("intro") === "1";
+          const seen = window.sessionStorage.getItem("fakhri_intro_cinematic_v2") === "played";
+          const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          if (!reduced && (force || !seen)) {
+            document.documentElement.classList.add("intro-booting");
+            window.setTimeout(
+              () => document.documentElement.classList.remove("intro-booting"),
+              10000,
+            );
+          }
+        } catch {
+          document.documentElement.classList.add("intro-booting");
+        }
+      })();
+    </script>
+    <style>
+      html.intro-booting,
+      html.intro-booting body {
+        background: #24131b;
+      }
+
+      html.intro-booting body::before {
+        position: fixed;
+        z-index: 2147483646;
+        inset: 0;
+        background:
+          radial-gradient(circle at 13% 18%, rgba(216, 137, 161, 0.2), transparent 34rem),
+          radial-gradient(circle at 86% 22%, rgba(42, 140, 130, 0.17), transparent 38rem),
+          linear-gradient(112deg, #24131b, #452735);
+        content: "";
+      }
+    </style>
+
+    <title>Fakhri Mart | Yarn Store & Craft Supplier in Pune</title>
     <meta
       name="description"
-      content="Fakhri Mart offers yarns, crochet threads, macrame cords, embroidery threads, beads, purse accessories, bases, handles and craft essentials with all-India delivery and bulk enquiry support."
+      content="Fakhri Mart in Pune offers yarns, crochet threads, macrame cords, embroidery threads, beads, purse accessories and craft essentials with all-India delivery and bulk enquiry support."
     />
+    <link rel="canonical" href="https://fakhriyarns.vercel.app/" />
+    <link rel="sitemap" type="application/xml" href="https://fakhriyarns.vercel.app/sitemap.xml" />
 
-    <!-- Favicon and Icons -->
-    <link rel="icon" type="image/webp" href="/assets/fakhri-mart-logo.webp" />
-    <link rel="apple-touch-icon" href="/assets/fakhri-mart-logo.webp" />
-    <link rel="shortcut icon" type="image/webp" href="/assets/fakhri-mart-logo.webp" />
-
-    <!-- Preconnect for fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-    <!-- Preload + load fonts: Playfair Display (display serif) + Inter (body sans) + JetBrains Mono (code) -->
+    <link rel="icon" type="image/png" href="/assets/brand/fakhri-logo-180.png" />
+    <link rel="apple-touch-icon" href="/assets/brand/fakhri-logo-180.png" />
+    <link rel="shortcut icon" href="/assets/brand/fakhri-logo-180.png" />
     <link
       rel="preload"
-      as="style"
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      as="image"
+      href="/assets/images/editorial/atelier-hero-960.avif"
+      imagesrcset="/assets/images/editorial/atelier-hero-640.avif 640w, /assets/images/editorial/atelier-hero-960.avif 960w, /assets/images/editorial/atelier-hero.avif 1280w"
+      imagesizes="(max-width: 48rem) calc(100vw - 2rem), 46vw"
+      type="image/avif"
+      fetchpriority="high"
     />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
-    />
-
-    <!-- Preload hero image (LCP element) -->
-    <link rel="preload" as="image" href="/assets/images/hero_banner.webp" fetchpriority="high" />
-
-    <!-- Preconnect for WhatsApp (primary conversion) -->
-    <link rel="preconnect" href="https://wa.me" />
+    <link rel="preload" as="image" href="/assets/images/editorial/shade-library-960.avif" type="image/avif" />
+    <link rel="preload" as="image" href="/assets/brand/fakhri-logo-256.webp" type="image/webp" />
     <link rel="dns-prefetch" href="https://wa.me" />
+    <link rel="dns-prefetch" href="https://maps.google.com" />
 
-    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://fakhrimart.in" />
+    <meta property="og:url" content="https://fakhriyarns.vercel.app/" />
     <meta property="og:site_name" content="Fakhri Mart" />
     <meta property="og:locale" content="en_IN" />
-    <meta property="og:title" content="Fakhri Mart | Yarn Store & Craft Supplier" />
-    <meta property="og:description" content="Fakhri Mart offers yarns, crochet threads, macrame cords, embroidery threads, beads, purse accessories, bases, handles and craft essentials with all-India delivery and bulk enquiry support." />
-    <meta property="og:image" content="/assets/fakhri-mart-logo.webp" />
+    <meta property="og:title" content="Fakhri Mart | Yarn Store & Craft Supplier in Pune" />
+    <meta property="og:description" content="Yarns, crochet threads, macrame cords, embroidery threads, beads, purse accessories and craft essentials from Pune with all-India delivery." />
+    <meta property="og:image" content="https://fakhriyarns.vercel.app/assets/images/editorial/atelier-hero-960.webp" />
+    <meta property="og:image:alt" content="Fakhri Mart yarn and craft material atelier" />
 
-    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@fakhrimart53" />
-    <meta property="twitter:title" content="Fakhri Mart | Yarn Store & Craft Supplier" />
-    <meta property="twitter:description" content="Fakhri Mart offers yarns, crochet threads, macrame cords, embroidery threads, beads, purse accessories, bases, handles and craft essentials with all-India delivery and bulk enquiry support." />
-    <meta property="twitter:image" content="/assets/fakhri-mart-logo.webp" />
+    <meta name="twitter:title" content="Fakhri Mart | Yarn Store & Craft Supplier in Pune" />
+    <meta name="twitter:description" content="Yarns, crochet threads, macrame cords and craft essentials from Pune with all-India delivery." />
+    <meta name="twitter:image" content="https://fakhriyarns.vercel.app/assets/images/editorial/atelier-hero-960.webp" />
   </head>
   <body>
     <div id="root"></div>

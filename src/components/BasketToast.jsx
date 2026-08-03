@@ -1,8 +1,6 @@
-import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Check, X } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Check, X } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
-import { ease, duration } from "../motion-tokens.js";
 
 /**
  * BasketToast — slides in when items are added to the enquiry basket.
@@ -16,8 +14,20 @@ import { ease, duration } from "../motion-tokens.js";
  */
 export default function BasketToast() {
   const [toast, setToast] = useState(null); // { itemName, count }
+  const [closing, setClosing] = useState(false);
   const prevCountRef = useRef(0);
   const dismissTimerRef = useRef(null);
+  const exitTimerRef = useRef(null);
+
+  const dismiss = useCallback(() => {
+    setClosing(true);
+    document.body.classList.remove("toast-visible");
+    if (exitTimerRef.current) clearTimeout(exitTimerRef.current);
+    exitTimerRef.current = setTimeout(() => {
+      setToast(null);
+      setClosing(false);
+    }, 220);
+  }, []);
 
   useEffect(() => {
     // Initialize prevCount from current basket
@@ -35,18 +45,20 @@ export default function BasketToast() {
         if (count > prevCountRef.current && count > 0) {
           // Item was added (count increased)
           const lastItem = basket[basket.length - 1];
+          if (exitTimerRef.current) {
+            clearTimeout(exitTimerRef.current);
+            exitTimerRef.current = null;
+          }
           setToast({
             itemName: lastItem?.name || "Item",
             count,
           });
+          setClosing(false);
           // Add body class so FloatingWhatsApp bumps up
           document.body.classList.add("toast-visible");
           // Clear any existing timer, then auto-dismiss after 3.5s
           if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current);
-          dismissTimerRef.current = setTimeout(() => {
-            setToast(null);
-            document.body.classList.remove("toast-visible");
-          }, 3500);
+          dismissTimerRef.current = setTimeout(dismiss, 3500);
         }
         prevCountRef.current = count;
       } catch {}
@@ -56,19 +68,14 @@ export default function BasketToast() {
     return () => {
       window.removeEventListener("enquiry-basket-updated", handleUpdate);
       if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current);
+      if (exitTimerRef.current) clearTimeout(exitTimerRef.current);
       document.body.classList.remove("toast-visible");
     };
-  }, []);
+  }, [dismiss]);
 
-  return (
-    <AnimatePresence>
-      {toast && (
-        <motion.div
-          className="basket-toast"
-          initial={{ opacity: 0, y: 60, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 60, scale: 0.95 }}
-          transition={{ duration: duration.standard, ease: ease.soft }}
+  return toast ? (
+        <div
+          className={`basket-toast ${closing ? "is-exiting" : ""}`}
           style={{
             position: "fixed",
             bottom: "20px",
@@ -132,10 +139,7 @@ export default function BasketToast() {
           {/* Close button */}
           <button
             type="button"
-            onClick={() => {
-              setToast(null);
-              document.body.classList.remove("toast-visible");
-            }}
+            onClick={dismiss}
             aria-label="Dismiss notification"
             style={{
               background: "none",
@@ -148,8 +152,6 @@ export default function BasketToast() {
           >
             <X size={16} />
           </button>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
+        </div>
+  ) : null;
 }

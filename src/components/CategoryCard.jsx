@@ -1,4 +1,4 @@
-import { ArrowRight, MessageCircle } from "lucide-react";
+import { ArrowRight, ChatCircleDots } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
 import { createWhatsAppLink } from "../data/siteData.js";
 import IconBadge from "./IconBadge.jsx";
@@ -31,7 +31,7 @@ export default function CategoryCard({ category }) {
           <ArrowRight size={15} />
         </Link>
         <a href={createWhatsAppLink(message)} target="_blank" rel="noreferrer" className="icon-link" aria-label={`Enquire about ${category.name} on WhatsApp`}>
-          <MessageCircle size={17} />
+          <ChatCircleDots size={17} />
         </a>
       </div>
     </article>

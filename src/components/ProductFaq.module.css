@@ -1,0 +1,120 @@
+.group {
+  border-top: 1px solid color-mix(in srgb, var(--ink-900) 14%, transparent);
+}
+
+.item {
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--ink-900) 14%, transparent);
+}
+
+.question {
+  display: grid;
+  width: 100%;
+  min-height: 3.65rem;
+  padding: 0.95rem 0.15rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+  border: 0;
+  background: transparent;
+  color: var(--ink-900);
+  font: inherit;
+  font-size: 0.93rem;
+  font-weight: 720;
+  line-height: 1.42;
+  text-align: left;
+  transition:
+    color var(--motion-duration-fast) var(--motion-ease-direct),
+    transform var(--motion-duration-fast) var(--motion-ease-emphasis);
+}
+
+.question:is(:hover, :focus-visible) {
+  color: var(--teal-900);
+}
+
+.question:active {
+  transform: scale(0.992);
+}
+
+.question:focus-visible {
+  border-radius: 0.45rem;
+  outline: 0.18rem solid color-mix(in srgb, var(--teal-700) 72%, white);
+  outline-offset: 0.2rem;
+}
+
+.caret {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--rose-400) 14%, white);
+  color: var(--ink-900);
+  transform: rotate(0);
+  transition:
+    background-color var(--motion-duration-fast) var(--motion-ease-direct),
+    color var(--motion-duration-fast) var(--motion-ease-direct),
+    transform 220ms var(--motion-ease-emphasis);
+}
+
+.item[data-open="true"] .caret {
+  background: var(--teal-900);
+  color: white;
+  transform: rotate(180deg);
+}
+
+.panel {
+  display: grid;
+  overflow: hidden;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  contain: layout paint;
+  transition:
+    grid-template-rows 220ms var(--motion-ease-standard),
+    opacity 160ms var(--motion-ease-direct),
+    visibility 0s linear 220ms;
+}
+
+.panel[data-open="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.answerClip {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.answer {
+  padding: 0 2.8rem 1.15rem 0.15rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.68;
+}
+
+.answer p {
+  margin: 0;
+}
+
+@media (max-width: 38rem) {
+  .question {
+    min-height: 3.9rem;
+    padding-block: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .answer {
+    padding-right: 0.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .question,
+  .caret,
+  .panel {
+    transition: none;
+  }
+}

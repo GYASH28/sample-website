@@ -12,9 +12,11 @@ const Gallery = lazy(() => import("./pages/Gallery.jsx"));
 const Enquiry = lazy(() => import("./pages/Enquiry.jsx"));
 const Contact = lazy(() => import("./pages/Contact.jsx"));
 const Wishlist = lazy(() => import("./pages/Wishlist.jsx"));
+const YarnGuide = lazy(() => import("./pages/YarnGuide.jsx"));
 const Blog = lazy(() => import("./pages/Blog.jsx"));
 const BlogPost = lazy(() => import("./pages/BlogPost.jsx"));
 const NotFound = lazy(() => import("./pages/NotFound.jsx"));
+const InformationPage = lazy(() => import("./pages/InformationPage.jsx"));
 
 export default function App() {
   return (
@@ -29,9 +31,13 @@ export default function App() {
             <Route path="gallery" element={<Gallery />} />
             <Route path="enquiry" element={<Enquiry />} />
             <Route path="wishlist" element={<Wishlist />} />
+            <Route path="yarn-guide" element={<YarnGuide />} />
             <Route path="contact" element={<Contact />} />
             <Route path="blog" element={<Blog />} />
             <Route path="blog/:slug" element={<BlogPost />} />
+            <Route path="privacy" element={<InformationPage />} />
+            <Route path="terms" element={<InformationPage />} />
+            <Route path="delivery-enquiries" element={<InformationPage />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

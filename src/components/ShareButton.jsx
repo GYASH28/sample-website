@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Share2, Check, Link2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Check, LinkSimple, ShareNetwork } from "@phosphor-icons/react";
 
 /**
  * ShareButton — uses native Web Share API on mobile, falls back to copy-link on desktop.
@@ -8,9 +8,11 @@ import { Share2, Check, Link2 } from "lucide-react";
 export default function ShareButton({ url, title, text, className = "" }) {
   const [copied, setCopied] = useState(false);
   const [canShare, setCanShare] = useState(false);
+  const feedbackTimerRef = useRef(null);
 
   useEffect(() => {
     setCanShare(typeof navigator !== "undefined" && !!navigator.share);
+    return () => window.clearTimeout(feedbackTimerRef.current);
   }, []);
 
   const shareData = {
@@ -27,19 +29,27 @@ export default function ShareButton({ url, title, text, className = "" }) {
         // User cancelled — no action needed
         if (err.name !== "AbortError") {
           // Fallback to copy
-          handleCopy();
+          await handleCopy();
         }
       }
     } else {
-      handleCopy();
+      await handleCopy();
     }
   }
 
-  function handleCopy() {
+  function showCopiedFeedback() {
+    setCopied(true);
+    window.clearTimeout(feedbackTimerRef.current);
+    feedbackTimerRef.current = window.setTimeout(
+      () => setCopied(false),
+      2_000,
+    );
+  }
+
+  async function handleCopy() {
     try {
-      navigator.clipboard.writeText(shareData.url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      await navigator.clipboard.writeText(shareData.url);
+      showCopiedFeedback();
     } catch {
       // Clipboard API not available — try legacy
       const textarea = document.createElement("textarea");
@@ -48,8 +58,7 @@ export default function ShareButton({ url, title, text, className = "" }) {
       textarea.select();
       try {
         document.execCommand("copy");
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        showCopiedFeedback();
       } catch {}
       document.body.removeChild(textarea);
     }
@@ -69,12 +78,12 @@ export default function ShareButton({ url, title, text, className = "" }) {
         </>
       ) : canShare ? (
         <>
-          <Share2 size={14} aria-hidden="true" />
+          <ShareNetwork size={14} aria-hidden="true" />
           Share
         </>
       ) : (
         <>
-          <Link2 size={14} aria-hidden="true" />
+          <LinkSimple size={14} aria-hidden="true" />
           Copy Link
         </>
       )}

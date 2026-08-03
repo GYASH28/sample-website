@@ -1,235 +1,319 @@
-// src/components/IntroAnimation.jsx
-// Brand-new opening animation — cinematic, optimized, reduced-motion safe.
-// Plays ONCE per session (sessionStorage). Skip button always visible.
-//
-// Sequence (3.2s total):
-//  1. 0.0s  — Cream overlay fades in, three concentric thread-circles draw (gold → teal → pink)
-//  2. 0.7s  — Yarn ball SVG unravels from center with spring overshoot
-//  3. 1.2s  — "Fakhri Mart" reveals letter-by-letter with 3D rotateX
-//  4. 1.8s  — Tagline fades in beneath
-//  5. 2.4s  — Entire overlay lifts up and fades out (curtain reveal)
-//  6. 3.2s  — onComplete fires, page is interactive
-//
-// Accessibility:
-//  - Skip button always visible (top-right)
-//  - Respects prefers-reduced-motion (skips entirely, calls onComplete immediately)
-//  - aria-hidden on all decorative SVGs
-//  - Body scroll locked during animation
-
-import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { businessInfo } from "../data/siteData.js";
-import { ease } from "../motion-tokens.js";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import {
+  rememberIntroPlayback,
+  shouldPlayIntro,
+} from "../lib/introPlayback.js";
+import styles from "./IntroAnimation.module.css";
 
 const PHASES = {
-  CIRCLE_1: "circle-1",
-  CIRCLE_2: "circle-2",
-  CIRCLE_3: "circle-3",
-  BALL: "ball",
-  TITLE: "title",
-  TAGLINE: "tagline",
-  LIFT: "lift",
-  DONE: "done",
+  opening: "opening",
+  materials: "materials",
+  making: "making",
+  collection: "collection",
+  brand: "brand",
+  handoff: "handoff",
+  exiting: "exiting",
 };
 
-const TIMINGS = [
-  [PHASES.CIRCLE_2, 300],
-  [PHASES.CIRCLE_3, 550],
-  [PHASES.BALL, 800],
-  [PHASES.TITLE, 1200],
-  [PHASES.TAGLINE, 1800],
-  [PHASES.LIFT, 2400],
-  [PHASES.DONE, 3200],
-];
+const TIMELINES = {
+  full: {
+    steps: [
+      [PHASES.materials, 620],
+      [PHASES.making, 2_000],
+      [PHASES.collection, 3_420],
+      [PHASES.brand, 4_850],
+      [PHASES.handoff, 6_080],
+    ],
+    complete: 6_820,
+    safety: 8_500,
+  },
+  compact: {
+    steps: [
+      [PHASES.materials, 380],
+      [PHASES.making, 1_350],
+      [PHASES.collection, 2_350],
+      [PHASES.brand, 3_340],
+      [PHASES.handoff, 4_360],
+    ],
+    complete: 5_000,
+    safety: 6_500,
+  },
+};
 
-export default function IntroAnimation({ onComplete }) {
-  const [phase, setPhase] = useState(PHASES.CIRCLE_1);
-  const [visible, setVisible] = useState(true);
+function readTimeline() {
+  if (typeof document === "undefined") return TIMELINES.full;
+  return document.documentElement.dataset.motionProfile === "compact"
+    ? TIMELINES.compact
+    : TIMELINES.full;
+}
 
-  useEffect(() => {
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const isPlayed = sessionStorage.getItem("fakhri_intro_v3") === "true";
+function clearIntroClasses() {
+  document.body.classList.remove("intro-running", "intro-hold-hero");
+  document.documentElement.classList.remove("intro-booting", "intro-handoff");
+}
 
-    if (prefersReducedMotion || isPlayed) {
-      setVisible(false);
-      onComplete();
-      return;
+export default function IntroAnimation() {
+  const [visible, setVisible] = useState(shouldPlayIntro);
+  const [phase, setPhase] = useState(PHASES.opening);
+  const [timeline] = useState(readTimeline);
+  const phaseRef = useRef(PHASES.opening);
+  const skipRef = useRef(null);
+  const previousFocusRef = useRef(null);
+  const finishedRef = useRef(false);
+  const timersRef = useRef(new Set());
+
+  const setIntroPhase = useCallback((nextPhase) => {
+    if (finishedRef.current) return;
+    phaseRef.current = nextPhase;
+    setPhase(nextPhase);
+  }, []);
+
+  const schedule = useCallback((callback, delay) => {
+    const timer = window.setTimeout(() => {
+      timersRef.current.delete(timer);
+      callback();
+    }, delay);
+    timersRef.current.add(timer);
+    return timer;
+  }, []);
+
+  const clearTimers = useCallback(() => {
+    timersRef.current.forEach((timer) => window.clearTimeout(timer));
+    timersRef.current.clear();
+  }, []);
+
+  const releaseHero = useCallback(() => {
+    document.documentElement.classList.add("intro-handoff");
+    const heroFrame = document.querySelector("[data-home-hero-frame]");
+    for (const animation of heroFrame?.getAnimations() || []) {
+      try {
+        animation.finish();
+      } catch {
+        // A cancelled CSS animation can disappear between collection and finish.
+      }
+    }
+  }, []);
+
+  const finishImmediately = useCallback(() => {
+    if (finishedRef.current) return;
+    finishedRef.current = true;
+    clearTimers();
+    rememberIntroPlayback();
+    clearIntroClasses();
+    setVisible(false);
+  }, [clearTimers]);
+
+  const finish = useCallback(() => {
+    if (finishedRef.current || phaseRef.current === PHASES.exiting) return;
+    clearTimers();
+    phaseRef.current = PHASES.exiting;
+    setPhase(PHASES.exiting);
+    releaseHero();
+    schedule(finishImmediately, 720);
+  }, [clearTimers, finishImmediately, releaseHero, schedule]);
+
+  useLayoutEffect(() => {
+    document.documentElement.classList.remove("intro-booting");
+    if (!visible) {
+      clearIntroClasses();
+      return undefined;
     }
 
-    document.body.classList.add("intro-running");
-
-    const timers = TIMINGS.map(([p, delay]) =>
-      setTimeout(() => {
-        setPhase(p);
-        if (p === PHASES.DONE) {
-          sessionStorage.setItem("fakhri_intro_v3", "true");
-          document.body.classList.remove("intro-running");
-          setVisible(false);
-          onComplete();
-        }
-      }, delay)
-    );
+    previousFocusRef.current =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    document.body.classList.add("intro-running", "intro-hold-hero");
+    skipRef.current?.focus({ preventScroll: true });
 
     return () => {
-      timers.forEach(clearTimeout);
-      document.body.classList.remove("intro-running");
+      clearIntroClasses();
+      const previousFocus = previousFocusRef.current;
+      if (
+        previousFocus instanceof HTMLElement &&
+        previousFocus.isConnected &&
+        previousFocus !== document.body
+      ) {
+        previousFocus.focus({ preventScroll: true });
+      }
     };
-  }, [onComplete]);
+  }, [visible]);
 
-  const handleSkip = () => {
-    sessionStorage.setItem("fakhri_intro_v3", "true");
-    document.body.classList.remove("intro-running");
-    setVisible(false);
-    onComplete();
-  };
+  useEffect(() => {
+    if (!visible) return undefined;
+    rememberIntroPlayback();
 
-  const isPast = (p) => {
-    const order = Object.values(PHASES);
-    return order.indexOf(phase) >= order.indexOf(p);
-  };
+    timeline.steps.forEach(([nextPhase, delay]) => {
+      schedule(() => {
+        if (finishedRef.current || phaseRef.current === PHASES.exiting) return;
+        setIntroPhase(nextPhase);
+        if (nextPhase === PHASES.handoff) releaseHero();
+      }, delay);
+    });
+    schedule(finish, timeline.complete);
+    schedule(finishImmediately, timeline.safety);
 
-  const titleLetters = businessInfo.shortName.split("");
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        finish();
+        return;
+      }
+      if (event.key === "Tab") {
+        event.preventDefault();
+        skipRef.current?.focus({ preventScroll: true });
+      }
+    };
+
+    const onVisibilityChange = () => {
+      if (document.hidden) finishImmediately();
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      clearTimers();
+      clearIntroClasses();
+    };
+  }, [
+    clearTimers,
+    finish,
+    finishImmediately,
+    releaseHero,
+    schedule,
+    setIntroPhase,
+    timeline,
+    visible,
+  ]);
+
+  if (!visible) return null;
 
   return (
-    <AnimatePresence>
-      {visible && (
-        <motion.div
-          className="intro-overlay"
-          initial={{ opacity: 1 }}
-          animate={{
-            opacity: phase === PHASES.LIFT || phase === PHASES.DONE ? 0 : 1,
-            y: phase === PHASES.LIFT || phase === PHASES.DONE ? "-100%" : "0%",
-          }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.8, ease: ease.soft }}
-        >
-          {/* Skip button */}
-          <button
-            type="button"
-            className="intro-skip-btn"
-            onClick={handleSkip}
-            aria-label="Skip intro animation"
-          >
-            Skip Intro →
-          </button>
+    <div
+      className={styles.overlay}
+      data-phase={phase}
+      data-duration={timeline.complete}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Fakhri Mart cinematic introduction"
+    >
+      <div className={styles.ambient} aria-hidden="true" />
+      <div className={styles.grain} aria-hidden="true" />
 
-          <div className="intro-container">
-            {/* Three concentric thread circles — draw in sequence */}
-            <svg className="intro-stitch intro-stitch-1" viewBox="0 0 240 240" width="240" height="240" aria-hidden="true">
-              <motion.circle
-                cx="120" cy="120" r="108"
-                fill="none"
-                stroke="var(--gold)"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeDasharray="679"
-                initial={{ strokeDashoffset: 679, opacity: 0 }}
-                animate={{ strokeDashoffset: 0, opacity: 0.9 }}
-                transition={{ duration: 1.0, ease: ease.soft }}
-                style={{ transformOrigin: "center", transform: "rotate(-90deg)" }}
-              />
-            </svg>
+      <div className={styles.reelMeta} aria-hidden="true">
+        <span>Fakhri Mart</span>
+        <i />
+        <span>The maker&apos;s opening</span>
+      </div>
+      <span className={styles.locationMeta} aria-hidden="true">Pune · India</span>
 
-            {isPast(PHASES.CIRCLE_2) && (
-              <svg className="intro-stitch intro-stitch-2" viewBox="0 0 240 240" width="200" height="200" aria-hidden="true">
-                <motion.circle
-                  cx="120" cy="120" r="108"
-                  fill="none"
-                  stroke="var(--teal)"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeDasharray="679"
-                  initial={{ strokeDashoffset: 679, opacity: 0 }}
-                  animate={{ strokeDashoffset: 0, opacity: 0.6 }}
-                  transition={{ duration: 0.9, ease: ease.soft }}
-                  style={{ transformOrigin: "center", transform: "rotate(-90deg)" }}
-                />
-              </svg>
-            )}
+      <svg
+        className={styles.threadRig}
+        viewBox="0 0 1200 760"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <path
+          className={styles.threadPath}
+          d="M-80 520 C150 430 258 566 438 438 C618 308 760 510 918 352 C1030 240 1120 282 1280 196"
+          pathLength="1"
+        />
+        <circle className={styles.threadNeedleEye} cx="918" cy="352" r="6" />
+      </svg>
 
-            {isPast(PHASES.CIRCLE_3) && (
-              <svg className="intro-stitch intro-stitch-3" viewBox="0 0 240 240" width="160" height="160" aria-hidden="true">
-                <motion.circle
-                  cx="120" cy="120" r="108"
-                  fill="none"
-                  stroke="var(--pink)"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeDasharray="679"
-                  initial={{ strokeDashoffset: 679, opacity: 0 }}
-                  animate={{ strokeDashoffset: 0, opacity: 0.5 }}
-                  transition={{ duration: 0.8, ease: ease.soft }}
-                  style={{ transformOrigin: "center", transform: "rotate(-90deg)" }}
-                />
-              </svg>
-            )}
+      <div className={styles.cinemaStage} aria-hidden="true">
+        <figure className={`${styles.scene} ${styles.sceneMaterials}`}>
+          <picture>
+            <source srcSet="/assets/images/editorial/shade-library-960.avif" type="image/avif" />
+            <img
+              src="/assets/images/editorial/shade-library-960.webp"
+              alt=""
+              width="960"
+              height="640"
+              decoding="async"
+              fetchPriority="high"
+            />
+          </picture>
+          <figcaption>
+            <span>01 · Material</span>
+            <strong>Colour begins the story.</strong>
+          </figcaption>
+        </figure>
 
-            {/* Yarn ball — unravels from center with spring overshoot */}
-            {isPast(PHASES.BALL) && (
-              <motion.div
-                className="intro-yarn-ball"
-                initial={{ x: "-50%", y: "-50%", scale: 0, opacity: 0, rotate: -180 }}
-                animate={{ x: "-50%", y: "-50%", scale: 1, opacity: 1, rotate: 0 }}
-                transition={{ duration: 0.7, ease: [0.34, 1.56, 0.64, 1] }}
-                aria-hidden="true"
-              >
-                <svg width="100" height="100" viewBox="0 0 120 120" fill="none">
-                  <circle cx="60" cy="60" r="32" fill="var(--gold)" opacity="0.9" />
-                  <path d="M 30,60 Q 60,30 90,60" stroke="var(--gold-soft)" strokeWidth="2" fill="none" opacity="0.7" />
-                  <path d="M 30,60 Q 60,90 90,60" stroke="var(--gold-soft)" strokeWidth="2" fill="none" opacity="0.7" />
-                  <path d="M 60,28 Q 92,60 60,92" stroke="var(--gold-soft)" strokeWidth="2" fill="none" opacity="0.5" />
-                  <path d="M 60,28 Q 28,60 60,92" stroke="var(--gold-soft)" strokeWidth="2" fill="none" opacity="0.5" />
-                  <ellipse cx="50" cy="50" rx="8" ry="5" fill="var(--bg)" opacity="0.4" />
-                </svg>
-              </motion.div>
-            )}
+        <figure className={`${styles.scene} ${styles.sceneMaking}`}>
+          <picture>
+            <source srcSet="/assets/images/editorial/atelier-hero-960.avif" type="image/avif" />
+            <img
+              src="/assets/images/editorial/atelier-hero-960.webp"
+              alt=""
+              width="960"
+              height="640"
+              decoding="async"
+            />
+          </picture>
+          <figcaption>
+            <span>02 · Making</span>
+            <strong>One thread. A hundred possibilities.</strong>
+          </figcaption>
+        </figure>
 
-            {/* Logo — the real Fakhri Mart logo, appears center with spring overshoot */}
-            {isPast(PHASES.BALL) && (
-              <motion.div
-                className="intro-logo-wrapper"
-                initial={{ x: "-50%", y: "-50%", scale: 0, opacity: 0, rotate: -90 }}
-                animate={{ x: "-50%", y: "-50%", scale: 1, opacity: 1, rotate: 0 }}
-                transition={{ duration: 0.8, ease: [0.34, 1.56, 0.64, 1] }}
-                aria-hidden="true"
-              >
-                <img src="/assets/fakhri-mart-logo.webp" alt="" className="intro-logo-img" />
-              </motion.div>
-            )}
+        <figure className={`${styles.scene} ${styles.sceneCollection}`}>
+          <picture>
+            <source srcSet="/assets/images/editorial/crochet-bag-worktable-960.avif" type="image/avif" />
+            <img
+              src="/assets/images/editorial/crochet-bag-worktable-960.webp"
+              alt=""
+              width="960"
+              height="640"
+              decoding="async"
+            />
+          </picture>
+          <figcaption>
+            <span>03 · Creation</span>
+            <strong>Good materials make making easier.</strong>
+          </figcaption>
+        </figure>
 
-            {/* Title — letter-by-letter 3D reveal */}
-            {isPast(PHASES.TITLE) && (
-              <div className="intro-text">
-                <h2 className="intro-title">
-                  {titleLetters.map((letter, i) => (
-                    <motion.span
-                      key={`${letter}-${i}`}
-                      initial={{ opacity: 0, y: 20, rotateX: -90 }}
-                      animate={{ opacity: 1, y: 0, rotateX: 0 }}
-                      transition={{ duration: 0.45, ease: [0.34, 1.56, 0.64, 1], delay: i * 0.04 }}
-                      style={{ display: "inline-block", transformOrigin: "bottom" }}
-                    >
-                      {letter === " " ? "\u00A0" : letter}
-                    </motion.span>
-                  ))}
-                </h2>
-              </div>
-            )}
+        <span className={styles.frameGlow} />
+        <span className={styles.frameVignette} />
+      </div>
 
-            {/* Tagline — fades in below title */}
-            {isPast(PHASES.TAGLINE) && (
-              <motion.p
-                className="intro-tagline"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: ease.soft }}
-              >
-                {businessInfo.tagline}
-              </motion.p>
-            )}
+      <div className={styles.brandCurtain} aria-hidden="true">
+        <div className={styles.brandLockup}>
+          <span className={styles.brandHalo} />
+          <img
+            src="/assets/brand/fakhri-logo-256.webp"
+            alt=""
+            width="256"
+            height="256"
+          />
+          <div>
+            <p>From one thread</p>
+            <strong>Fakhri Mart</strong>
+            <span>Yarn & craft materials · Pune</span>
           </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          <i className={styles.brandThread} />
+          <small>Enter the atelier</small>
+        </div>
+      </div>
+
+      <div className={styles.progress} aria-hidden="true">
+        <span>Opening film</span>
+        <i><b /></i>
+        <span>01 / 01</span>
+      </div>
+
+      <button ref={skipRef} className={styles.skip} type="button" onClick={finish}>
+        <span>Skip intro</span>
+        <i aria-hidden="true">↗</i>
+      </button>
+    </div>
   );
 }
