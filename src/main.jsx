@@ -10,6 +10,7 @@ import "./styles.css";
 import "./atelier.css";
 import "./motion.css";
 import "./atelier-growth.css";
+import "./scroll-cinema.css";
 
 applyMotionProfile();
 
