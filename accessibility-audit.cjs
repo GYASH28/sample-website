@@ -37,6 +37,9 @@ const routes = process.env.A11Y_ROUTE ? [process.env.A11Y_ROUTE] : allRoutes;
       viewport: { width: viewport.width, height: viewport.height },
       reducedMotion: "reduce",
     });
+    await context.addInitScript(() => {
+      sessionStorage.setItem("fakhri_intro_cinematic_v2", "played");
+    });
 
     for (const route of routes) {
       const page = await context.newPage();
@@ -50,6 +53,14 @@ const routes = process.env.A11Y_ROUTE ? [process.env.A11Y_ROUTE] : allRoutes;
         waitUntil: "networkidle",
         timeout: 30000,
       });
+      await page.waitForFunction(() => {
+        return (
+          document.querySelectorAll("main").length === 1 &&
+          document.querySelectorAll("h1").length === 1 &&
+          !document.documentElement.classList.contains("intro-booting")
+        );
+      }, { timeout: 10000 });
+      await page.evaluate(() => document.fonts.ready);
 
       const structure = await page.evaluate(() => ({
         mains: document.querySelectorAll("main").length,
