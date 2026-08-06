@@ -11,6 +11,7 @@ import "./atelier.css";
 import "./motion.css";
 import "./atelier-growth.css";
 import "./scroll-cinema.css";
+import "./commerce-upgrade.css";
 
 applyMotionProfile();
 
