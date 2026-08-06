@@ -12,6 +12,7 @@ import "./motion.css";
 import "./atelier-growth.css";
 import "./scroll-cinema.css";
 import "./commerce-upgrade.css";
+import "./product-first-v2.css";
 
 applyMotionProfile();
 
