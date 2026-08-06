@@ -13,15 +13,19 @@ if (!existsSync(cli)) {
   process.exit(1);
 }
 
-console.log("Installing Playwright Chromium for prerendering…");
-const result = spawnSync(process.execPath, [cli, "install", "chromium"], {
-  cwd: process.cwd(),
-  stdio: "inherit",
-  env: process.env,
-});
+console.log("Installing Playwright Chromium and required Linux dependencies…");
+const result = spawnSync(
+  process.execPath,
+  [cli, "install", "--with-deps", "chromium"],
+  {
+    cwd: process.cwd(),
+    stdio: "inherit",
+    env: process.env,
+  },
+);
 
 if (result.error) {
-  console.error(`Unable to install Chromium: ${result.error.message}`);
+  console.error(`Unable to install Chromium dependencies: ${result.error.message}`);
   process.exit(1);
 }
 
