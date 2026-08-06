@@ -1,15 +1,14 @@
 import { ArrowRight } from "@phosphor-icons/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
-
-const STORAGE_KEY = "fakhri_commerce_intro_v3";
+import { COMMERCE_INTRO_SESSION_KEY } from "../lib/commerceIntro.js";
 
 function shouldShowIntro(pathname) {
   if (pathname !== "/" || typeof window === "undefined") return false;
   const params = new URLSearchParams(window.location.search);
   if (params.get("intro") === "1") return true;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
-  return window.sessionStorage.getItem(STORAGE_KEY) !== "played";
+  return window.sessionStorage.getItem(COMMERCE_INTRO_SESSION_KEY) !== "played";
 }
 
 export default function CommerceIntro() {
@@ -18,11 +17,14 @@ export default function CommerceIntro() {
   const [phase, setPhase] = useState("thread");
   const skipRef = useRef(null);
   const timersRef = useRef([]);
+  const finishingRef = useRef(false);
 
   const finish = useCallback(() => {
+    if (finishingRef.current) return;
+    finishingRef.current = true;
     timersRef.current.forEach((timer) => window.clearTimeout(timer));
     timersRef.current = [];
-    window.sessionStorage.setItem(STORAGE_KEY, "played");
+    window.sessionStorage.setItem(COMMERCE_INTRO_SESSION_KEY, "played");
     setPhase("exit");
     window.setTimeout(() => setVisible(false), 420);
   }, []);
