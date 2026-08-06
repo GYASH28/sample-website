@@ -7,46 +7,11 @@
     <meta name="robots" content="index, follow, max-image-preview:large" />
     <meta name="geo.region" content="IN-MH" />
     <meta name="geo.placename" content="Pune" />
-    <script>
-      (() => {
-        try {
-          const force = new URLSearchParams(window.location.search).get("intro") === "1";
-          const seen = window.sessionStorage.getItem("fakhri_intro_cinematic_v2") === "played";
-          const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-          if (!reduced && (force || !seen)) {
-            document.documentElement.classList.add("intro-booting");
-            window.setTimeout(
-              () => document.documentElement.classList.remove("intro-booting"),
-              10000,
-            );
-          }
-        } catch {
-          document.documentElement.classList.add("intro-booting");
-        }
-      })();
-    </script>
-    <style>
-      html.intro-booting,
-      html.intro-booting body {
-        background: #24131b;
-      }
-
-      html.intro-booting body::before {
-        position: fixed;
-        z-index: 2147483646;
-        inset: 0;
-        background:
-          radial-gradient(circle at 13% 18%, rgba(216, 137, 161, 0.2), transparent 34rem),
-          radial-gradient(circle at 86% 22%, rgba(42, 140, 130, 0.17), transparent 38rem),
-          linear-gradient(112deg, #24131b, #452735);
-        content: "";
-      }
-    </style>
 
     <title>Fakhri Mart | Yarn Store & Craft Supplier in Pune</title>
     <meta
       name="description"
-      content="Fakhri Mart in Pune offers yarns, crochet threads, macrame cords, embroidery threads, beads, purse accessories and craft essentials with all-India delivery and bulk enquiry support."
+      content="Browse yarns, crochet threads, macrame cords, embroidery supplies, beads, purse accessories and craft essentials from Pune. Save products and request live shades and quantity-based pricing."
     />
     <link rel="canonical" href="https://fakhriyarns.vercel.app/" />
     <link rel="sitemap" type="application/xml" href="https://fakhriyarns.vercel.app/sitemap.xml" />
@@ -59,11 +24,10 @@
       as="image"
       href="/assets/images/editorial/atelier-hero-960.avif"
       imagesrcset="/assets/images/editorial/atelier-hero-640.avif 640w, /assets/images/editorial/atelier-hero-960.avif 960w, /assets/images/editorial/atelier-hero.avif 1280w"
-      imagesizes="(max-width: 48rem) calc(100vw - 2rem), 46vw"
+      imagesizes="(max-width: 48rem) calc(100vw - 24px), 48vw"
       type="image/avif"
       fetchpriority="high"
     />
-    <link rel="preload" as="image" href="/assets/images/editorial/shade-library-960.avif" type="image/avif" />
     <link rel="preload" as="image" href="/assets/brand/fakhri-logo-256.webp" type="image/webp" />
     <link rel="dns-prefetch" href="https://wa.me" />
     <link rel="dns-prefetch" href="https://maps.google.com" />
@@ -73,14 +37,14 @@
     <meta property="og:site_name" content="Fakhri Mart" />
     <meta property="og:locale" content="en_IN" />
     <meta property="og:title" content="Fakhri Mart | Yarn Store & Craft Supplier in Pune" />
-    <meta property="og:description" content="Yarns, crochet threads, macrame cords, embroidery threads, beads, purse accessories and craft essentials from Pune with all-India delivery." />
+    <meta property="og:description" content="Browse yarns, threads, macrame, beads and craft essentials, then request current shades and quantity-based pricing." />
     <meta property="og:image" content="https://fakhriyarns.vercel.app/assets/images/editorial/atelier-hero-960.webp" />
-    <meta property="og:image:alt" content="Fakhri Mart yarn and craft material atelier" />
+    <meta property="og:image:alt" content="Fakhri Mart yarn and craft materials" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@fakhrimart53" />
     <meta name="twitter:title" content="Fakhri Mart | Yarn Store & Craft Supplier in Pune" />
-    <meta name="twitter:description" content="Yarns, crochet threads, macrame cords and craft essentials from Pune with all-India delivery." />
+    <meta name="twitter:description" content="Browse yarns, threads and craft supplies, then request live shades and quantity-based pricing." />
     <meta name="twitter:image" content="https://fakhriyarns.vercel.app/assets/images/editorial/atelier-hero-960.webp" />
   </head>
   <body>

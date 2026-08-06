@@ -4,8 +4,9 @@ import FloatingWhatsApp from "./FloatingWhatsApp.jsx";
 import Footer from "./Footer.jsx";
 import Header from "./Header.jsx";
 import BasketToast from "./BasketToast.jsx";
-import IntroAnimation from "./IntroAnimation.jsx";
 import ScrollDirector from "./ScrollDirector.jsx";
+import MobileBottomNav from "./MobileBottomNav.jsx";
+import EnquiryDrawerLauncher from "./EnquiryDrawerLauncher.jsx";
 
 function ScrollToTop() {
   const { hash, pathname } = useLocation();
@@ -45,7 +46,6 @@ export default function Layout() {
   return (
     <>
       <a href="#main-content" className="skip-link">Skip to main content</a>
-      <IntroAnimation />
       <ScrollDirector />
       <ScrollToTop />
       <Header />
@@ -66,6 +66,8 @@ export default function Layout() {
       <Footer />
       <FloatingWhatsApp />
       <BasketToast />
+      <EnquiryDrawerLauncher />
+      <MobileBottomNav />
     </>
   );
 }
