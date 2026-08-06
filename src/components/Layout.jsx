@@ -7,6 +7,8 @@ import BasketToast from "./BasketToast.jsx";
 import ScrollDirector from "./ScrollDirector.jsx";
 import MobileBottomNav from "./MobileBottomNav.jsx";
 import EnquiryDrawerLauncher from "./EnquiryDrawerLauncher.jsx";
+import CommerceIntro from "./CommerceIntro.jsx";
+import ScrollProgress from "./ScrollProgress.jsx";
 
 function ScrollToTop() {
   const { hash, pathname } = useLocation();
@@ -46,6 +48,8 @@ export default function Layout() {
   return (
     <>
       <a href="#main-content" className="skip-link">Skip to main content</a>
+      <CommerceIntro />
+      <ScrollProgress />
       <ScrollDirector />
       <ScrollToTop />
       <Header />
