@@ -1,12 +1,12 @@
-import HeroSignature from "../components/home/HeroSignature.jsx";
+import CommerceHero from "../components/home/CommerceHero.jsx";
 import {
-  FeaturedEditSection,
-  MaterialIndexSection,
-  MaterialRibbon,
-  ProcessSection,
-  ShadeDeskSection,
-  TradePanelSection,
-} from "../components/home/HomeSections.jsx";
+  CommerceBenefits,
+  CommerceCategoryGrid,
+  CommerceCategoryNav,
+  CommerceOrderFlow,
+  CommerceProductRail,
+  CommerceWholesaleCta,
+} from "../components/home/CommerceHomeSections.jsx";
 import {
   businessInfo,
   featuredProducts,
@@ -19,58 +19,54 @@ import {
   websiteJsonLd,
 } from "../hooks/useJsonLd.js";
 
-const categoryNames = [
-  "Bliss Threads",
-  "T-Shirt Yarn",
-  "Macrame Cord",
-  "Embroidery Threads",
-  "Beads",
-  "Purse Materials",
-];
+const yarnAndThreadProducts = featuredProducts
+  .filter((product) => ["Yarns", "Threads"].includes(product.masterCategory))
+  .slice(0, 8);
 
-const shadeSlugs = [
-  "cotton-dreamz",
-  "makhhi-thread",
-  "single-macrame-cord",
-];
-
-const featuredSlugs = [
-  "makhhi-thread",
-  "cotton-dreamz",
-  "single-macrame-cord",
-  "purse-handles",
-];
-
-const categoryEdit = categoryNames
-  .map((name) => productCategories.find((category) => category.name === name))
-  .filter(Boolean);
-
-const shadeProducts = shadeSlugs
-  .map((slug) => featuredProducts.find((product) => product.slug === slug))
-  .filter(Boolean);
-
-const featuredEdit = featuredSlugs
-  .map((slug) => featuredProducts.find((product) => product.slug === slug))
-  .filter(Boolean);
+const projectAndAccessoryProducts = featuredProducts
+  .filter((product) => {
+    const searchable = [
+      product.category,
+      product.masterCategory,
+      ...(product.tags || []),
+      ...(product.filters || []),
+    ].join(" ");
+    return /macrame|bag|purse|bead|base|accessor|hook/i.test(searchable);
+  })
+  .filter((product) => !yarnAndThreadProducts.some((item) => item.slug === product.slug))
+  .slice(0, 8);
 
 export default function Home() {
   useDocumentMeta({
     title: "Fakhri Mart | Yarn, Threads & Craft Materials from Pune",
     description:
-      "Browse yarn, crochet thread, macrame cord and bag-making supplies. Ask Fakhri Mart for current shades, pack sizes and quantity-based prices.",
+      "Browse yarn, crochet thread, macrame cord, embroidery supplies, beads and bag-making materials. Save products and ask Fakhri Mart for live shades and quantity-based pricing.",
   });
   useJsonLd(localBusinessJsonLd(businessInfo));
   useJsonLd(websiteJsonLd());
 
   return (
-    <div className="fm-home">
-      <HeroSignature />
-      <MaterialRibbon categories={categoryEdit} />
-      <MaterialIndexSection categories={categoryEdit} />
-      <ShadeDeskSection products={shadeProducts} />
-      <FeaturedEditSection products={featuredEdit} />
-      <ProcessSection />
-      <TradePanelSection />
+    <div className="fm-home commerce-home">
+      <CommerceHero />
+      <CommerceCategoryNav categories={productCategories} />
+      <CommerceCategoryGrid categories={productCategories.slice(0, 8)} />
+      <CommerceBenefits />
+      <CommerceProductRail
+        eyebrow="Popular yarns and threads"
+        title="Browse by fibre, feel and project"
+        text="Compare product families, listed shades and common uses, then ask for the current pack and availability."
+        products={yarnAndThreadProducts.length ? yarnAndThreadProducts : featuredProducts.slice(0, 8)}
+        href="/products?department=Yarns"
+      />
+      <CommerceProductRail
+        eyebrow="Macrame, bags and finishing"
+        title="Everything around the yarn"
+        text="Find cords, handles, bases, beads, hooks and finishing materials without digging through unrelated pages."
+        products={projectAndAccessoryProducts.length ? projectAndAccessoryProducts : featuredProducts.slice(8, 16)}
+        href="/products?department=Accessories"
+      />
+      <CommerceOrderFlow />
+      <CommerceWholesaleCta />
     </div>
   );
 }
