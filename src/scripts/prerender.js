@@ -15,6 +15,7 @@ if (!existsSync(distDir)) {
 
 const { featuredProducts, blogPosts } = await import("../data/siteData.js");
 const { INTRO_SESSION_KEY } = await import("../lib/introPlayback.js");
+const { COMMERCE_INTRO_SESSION_KEY } = await import("../lib/commerceIntro.js");
 
 const staticRoutes = [
   "/",
@@ -79,9 +80,13 @@ try {
   }
 
   const page = await browser.newPage();
-  await page.addInitScript((sessionKey) => {
-    sessionStorage.setItem(sessionKey, "played");
-  }, INTRO_SESSION_KEY);
+  await page.addInitScript(
+    ({ legacyKey, commerceKey }) => {
+      sessionStorage.setItem(legacyKey, "played");
+      sessionStorage.setItem(commerceKey, "played");
+    },
+    { legacyKey: INTRO_SESSION_KEY, commerceKey: COMMERCE_INTRO_SESSION_KEY },
+  );
 
   let successCount = 0;
   let failCount = 0;
@@ -93,7 +98,14 @@ try {
       await page.waitForTimeout(500);
       await page.evaluate(() => {
         document.documentElement.classList.remove("motion-ready", "intro-booting", "intro-handoff");
-        document.body.classList.remove("intro-running", "intro-hold-hero");
+        document.body.classList.remove(
+          "intro-running",
+          "intro-hold-hero",
+          "commerce-intro-open",
+          "quick-view-open",
+        );
+        document.querySelector(".commerce-intro")?.remove();
+        document.querySelector(".quick-view-layer")?.remove();
       });
 
       const html = await page.content();
