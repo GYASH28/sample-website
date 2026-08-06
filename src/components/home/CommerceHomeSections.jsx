@@ -125,7 +125,7 @@ const crafts = [
   { name: "Crochet", test: /crochet|amigurumi|hook/i },
   { name: "Knitting", test: /knit|wearable|scarf|baby/i },
   { name: "Macrame", test: /macrame|cord|plant hanger/i },
-  { name: "Bag making", test: /bag|purse|handle|base|lock|charm/i },
+  { name: "Bag Making", test: /bag|purse|handle|base|lock|charm/i },
   { name: "Embroidery", test: /embroidery|lacchi|stitch/i },
 ];
 
@@ -160,7 +160,7 @@ export function CommerceCraftFinder({ products }) {
               </button>
             ))}
           </div>
-          <Link className="commerce-craft-finder__link" to={`/products?tag=${encodeURIComponent(activeCraft.name)}`}>
+          <Link className="commerce-craft-finder__link" to={`/products?q=${encodeURIComponent(activeCraft.name)}`}>
             Explore all {activeCraft.name.toLowerCase()} products <ArrowRight size={17} />
           </Link>
         </Reveal>
