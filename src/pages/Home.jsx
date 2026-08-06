@@ -20,17 +20,18 @@ import {
   websiteJsonLd,
 } from "../hooks/useJsonLd.js";
 
-const popularProducts = featuredProducts.slice(0, 10);
-const yarnProducts = featuredProducts.filter((product) => product.masterCategory === "Yarns").slice(0, 10);
-const threadProducts = featuredProducts.filter((product) => product.masterCategory === "Threads").slice(0, 10);
-const accessoryProducts = featuredProducts.filter((product) => product.masterCategory === "Accessories").slice(0, 10);
+const RAIL_SIZE = 6;
+const popularProducts = featuredProducts.slice(0, RAIL_SIZE);
+const yarnProducts = featuredProducts.filter((product) => product.masterCategory === "Yarns").slice(0, RAIL_SIZE);
+const threadProducts = featuredProducts.filter((product) => product.masterCategory === "Threads").slice(0, RAIL_SIZE);
+const accessoryProducts = featuredProducts.filter((product) => product.masterCategory === "Accessories").slice(0, RAIL_SIZE);
 
 const macrameAndBagProducts = featuredProducts
   .filter((product) => {
     const searchable = [product.name, product.category, product.suitableFor, ...(product.tags || []), ...(product.filters || [])].join(" ");
     return /macrame|cord|bag|purse|handle|base|bead|hook/i.test(searchable);
   })
-  .slice(0, 10);
+  .slice(0, RAIL_SIZE);
 
 export default function Home() {
   useDocumentMeta({
@@ -69,7 +70,7 @@ export default function Home() {
         eyebrow="Thread collection"
         title="Crochet, embroidery and decorative threads"
         text="Compare thread types, available shade families and the projects they suit before requesting current stock."
-        products={threadProducts.length ? threadProducts : featuredProducts.slice(4, 14)}
+        products={threadProducts.length ? threadProducts : featuredProducts.slice(4, 4 + RAIL_SIZE)}
         href="/products?department=Threads"
       />
 
@@ -85,7 +86,7 @@ export default function Home() {
         eyebrow="Tools and accessories"
         title="The useful extras that finish the work"
         text="Hooks, rings, locks, charms and other practical materials for makers, classes and resale shelves."
-        products={accessoryProducts.length ? accessoryProducts : featuredProducts.slice(-10)}
+        products={accessoryProducts.length ? accessoryProducts : featuredProducts.slice(-RAIL_SIZE)}
         href="/products?department=Accessories"
       />
 
