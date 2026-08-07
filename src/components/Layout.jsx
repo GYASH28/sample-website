@@ -11,6 +11,7 @@ import CommerceIntro from "./CommerceIntro.jsx";
 import ScrollProgress from "./ScrollProgress.jsx";
 import DelightLayer from "./DelightLayer.jsx";
 import MobileProductDock from "./MobileProductDock.jsx";
+import HeaderEnhancer from "./HeaderEnhancer.jsx";
 
 function ScrollToTop() {
   const { hash, pathname } = useLocation();
@@ -54,6 +55,7 @@ export default function Layout() {
       <ScrollProgress />
       <ScrollDirector />
       <ScrollToTop />
+      <HeaderEnhancer />
       <Header />
       <main id="main-content">
         <div
