@@ -25,6 +25,10 @@ export default function CommerceHero() {
   const [autoPaused, setAutoPaused] = useState(false);
   const [interactionPaused, setInteractionPaused] = useState(false);
   const visualRef = useRef(null);
+  const pointerFrameRef = useRef(0);
+  const pointerRef = useRef({ x: 0, y: 0 });
+  const visualRectRef = useRef(null);
+  const pointerMotionEnabledRef = useRef(false);
   const { add } = useEnquiryBasket();
   const { has, toggle } = useWishlist();
 
@@ -40,6 +44,10 @@ export default function CommerceHero() {
     }, AUTO_ADVANCE_MS);
     return () => window.clearTimeout(timer);
   }, [index, autoPaused, interactionPaused]);
+
+  useEffect(() => () => {
+    if (pointerFrameRef.current) window.cancelAnimationFrame(pointerFrameRef.current);
+  }, []);
 
   if (!product) return null;
 
@@ -63,22 +71,48 @@ export default function CommerceHero() {
     window.setTimeout(() => setAdded(false), 1_500);
   };
 
-  const onPointerMove = (event) => {
-    if (!visualRef.current || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
-    const rect = visualRef.current.getBoundingClientRect();
-    const px = (event.clientX - rect.left) / rect.width;
-    const py = (event.clientY - rect.top) / rect.height;
+  const applyPointerMotion = () => {
+    pointerFrameRef.current = 0;
+    const visual = visualRef.current;
+    const rect = visualRectRef.current;
+    if (!visual || !rect || !pointerMotionEnabledRef.current) return;
+
+    const px = Math.min(1, Math.max(0, (pointerRef.current.x - rect.left) / rect.width));
+    const py = Math.min(1, Math.max(0, (pointerRef.current.y - rect.top) / rect.height));
     const x = px - 0.5;
     const y = py - 0.5;
-    visualRef.current.style.setProperty("--hero-rx", `${y * -3.5}deg`);
-    visualRef.current.style.setProperty("--hero-ry", `${x * 4.5}deg`);
-    visualRef.current.style.setProperty("--hero-x", `${x * 10}px`);
-    visualRef.current.style.setProperty("--hero-y", `${y * 8}px`);
-    visualRef.current.style.setProperty("--hero-glow-x", `${px * 100}%`);
-    visualRef.current.style.setProperty("--hero-glow-y", `${py * 100}%`);
+
+    visual.style.setProperty("--hero-rx", `${y * -2.5}deg`);
+    visual.style.setProperty("--hero-ry", `${x * 3.2}deg`);
+    visual.style.setProperty("--hero-x", `${x * 7}px`);
+    visual.style.setProperty("--hero-y", `${y * 6}px`);
+    visual.style.setProperty("--hero-glow-x", `${px * 100}%`);
+    visual.style.setProperty("--hero-glow-y", `${py * 100}%`);
+  };
+
+  const onPointerMove = (event) => {
+    if (!pointerMotionEnabledRef.current) return;
+    pointerRef.current = { x: event.clientX, y: event.clientY };
+    if (!pointerFrameRef.current) {
+      pointerFrameRef.current = window.requestAnimationFrame(applyPointerMotion);
+    }
+  };
+
+  const onPointerEnter = () => {
+    setInteractionPaused(true);
+    const profile = document.documentElement.dataset.motionProfile;
+    pointerMotionEnabledRef.current =
+      profile === "full" && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    visualRectRef.current = visualRef.current?.getBoundingClientRect() || null;
   };
 
   const resetPointer = () => {
+    pointerMotionEnabledRef.current = false;
+    visualRectRef.current = null;
+    if (pointerFrameRef.current) {
+      window.cancelAnimationFrame(pointerFrameRef.current);
+      pointerFrameRef.current = 0;
+    }
     if (!visualRef.current) return;
     visualRef.current.style.setProperty("--hero-rx", "0deg");
     visualRef.current.style.setProperty("--hero-ry", "0deg");
@@ -154,7 +188,7 @@ export default function CommerceHero() {
           ref={visualRef}
           className="commerce-hero__visual product-first-hero__visual"
           onPointerMove={onPointerMove}
-          onPointerEnter={() => setInteractionPaused(true)}
+          onPointerEnter={onPointerEnter}
           onPointerLeave={() => {
             setInteractionPaused(false);
             resetPointer();

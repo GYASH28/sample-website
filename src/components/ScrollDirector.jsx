@@ -32,9 +32,17 @@ function elementProgress(element, viewportHeight) {
   return clamp((viewportHeight - rect.top) / (viewportHeight + rect.height));
 }
 
+function uniqueElements(selector) {
+  return [...document.querySelectorAll(selector)].filter(
+    (element, index, collection) =>
+      element instanceof HTMLElement && collection.indexOf(element) === index,
+  );
+}
+
 export default function ScrollDirector() {
   const { pathname } = useLocation();
   const frameRef = useRef(0);
+  const pointerFrameRef = useRef(0);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -48,33 +56,99 @@ export default function ScrollDirector() {
       return undefined;
     }
 
-    let scenes = [];
-    let cards = [];
-    let media = [];
+    const isHome = pathname === "/";
+    const activeScenes = new Set();
+    const activeMedia = new Set();
+    const markedElements = new Set();
+    const profile = root.dataset.motionProfile;
+    const profileIntensity = profile === "lite" ? 0 : profile === "compact" ? 0.36 : 0.62;
+    // The homepage is already visually dense. One-time reveals feel more cinematic
+    // and are materially cheaper than continuous per-section parallax while scrolling.
+    const intensity = isHome ? 0 : profileIntensity;
+    const allowPointerLight = !isHome && profile === "full" && finePointerQuery.matches;
     let collectionTimers = [];
+    let lastPointerX = 0;
+    let lastPointerY = 0;
+
+    const revealObserver = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const element = entry.target;
+          element.classList.add("is-scroll-revealed");
+          observer.unobserve(element);
+        });
+      },
+      { rootMargin: "0px 0px -7% 0px", threshold: 0.08 },
+    );
+
+    const activeObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const target = entry.target;
+          const scene = target.dataset.scrollScene === "true";
+          const media = target.dataset.scrollMedia === "true";
+
+          if (scene) {
+            if (entry.isIntersecting) activeScenes.add(target);
+            else activeScenes.delete(target);
+          }
+          if (media) {
+            if (entry.isIntersecting) activeMedia.add(target);
+            else activeMedia.delete(target);
+          }
+        });
+      },
+      { rootMargin: "18% 0px 18% 0px", threshold: 0 },
+    );
+
+    const prepareReveal = (element, index = 0) => {
+      if (element.dataset.scrollPrepared === "true") return;
+      element.dataset.scrollPrepared = "true";
+      element.style.setProperty("--reveal-delay", `${Math.min(index % 6, 5) * 42}ms`);
+      markedElements.add(element);
+
+      const rect = element.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.86) {
+        element.classList.add("is-scroll-revealed");
+      } else {
+        revealObserver.observe(element);
+      }
+    };
 
     const markElements = () => {
-      scenes = [...document.querySelectorAll(SCENE_SELECTOR)].filter(
-        (element, index, collection) =>
-          element instanceof HTMLElement && collection.indexOf(element) === index,
-      );
-      cards = [...document.querySelectorAll(CARD_SELECTOR)].filter(
-        (element) => element instanceof HTMLElement,
-      );
-      media = [...document.querySelectorAll(MEDIA_SELECTOR)].filter(
-        (element) =>
-          element instanceof HTMLElement &&
-          !element.closest("[data-scroll-media='false']"),
-      );
+      const scenes = uniqueElements(SCENE_SELECTOR);
+      const cards = uniqueElements(CARD_SELECTOR);
+      const media = intensity === 0
+        ? []
+        : uniqueElements(MEDIA_SELECTOR).filter(
+            (element) => !element.closest("[data-scroll-media='false']"),
+          );
 
-      scenes.forEach((element) => {
-        element.dataset.scrollScene = "true";
+      scenes.forEach((element, index) => {
+        if (element.dataset.scrollScene !== "true") {
+          element.dataset.scrollScene = "true";
+          markedElements.add(element);
+          if (intensity > 0) activeObserver.observe(element);
+        }
+        if (index > 0) prepareReveal(element, index);
+        else element.classList.add("is-scroll-revealed");
       });
-      cards.forEach((element) => {
-        element.dataset.scrollCard = "true";
+
+      cards.forEach((element, index) => {
+        if (element.dataset.scrollCard !== "true") {
+          element.dataset.scrollCard = "true";
+          markedElements.add(element);
+        }
+        prepareReveal(element, index);
       });
+
       media.forEach((element) => {
-        element.dataset.scrollMedia = "true";
+        if (element.dataset.scrollMedia !== "true") {
+          element.dataset.scrollMedia = "true";
+          markedElements.add(element);
+          activeObserver.observe(element);
+        }
       });
     };
 
@@ -83,38 +157,28 @@ export default function ScrollDirector() {
       const viewportHeight = Math.max(window.innerHeight, 1);
       const scrollable = Math.max(root.scrollHeight - viewportHeight, 1);
       const pageProgress = clamp(window.scrollY / scrollable);
-      const profile = root.dataset.motionProfile;
-      const intensity = profile === "lite" ? 0 : profile === "compact" ? 0.56 : 1;
 
       root.style.setProperty("--page-scroll", pageProgress.toFixed(5));
       root.style.setProperty("--thread-offset", (1 - pageProgress).toFixed(5));
       root.style.setProperty("--scroll-percent", `${(pageProgress * 100).toFixed(3)}%`);
 
-      for (const element of scenes) {
+      if (intensity === 0) return;
+
+      activeScenes.forEach((element) => {
         const progress = elementProgress(element, viewportHeight);
-        const shift = (0.5 - progress) * 22 * intensity;
+        const shift = (0.5 - progress) * 14 * intensity;
         element.style.setProperty("--scene-progress", progress.toFixed(4));
         element.style.setProperty("--scene-shift", `${shift.toFixed(2)}px`);
-        element.style.setProperty(
-          "--scene-line",
-          clamp(progress * 1.38).toFixed(4),
-        );
-      }
+        element.style.setProperty("--scene-line", clamp(progress * 1.28).toFixed(4));
+      });
 
-      for (const element of cards) {
+      activeMedia.forEach((element) => {
         const progress = elementProgress(element, viewportHeight);
-        const lift = (0.5 - progress) * 12 * intensity;
-        element.style.setProperty("--scroll-lift", `${lift.toFixed(2)}px`);
-      }
-
-      for (const element of media) {
-        const progress = elementProgress(element, viewportHeight);
-        const distance = Math.abs(0.5 - progress);
-        const scale = 1 + distance * 0.032 * intensity;
-        const shift = (0.5 - progress) * 10 * intensity;
+        const shift = (0.5 - progress) * 6 * intensity;
+        const scale = 1 + Math.abs(0.5 - progress) * 0.012 * intensity;
         element.style.setProperty("--scroll-media-scale", scale.toFixed(4));
         element.style.setProperty("--scroll-media-shift", `${shift.toFixed(2)}px`);
-      }
+      });
     };
 
     const scheduleUpdate = () => {
@@ -128,39 +192,48 @@ export default function ScrollDirector() {
     };
 
     const handlePointerMove = (event) => {
-      if (!finePointerQuery.matches) return;
-      root.style.setProperty("--pointer-x", `${event.clientX}px`);
-      root.style.setProperty("--pointer-y", `${event.clientY}px`);
+      if (!allowPointerLight) return;
+      lastPointerX = event.clientX;
+      lastPointerY = event.clientY;
+      if (pointerFrameRef.current) return;
+      pointerFrameRef.current = window.requestAnimationFrame(() => {
+        pointerFrameRef.current = 0;
+        root.style.setProperty("--pointer-x", `${lastPointerX}px`);
+        root.style.setProperty("--pointer-y", `${lastPointerY}px`);
+      });
     };
 
     collectAndUpdate();
-    collectionTimers = [80, 280, 760].map((delay) =>
+    collectionTimers = [120, 520].map((delay) =>
       window.setTimeout(collectAndUpdate, delay),
     );
 
-    const resizeObserver = new ResizeObserver(scheduleUpdate);
-    resizeObserver.observe(document.body);
-
     window.addEventListener("scroll", scheduleUpdate, { passive: true });
     window.addEventListener("resize", collectAndUpdate, { passive: true });
-    window.addEventListener("pointermove", handlePointerMove, { passive: true });
+    if (allowPointerLight) {
+      window.addEventListener("pointermove", handlePointerMove, { passive: true });
+    }
 
     return () => {
       if (frameRef.current) window.cancelAnimationFrame(frameRef.current);
+      if (pointerFrameRef.current) window.cancelAnimationFrame(pointerFrameRef.current);
       collectionTimers.forEach((timer) => window.clearTimeout(timer));
-      resizeObserver.disconnect();
+      revealObserver.disconnect();
+      activeObserver.disconnect();
       window.removeEventListener("scroll", scheduleUpdate);
       window.removeEventListener("resize", collectAndUpdate);
-      window.removeEventListener("pointermove", handlePointerMove);
+      if (allowPointerLight) window.removeEventListener("pointermove", handlePointerMove);
 
-      [...scenes, ...cards, ...media].forEach((element) => {
+      markedElements.forEach((element) => {
         delete element.dataset.scrollScene;
         delete element.dataset.scrollCard;
         delete element.dataset.scrollMedia;
+        delete element.dataset.scrollPrepared;
+        element.classList.remove("is-scroll-revealed");
+        element.style.removeProperty("--reveal-delay");
         element.style.removeProperty("--scene-progress");
         element.style.removeProperty("--scene-shift");
         element.style.removeProperty("--scene-line");
-        element.style.removeProperty("--scroll-lift");
         element.style.removeProperty("--scroll-media-scale");
         element.style.removeProperty("--scroll-media-shift");
       });
@@ -169,7 +242,7 @@ export default function ScrollDirector() {
 
   return (
     <div className="scroll-director" aria-hidden="true">
-      <span className="scroll-director__aurora" />
+      {pathname !== "/" ? <span className="scroll-director__aurora" /> : null}
       <span className="scroll-director__rail">
         <i />
       </span>

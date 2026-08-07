@@ -19,18 +19,22 @@ export function resolveMotionProfile() {
   const constrainedConnection =
     connection?.saveData ||
     ["slow-2g", "2g"].includes(connection?.effectiveType);
-  const constrainedHardware =
+  const veryConstrainedHardware =
     (navigator.deviceMemory && navigator.deviceMemory <= 2) ||
     (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2);
 
-  if (constrainedConnection || constrainedHardware) {
+  if (constrainedConnection || veryConstrainedHardware) {
     return MOTION_PROFILES.lite;
   }
 
-  if (
+  const midRangeHardware =
+    (navigator.deviceMemory && navigator.deviceMemory <= 4) ||
+    (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
+  const compactViewport =
     window.matchMedia("(pointer: coarse)").matches ||
-    window.matchMedia("(max-width: 42rem)").matches
-  ) {
+    window.matchMedia("(max-width: 42rem)").matches;
+
+  if (midRangeHardware || compactViewport) {
     return MOTION_PROFILES.compact;
   }
 
