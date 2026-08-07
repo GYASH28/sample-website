@@ -19,6 +19,7 @@ import "./production-hardening-v4.css";
 import "./production-a11y-fixes.css";
 import "./motion-performance-v5.css";
 import "./hero-v6.css";
+import "./hero-cinematic-v7.css";
 
 applyMotionProfile();
 
