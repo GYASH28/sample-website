@@ -1,4 +1,26 @@
-/* Final v11 rendered-audit corrections. */
+/* Final v11 rendered + human visual-audit corrections. */
+
+/* ---------- Homepage sections ---------- */
+:root[data-theme="dark"] .commerce-product-section {
+  border-color: var(--ui-border) !important;
+  background:
+    radial-gradient(circle at 92% 8%, rgba(115, 200, 189, 0.035), transparent 24rem),
+    var(--ui-bg-elevated) !important;
+  color: var(--ui-text) !important;
+}
+
+:root[data-theme="dark"] .commerce-product-section .commerce-heading h2,
+:root[data-theme="dark"] .commerce-product-section .commerce-heading strong {
+  color: var(--ui-text-strong) !important;
+}
+
+:root[data-theme="dark"] .commerce-product-section .commerce-heading p:not(.eyebrow) {
+  color: var(--ui-text-muted) !important;
+}
+
+:root[data-theme="dark"] .commerce-product-section .commerce-heading a {
+  color: var(--ui-accent) !important;
+}
 
 :root[data-theme="dark"] .commerce-order-flow ol > li,
 :root[data-theme="dark"] .commerce-order-flow ol > .reveal {
@@ -26,4 +48,161 @@
 :root[data-theme="dark"] .commerce-order-flow ol > li > svg,
 :root[data-theme="dark"] .commerce-order-flow ol > .reveal > svg {
   color: var(--ui-accent) !important;
+}
+
+/* ---------- Catalogue CTA ---------- */
+/* The legacy CTA paints its cream canvas with ::after, so changing the section
+   itself was not enough. Override every painted layer explicitly. */
+:root[data-theme="dark"] .catalogue-cta {
+  border-color: var(--ui-border-strong) !important;
+  background: #1b1f1b !important;
+  box-shadow: var(--ui-shadow) !important;
+}
+
+:root[data-theme="dark"] .catalogue-cta::before {
+  background: linear-gradient(120deg, rgba(115, 200, 189, 0.13), transparent 35%, rgba(237, 164, 186, 0.10), transparent 74%) !important;
+  opacity: 1 !important;
+}
+
+:root[data-theme="dark"] .catalogue-cta::after {
+  background:
+    radial-gradient(circle at 84% 12%, rgba(115, 200, 189, 0.06), transparent 20rem),
+    linear-gradient(135deg, #202420, #191c19) !important;
+}
+
+:root[data-theme="dark"] .catalogue-cta .cta-pattern {
+  background:
+    radial-gradient(circle at 15% 20%, rgba(237, 164, 186, 0.07) 0 1px, transparent 2px),
+    repeating-linear-gradient(120deg, rgba(115, 200, 189, 0.035) 0 1px, transparent 1px 34px) !important;
+  opacity: 0.65 !important;
+}
+
+:root[data-theme="dark"] .catalogue-cta .cta-content {
+  position: relative;
+  z-index: 3;
+}
+
+:root[data-theme="dark"] .catalogue-cta h2 {
+  color: var(--ui-text-strong) !important;
+}
+
+:root[data-theme="dark"] .catalogue-cta p:not(.eyebrow) {
+  color: var(--ui-text-muted) !important;
+}
+
+/* ---------- Yarn guide / project finder ---------- */
+:root[data-theme="dark"] .project-choice {
+  border-color: var(--ui-border) !important;
+  background: var(--ui-surface) !important;
+  color: var(--ui-text) !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme="dark"] .project-choice:hover,
+:root[data-theme="dark"] .project-choice:focus-visible {
+  border-color: var(--ui-accent) !important;
+  background: var(--ui-surface-soft) !important;
+}
+
+:root[data-theme="dark"] .project-choice--active {
+  border-color: rgba(115, 200, 189, 0.48) !important;
+  background: #173d38 !important;
+}
+
+:root[data-theme="dark"] .project-choice svg {
+  color: var(--ui-accent) !important;
+}
+
+:root[data-theme="dark"] .project-choice strong {
+  color: var(--ui-text-strong) !important;
+}
+
+:root[data-theme="dark"] .project-choice small {
+  color: var(--ui-text-muted) !important;
+}
+
+:root[data-theme="dark"] .project-recommendation {
+  border-color: var(--ui-border) !important;
+  background:
+    radial-gradient(circle at 90% 8%, rgba(115, 200, 189, 0.055), transparent 20rem),
+    var(--ui-surface) !important;
+  color: var(--ui-text) !important;
+  box-shadow: var(--ui-shadow-soft) !important;
+}
+
+:root[data-theme="dark"] .project-recommendation h2,
+:root[data-theme="dark"] .project-recommendation strong {
+  color: var(--ui-text-strong) !important;
+}
+
+:root[data-theme="dark"] .project-recommendation p,
+:root[data-theme="dark"] .project-recommendation li,
+:root[data-theme="dark"] .project-recommendation > small {
+  color: var(--ui-text-muted) !important;
+}
+
+:root[data-theme="dark"] .project-recommendation li svg {
+  color: var(--ui-accent) !important;
+}
+
+:root[data-theme="dark"] .guide-faqs__list details {
+  border-color: var(--ui-border) !important;
+  background: var(--ui-surface) !important;
+}
+
+:root[data-theme="dark"] .guide-faqs__list summary {
+  color: var(--ui-text-strong) !important;
+}
+
+:root[data-theme="dark"] .guide-faqs__list details p {
+  color: var(--ui-text-muted) !important;
+}
+
+/* ---------- Store location ---------- */
+:root[data-theme="dark"] .store-location {
+  border-color: var(--ui-border) !important;
+  background: var(--ui-surface) !important;
+  box-shadow: var(--ui-shadow-soft) !important;
+}
+
+:root[data-theme="dark"] .store-location__copy {
+  background:
+    radial-gradient(circle at 14% 16%, rgba(237, 164, 186, 0.05), transparent 18rem),
+    var(--ui-surface) !important;
+  color: var(--ui-text) !important;
+}
+
+:root[data-theme="dark"] .store-location__copy h2,
+:root[data-theme="dark"] .store-location__identity strong {
+  color: var(--ui-text-strong) !important;
+}
+
+:root[data-theme="dark"] .store-location__copy p,
+:root[data-theme="dark"] .store-location__identity span {
+  color: var(--ui-text-muted) !important;
+}
+
+:root[data-theme="dark"] .store-location__identity {
+  border-color: var(--ui-border) !important;
+  background: var(--ui-surface-soft) !important;
+  color: var(--ui-text) !important;
+}
+
+:root[data-theme="dark"] .store-location__identity svg {
+  color: var(--ui-accent) !important;
+}
+
+:root[data-theme="dark"] .store-location__map {
+  border-color: var(--ui-border) !important;
+  background: #171a17 !important;
+}
+
+/* ---------- Safer dark surfaces for utility/editorial controls ---------- */
+:root[data-theme="dark"] :is(
+  .guide-faqs__list details,
+  .project-choice,
+  .project-recommendation,
+  .store-location__identity
+) {
+  color-scheme: dark;
 }
