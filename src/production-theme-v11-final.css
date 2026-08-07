@@ -207,6 +207,97 @@
   background: #171a17 !important;
 }
 
+/* ---------- Dark liquid-glass scrolled navigation ---------- */
+/* v9 hard-coded a cream glass recipe on the inner nav shell. Override the
+   exact painted shell and its nested controls so dark mode stays dark after
+   the announcement collapses and the header enters its floating state. */
+:root[data-theme="dark"] .site-header.is-scrolled .nav-shell,
+:root[data-theme="dark"] .site-header.is-deep .nav-shell {
+  border-color: rgba(244, 238, 228, 0.14) !important;
+  background:
+    linear-gradient(135deg, rgba(34, 38, 34, 0.94), rgba(23, 26, 23, 0.88) 52%, rgba(23, 61, 56, 0.42)),
+    radial-gradient(circle at 18% -10%, rgba(255, 255, 255, 0.055), transparent 38%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.22),
+    0 16px 38px rgba(0, 0, 0, 0.34) !important;
+  color: var(--ui-text) !important;
+}
+
+:root[data-theme="dark"] .site-header.is-deep .nav-shell {
+  backdrop-filter: blur(18px) saturate(1.12) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.12) !important;
+}
+
+:root[data-theme="dark"] .site-header.is-scrolling .nav-shell {
+  border-color: var(--ui-border-strong) !important;
+  background: rgba(23, 26, 23, 0.97) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+:root[data-theme="dark"] .site-header.is-scrolled .nav-shell::before,
+:root[data-theme="dark"] .site-header.is-deep .nav-shell::before {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent) !important;
+  opacity: 0.62 !important;
+}
+
+:root[data-theme="dark"] .site-header.is-deep .brand,
+:root[data-theme="dark"] .site-header.is-deep .header-search-trigger,
+:root[data-theme="dark"] .site-header.is-deep .language-control,
+:root[data-theme="dark"] .site-header.is-deep .icon-button,
+:root[data-theme="dark"] .site-header.is-deep .theme-toggle,
+:root[data-theme="dark"] .site-header.is-scrolled .brand,
+:root[data-theme="dark"] .site-header.is-scrolled .header-search-trigger,
+:root[data-theme="dark"] .site-header.is-scrolled .language-control,
+:root[data-theme="dark"] .site-header.is-scrolled .icon-button,
+:root[data-theme="dark"] .site-header.is-scrolled .theme-toggle {
+  border-color: var(--ui-border-strong) !important;
+  background: rgba(32, 35, 31, 0.9) !important;
+  color: var(--ui-text-strong) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045) !important;
+}
+
+:root[data-theme="dark"] .site-header.is-scrolled .desktop-nav > a,
+:root[data-theme="dark"] .site-header.is-scrolled .catalogue-nav-item > a,
+:root[data-theme="dark"] .site-header.is-scrolled .mega-toggle,
+:root[data-theme="dark"] .site-header.is-deep .desktop-nav > a,
+:root[data-theme="dark"] .site-header.is-deep .catalogue-nav-item > a,
+:root[data-theme="dark"] .site-header.is-deep .mega-toggle {
+  color: var(--ui-text-muted) !important;
+}
+
+:root[data-theme="dark"] .site-header.is-scrolled .desktop-nav > a:hover,
+:root[data-theme="dark"] .site-header.is-scrolled .catalogue-nav-item > a:hover,
+:root[data-theme="dark"] .site-header.is-scrolled .desktop-nav > a.active,
+:root[data-theme="dark"] .site-header.is-scrolled .catalogue-nav-item > a.active,
+:root[data-theme="dark"] .site-header.is-deep .desktop-nav > a:hover,
+:root[data-theme="dark"] .site-header.is-deep .catalogue-nav-item > a:hover,
+:root[data-theme="dark"] .site-header.is-deep .desktop-nav > a.active,
+:root[data-theme="dark"] .site-header.is-deep .catalogue-nav-item > a.active {
+  color: var(--ui-accent) !important;
+}
+
+:root[data-theme="dark"] .site-header.is-scrolled .brand strong,
+:root[data-theme="dark"] .site-header.is-deep .brand strong {
+  color: var(--ui-text-strong) !important;
+}
+
+:root[data-theme="dark"] .site-header.is-scrolled .brand small,
+:root[data-theme="dark"] .site-header.is-deep .brand small,
+:root[data-theme="dark"] .site-header.is-scrolled .header-search-trigger,
+:root[data-theme="dark"] .site-header.is-deep .header-search-trigger {
+  color: var(--ui-text-muted) !important;
+}
+
+:root[data-theme="dark"][data-motion-profile="compact"] .site-header.is-deep .nav-shell,
+:root[data-theme="dark"][data-motion-profile="lite"] .site-header.is-deep .nav-shell {
+  border-color: var(--ui-border-strong) !important;
+  background: rgba(23, 26, 23, 0.97) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
 /* ---------- Safer dark surfaces for utility/editorial controls ---------- */
 :root[data-theme="dark"] :is(
   .guide-faqs__list details,
