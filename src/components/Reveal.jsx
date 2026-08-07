@@ -1,10 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
-// ─── Shared single IntersectionObserver ───
-// All Reveal instances register with this one observer instead of each
-// creating their own. Cuts dozens of observer instances down to one.
 const callbacks = new Map();
-
 let sharedObserver = null;
 
 function getObserver() {
@@ -12,32 +8,18 @@ function getObserver() {
   sharedObserver = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
-        if (entry.isIntersecting) {
-          const cb = callbacks.get(entry.target);
-          if (cb) cb();
-          callbacks.delete(entry.target);
-          sharedObserver.unobserve(entry.target);
-        }
+        if (!entry.isIntersecting) continue;
+        const callback = callbacks.get(entry.target);
+        callback?.();
+        callbacks.delete(entry.target);
+        sharedObserver?.unobserve(entry.target);
       }
     },
-    { rootMargin: "0px 0px 80px 0px", threshold: 0.08 },
+    { rootMargin: "0px 0px 70px 0px", threshold: 0.07 },
   );
   return sharedObserver;
 }
 
-/**
- * Reveal — wraps children in a scroll-triggered reveal animation.
- *
- * Variants:
- *  - fade-up (default)
- *  - fade-down
- *  - scale-in
- *  - slide-left
- *  - slide-right
- *  - clip-reveal       (Phase 2: image wipe from bottom)
- *  - clip-reveal-left  (Phase 2: wipe from left)
- *  - thread-draw       (Phase 2: SVG path draw — for decorative threads)
- */
 export default function Reveal({
   as: Tag = "div",
   className = "",
@@ -46,21 +28,26 @@ export default function Reveal({
   children,
 }) {
   const ref = useRef(null);
-  const [visible, setVisible] = useState(false);
-  const cappedDelay = Math.min(Math.max(Number(delay) || 0, 0), 270);
+  const cappedDelay = Math.min(Math.max(Number(delay) || 0, 0), 220);
 
   useEffect(() => {
     const element = ref.current;
     if (!element) return undefined;
 
-    // Respect reduced motion — make visible immediately
+    const reveal = () => element.classList.add("is-visible");
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setVisible(true);
+      reveal();
+      return undefined;
+    }
+
+    const rect = element.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.92) {
+      reveal();
       return undefined;
     }
 
     const observer = getObserver();
-    callbacks.set(element, () => setVisible(true));
+    callbacks.set(element, reveal);
     observer.observe(element);
 
     return () => {
@@ -72,7 +59,7 @@ export default function Reveal({
   return (
     <Tag
       ref={ref}
-      className={`reveal reveal-${variant} ${visible ? "is-visible" : ""} ${className}`}
+      className={`reveal reveal-${variant} ${className}`}
       data-reveal={variant}
       style={{ "--reveal-delay": `${cappedDelay}ms` }}
     >
