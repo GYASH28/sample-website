@@ -30,6 +30,7 @@ import "./production-theme-v11-fixes.css";
 import "./production-theme-v11-final.css";
 import "./seamless-header-v12.css";
 import "./brand-highlight-v12.css";
+import "./header-glass-tuning-v12.css";
 
 applyMotionProfile();
 
