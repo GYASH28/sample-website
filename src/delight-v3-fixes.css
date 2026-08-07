@@ -1,0 +1,31 @@
+@media (min-width: 800px) {
+  .commerce-product-rail {
+    -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 38px), transparent 100%);
+  }
+}
+
+@media (max-width: 760px) {
+  body:has(.mobile-product-dock) .floating-whatsapp {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(12px) scale(0.92);
+  }
+
+  body:has(.mobile-product-dock) main {
+    padding-bottom: 82px;
+  }
+
+  .mobile-product-dock,
+  .mobile-bottom-nav,
+  .floating-whatsapp {
+    transition: opacity 220ms ease, transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+@supports not selector(body:has(*)) {
+  @media (max-width: 760px) {
+    .mobile-product-dock {
+      bottom: calc(82px + env(safe-area-inset-bottom));
+    }
+  }
+}
