@@ -23,6 +23,7 @@ import "./hero-cinematic-v7.css";
 import "./site-experience-v8.css";
 import "./site-experience-v8-fixes.css";
 import "./liquid-scroll-v9.css";
+import "./site-revamp-v10.css";
 
 applyMotionProfile();
 
