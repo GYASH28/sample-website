@@ -8,6 +8,7 @@ import {
   CommerceProductRail,
   CommerceWholesaleCta,
 } from "../components/home/CommerceHomeSections.jsx";
+import { RecentlyViewedHome, ShadeDiscovery } from "../components/home/StorefrontDiscovery.jsx";
 import {
   businessInfo,
   featuredProducts,
@@ -46,6 +47,7 @@ export default function Home() {
     <div className="fm-home commerce-home product-first-home">
       <CommerceHero />
       <CommerceCategoryNav categories={productCategories} />
+      <RecentlyViewedHome />
 
       <CommerceProductRail
         eyebrow="Popular right now"
@@ -56,6 +58,7 @@ export default function Home() {
       />
 
       <CommerceCategoryGrid categories={productCategories.slice(0, 8)} />
+      <ShadeDiscovery />
       <CommerceCraftFinder products={featuredProducts} />
 
       <CommerceProductRail

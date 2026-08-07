@@ -5,7 +5,7 @@ import {
   X,
 } from "@phosphor-icons/react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { featuredProducts, productCategories } from "../data/siteData.js";
 import { useLanguage } from "../context/LanguageContext.jsx";
 
@@ -40,8 +40,10 @@ function readRecent() {
 
 export default function SearchDialog({ open, onClose }) {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [recent, setRecent] = useState(readRecent);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const inputRef = useRef(null);
   const panelRef = useRef(null);
 
@@ -52,6 +54,10 @@ export default function SearchDialog({ open, onClose }) {
       .filter((product) => searchableText(product).includes(normalized))
       .slice(0, 8);
   }, [query]);
+
+  useEffect(() => {
+    setActiveIndex(-1);
+  }, [query, open]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -96,9 +102,38 @@ export default function SearchDialog({ open, onClose }) {
     localStorage.setItem(RECENT_KEY, JSON.stringify(next));
   };
 
+  const clearRecent = () => {
+    setRecent([]);
+    localStorage.removeItem(RECENT_KEY);
+  };
+
   const closeWithSearch = () => {
     remember(query);
     onClose();
+  };
+
+  const submitSearch = () => {
+    remember(query);
+    const target = activeIndex >= 0 ? results[activeIndex] : null;
+    onClose();
+    if (target) {
+      navigate(`/products/${target.slug}`);
+      return;
+    }
+    navigate(query.trim() ? `/products?q=${encodeURIComponent(query.trim())}` : "/products");
+  };
+
+  const onInputKeyDown = (event) => {
+    if (event.key === "ArrowDown" && results.length) {
+      event.preventDefault();
+      setActiveIndex((value) => (value + 1) % results.length);
+    } else if (event.key === "ArrowUp" && results.length) {
+      event.preventDefault();
+      setActiveIndex((value) => (value <= 0 ? results.length - 1 : value - 1));
+    } else if (event.key === "Enter") {
+      event.preventDefault();
+      submitSearch();
+    }
   };
 
   return (
@@ -132,10 +167,16 @@ export default function SearchDialog({ open, onClose }) {
           <input
             ref={inputRef}
             type="search"
+            role="combobox"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
+            onKeyDown={onInputKeyDown}
             placeholder={t("searchHint")}
             autoComplete="off"
+            aria-autocomplete="list"
+            aria-controls="catalogue-search-results"
+            aria-expanded={open && results.length > 0}
+            aria-activedescendant={activeIndex >= 0 ? `search-result-${results[activeIndex]?.slug}` : undefined}
           />
           <kbd>Esc</kbd>
         </label>
@@ -148,6 +189,7 @@ export default function SearchDialog({ open, onClose }) {
                 {item}
               </button>
             ))}
+            <button className="recent-searches__clear" type="button" onClick={clearRecent}>Clear</button>
           </div>
         )}
 
@@ -163,11 +205,17 @@ export default function SearchDialog({ open, onClose }) {
           </div>
 
           {results.length > 0 ? (
-            <ul className="search-result-list">
-              {results.map((product) => (
-                <li key={product.slug}>
-                  <Link to={`/products/${product.slug}`} onClick={closeWithSearch}>
-                    <img src={product.image} alt="" width="72" height="72" />
+            <ul className="search-result-list" id="catalogue-search-results" role="listbox">
+              {results.map((product, resultIndex) => (
+                <li
+                  key={product.slug}
+                  id={`search-result-${product.slug}`}
+                  className={resultIndex === activeIndex ? "is-keyboard-active" : ""}
+                  role="option"
+                  aria-selected={resultIndex === activeIndex}
+                >
+                  <Link to={`/products/${product.slug}`} onClick={closeWithSearch} onMouseEnter={() => setActiveIndex(resultIndex)}>
+                    <img src={product.image} alt="" width="72" height="72" loading="lazy" decoding="async" />
                     <span>
                       <strong>{product.name}</strong>
                       <small>{product.brand || product.category} · {product.masterCategory}</small>
