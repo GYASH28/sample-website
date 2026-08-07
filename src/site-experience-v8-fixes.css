@@ -1,0 +1,16 @@
+/* Final compatibility fixes for site experience v8 */
+
+.announcement-bar {
+  min-height: 0 !important;
+  padding-block: 0 !important;
+}
+
+.site-header.is-scrolled .announcement-bar {
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+  padding-block: 0 !important;
+  margin-block: 0 !important;
+  border-bottom-width: 0 !important;
+}

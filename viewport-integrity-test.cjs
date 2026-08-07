@@ -63,9 +63,12 @@ const viewports = [
 
           const state = await page.evaluate(() => {
             const root = document.documentElement;
+            const routeStage = document.querySelector(".route-stage");
             return {
               h1Count: document.querySelectorAll("h1").length,
               overflow: Math.max(0, root.scrollWidth - root.clientWidth),
+              routeStageHeight: routeStage?.getBoundingClientRect().height || 0,
+              viewportHeight: window.innerHeight,
               brokenImages: [...document.images]
                 .filter((image) => image.complete && image.naturalWidth === 0)
                 .map((image) => image.currentSrc || image.src),
@@ -84,12 +87,37 @@ const viewports = [
           if (state.overflow > 1) {
             throw new Error(`horizontal overflow ${state.overflow}px`);
           }
+          if (state.routeStageHeight < state.viewportHeight - 90) {
+            throw new Error(
+              `route stage is not full-screen enough: ${state.routeStageHeight}px for ${state.viewportHeight}px viewport`,
+            );
+          }
           if (state.brokenImages.length) {
             throw new Error(`broken images: ${state.brokenImages.join(", ")}`);
           }
           if (state.locks.length) {
             throw new Error(`stale body locks: ${state.locks.join(", ")}`);
           }
+
+          if (route === "/") {
+            await page.evaluate(() => window.scrollTo({ top: 130, behavior: "instant" }));
+            await page.waitForTimeout(480);
+            const headerState = await page.evaluate(() => {
+              const header = document.querySelector(".site-header");
+              const announcement = document.querySelector(".announcement-bar");
+              const styles = announcement ? getComputedStyle(announcement) : null;
+              return {
+                scrolled: Boolean(header?.classList.contains("is-scrolled")),
+                announcementHeight: announcement?.getBoundingClientRect().height || 0,
+                announcementOpacity: Number.parseFloat(styles?.opacity || "1"),
+              };
+            });
+            if (!headerState.scrolled) throw new Error("smart header did not enter scrolled state");
+            if (headerState.announcementHeight > 2 || headerState.announcementOpacity > 0.08) {
+              throw new Error(`announcement bar did not fade/collapse: ${JSON.stringify(headerState)}`);
+            }
+          }
+
           if (errors.length) {
             throw new Error(`console errors: ${errors.join(" | ")}`);
           }

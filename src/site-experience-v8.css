@@ -1,0 +1,445 @@
+/* Fakhri Mart — site-wide experience polish v8 */
+
+:root {
+  --fm-header-compact-height: 64px;
+  --fm-route-min-height: calc(100svh - var(--fm-header-compact-height));
+}
+
+/* Accessible route-change announcement, visually hidden. */
+.route-announcer {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ─────────────────────────────────────────────
+   Smart header: announcement fades away, nav remains useful.
+   ───────────────────────────────────────────── */
+.site-header {
+  overflow: clip;
+  background: rgba(255, 250, 244, 0.88);
+  transform: translateZ(0);
+}
+
+.announcement-bar {
+  max-height: 34px;
+  border-bottom-color: rgba(50, 48, 45, 0.08);
+  opacity: 1;
+  transform: translateY(0);
+  transform-origin: top center;
+  transition:
+    max-height 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 220ms ease,
+    transform 340ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 220ms ease;
+}
+
+.announcement-bar__inner {
+  display: flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(18px, 4vw, 48px);
+  padding-block: 7px;
+  color: var(--charcoal, #32302d);
+  font-size: 0.7rem;
+  font-weight: 820;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.announcement-bar__inner span {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.announcement-bar__inner span:not(:first-child)::before {
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--teal, #2a8c82) 68%, var(--pink-dark, #b95776));
+  content: "";
+  opacity: 0.72;
+}
+
+.site-header.is-scrolled .announcement-bar {
+  max-height: 0;
+  border-bottom-color: transparent;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px);
+}
+
+.nav-shell {
+  min-height: 74px;
+  transition:
+    min-height 360ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.site-header.is-scrolled .nav-shell {
+  min-height: 64px;
+}
+
+.site-header.is-scrolled {
+  background: rgba(255, 250, 244, 0.91);
+  border-bottom-color: rgba(50, 48, 45, 0.08);
+  box-shadow: 0 12px 36px rgba(52, 42, 35, 0.07);
+}
+
+.site-header.is-deep {
+  background: rgba(255, 250, 244, 0.82);
+  box-shadow: 0 14px 38px rgba(52, 42, 35, 0.075);
+  backdrop-filter: blur(18px) saturate(1.12);
+}
+
+.site-header.is-deep .brand {
+  border-color: rgba(50, 48, 45, 0.07);
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: 0 7px 20px rgba(67, 52, 43, 0.055);
+}
+
+.site-header.is-deep .brand-mark {
+  transform: scale(0.9) rotate(-1deg);
+}
+
+.site-header.is-deep .brand small {
+  opacity: 0.72;
+}
+
+.site-header[data-scroll-direction="down"].is-deep .nav-shell {
+  transform: translateY(-2px);
+}
+
+.site-header[data-scroll-direction="up"].is-deep .nav-shell {
+  transform: translateY(0);
+}
+
+.site-header .brand,
+.site-header .brand small {
+  transition:
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 240ms ease,
+    border-color 240ms ease,
+    box-shadow 240ms ease,
+    opacity 220ms ease;
+}
+
+.header-search-trigger kbd {
+  min-width: max-content;
+  padding-inline: 7px;
+  font-variant-numeric: tabular-nums;
+}
+
+.nav-count {
+  animation: fm-count-pop 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.mega-category-grid a {
+  position: relative;
+  overflow: hidden;
+}
+
+.mega-category-grid a::before {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--teal, #2a8c82), var(--pink-dark, #b95776));
+  content: "";
+  opacity: 0;
+  transform: scaleX(0.25);
+  transform-origin: left center;
+  transition: opacity 180ms ease, transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mega-category-grid a:hover::before,
+.mega-category-grid a:focus-visible::before {
+  opacity: 0.8;
+  transform: scaleX(1);
+}
+
+/* ─────────────────────────────────────────────
+   Full-screen route framing.
+   Short routes now occupy the viewport; long routes grow naturally.
+   ───────────────────────────────────────────── */
+main#main-content {
+  position: relative;
+  min-height: var(--fm-route-min-height);
+  isolation: isolate;
+}
+
+.route-stage {
+  position: relative;
+  min-height: var(--fm-route-min-height);
+  isolation: isolate;
+}
+
+.route-stage > * {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+.route-stage:not([data-route-family="home"])::before {
+  position: absolute;
+  z-index: 0;
+  top: -12rem;
+  right: -15rem;
+  width: min(42rem, 62vw);
+  height: min(42rem, 62vw);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(42, 140, 130, 0.07), transparent 68%);
+  content: "";
+  pointer-events: none;
+}
+
+.route-stage[data-route-family="editorial"]::before {
+  background: radial-gradient(circle, rgba(217, 165, 179, 0.11), transparent 68%);
+}
+
+.route-stage[data-route-family="utility"] {
+  background:
+    radial-gradient(circle at 8% 12%, rgba(217, 165, 179, 0.07), transparent 28rem),
+    radial-gradient(circle at 92% 8%, rgba(42, 140, 130, 0.055), transparent 26rem);
+}
+
+.route-stage[data-route-family="utility"]::after,
+.route-stage[data-route-family="editorial"]::after,
+.route-stage[data-route-family="catalogue"]::after,
+.route-stage[data-route-family="detail"]::after {
+  position: absolute;
+  z-index: 0;
+  top: clamp(28px, 5vw, 64px);
+  right: clamp(18px, 3vw, 42px);
+  width: clamp(44px, 6vw, 84px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(31, 27, 22, 0.18));
+  content: "";
+  pointer-events: none;
+}
+
+.site-footer {
+  margin-top: 0;
+}
+
+/* Better anchor landing once the announcement strip has collapsed. */
+html {
+  scroll-padding-top: 82px;
+}
+
+[id] {
+  scroll-margin-top: 82px;
+}
+
+/* Connection feedback appears only when it is useful. */
+.connection-status {
+  position: fixed;
+  z-index: 160;
+  right: max(18px, env(safe-area-inset-right, 0px));
+  bottom: max(22px, env(safe-area-inset-bottom, 0px));
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 11px;
+  align-items: center;
+  width: min(390px, calc(100vw - 36px));
+  padding: 12px 13px;
+  border: 1px solid rgba(50, 48, 45, 0.12);
+  border-radius: 16px;
+  background: rgba(255, 252, 247, 0.94);
+  color: var(--ink, #1f1b16);
+  box-shadow: 0 18px 52px rgba(49, 32, 35, 0.16);
+  backdrop-filter: blur(16px) saturate(1.08);
+  animation: fm-status-in 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.connection-status > svg {
+  color: var(--teal-dark, #14766f);
+}
+
+.connection-status.is-offline > svg {
+  color: #9b4b42;
+}
+
+.connection-status > div {
+  min-width: 0;
+}
+
+.connection-status strong,
+.connection-status span {
+  display: block;
+}
+
+.connection-status strong {
+  margin-bottom: 2px;
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.connection-status span {
+  color: var(--muted, #544c43);
+  font-size: 0.68rem;
+  line-height: 1.35;
+}
+
+.connection-status button {
+  min-height: 34px;
+  padding: 6px 9px;
+  border: 1px solid rgba(50, 48, 45, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.74);
+  color: var(--ink, #1f1b16);
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+/* A tiny route arrival polish without competing with page-specific motion. */
+.route-stage[data-route-family="utility"],
+.route-stage[data-route-family="editorial"],
+.route-stage[data-route-family="catalogue"],
+.route-stage[data-route-family="detail"] {
+  animation: fm-route-arrive 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes fm-count-pop {
+  0% { transform: scale(0.62); opacity: 0.4; }
+  60% { transform: scale(1.14); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fm-status-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes fm-route-arrive {
+  from { opacity: 0.82; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Balanced/lite devices keep the behavior but skip expensive glass. */
+html[data-motion-profile="compact"] .site-header.is-deep,
+html[data-motion-profile="lite"] .site-header.is-deep,
+html[data-motion-profile="compact"] .connection-status,
+html[data-motion-profile="lite"] .connection-status {
+  backdrop-filter: none;
+}
+
+html[data-motion-profile="compact"] .site-header.is-deep,
+html[data-motion-profile="lite"] .site-header.is-deep {
+  background: rgba(255, 250, 244, 0.97);
+}
+
+@media (max-width: 900px) {
+  :root {
+    --fm-header-compact-height: 62px;
+  }
+
+  .announcement-bar__inner {
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 0.62rem;
+    letter-spacing: 0.035em;
+  }
+
+  .announcement-bar__inner span:nth-child(2) {
+    display: none;
+  }
+
+  .nav-shell {
+    min-height: 68px;
+  }
+
+  .site-header.is-scrolled .nav-shell {
+    min-height: 62px;
+  }
+
+  .site-header.is-deep .brand small {
+    max-height: 0;
+    margin: 0;
+    opacity: 0;
+  }
+
+  .site-header.is-deep .brand {
+    padding-right: 9px;
+  }
+
+  .route-stage:not([data-route-family="home"])::before {
+    top: -9rem;
+    right: -13rem;
+    width: 28rem;
+    height: 28rem;
+  }
+
+  .connection-status {
+    right: 14px;
+    bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+    width: calc(100vw - 28px);
+  }
+}
+
+@media (max-width: 560px) {
+  .announcement-bar {
+    max-height: 30px;
+  }
+
+  .site-header.is-scrolled .announcement-bar {
+    max-height: 0;
+  }
+
+  .announcement-bar__inner {
+    min-height: 30px;
+    padding-block: 6px;
+    font-size: 0.58rem;
+  }
+
+  .announcement-bar__inner span::before {
+    display: none;
+  }
+
+  .site-header.is-deep .brand strong {
+    font-size: 0.9rem;
+  }
+
+  .route-stage[data-route-family="utility"]::after,
+  .route-stage[data-route-family="editorial"]::after,
+  .route-stage[data-route-family="catalogue"]::after,
+  .route-stage[data-route-family="detail"]::after {
+    right: 14px;
+    width: 38px;
+  }
+
+  .connection-status {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .connection-status button {
+    grid-column: 1 / -1;
+    justify-self: end;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .announcement-bar,
+  .nav-shell,
+  .site-header .brand,
+  .site-header .brand small,
+  .connection-status,
+  .route-stage {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .nav-count {
+    animation: none !important;
+  }
+}
