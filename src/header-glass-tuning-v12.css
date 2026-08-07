@@ -1,5 +1,19 @@
 /* Final v12 glass/performance tuning. */
 
+/* The sticky wrapper is positioning only in both themes. A legacy v10/v11
+   dark rule had higher specificity and repainted this wrapper, producing the
+   second slab behind the nav. Keep every wrapper state physically clear. */
+:root[data-theme="dark"] .site-header,
+:root[data-theme="dark"] .site-header.is-scrolled,
+:root[data-theme="dark"] .site-header.is-deep,
+:root[data-theme="dark"] .site-header.is-scrolling {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
 /* One blur layer only; keep it modest enough to remain responsive while the
    page moves underneath the sticky surface. */
 html[data-motion-profile="full"] .site-header .nav-shell {
