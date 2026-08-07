@@ -8,7 +8,6 @@ const Home = lazy(() => import("./pages/Home.jsx"));
 const About = lazy(() => import("./pages/About.jsx"));
 const Products = lazy(() => import("./pages/Products.jsx"));
 const ProductDetail = lazy(() => import("./pages/ProductDetail.jsx"));
-const Gallery = lazy(() => import("./pages/Gallery.jsx"));
 const Enquiry = lazy(() => import("./pages/Enquiry.jsx"));
 const Contact = lazy(() => import("./pages/Contact.jsx"));
 const Wishlist = lazy(() => import("./pages/Wishlist.jsx"));
@@ -28,7 +27,6 @@ export default function App() {
             <Route path="about" element={<About />} />
             <Route path="products" element={<Products />} />
             <Route path="products/:slug" element={<ProductDetail />} />
-            <Route path="gallery" element={<Gallery />} />
             <Route path="enquiry" element={<Enquiry />} />
             <Route path="wishlist" element={<Wishlist />} />
             <Route path="yarn-guide" element={<YarnGuide />} />
