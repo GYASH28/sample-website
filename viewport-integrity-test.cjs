@@ -6,7 +6,6 @@ const routes = [
   "/",
   "/products",
   "/products/makhhi-thread",
-  "/gallery",
   "/about",
   "/blog",
   "/contact",
@@ -63,6 +62,7 @@ async function auditScrollLayoutReads(page) {
       });
       await context.addInitScript(() => {
         sessionStorage.setItem("fakhri_intro_cinematic_v2", "played");
+        localStorage.setItem("fakhri_theme", "light");
       });
 
       for (const route of routes) {
@@ -132,32 +132,48 @@ async function auditScrollLayoutReads(page) {
             const headerState = await page.evaluate(() => {
               const header = document.querySelector(".site-header");
               const announcement = document.querySelector(".announcement-bar");
-              const liquidProgress = document.querySelector(".scroll-liquid-progress");
+              const spool = document.querySelector(".scroll-spool-progress");
               const styles = announcement ? getComputedStyle(announcement) : null;
-              const progressStyles = liquidProgress ? getComputedStyle(liquidProgress) : null;
+              const spoolStyles = spool ? getComputedStyle(spool) : null;
               return {
                 scrolled: Boolean(header?.classList.contains("is-scrolled")),
                 announcementHeight: announcement?.getBoundingClientRect().height || 0,
                 announcementOpacity: Number.parseFloat(styles?.opacity || "1"),
-                liquidProgressPresent: Boolean(liquidProgress),
-                liquidProgressOpacity: Number.parseFloat(progressStyles?.opacity || "0"),
+                spoolPresent: Boolean(spool),
+                spoolOpacity: Number.parseFloat(spoolStyles?.opacity || "0"),
               };
             });
             if (!headerState.scrolled) throw new Error("smart header did not enter scrolled state");
             if (headerState.announcementHeight > 2 || headerState.announcementOpacity > 0.08) {
               throw new Error(`announcement bar did not fade/collapse: ${JSON.stringify(headerState)}`);
             }
-            if (!headerState.liquidProgressPresent) {
-              throw new Error("liquid scroll progress control is missing");
+            if (!headerState.spoolPresent) {
+              throw new Error("spool scroll progress control is missing");
             }
-            if (!viewport.mobile && viewport.width > 1024 && headerState.liquidProgressOpacity < 0.5) {
-              throw new Error(`liquid scroll progress did not become visible: ${JSON.stringify(headerState)}`);
+            if (!viewport.mobile && viewport.width > 1024 && headerState.spoolOpacity < 0.5) {
+              throw new Error(`spool scroll progress did not become visible: ${JSON.stringify(headerState)}`);
             }
+          }
+
+          if (!viewport.mobile && route === "/about") {
+            const toggle = page.locator(".theme-toggle").first();
+            await toggle.click();
+            await page.waitForFunction(() => document.documentElement.dataset.theme === "dark");
+            const darkState = await page.evaluate(() => ({
+              theme: document.documentElement.dataset.theme,
+              colorScheme: document.documentElement.style.colorScheme,
+              bodyBackground: getComputedStyle(document.body).backgroundColor,
+            }));
+            if (darkState.theme !== "dark" || darkState.colorScheme !== "dark") {
+              throw new Error(`dark mode did not activate: ${JSON.stringify(darkState)}`);
+            }
+            await toggle.click();
+            await page.waitForFunction(() => document.documentElement.dataset.theme === "light");
           }
 
           if (!viewport.mobile && route === "/products") {
             const layoutReads = await auditScrollLayoutReads(page);
-            if (layoutReads > 24) {
+            if (layoutReads > 18) {
               throw new Error(`scroll triggered too many JS layout reads: ${layoutReads}`);
             }
           }
@@ -190,7 +206,7 @@ async function auditScrollLayoutReads(page) {
     console.error(JSON.stringify({ failures }, null, 2));
     process.exit(1);
   }
-  console.log("\nViewport integrity and scroll layout-read suite passed.");
+  console.log("\nViewport, dark-mode, and scroll layout-read suite passed.");
 })().catch((error) => {
   console.error(error);
   process.exit(1);
