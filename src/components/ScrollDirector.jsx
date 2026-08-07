@@ -56,12 +56,16 @@ export default function ScrollDirector() {
       return undefined;
     }
 
+    const isHome = pathname === "/";
     const activeScenes = new Set();
     const activeMedia = new Set();
     const markedElements = new Set();
     const profile = root.dataset.motionProfile;
-    const intensity = profile === "lite" ? 0 : profile === "compact" ? 0.42 : 0.78;
-    const allowPointerLight = profile === "full" && finePointerQuery.matches;
+    const profileIntensity = profile === "lite" ? 0 : profile === "compact" ? 0.36 : 0.62;
+    // The homepage is already visually dense. One-time reveals feel more cinematic
+    // and are materially cheaper than continuous per-section parallax while scrolling.
+    const intensity = isHome ? 0 : profileIntensity;
+    const allowPointerLight = !isHome && profile === "full" && finePointerQuery.matches;
     let collectionTimers = [];
     let lastPointerX = 0;
     let lastPointerY = 0;
@@ -115,15 +119,17 @@ export default function ScrollDirector() {
     const markElements = () => {
       const scenes = uniqueElements(SCENE_SELECTOR);
       const cards = uniqueElements(CARD_SELECTOR);
-      const media = uniqueElements(MEDIA_SELECTOR).filter(
-        (element) => !element.closest("[data-scroll-media='false']"),
-      );
+      const media = intensity === 0
+        ? []
+        : uniqueElements(MEDIA_SELECTOR).filter(
+            (element) => !element.closest("[data-scroll-media='false']"),
+          );
 
       scenes.forEach((element, index) => {
         if (element.dataset.scrollScene !== "true") {
           element.dataset.scrollScene = "true";
           markedElements.add(element);
-          activeObserver.observe(element);
+          if (intensity > 0) activeObserver.observe(element);
         }
         if (index > 0) prepareReveal(element, index);
         else element.classList.add("is-scroll-revealed");
@@ -160,16 +166,16 @@ export default function ScrollDirector() {
 
       activeScenes.forEach((element) => {
         const progress = elementProgress(element, viewportHeight);
-        const shift = (0.5 - progress) * 16 * intensity;
+        const shift = (0.5 - progress) * 14 * intensity;
         element.style.setProperty("--scene-progress", progress.toFixed(4));
         element.style.setProperty("--scene-shift", `${shift.toFixed(2)}px`);
-        element.style.setProperty("--scene-line", clamp(progress * 1.32).toFixed(4));
+        element.style.setProperty("--scene-line", clamp(progress * 1.28).toFixed(4));
       });
 
       activeMedia.forEach((element) => {
         const progress = elementProgress(element, viewportHeight);
-        const shift = (0.5 - progress) * 8 * intensity;
-        const scale = 1 + Math.abs(0.5 - progress) * 0.018 * intensity;
+        const shift = (0.5 - progress) * 6 * intensity;
+        const scale = 1 + Math.abs(0.5 - progress) * 0.012 * intensity;
         element.style.setProperty("--scroll-media-scale", scale.toFixed(4));
         element.style.setProperty("--scroll-media-shift", `${shift.toFixed(2)}px`);
       });
@@ -236,7 +242,7 @@ export default function ScrollDirector() {
 
   return (
     <div className="scroll-director" aria-hidden="true">
-      <span className="scroll-director__aurora" />
+      {pathname !== "/" ? <span className="scroll-director__aurora" /> : null}
       <span className="scroll-director__rail">
         <i />
       </span>
