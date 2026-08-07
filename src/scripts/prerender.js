@@ -21,7 +21,6 @@ const staticRoutes = [
   "/",
   "/products",
   "/yarn-guide",
-  "/gallery",
   "/about",
   "/contact",
   "/wishlist",
