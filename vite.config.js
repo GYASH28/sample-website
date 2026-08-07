@@ -3,6 +3,11 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      "react-router-dom": "react-router",
+    },
+  },
   build: {
     cssCodeSplit: true,
   },
