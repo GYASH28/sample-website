@@ -1,21 +1,16 @@
 /* v11 targeted fixes discovered by rendered browser + Axe audits. */
 
-/* The selected language is an inverse control; the generic muted control color
-   must never win over its active state. */
 .language-control > .active,
 .language-control button.active {
   background: #155f5e !important;
   color: #fff !important;
 }
 
-/* Inverse wholesale panel needs a light editorial accent rather than the
-   standard gold intended for pale canvases. */
 .commerce-wholesale .eyebrow,
 .commerce-wholesale__grid .eyebrow {
   color: #f2d695 !important;
 }
 
-/* Catalogue CTA was still using an old light-only gradient. */
 :root[data-theme="dark"] .catalogue-cta {
   border-color: var(--ui-border) !important;
   background:
@@ -32,7 +27,6 @@
   color: var(--ui-text-muted) !important;
 }
 
-/* Home-specific surfaces that predate the theme system. */
 :root[data-theme="dark"] .commerce-category-nav,
 :root[data-theme="dark"] .commerce-section.shade-discovery,
 :root[data-theme="dark"] .commerce-section.commerce-order-flow,
@@ -65,7 +59,6 @@
   color: var(--ui-accent) !important;
 }
 
-/* Product-card utility buttons were still literal white. */
 :root[data-theme="dark"] .card-floating-btn,
 :root[data-theme="dark"] .favorite-toggle-btn-card,
 :root[data-theme="dark"] .product-showcase-card__quick,
@@ -92,22 +85,18 @@
   color: var(--ui-accent) !important;
 }
 
-/* Old anonymous carousel controls are intentionally pale in light mode; in
-   dark mode they should read as subdued controls rather than white stickers. */
 :root[data-theme="dark"] .commerce-section button:not(.btn):not(.product-showcase-card__quick),
 :root[data-theme="dark"] .hero-v6 button:not(.btn) {
   border-color: var(--ui-border) !important;
 }
 
-/* Keep image thumbnails/images themselves unfiltered while their button shell
-   follows the dark surface. */
 :root[data-theme="dark"] .thumbnail-rect-btn img,
 :root[data-theme="dark"] .product-card img,
 :root[data-theme="dark"] .product-showcase-card img {
   filter: none !important;
 }
 
-/* More readable tiny UI copy. */
+/* Readability pass for dense catalogue/header metadata. */
 .primary-nav a,
 .desktop-nav > a,
 .catalogue-nav-item > a,
@@ -121,9 +110,56 @@
   text-rendering: optimizeLegibility;
 }
 
+.announcement-bar {
+  font-size: 0.68rem !important;
+}
+
+.language-control button {
+  min-width: 2rem;
+  min-height: 2rem;
+  font-size: 0.7rem !important;
+  font-weight: 750;
+}
+
+.product-card-badge-floating,
+.badge-highlight,
+.swatches-count-label {
+  font-size: 0.62rem !important;
+}
+
+.product-card-specs,
+.result-count-text {
+  font-size: 0.72rem !important;
+  line-height: 1.55;
+}
+
+.filter-label {
+  font-size: 0.64rem !important;
+}
+
+.active-filter-chip {
+  font-size: 0.68rem !important;
+}
+
+.footer-contact small,
+.footer-bottom {
+  font-size: 0.66rem !important;
+}
+
 @media (min-width: 75.01rem) {
   .desktop-nav > a,
   .catalogue-nav-item > a {
     font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 48rem) {
+  .announcement-bar {
+    font-size: 0.64rem !important;
+  }
+
+  .product-card-specs,
+  .product-card-variants {
+    font-size: 0.72rem !important;
   }
 }
