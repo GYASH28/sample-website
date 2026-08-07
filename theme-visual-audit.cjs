@@ -13,6 +13,7 @@ const routes = [
 ];
 const viewports = [["desktop", { width: 1440, height: 960 }], ["mobile", { width: 390, height: 844 }]];
 const themes = ["light", "dark"];
+const SECTION_VISUAL_ROUTES = new Set(["home", "catalogue", "product", "contact", "yarn-guide"]);
 
 async function settleEntirePage(page) {
   await page.evaluate(async () => {
@@ -25,6 +26,52 @@ async function settleEntirePage(page) {
     window.scrollTo(0, 0);
   });
   await page.waitForTimeout(180);
+}
+
+async function inspectSectionsInViewport(page, { name, viewportName, theme }) {
+  if (theme !== "dark" || !SECTION_VISUAL_ROUTES.has(name)) return [];
+  const count = await page.locator("#main-content section").count();
+  const failures = [];
+
+  for (let index = 0; index < count; index += 1) {
+    const section = page.locator("#main-content section").nth(index);
+    await section.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+    await page.waitForTimeout(90);
+
+    const state = await section.evaluate((element) => {
+      const visible = (node) => {
+        const rect = node.getBoundingClientRect();
+        const style = getComputedStyle(node);
+        return rect.width > 2 && rect.height > 2 && style.display !== "none" && style.visibility !== "hidden" && Number(style.opacity || 1) > 0.08;
+      };
+      const content = [...element.querySelectorAll("h1,h2,h3,h4,p,a,button,strong,img,picture,iframe,input,textarea,select")]
+        .filter(visible);
+      const rect = element.getBoundingClientRect();
+      return {
+        className: String(element.className || ""),
+        text: element.innerText?.trim().slice(0, 180) || "",
+        meaningfulVisible: content.length,
+        height: Math.round(rect.height),
+        opacity: Number(getComputedStyle(element).opacity || 1),
+      };
+    });
+
+    if (state.height > 100 && state.meaningfulVisible === 0) {
+      failures.push({ index, ...state });
+    }
+
+    if (viewportName === "desktop" || name === "home" || name === "yarn-guide") {
+      await page.screenshot({
+        path: path.join(OUTPUT, `${viewportName}-${theme}-${name}-section-${String(index).padStart(2, "0")}.png`),
+        fullPage: false,
+        animations: "disabled",
+      });
+    }
+  }
+
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(80);
+  return failures;
 }
 
 async function inspectRenderedState(page) {
@@ -43,7 +90,8 @@ async function inspectRenderedState(page) {
       ".product-card", ".category-card", ".contact-card", ".blog-story-card", ".wishlist-card-shell",
       ".enquiry-basket-items-panel", ".enquiry-form-panel", ".basket-item-card-row", ".tabs-navigation-strip",
       ".mobile-nav-drawer", ".search-dialog", ".quick-view-panel", ".enquiry-drawer", ".site-footer",
-      ".catalogue-cta", ".commerce-category-nav", ".commerce-wholesale", ".enquiry-launcher"
+      ".catalogue-cta", ".commerce-category-nav", ".commerce-wholesale", ".enquiry-launcher",
+      ".project-choice", ".project-recommendation", ".store-location__copy", ".guide-faqs__list details"
     ];
     const lightSurfaceLeaks = [];
     if (document.documentElement.dataset.theme === "dark") {
@@ -86,9 +134,6 @@ async function verifyThemeControls(browser) {
   await context.addInitScript(() => sessionStorage.setItem("fakhri_intro_cinematic_v2", "played"));
   const page = await context.newPage();
   await page.goto(`${BASE_URL}/about`, { waitUntil: "networkidle", timeout: 30_000 });
-
-  // Establish a clean no-explicit-preference state once, then reload. Do not
-  // clear storage in an init script because that would invalidate persistence.
   await page.evaluate(() => localStorage.removeItem("fakhri_theme"));
   await page.reload({ waitUntil: "networkidle" });
   await page.waitForFunction(() => document.querySelectorAll(".theme-toggle").length >= 2);
@@ -144,15 +189,16 @@ async function verifyThemeControls(browser) {
           await page.waitForFunction(() => document.readyState === "complete" && document.querySelector("#main-content"));
           await page.evaluate(() => document.fonts.ready);
           await settleEntirePage(page);
+          const blankSections = await inspectSectionsInViewport(page, { name, viewportName, theme });
           const metrics = await inspectRenderedState(page);
           const axe = await new AxeBuilder({ page }).withRules(["color-contrast"]).analyze();
           const contrastViolations = axe.violations.map((violation) => ({
             id: violation.id,
             nodes: violation.nodes.map((node) => ({ target: node.target, html: node.html, summary: node.failureSummary })),
           }));
-          const entry = { viewport: viewportName, theme, route, errors, ...metrics, contrastViolations };
+          const entry = { viewport: viewportName, theme, route, errors, blankSections, ...metrics, contrastViolations };
           report.push(entry);
-          if (metrics.theme !== theme || metrics.overflow > 1 || metrics.h1Count !== 1 || errors.length || metrics.lightSurfaceLeaks.length || metrics.unresolvedReveals.length || metrics.brokenImages.length || contrastViolations.length) failures.push(entry);
+          if (metrics.theme !== theme || metrics.overflow > 1 || metrics.h1Count !== 1 || errors.length || blankSections.length || metrics.lightSurfaceLeaks.length || metrics.unresolvedReveals.length || metrics.brokenImages.length || contrastViolations.length) failures.push(entry);
           await page.screenshot({ path: path.join(OUTPUT, `${viewportName}-${theme}-${name}.png`), fullPage: true, animations: "disabled" });
           await page.close();
         }
@@ -169,5 +215,5 @@ async function verifyThemeControls(browser) {
     console.error(JSON.stringify(failures.slice(0, 6), null, 2));
     process.exit(1);
   }
-  console.log(`Theme visual audit passed ${report.length} rendered route/theme/viewport combinations plus persistence/synchronization checks.`);
+  console.log(`Theme visual audit passed ${report.length} rendered route/theme/viewport combinations, in-viewport section checks, and persistence/synchronization checks.`);
 })();
