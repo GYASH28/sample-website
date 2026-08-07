@@ -1,7 +1,8 @@
 /* Final v11 rendered + human visual-audit corrections. */
 
 /* ---------- Homepage sections ---------- */
-:root[data-theme="dark"] .commerce-product-section {
+:root[data-theme="dark"] .commerce-product-section,
+:root[data-theme="dark"] .commerce-craft-finder {
   border-color: var(--ui-border) !important;
   background:
     radial-gradient(circle at 92% 8%, rgba(115, 200, 189, 0.035), transparent 24rem),
@@ -10,16 +11,25 @@
 }
 
 :root[data-theme="dark"] .commerce-product-section .commerce-heading h2,
-:root[data-theme="dark"] .commerce-product-section .commerce-heading strong {
+:root[data-theme="dark"] .commerce-product-section .commerce-heading strong,
+:root[data-theme="dark"] .commerce-craft-finder h2,
+:root[data-theme="dark"] .commerce-craft-finder strong {
   color: var(--ui-text-strong) !important;
 }
 
-:root[data-theme="dark"] .commerce-product-section .commerce-heading p:not(.eyebrow) {
+:root[data-theme="dark"] .commerce-product-section .commerce-heading p:not(.eyebrow),
+:root[data-theme="dark"] .commerce-craft-finder p:not(.eyebrow) {
   color: var(--ui-text-muted) !important;
 }
 
-:root[data-theme="dark"] .commerce-product-section .commerce-heading a {
+:root[data-theme="dark"] .commerce-product-section .commerce-heading a,
+:root[data-theme="dark"] .commerce-craft-finder a {
   color: var(--ui-accent) !important;
+}
+
+:root[data-theme="dark"] .commerce-craft-finder__grid,
+:root[data-theme="dark"] .commerce-craft-finder__intro {
+  color: var(--ui-text) !important;
 }
 
 :root[data-theme="dark"] .commerce-order-flow ol > li,
