@@ -27,6 +27,7 @@ import "./site-revamp-v10.css";
 import "./site-revamp-v10-fixes.css";
 import "./production-theme-v11.css";
 import "./production-theme-v11-fixes.css";
+import "./production-theme-v11-final.css";
 
 applyMotionProfile();
 
