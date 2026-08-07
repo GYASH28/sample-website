@@ -50,3 +50,28 @@ html[data-motion-profile="full"] .site-header .nav-shell {
   line-height: 1.45;
   text-align: center;
 }
+
+/* Manual screenshot review exposed an older inverse-text rule leaking into the
+   light About principle cards. Keep the teal section, but make each card a
+   readable light neumorphic surface instead of white-on-white. */
+:root[data-theme="light"] .about-principles .principle-list article {
+  border: 1px solid rgba(50, 48, 45, 0.09) !important;
+  background: rgba(255, 253, 248, 0.94) !important;
+  color: var(--ui-text, #2f2927) !important;
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.88),
+    inset -1px -1px 0 rgba(76, 49, 45, 0.035),
+    0 10px 24px rgba(53, 47, 42, 0.08) !important;
+}
+
+:root[data-theme="light"] .about-principles .principle-list article > span {
+  color: var(--teal-dark, #1f6f68) !important;
+}
+
+:root[data-theme="light"] .about-principles .principle-list article h3 {
+  color: var(--ui-text-strong, #251f1d) !important;
+}
+
+:root[data-theme="light"] .about-principles .principle-list article p {
+  color: var(--ui-text-muted, #665f5b) !important;
+}
