@@ -9,6 +9,8 @@ import MobileBottomNav from "./MobileBottomNav.jsx";
 import EnquiryDrawerLauncher from "./EnquiryDrawerLauncher.jsx";
 import CommerceIntro from "./CommerceIntro.jsx";
 import ScrollProgress from "./ScrollProgress.jsx";
+import DelightLayer from "./DelightLayer.jsx";
+import MobileProductDock from "./MobileProductDock.jsx";
 
 function ScrollToTop() {
   const { hash, pathname } = useLocation();
@@ -71,6 +73,8 @@ export default function Layout() {
       <FloatingWhatsApp />
       <BasketToast />
       <EnquiryDrawerLauncher />
+      <DelightLayer />
+      <MobileProductDock />
       <MobileBottomNav />
     </>
   );
