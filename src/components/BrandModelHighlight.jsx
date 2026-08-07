@@ -91,12 +91,10 @@ export default function BrandModelHighlight() {
           <div className="brand-model-highlight__halo" aria-hidden="true" />
           {ready ? (
             <model-viewer
-              class="brand-model-highlight__viewer"
+              className="brand-model-highlight__viewer"
               src={LOGO_MODEL_DATA_URL}
               alt="Interactive three-dimensional Fakhri Mart yarn store logo"
               camera-controls
-              auto-rotate
-              rotation-per-second="12deg"
               camera-orbit="0deg 78deg 3.15m"
               min-camera-orbit="auto 58deg 2.7m"
               max-camera-orbit="auto 96deg 4m"
