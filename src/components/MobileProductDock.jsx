@@ -1,9 +1,16 @@
 import { Heart, ShoppingBagOpen } from "@phosphor-icons/react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { featuredProducts } from "../data/siteData.js";
 import { useEnquiryBasket } from "../hooks/useEnquiryBasket.js";
 import { useWishlist } from "../hooks/useWishlist.js";
+
+function getDefaultVariant(product) {
+  if (product.slug === "t-shirt-yarn") return "250gm";
+  if (product.slug.includes("macrame-cord")) return "3MM";
+  if (product.slug === "crochet-hook") return "2.0mm";
+  return null;
+}
 
 export default function MobileProductDock() {
   const { pathname } = useLocation();
@@ -12,6 +19,9 @@ export default function MobileProductDock() {
   const { add } = useEnquiryBasket();
   const { has, toggle } = useWishlist();
   const [added, setAdded] = useState(false);
+  const resetTimerRef = useRef(null);
+
+  useEffect(() => () => window.clearTimeout(resetTimerRef.current), []);
 
   if (!product) return null;
 
@@ -25,11 +35,12 @@ export default function MobileProductDock() {
       shade: product.colors?.[0] || null,
       quantity: product.quantityOptions?.min || 1,
       unit: product.quantityOptions?.unit || "pcs",
-      variant: null,
+      variant: getDefaultVariant(product),
       note: "Added from mobile product dock",
     });
     setAdded(true);
-    window.setTimeout(() => setAdded(false), 1400);
+    window.clearTimeout(resetTimerRef.current);
+    resetTimerRef.current = window.setTimeout(() => setAdded(false), 1400);
   };
 
   return (
