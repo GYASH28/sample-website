@@ -1,64 +1,70 @@
 import { useEffect, useState } from "react";
 
 const STORAGE_KEY = "fakhri_wishlist";
+const UPDATE_EVENT = "wishlist-updated";
+const MAX_ITEMS = 250;
+
+function normalizeWishlist(value) {
+  if (!Array.isArray(value)) return [];
+  return [...new Set(value.filter((slug) => typeof slug === "string" && slug.trim()).map((slug) => slug.trim()))].slice(0, MAX_ITEMS);
+}
 
 export function getWishlist() {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch (e) {
-    console.error("Failed to load wishlist from localStorage", e);
+    return stored ? normalizeWishlist(JSON.parse(stored)) : [];
+  } catch {
     return [];
   }
 }
 
 export function saveWishlist(wishlist) {
+  const normalized = normalizeWishlist(wishlist);
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(wishlist));
-    window.dispatchEvent(new Event("wishlist-updated"));
-  } catch (e) {
-    console.error("Failed to save wishlist to localStorage", e);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
+    window.dispatchEvent(new Event(UPDATE_EVENT));
+  } catch {
+    // Storage can be unavailable in private/restricted browser contexts.
   }
+  return normalized;
 }
 
 export function toggleWishlist(slug) {
+  if (typeof slug !== "string" || !slug.trim()) return;
   const wishlist = getWishlist();
-  const index = wishlist.indexOf(slug);
-  if (index > -1) {
-    wishlist.splice(index, 1);
-  } else {
-    wishlist.push(slug);
-  }
-  saveWishlist(wishlist);
+  const cleanSlug = slug.trim();
+  const next = wishlist.includes(cleanSlug)
+    ? wishlist.filter((item) => item !== cleanSlug)
+    : [...wishlist, cleanSlug];
+  saveWishlist(next);
 }
 
 export function addToWishlist(slug) {
+  if (typeof slug !== "string" || !slug.trim()) return;
   const wishlist = getWishlist();
-  if (!wishlist.includes(slug)) {
-    wishlist.push(slug);
-    saveWishlist(wishlist);
-  }
+  const cleanSlug = slug.trim();
+  if (!wishlist.includes(cleanSlug)) saveWishlist([...wishlist, cleanSlug]);
 }
 
 export function removeFromWishlist(slug) {
-  const wishlist = getWishlist();
-  const index = wishlist.indexOf(slug);
-  if (index > -1) {
-    wishlist.splice(index, 1);
-    saveWishlist(wishlist);
-  }
+  if (typeof slug !== "string") return;
+  saveWishlist(getWishlist().filter((item) => item !== slug));
 }
 
 export function useWishlist() {
   const [wishlist, setWishlist] = useState(() => getWishlist());
 
   useEffect(() => {
-    const handleUpdate = () => {
-      setWishlist(getWishlist());
+    const handleUpdate = () => setWishlist(getWishlist());
+    const handleStorage = (event) => {
+      if (!event || event.key === STORAGE_KEY) handleUpdate();
     };
-    window.addEventListener("wishlist-updated", handleUpdate);
+
+    window.addEventListener(UPDATE_EVENT, handleUpdate);
+    window.addEventListener("storage", handleStorage);
     return () => {
-      window.removeEventListener("wishlist-updated", handleUpdate);
+      window.removeEventListener(UPDATE_EVENT, handleUpdate);
+      window.removeEventListener("storage", handleStorage);
     };
   }, []);
 
