@@ -1,5 +1,5 @@
 import { ArrowRight, CubeFocus, Sparkle } from "@phosphor-icons/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import LOGO_MODEL_DATA_URL from "../data/logo3dHighlight.js";
 
@@ -32,44 +32,27 @@ function ensureModelViewer() {
 }
 
 export default function BrandModelHighlight() {
-  const sectionRef = useRef(null);
   const [requested, setRequested] = useState(false);
   const [ready, setReady] = useState(false);
+  const [loadFailed, setLoadFailed] = useState(false);
 
   useEffect(() => {
-    const element = sectionRef.current;
-    if (!element || typeof IntersectionObserver === "undefined") return undefined;
-
-    const connection = navigator.connection;
-    const conserveData = Boolean(connection?.saveData);
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
-        if (!conserveData) setRequested(true);
-        observer.disconnect();
-      },
-      { rootMargin: "240px 0px", threshold: 0.01 },
-    );
-
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (!requested || ready) return undefined;
+    if (!requested || ready || loadFailed) return undefined;
     let active = true;
 
     ensureModelViewer().then((available) => {
-      if (active && available) setReady(true);
+      if (!active) return;
+      if (available) setReady(true);
+      else setLoadFailed(true);
     });
 
     return () => {
       active = false;
     };
-  }, [requested, ready]);
+  }, [requested, ready, loadFailed]);
 
   return (
-    <section ref={sectionRef} className="brand-model-highlight" aria-labelledby="brand-model-title">
+    <section className="brand-model-highlight" aria-labelledby="brand-model-title">
       <div className="container brand-model-highlight__grid">
         <div className="brand-model-highlight__copy">
           <p className="eyebrow">A mark made to feel tactile</p>
@@ -80,7 +63,7 @@ export default function BrandModelHighlight() {
           </p>
           <div className="brand-model-highlight__notes" aria-label="3D brand highlight details">
             <span><CubeFocus size={18} weight="duotone" /> Drag to inspect</span>
-            <span><Sparkle size={18} weight="duotone" /> Lightweight interactive highlight</span>
+            <span><Sparkle size={18} weight="duotone" /> Loads only when you choose</span>
           </div>
           <Link className="text-link" to="/products">
             Explore the materials behind the brand <ArrowRight size={18} />
@@ -116,9 +99,22 @@ export default function BrandModelHighlight() {
                 loading="lazy"
                 decoding="async"
               />
-              <button type="button" onClick={() => setRequested(true)}>
-                <CubeFocus size={18} /> Load interactive 3D
+              <button
+                type="button"
+                onClick={() => {
+                  setLoadFailed(false);
+                  setRequested(true);
+                }}
+                disabled={requested && !loadFailed}
+              >
+                <CubeFocus size={18} />
+                {requested && !loadFailed ? "Loading 3D…" : loadFailed ? "Retry interactive 3D" : "Explore in 3D"}
               </button>
+              {loadFailed ? (
+                <span className="brand-model-highlight__fallback-note" role="status">
+                  Interactive view is unavailable right now. The page remains fully usable.
+                </span>
+              ) : null}
             </div>
           )}
           <span className="brand-model-highlight__caption">Fakhri Mart · Pune</span>
