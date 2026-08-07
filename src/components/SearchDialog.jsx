@@ -167,11 +167,15 @@ export default function SearchDialog({ open, onClose }) {
           <input
             ref={inputRef}
             type="search"
+            role="combobox"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             onKeyDown={onInputKeyDown}
             placeholder={t("searchHint")}
             autoComplete="off"
+            aria-autocomplete="list"
+            aria-controls="catalogue-search-results"
+            aria-expanded={open && results.length > 0}
             aria-activedescendant={activeIndex >= 0 ? `search-result-${results[activeIndex]?.slug}` : undefined}
           />
           <kbd>Esc</kbd>
@@ -201,9 +205,15 @@ export default function SearchDialog({ open, onClose }) {
           </div>
 
           {results.length > 0 ? (
-            <ul className="search-result-list">
+            <ul className="search-result-list" id="catalogue-search-results" role="listbox">
               {results.map((product, resultIndex) => (
-                <li key={product.slug} id={`search-result-${product.slug}`} className={resultIndex === activeIndex ? "is-keyboard-active" : ""}>
+                <li
+                  key={product.slug}
+                  id={`search-result-${product.slug}`}
+                  className={resultIndex === activeIndex ? "is-keyboard-active" : ""}
+                  role="option"
+                  aria-selected={resultIndex === activeIndex}
+                >
                   <Link to={`/products/${product.slug}`} onClick={closeWithSearch} onMouseEnter={() => setActiveIndex(resultIndex)}>
                     <img src={product.image} alt="" width="72" height="72" loading="lazy" decoding="async" />
                     <span>
