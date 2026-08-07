@@ -23,13 +23,16 @@ function getVariantOptions(product) {
 
 export default function ProductQuickView({ product, open, onClose }) {
   const closeRef = useRef(null);
+  const addedTimerRef = useRef(null);
   const { add } = useEnquiryBasket();
   const { has, toggle } = useWishlist();
   const [color, setColor] = useState(product.colors?.[0] || null);
   const variants = useMemo(() => getVariantOptions(product), [product]);
+  const gallery = useMemo(() => [product.image, ...(product.galleryImages || [])].filter(Boolean), [product]);
   const [variant, setVariant] = useState(variants[0] || null);
   const [quantity, setQuantity] = useState(product.quantityOptions?.min || 1);
   const [added, setAdded] = useState(false);
+  const [imageIndex, setImageIndex] = useState(0);
   const isSaved = has(product.slug);
 
   useEffect(() => {
@@ -37,7 +40,10 @@ export default function ProductQuickView({ product, open, onClose }) {
     setVariant(variants[0] || null);
     setQuantity(product.quantityOptions?.min || 1);
     setAdded(false);
+    setImageIndex(0);
   }, [product, variants]);
+
+  useEffect(() => () => window.clearTimeout(addedTimerRef.current), []);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -77,7 +83,8 @@ export default function ProductQuickView({ product, open, onClose }) {
       note: "",
     });
     setAdded(true);
-    window.setTimeout(() => setAdded(false), 1_600);
+    window.clearTimeout(addedTimerRef.current);
+    addedTimerRef.current = window.setTimeout(() => setAdded(false), 1_600);
   };
 
   const message = `Hello Fakhri Mart, I want to enquire about *${product.name}*${color ? ` in *${color.name}*` : ""}${variant ? ` (${variant})` : ""}, quantity *${quantity} ${product.quantityOptions?.unit || "pcs"}*. Please share current availability, shade photos and price.`;
@@ -91,8 +98,25 @@ export default function ProductQuickView({ product, open, onClose }) {
         </button>
 
         <div className="quick-view__media">
-          <img src={image} alt={product.name} width="720" height="720" decoding="async" />
+          <img key={gallery[imageIndex]} className="quick-view__main-image" src={gallery[imageIndex]} alt={product.name} width="720" height="720" decoding="async" />
           <span>{product.stock === "out" ? "Currently unavailable" : "Availability confirmed live"}</span>
+          {gallery.length > 1 ? (
+            <div className="quick-view__gallery" aria-label="Material views">
+              {gallery.slice(0, 4).map((source, index) => (
+                <button
+                  key={source}
+                  type="button"
+                  className={index === imageIndex ? "is-active" : ""}
+                  onClick={() => setImageIndex(index)}
+                  aria-label={`Show material view ${index + 1}`}
+                  aria-pressed={index === imageIndex}
+                >
+                  <img src={source} alt="" width="58" height="58" loading="lazy" decoding="async" />
+                </button>
+              ))}
+            </div>
+          ) : null}
+          <small className="quick-view__photo-note">Representative material photos · ask for current shade photos before ordering.</small>
         </div>
 
         <div className="quick-view__content">
