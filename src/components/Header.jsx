@@ -31,13 +31,22 @@ const primaryLinks = [
 ];
 
 function Counter({ value }) {
-  return value > 0 ? <span className="nav-count" aria-hidden="true">{value}</span> : null;
+  return value > 0 ? (
+    <span key={value} className="nav-count" aria-hidden="true">{value}</span>
+  ) : null;
+}
+
+function isEditableTarget(target) {
+  return target instanceof HTMLElement && Boolean(
+    target.closest('input, textarea, select, [contenteditable="true"]'),
+  );
 }
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [megaOpen, setMegaOpen] = useState(false);
+  const [shortcutLabel, setShortcutLabel] = useState("Ctrl K");
   const menuButtonRef = useRef(null);
   const drawerRef = useRef(null);
   const location = useLocation();
@@ -53,6 +62,11 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
+    const platform = navigator.userAgentData?.platform || navigator.platform || "";
+    setShortcutLabel(/Mac|iPhone|iPad|iPod/i.test(platform) ? "⌘K" : "Ctrl K");
+  }, []);
+
+  useEffect(() => {
     closeMenu();
     setMegaOpen(false);
     setSearchOpen(false);
@@ -63,7 +77,16 @@ export default function Header() {
       if ((event.ctrlKey || event.metaKey) && event.key.toLocaleLowerCase() === "k") {
         event.preventDefault();
         openSearch();
+        return;
       }
+
+      if (event.key === "/" && !isEditableTarget(event.target)) {
+        event.preventDefault();
+        openSearch();
+        return;
+      }
+
+      if (event.key === "Escape") setMegaOpen(false);
     };
     const onOpenSearch = () => openSearch();
 
@@ -111,9 +134,11 @@ export default function Header() {
     <>
       <header className="site-header">
         <div className="announcement-bar" aria-label="Store information">
-          <span>{t("allIndia")}</span>
-          <span>{t("wholesale")}</span>
-          <span>{t("shades")}</span>
+          <div className="container announcement-bar__inner">
+            <span>{t("allIndia")}</span>
+            <span>{t("wholesale")}</span>
+            <span>{t("shades")}</span>
+          </div>
         </div>
 
         <div className="container nav-shell">
@@ -169,7 +194,7 @@ export default function Header() {
                         to={`/products?category=${encodeURIComponent(category.name)}`}
                       >
                         <span>{category.shortName}</span>
-                        <small>{category.items?.length || 0} material lines</small>
+                        <small>{category.products?.length || 0} material lines</small>
                       </Link>
                     ))}
                   </div>
@@ -187,10 +212,12 @@ export default function Header() {
               type="button"
               onClick={openSearch}
               aria-label={t("search")}
+              aria-keyshortcuts="Control+K Meta+K /"
+              title={`Search (${shortcutLabel} or /)`}
             >
               <MagnifyingGlass size={19} />
               <span>{t("search")}</span>
-              <kbd>⌘K</kbd>
+              <kbd>{shortcutLabel}</kbd>
             </button>
 
             <div className="language-control" aria-label="Language">
