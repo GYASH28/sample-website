@@ -1,9 +1,9 @@
 name: Motion performance v5 benchmark
 
 on:
-  push:
+  pull_request:
     branches:
-      - refine/intro-motion-performance-v5
+      - main
 
 jobs:
   benchmark:
