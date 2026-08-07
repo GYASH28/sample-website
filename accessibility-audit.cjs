@@ -9,7 +9,6 @@ const allRoutes = [
   "/enquiry",
   "/wishlist",
   "/about",
-  "/gallery",
   "/contact",
   "/blog",
   "/blog/how-to-choose-yarn-weight",
