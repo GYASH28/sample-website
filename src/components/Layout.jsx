@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import FloatingWhatsApp from "./FloatingWhatsApp.jsx";
 import Footer from "./Footer.jsx";
@@ -12,6 +12,7 @@ import ScrollProgress from "./ScrollProgress.jsx";
 import DelightLayer from "./DelightLayer.jsx";
 import MobileProductDock from "./MobileProductDock.jsx";
 import HeaderEnhancer from "./HeaderEnhancer.jsx";
+import ConnectionStatus from "./ConnectionStatus.jsx";
 
 function ScrollToTop() {
   const { hash, pathname } = useLocation();
@@ -44,6 +45,38 @@ function getRouteFamily(pathname) {
   return "utility";
 }
 
+function getRouteLabel(pathname) {
+  if (pathname === "/") return "Home";
+  if (pathname === "/products") return "Catalogue";
+  if (pathname.startsWith("/products/")) return "Product details";
+  if (pathname === "/gallery") return "Gallery";
+  if (pathname === "/about") return "About";
+  if (pathname === "/blog") return "Guides";
+  if (pathname.startsWith("/blog/")) return "Guide";
+  if (pathname === "/contact") return "Contact";
+  if (pathname === "/wishlist") return "Wishlist";
+  if (pathname === "/enquiry") return "Enquiry";
+  return "Page";
+}
+
+function RouteAnnouncer() {
+  const { pathname } = useLocation();
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setMessage(`${getRouteLabel(pathname)} page opened`);
+    }, 120);
+    return () => window.clearTimeout(timer);
+  }, [pathname]);
+
+  return (
+    <div className="route-announcer" role="status" aria-live="polite" aria-atomic="true">
+      {message}
+    </div>
+  );
+}
+
 export default function Layout() {
   const location = useLocation();
   const routeFamily = getRouteFamily(location.pathname);
@@ -57,7 +90,8 @@ export default function Layout() {
       <ScrollToTop />
       <HeaderEnhancer />
       <Header />
-      <main id="main-content">
+      <RouteAnnouncer />
+      <main id="main-content" data-route-family={routeFamily}>
         <div
           key={`thread-${location.pathname}`}
           className="route-thread-transition"
@@ -78,6 +112,7 @@ export default function Layout() {
       <DelightLayer />
       <MobileProductDock />
       <MobileBottomNav />
+      <ConnectionStatus />
     </>
   );
 }
