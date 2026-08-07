@@ -4,6 +4,8 @@ import {
   CheckCircle,
   Heart,
   MagnifyingGlass,
+  Pause,
+  Play,
   ShoppingBagOpen,
 } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
@@ -13,12 +15,15 @@ import { useEnquiryBasket } from "../../hooks/useEnquiryBasket.js";
 import { useWishlist } from "../../hooks/useWishlist.js";
 
 const spotlightProducts = featuredProducts.slice(0, 6);
+const AUTO_ADVANCE_MS = 6500;
 
 export default function CommerceHero() {
   const [index, setIndex] = useState(0);
   const product = spotlightProducts[index] || featuredProducts[0];
   const [color, setColor] = useState(product?.colors?.[0] || null);
   const [added, setAdded] = useState(false);
+  const [autoPaused, setAutoPaused] = useState(false);
+  const [interactionPaused, setInteractionPaused] = useState(false);
   const visualRef = useRef(null);
   const { add } = useEnquiryBasket();
   const { has, toggle } = useWishlist();
@@ -27,6 +32,14 @@ export default function CommerceHero() {
     setColor(product?.colors?.[0] || null);
     setAdded(false);
   }, [product]);
+
+  useEffect(() => {
+    if (autoPaused || interactionPaused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+    const timer = window.setTimeout(() => {
+      setIndex((value) => (value + 1) % spotlightProducts.length);
+    }, AUTO_ADVANCE_MS);
+    return () => window.clearTimeout(timer);
+  }, [index, autoPaused, interactionPaused]);
 
   if (!product) return null;
 
@@ -53,12 +66,16 @@ export default function CommerceHero() {
   const onPointerMove = (event) => {
     if (!visualRef.current || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
     const rect = visualRef.current.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width - 0.5;
-    const y = (event.clientY - rect.top) / rect.height - 0.5;
+    const px = (event.clientX - rect.left) / rect.width;
+    const py = (event.clientY - rect.top) / rect.height;
+    const x = px - 0.5;
+    const y = py - 0.5;
     visualRef.current.style.setProperty("--hero-rx", `${y * -3.5}deg`);
     visualRef.current.style.setProperty("--hero-ry", `${x * 4.5}deg`);
     visualRef.current.style.setProperty("--hero-x", `${x * 10}px`);
     visualRef.current.style.setProperty("--hero-y", `${y * 8}px`);
+    visualRef.current.style.setProperty("--hero-glow-x", `${px * 100}%`);
+    visualRef.current.style.setProperty("--hero-glow-y", `${py * 100}%`);
   };
 
   const resetPointer = () => {
@@ -67,6 +84,8 @@ export default function CommerceHero() {
     visualRef.current.style.setProperty("--hero-ry", "0deg");
     visualRef.current.style.setProperty("--hero-x", "0px");
     visualRef.current.style.setProperty("--hero-y", "0px");
+    visualRef.current.style.setProperty("--hero-glow-x", "50%");
+    visualRef.current.style.setProperty("--hero-glow-y", "50%");
   };
 
   const saved = has(product.slug);
@@ -87,7 +106,7 @@ export default function CommerceHero() {
             <ArrowRight size={17} />
           </Link>
 
-          <div className="product-first-hero__spotlight-copy" aria-live="polite">
+          <div className="product-first-hero__spotlight-copy" aria-live="off">
             <div>
               <span>{product.category}</span>
               <strong>{product.name}</strong>
@@ -107,7 +126,7 @@ export default function CommerceHero() {
                     aria-pressed={color?.name === shade.name}
                   />
                 ))}
-                <span>{color?.name || `${product.colors.length} shades`}</span>
+                <span key={color?.name || "shade-count"} className="hero-shade-name">{color?.name || `${product.colors.length} shades`}</span>
               </div>
             ) : null}
           </div>
@@ -135,7 +154,15 @@ export default function CommerceHero() {
           ref={visualRef}
           className="commerce-hero__visual product-first-hero__visual"
           onPointerMove={onPointerMove}
-          onPointerLeave={resetPointer}
+          onPointerEnter={() => setInteractionPaused(true)}
+          onPointerLeave={() => {
+            setInteractionPaused(false);
+            resetPointer();
+          }}
+          onFocusCapture={() => setInteractionPaused(true)}
+          onBlurCapture={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget)) setInteractionPaused(false);
+          }}
         >
           <div className="product-first-hero__frame">
             <img
@@ -148,10 +175,12 @@ export default function CommerceHero() {
               decoding="async"
             />
             <span className="product-first-hero__shade-glow" style={{ backgroundColor: color?.hex || "#2a8c82" }} aria-hidden="true" />
+            <span className="product-first-hero__pointer-light" aria-hidden="true" />
             <div className="product-first-hero__image-label">
               <span>{String(index + 1).padStart(2, "0")} / {String(spotlightProducts.length).padStart(2, "0")}</span>
               <strong>{product.name}</strong>
             </div>
+            {!autoPaused && !interactionPaused ? <span key={`progress-${index}`} className="product-first-hero__autoplay-track" aria-hidden="true"><i /></span> : null}
           </div>
 
           <div className="product-first-hero__controls">
@@ -172,6 +201,15 @@ export default function CommerceHero() {
               ))}
             </div>
             <button type="button" onClick={() => move(1)} aria-label="Next product"><ArrowRight size={19} /></button>
+            <button
+              type="button"
+              className="product-first-hero__autoplay-toggle"
+              onClick={() => setAutoPaused((value) => !value)}
+              aria-label={autoPaused ? "Play featured products" : "Pause featured products"}
+              aria-pressed={autoPaused}
+            >
+              {autoPaused ? <Play size={17} /> : <Pause size={17} />}
+            </button>
           </div>
 
           <div className="commerce-hero__stock-note product-first-hero__stock-note">
