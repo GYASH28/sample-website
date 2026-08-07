@@ -2,6 +2,7 @@ const { chromium } = require("playwright");
 
 const BASE_URL = "http://127.0.0.1:4173";
 const INTRO_SELECTOR = '.commerce-intro[aria-label="Fakhri Mart opening sequence"]';
+const HERO_STAGE_SELECTOR = ".hero-v6__stage";
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -33,7 +34,7 @@ function assert(condition, message) {
     const skip = intro.getByRole("button", { name: /skip intro/i });
     await skip.click();
     await intro.waitFor({ state: "detached", timeout: 2500 });
-    await page.locator(".product-first-hero__frame").waitFor({ state: "visible", timeout: 5000 });
+    await page.locator(HERO_STAGE_SELECTOR).waitFor({ state: "visible", timeout: 5000 });
 
     await page.waitForFunction(() => document.querySelectorAll('[data-scroll-scene="true"]').length >= 5);
     const initialProgress = await page.evaluate(() =>
@@ -76,10 +77,11 @@ function assert(condition, message) {
 
     await mobileIntro.getByRole("button", { name: /skip intro/i }).click();
     await mobileIntro.waitFor({ state: "detached", timeout: 2500 });
+    await mobile.locator(HERO_STAGE_SELECTOR).waitFor({ state: "visible", timeout: 5000 });
     await mobile.close();
 
     assert(errors.length === 0, `Browser errors detected:\n${errors.join("\n")}`);
-    console.log("✓ Opening sequence and scroll direction passed desktop and mobile regression checks");
+    console.log("✓ Opening sequence and refined hero passed desktop and mobile regression checks");
   } finally {
     await browser.close();
   }
