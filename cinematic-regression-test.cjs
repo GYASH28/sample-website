@@ -3,6 +3,8 @@ const { chromium } = require("playwright");
 const BASE_URL = "http://127.0.0.1:4173";
 const INTRO_SELECTOR = '.commerce-intro[aria-label="Fakhri Mart opening sequence"]';
 const HERO_STAGE_SELECTOR = ".hero-v6__stage";
+const SPOOL_SELECTOR = ".scroll-spool-progress";
+const SPOOL_RING_SELECTOR = ".scroll-spool-progress__ring";
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -37,15 +39,30 @@ function assert(condition, message) {
     await page.locator(HERO_STAGE_SELECTOR).waitFor({ state: "visible", timeout: 5000 });
 
     await page.waitForFunction(() => document.querySelectorAll('[data-scroll-scene="true"]').length >= 5);
-    const initialProgress = await page.evaluate(() =>
-      Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--page-scroll")) || 0,
-    );
+    await page.locator(SPOOL_SELECTOR).waitFor({ state: "attached", timeout: 3000 });
+
+    const initialProgress = await page.evaluate((ringSelector) => {
+      const ring = document.querySelector(ringSelector);
+      return Number.parseFloat(ring?.style.strokeDashoffset || "100");
+    }, SPOOL_RING_SELECTOR);
+
     await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }));
     await page.waitForTimeout(350);
-    const finalProgress = await page.evaluate(() =>
-      Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--page-scroll")) || 0,
+
+    const finalProgress = await page.evaluate(({ spoolSelector, ringSelector }) => {
+      const spool = document.querySelector(spoolSelector);
+      const ring = document.querySelector(ringSelector);
+      return {
+        dashOffset: Number.parseFloat(ring?.style.strokeDashoffset || "100"),
+        active: Boolean(spool?.classList.contains("is-active")),
+      };
+    }, { spoolSelector: SPOOL_SELECTOR, ringSelector: SPOOL_RING_SELECTOR });
+
+    assert(
+      finalProgress.dashOffset < initialProgress - 45,
+      `Spool progress ring should respond to page movement: ${JSON.stringify({ initialProgress, finalProgress })}`,
     );
-    assert(finalProgress > initialProgress + 0.45, "Global scroll progress should respond to page movement");
+    assert(finalProgress.active, "Spool progress control should become active after page movement");
 
     const mobile = await browser.newPage({ viewport: { width: 390, height: 844 } });
     mobile.on("console", (message) => {
@@ -81,7 +98,7 @@ function assert(condition, message) {
     await mobile.close();
 
     assert(errors.length === 0, `Browser errors detected:\n${errors.join("\n")}`);
-    console.log("✓ Opening sequence and refined hero passed desktop and mobile regression checks");
+    console.log("✓ Opening sequence, animated hero, and spool progress passed desktop/mobile regression checks");
   } finally {
     await browser.close();
   }
