@@ -1,7 +1,6 @@
 import {
   ArrowLeft,
   ArrowRight,
-  CheckCircle,
   Heart,
   MagnifyingGlass,
   Pause,
@@ -16,6 +15,7 @@ import { useWishlist } from "../../hooks/useWishlist.js";
 
 const spotlightProducts = featuredProducts.slice(0, 6);
 const AUTO_ADVANCE_MS = 6500;
+const SWIPE_THRESHOLD = 42;
 
 export default function CommerceHero() {
   const [index, setIndex] = useState(0);
@@ -29,6 +29,7 @@ export default function CommerceHero() {
   const pointerRef = useRef({ x: 0, y: 0 });
   const visualRectRef = useRef(null);
   const pointerMotionEnabledRef = useRef(false);
+  const touchStartRef = useRef(null);
   const { add } = useEnquiryBasket();
   const { has, toggle } = useWishlist();
 
@@ -38,21 +39,35 @@ export default function CommerceHero() {
   }, [product]);
 
   useEffect(() => {
-    if (autoPaused || interactionPaused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+    if (
+      autoPaused ||
+      interactionPaused ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return undefined;
+    }
+
     const timer = window.setTimeout(() => {
       setIndex((value) => (value + 1) % spotlightProducts.length);
     }, AUTO_ADVANCE_MS);
+
     return () => window.clearTimeout(timer);
   }, [index, autoPaused, interactionPaused]);
 
-  useEffect(() => () => {
-    if (pointerFrameRef.current) window.cancelAnimationFrame(pointerFrameRef.current);
-  }, []);
+  useEffect(
+    () => () => {
+      if (pointerFrameRef.current) window.cancelAnimationFrame(pointerFrameRef.current);
+    },
+    [],
+  );
 
   if (!product) return null;
 
   const move = (direction) => {
-    setIndex((value) => (value + direction + spotlightProducts.length) % spotlightProducts.length);
+    setIndex(
+      (value) =>
+        (value + direction + spotlightProducts.length) % spotlightProducts.length,
+    );
   };
 
   const addProduct = () => {
@@ -77,15 +92,21 @@ export default function CommerceHero() {
     const rect = visualRectRef.current;
     if (!visual || !rect || !pointerMotionEnabledRef.current) return;
 
-    const px = Math.min(1, Math.max(0, (pointerRef.current.x - rect.left) / rect.width));
-    const py = Math.min(1, Math.max(0, (pointerRef.current.y - rect.top) / rect.height));
+    const px = Math.min(
+      1,
+      Math.max(0, (pointerRef.current.x - rect.left) / rect.width),
+    );
+    const py = Math.min(
+      1,
+      Math.max(0, (pointerRef.current.y - rect.top) / rect.height),
+    );
     const x = px - 0.5;
     const y = py - 0.5;
 
-    visual.style.setProperty("--hero-rx", `${y * -2.5}deg`);
-    visual.style.setProperty("--hero-ry", `${x * 3.2}deg`);
-    visual.style.setProperty("--hero-x", `${x * 7}px`);
-    visual.style.setProperty("--hero-y", `${y * 6}px`);
+    visual.style.setProperty("--hero-rx", `${y * -1.45}deg`);
+    visual.style.setProperty("--hero-ry", `${x * 1.8}deg`);
+    visual.style.setProperty("--hero-x", `${x * 4}px`);
+    visual.style.setProperty("--hero-y", `${y * 3}px`);
     visual.style.setProperty("--hero-glow-x", `${px * 100}%`);
     visual.style.setProperty("--hero-glow-y", `${py * 100}%`);
   };
@@ -102,17 +123,20 @@ export default function CommerceHero() {
     setInteractionPaused(true);
     const profile = document.documentElement.dataset.motionProfile;
     pointerMotionEnabledRef.current =
-      profile === "full" && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+      profile === "full" &&
+      window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     visualRectRef.current = visualRef.current?.getBoundingClientRect() || null;
   };
 
   const resetPointer = () => {
     pointerMotionEnabledRef.current = false;
     visualRectRef.current = null;
+
     if (pointerFrameRef.current) {
       window.cancelAnimationFrame(pointerFrameRef.current);
       pointerFrameRef.current = 0;
     }
+
     if (!visualRef.current) return;
     visualRef.current.style.setProperty("--hero-rx", "0deg");
     visualRef.current.style.setProperty("--hero-ry", "0deg");
@@ -122,71 +146,122 @@ export default function CommerceHero() {
     visualRef.current.style.setProperty("--hero-glow-y", "50%");
   };
 
+  const onTouchStart = (event) => {
+    const touch = event.touches?.[0];
+    if (!touch) return;
+    setInteractionPaused(true);
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+  };
+
+  const onTouchEnd = (event) => {
+    const start = touchStartRef.current;
+    const touch = event.changedTouches?.[0];
+    touchStartRef.current = null;
+    setInteractionPaused(false);
+    if (!start || !touch) return;
+
+    const deltaX = touch.clientX - start.x;
+    const deltaY = touch.clientY - start.y;
+    if (Math.abs(deltaX) < SWIPE_THRESHOLD || Math.abs(deltaX) <= Math.abs(deltaY)) {
+      return;
+    }
+
+    move(deltaX < 0 ? 1 : -1);
+  };
+
   const saved = has(product.slug);
+  const visibleColors = product.colors?.slice(0, 5) || [];
+  const remainingColors = Math.max((product.colors?.length || 0) - visibleColors.length, 0);
 
   return (
-    <section className="commerce-hero product-first-hero" aria-labelledby="home-title">
-      <div className="container commerce-hero__grid">
-        <div className="commerce-hero__copy">
-          <p className="eyebrow">Shop yarn, thread and craft materials</p>
-          <h1 id="home-title">Find the right material. Choose the shade. Build your enquiry.</h1>
-          <p className="commerce-hero__intro">
-            Explore real product families first—then compare shades, save favourites and send one organised retail or wholesale enquiry.
+    <section
+      className="commerce-hero product-first-hero hero-v6"
+      aria-labelledby="home-title"
+    >
+      <div className="container hero-v6__shell">
+        <div className="hero-v6__copy">
+          <div className="hero-v6__eyebrow">
+            <span aria-hidden="true" />
+            <p>Yarn & craft materials · Pune</p>
+          </div>
+
+          <h1 id="home-title">
+            Craft starts with the <em>right material.</em>
+          </h1>
+
+          <p className="hero-v6__intro">
+            Explore yarns, threads, macrame and craft essentials. Choose a shade,
+            save what you like, and send one organised enquiry.
           </p>
 
-          <Link className="commerce-hero__search" to="/products?q=">
-            <MagnifyingGlass size={20} />
-            <span>Search yarn, macrame, beads, hooks and bag materials</span>
+          <Link className="hero-v6__search" to="/products?q=">
+            <MagnifyingGlass size={19} />
+            <span>Search materials</span>
+            <small>Yarn, thread, beads, hooks…</small>
             <ArrowRight size={17} />
           </Link>
 
-          <div className="product-first-hero__spotlight-copy" aria-live="off">
-            <div>
-              <span>{product.category}</span>
-              <strong>{product.name}</strong>
-              <small>{product.variants}</small>
+          <div className="hero-v6__featured" aria-live="polite">
+            <div className="hero-v6__product-heading">
+              <p>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                Featured material
+              </p>
+              <h2 key={`title-${product.slug}`}>{product.name}</h2>
+              <small>{product.category} · {product.variants}</small>
             </div>
 
-            {product.colors?.length ? (
-              <div className="product-first-hero__swatches" aria-label="Choose spotlight shade">
-                {product.colors.slice(0, 6).map((shade) => (
-                  <button
-                    key={shade.name}
-                    type="button"
-                    className={color?.name === shade.name ? "is-active" : ""}
-                    style={{ backgroundColor: shade.hex }}
-                    onClick={() => setColor(shade)}
-                    aria-label={`Select ${shade.name}`}
-                    aria-pressed={color?.name === shade.name}
-                  />
-                ))}
-                <span key={color?.name || "shade-count"} className="hero-shade-name">{color?.name || `${product.colors.length} shades`}</span>
+            {visibleColors.length ? (
+              <div className="hero-v6__shade-picker" aria-label="Choose featured shade">
+                <div className="hero-v6__swatches">
+                  {visibleColors.map((shade) => (
+                    <button
+                      key={shade.name}
+                      type="button"
+                      className={color?.name === shade.name ? "is-active" : ""}
+                      style={{ "--swatch": shade.hex }}
+                      onClick={() => setColor(shade)}
+                      aria-label={`Select ${shade.name}`}
+                      aria-pressed={color?.name === shade.name}
+                    />
+                  ))}
+                </div>
+                <p>
+                  <strong key={color?.name || "shade"}>{color?.name || "Available shades"}</strong>
+                  {remainingColors ? <span>+{remainingColors} more</span> : null}
+                </p>
               </div>
             ) : null}
           </div>
 
-          <div className="commerce-hero__actions product-first-hero__actions">
-            <button className="btn btn-primary" type="button" onClick={addProduct} disabled={product.stock === "out"}>
-              <ShoppingBagOpen size={18} /> {added ? "Added to enquiry" : "Add to enquiry"}
+          <div className="hero-v6__actions">
+            <button
+              className="btn btn-primary hero-v6__primary"
+              type="button"
+              onClick={addProduct}
+              disabled={product.stock === "out"}
+            >
+              <ShoppingBagOpen size={18} />
+              {added ? "Added" : "Add to enquiry"}
             </button>
-            <Link className="btn btn-outline" to={`/products/${product.slug}`}>
-              View product <ArrowRight size={18} />
+
+            <Link className="hero-v6__product-link" to={`/products/${product.slug}`}>
+              View product <ArrowRight size={17} />
             </Link>
-            <button className={`product-first-hero__save ${saved ? "is-saved" : ""}`} type="button" onClick={() => toggle(product.slug)} aria-label={saved ? "Remove from wishlist" : "Save to wishlist"}>
-              <Heart size={21} weight={saved ? "fill" : "regular"} />
-            </button>
           </div>
 
-          <ul className="commerce-hero__trust" aria-label="Store benefits">
-            <li><CheckCircle size={17} /> Live shade confirmation</li>
-            <li><CheckCircle size={17} /> Retail and wholesale quantities</li>
-            <li><CheckCircle size={17} /> Delivery across India</li>
-          </ul>
+          <div className="hero-v6__assurance" aria-label="Store benefits">
+            <span>Live shade confirmation</span>
+            <i aria-hidden="true" />
+            <span>Retail + wholesale</span>
+            <i aria-hidden="true" />
+            <span>India-wide delivery</span>
+          </div>
         </div>
 
         <div
           ref={visualRef}
-          className="commerce-hero__visual product-first-hero__visual"
+          className="hero-v6__visual"
           onPointerMove={onPointerMove}
           onPointerEnter={onPointerEnter}
           onPointerLeave={() => {
@@ -195,31 +270,72 @@ export default function CommerceHero() {
           }}
           onFocusCapture={() => setInteractionPaused(true)}
           onBlurCapture={(event) => {
-            if (!event.currentTarget.contains(event.relatedTarget)) setInteractionPaused(false);
+            if (!event.currentTarget.contains(event.relatedTarget)) {
+              setInteractionPaused(false);
+            }
           }}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
         >
-          <div className="product-first-hero__frame">
-            <img
-              key={product.slug}
-              src={product.image}
-              alt={product.name}
-              width="900"
-              height="900"
-              fetchPriority="high"
-              decoding="async"
-            />
-            <span className="product-first-hero__shade-glow" style={{ backgroundColor: color?.hex || "#2a8c82" }} aria-hidden="true" />
-            <span className="product-first-hero__pointer-light" aria-hidden="true" />
-            <div className="product-first-hero__image-label">
-              <span>{String(index + 1).padStart(2, "0")} / {String(spotlightProducts.length).padStart(2, "0")}</span>
-              <strong>{product.name}</strong>
+          <div className="hero-v6__stage">
+            <div className="hero-v6__stage-top">
+              <span>Featured collection</span>
+              <button
+                type="button"
+                className={saved ? "is-saved" : ""}
+                onClick={() => toggle(product.slug)}
+                aria-label={saved ? "Remove from wishlist" : "Save to wishlist"}
+              >
+                <Heart size={20} weight={saved ? "fill" : "regular"} />
+              </button>
             </div>
-            {!autoPaused && !interactionPaused ? <span key={`progress-${index}`} className="product-first-hero__autoplay-track" aria-hidden="true"><i /></span> : null}
+
+            <div className="hero-v6__image-wrap">
+              <img
+                key={product.slug}
+                src={product.image}
+                alt={product.name}
+                width="900"
+                height="900"
+                fetchPriority="high"
+                decoding="async"
+              />
+              <span
+                className="hero-v6__shade-light"
+                style={{ "--shade": color?.hex || "#2a8c82" }}
+                aria-hidden="true"
+              />
+              <span className="hero-v6__pointer-light" aria-hidden="true" />
+            </div>
+
+            <div className="hero-v6__stage-caption">
+              <div>
+                <span>{product.category}</span>
+                <strong>{product.name}</strong>
+              </div>
+              <p>
+                <span
+                  className="hero-v6__active-swatch"
+                  style={{ "--swatch": color?.hex || "#2a8c82" }}
+                  aria-hidden="true"
+                />
+                {color?.name || "Choose shade"}
+              </p>
+            </div>
+
+            {!autoPaused && !interactionPaused ? (
+              <span key={`progress-${index}`} className="hero-v6__autoplay" aria-hidden="true">
+                <i />
+              </span>
+            ) : null}
           </div>
 
-          <div className="product-first-hero__controls">
-            <button type="button" onClick={() => move(-1)} aria-label="Previous product"><ArrowLeft size={19} /></button>
-            <div role="tablist" aria-label="Featured products">
+          <div className="hero-v6__carousel" aria-label="Featured product carousel">
+            <button type="button" onClick={() => move(-1)} aria-label="Previous product">
+              <ArrowLeft size={18} />
+            </button>
+
+            <div className="hero-v6__thumbs" role="tablist" aria-label="Featured products">
               {spotlightProducts.map((item, itemIndex) => (
                 <button
                   key={item.slug}
@@ -230,25 +346,37 @@ export default function CommerceHero() {
                   aria-selected={itemIndex === index}
                   aria-label={`Show ${item.name}`}
                 >
-                  <img src={item.image} alt="" width="56" height="56" loading="lazy" decoding="async" />
+                  <img
+                    src={item.image}
+                    alt=""
+                    width="62"
+                    height="62"
+                    loading={itemIndex === 0 ? "eager" : "lazy"}
+                    decoding="async"
+                  />
+                  <span>{String(itemIndex + 1).padStart(2, "0")}</span>
                 </button>
               ))}
             </div>
-            <button type="button" onClick={() => move(1)} aria-label="Next product"><ArrowRight size={19} /></button>
+
+            <button type="button" onClick={() => move(1)} aria-label="Next product">
+              <ArrowRight size={18} />
+            </button>
+
             <button
               type="button"
-              className="product-first-hero__autoplay-toggle"
+              className="hero-v6__pause"
               onClick={() => setAutoPaused((value) => !value)}
               aria-label={autoPaused ? "Play featured products" : "Pause featured products"}
               aria-pressed={autoPaused}
             >
-              {autoPaused ? <Play size={17} /> : <Pause size={17} />}
+              {autoPaused ? <Play size={16} /> : <Pause size={16} />}
             </button>
           </div>
 
-          <div className="commerce-hero__stock-note product-first-hero__stock-note">
-            <strong>{product.stock === "out" ? "Ask when it returns" : "Need this exact shade?"}</strong>
-            <span>Current stock photos and final quantity pricing are confirmed on WhatsApp.</span>
+          <div className="hero-v6__micro-note">
+            <span>Swipe or use the arrows</span>
+            <strong>{String(index + 1).padStart(2, "0")} / {String(spotlightProducts.length).padStart(2, "0")}</strong>
           </div>
         </div>
       </div>
