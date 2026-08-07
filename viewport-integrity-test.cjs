@@ -47,6 +47,87 @@ async function auditScrollLayoutReads(page) {
   return page.evaluate(() => window.__scrollLayoutReads || 0);
 }
 
+async function auditHeaderMorph(page) {
+  return page.evaluate(async () => {
+    const header = document.querySelector(".site-header");
+    const announcement = header?.querySelector(".announcement-bar");
+    const nav = header?.querySelector(".nav-shell");
+    if (!header || !announcement || !nav) throw new Error("header morph elements are missing");
+
+    const positions = [0, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120];
+    const samples = [];
+
+    for (const y of positions) {
+      window.scrollTo({ top: y, behavior: "instant" });
+      await new Promise((resolve) => window.requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+      const headerRect = header.getBoundingClientRect();
+      const navRect = nav.getBoundingClientRect();
+      const announcementStyle = getComputedStyle(announcement);
+      const headerStyle = getComputedStyle(header);
+      const navStyle = getComputedStyle(nav);
+      samples.push({
+        y,
+        headerHeight: headerRect.height,
+        navTop: navRect.top,
+        navHeight: navRect.height,
+        morph: Number.parseFloat(header.style.getPropertyValue("--header-morph") || "0"),
+        announcementOpacity: Number.parseFloat(announcementStyle.opacity || "1"),
+        headerBackground: headerStyle.backgroundColor,
+        headerBoxShadow: headerStyle.boxShadow,
+        headerBackdropFilter: headerStyle.backdropFilter || headerStyle.webkitBackdropFilter || "none",
+        navBackgroundImage: navStyle.backgroundImage,
+        navBackdropFilter: navStyle.backdropFilter || navStyle.webkitBackdropFilter || "none",
+      });
+    }
+
+    return {
+      samples,
+      oldScrollClasses: ["is-scrolled", "is-deep", "is-scrolling"].filter((name) => header.classList.contains(name)),
+    };
+  });
+}
+
+function assertHeaderMorphIsSeamless(audit) {
+  const { samples, oldScrollClasses } = audit;
+  const first = samples[0];
+  const last = samples[samples.length - 1];
+  const heights = samples.map((sample) => sample.headerHeight);
+  const heightRange = Math.max(...heights) - Math.min(...heights);
+  const navTops = samples.map((sample) => sample.navTop);
+  const jumps = navTops.slice(1).map((top, index) => Math.abs(top - navTops[index]));
+  const maxJump = Math.max(...jumps);
+  const reversed = navTops.slice(1).some((top, index) => top > navTops[index] + 0.75);
+
+  if (oldScrollClasses.length) {
+    throw new Error(`legacy header state classes are still active: ${oldScrollClasses.join(", ")}`);
+  }
+  if (heightRange > 1.25) {
+    throw new Error(`header layout height changes during morph: ${JSON.stringify({ heightRange, heights })}`);
+  }
+  if (reversed) {
+    throw new Error(`header nav reverses/jitters during the initial morph: ${JSON.stringify(navTops)}`);
+  }
+  if (maxJump > 7) {
+    throw new Error(`header nav has an abrupt scroll transition: ${JSON.stringify({ maxJump, navTops })}`);
+  }
+  if (first.navTop - last.navTop < 20) {
+    throw new Error(`header nav did not complete its compact morph: ${JSON.stringify({ first, last })}`);
+  }
+  if (last.morph < 0.98 || last.announcementOpacity > 0.08) {
+    throw new Error(`header morph did not settle cleanly: ${JSON.stringify(last)}`);
+  }
+  if (last.headerBackground !== "rgba(0, 0, 0, 0)" || last.headerBoxShadow !== "none") {
+    throw new Error(`header wrapper still paints a second visual layer: ${JSON.stringify(last)}`);
+  }
+  if (last.headerBackdropFilter !== "none") {
+    throw new Error(`header wrapper should not own the glass blur: ${JSON.stringify(last)}`);
+  }
+  if (!last.navBackgroundImage || last.navBackgroundImage === "none") {
+    throw new Error(`single nav surface is missing its liquid-glass paint: ${JSON.stringify(last)}`);
+  }
+}
+
 (async () => {
   const browser = await chromium.launch({
     ...(executablePath ? { executablePath } : {}),
@@ -127,31 +208,42 @@ async function auditScrollLayoutReads(page) {
           }
 
           if (route === "/") {
-            await page.evaluate(() => window.scrollTo({ top: 130, behavior: "instant" }));
-            await page.waitForTimeout(480);
+            const headerAudit = await auditHeaderMorph(page);
+            assertHeaderMorphIsSeamless(headerAudit);
+
             const headerState = await page.evaluate(() => {
-              const header = document.querySelector(".site-header");
               const announcement = document.querySelector(".announcement-bar");
               const spool = document.querySelector(".scroll-spool-progress");
               const styles = announcement ? getComputedStyle(announcement) : null;
               const spoolStyles = spool ? getComputedStyle(spool) : null;
               return {
-                scrolled: Boolean(header?.classList.contains("is-scrolled")),
-                announcementHeight: announcement?.getBoundingClientRect().height || 0,
                 announcementOpacity: Number.parseFloat(styles?.opacity || "1"),
                 spoolPresent: Boolean(spool),
                 spoolOpacity: Number.parseFloat(spoolStyles?.opacity || "0"),
               };
             });
-            if (!headerState.scrolled) throw new Error("smart header did not enter scrolled state");
-            if (headerState.announcementHeight > 2 || headerState.announcementOpacity > 0.08) {
-              throw new Error(`announcement bar did not fade/collapse: ${JSON.stringify(headerState)}`);
+            if (headerState.announcementOpacity > 0.08) {
+              throw new Error(`announcement bar did not fade away: ${JSON.stringify(headerState)}`);
             }
             if (!headerState.spoolPresent) {
               throw new Error("spool scroll progress control is missing");
             }
             if (!viewport.mobile && viewport.width > 1024 && headerState.spoolOpacity < 0.5) {
               throw new Error(`spool scroll progress did not become visible: ${JSON.stringify(headerState)}`);
+            }
+          }
+
+          if (route === "/about") {
+            const modelState = await page.evaluate(() => ({
+              highlightPresent: Boolean(document.querySelector(".brand-model-highlight")),
+              loadButtonPresent: Boolean(document.querySelector(".brand-model-highlight__poster button")),
+              viewerScriptPreloaded: Boolean(document.querySelector('script[data-fakhri-model-viewer="true"]')),
+            }));
+            if (!modelState.highlightPresent || !modelState.loadButtonPresent) {
+              throw new Error(`3D brand highlight is missing: ${JSON.stringify(modelState)}`);
+            }
+            if (modelState.viewerScriptPreloaded) {
+              throw new Error(`3D runtime should not load before user interaction: ${JSON.stringify(modelState)}`);
             }
           }
 
@@ -163,9 +255,14 @@ async function auditScrollLayoutReads(page) {
               theme: document.documentElement.dataset.theme,
               colorScheme: document.documentElement.style.colorScheme,
               bodyBackground: getComputedStyle(document.body).backgroundColor,
+              headerWrapper: getComputedStyle(document.querySelector(".site-header")).backgroundColor,
+              headerGlass: getComputedStyle(document.querySelector(".site-header .nav-shell")).backgroundImage,
             }));
             if (darkState.theme !== "dark" || darkState.colorScheme !== "dark") {
               throw new Error(`dark mode did not activate: ${JSON.stringify(darkState)}`);
+            }
+            if (darkState.headerWrapper !== "rgba(0, 0, 0, 0)" || darkState.headerGlass === "none") {
+              throw new Error(`dark header lost single-surface liquid glass: ${JSON.stringify(darkState)}`);
             }
             await toggle.click();
             await page.waitForFunction(() => document.documentElement.dataset.theme === "light");
@@ -206,7 +303,7 @@ async function auditScrollLayoutReads(page) {
     console.error(JSON.stringify({ failures }, null, 2));
     process.exit(1);
   }
-  console.log("\nViewport, dark-mode, and scroll layout-read suite passed.");
+  console.log("\nViewport, seamless-header, dark-mode, 3D-highlight, and scroll layout-read suite passed.");
 })().catch((error) => {
   console.error(error);
   process.exit(1);
