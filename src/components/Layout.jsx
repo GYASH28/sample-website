@@ -34,7 +34,6 @@ function getRouteFamily(pathname) {
   if (pathname === "/products") return "catalogue";
   if (pathname.startsWith("/products/")) return "detail";
   if (
-    pathname === "/gallery" ||
     pathname === "/about" ||
     pathname === "/blog" ||
     pathname.startsWith("/blog/")
@@ -48,7 +47,6 @@ function getRouteLabel(pathname) {
   if (pathname === "/") return "Home";
   if (pathname === "/products") return "Catalogue";
   if (pathname.startsWith("/products/")) return "Product details";
-  if (pathname === "/gallery") return "Gallery";
   if (pathname === "/about") return "About";
   if (pathname === "/blog") return "Guides";
   if (pathname.startsWith("/blog/")) return "Guide";

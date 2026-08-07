@@ -4,6 +4,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#FFF7EC" />
+    <script>
+      (() => {
+        try {
+          const stored = localStorage.getItem("fakhri_theme");
+          const theme = stored === "dark" || stored === "light"
+            ? stored
+            : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+          document.documentElement.dataset.theme = theme;
+          document.documentElement.style.colorScheme = theme;
+          document.querySelector('meta[name="theme-color"]')?.setAttribute(
+            "content",
+            theme === "dark" ? "#171717" : "#FFF7EC",
+          );
+        } catch {
+          document.documentElement.dataset.theme = "light";
+        }
+      })();
+    </script>
     <meta name="robots" content="index, follow, max-image-preview:large" />
     <meta name="geo.region" content="IN-MH" />
     <meta name="geo.placename" content="Pune" />

@@ -12,9 +12,10 @@ const CARD_SELECTOR = [
   "#main-content .category-card",
   "#main-content .blog-story-card",
   "#main-content .contact-card",
-  "#main-content .gallery-editorial-grid figure",
   "#main-content .store-location",
   "#main-content .yarn-guide-project",
+  "#main-content .about-value-card",
+  "#main-content .about-process-card",
 ].join(",");
 
 const clamp = (value, minimum = 0, maximum = 1) =>
@@ -31,6 +32,10 @@ export default function ScrollDirector() {
   const { pathname } = useLocation();
   const frameRef = useRef(0);
   const progressRef = useRef(null);
+  const ringRef = useRef(null);
+  const hubRef = useRef(null);
+  const labelRef = useRef(null);
+  const lastPercentRef = useRef(-1);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -52,11 +57,11 @@ export default function ScrollDirector() {
     const prepareReveal = (element, index = 0) => {
       if (element.dataset.scrollPrepared === "true") return;
       element.dataset.scrollPrepared = "true";
-      element.style.setProperty("--reveal-delay", `${Math.min(index % 6, 5) * 42}ms`);
+      element.style.setProperty("--reveal-delay", `${Math.min(index % 5, 4) * 34}ms`);
       markedElements.add(element);
 
       const rect = element.getBoundingClientRect();
-      if (rect.top < window.innerHeight * 0.86 || reducedQuery.matches) {
+      if (rect.top < window.innerHeight * 0.88 || reducedQuery.matches) {
         element.classList.add("is-scroll-revealed");
       } else {
         revealObserver.observe(element);
@@ -90,10 +95,19 @@ export default function ScrollDirector() {
       const viewportHeight = Math.max(window.innerHeight, 1);
       const scrollable = Math.max(root.scrollHeight - viewportHeight, 1);
       const progress = clamp(window.scrollY / scrollable);
+      const percent = Math.round(progress * 100);
 
-      root.style.setProperty("--page-scroll", progress.toFixed(5));
-      root.style.setProperty("--scroll-liquid-y", `${(progress * 142).toFixed(2)}px`);
-      progressRef.current?.classList.toggle("is-active", window.scrollY > 18 && scrollable > 80);
+      if (ringRef.current) ringRef.current.style.strokeDashoffset = `${100 - progress * 100}`;
+      if (hubRef.current && !reducedQuery.matches) {
+        hubRef.current.style.transform = `rotate(${(progress * 240).toFixed(1)}deg)`;
+      }
+
+      if (percent !== lastPercentRef.current) {
+        lastPercentRef.current = percent;
+        if (labelRef.current) labelRef.current.textContent = `${percent}`;
+      }
+
+      progressRef.current?.classList.toggle("is-active", window.scrollY > 22 && scrollable > 90);
     };
 
     const scheduleProgress = () => {
@@ -102,7 +116,7 @@ export default function ScrollDirector() {
 
     markElements();
     updateProgress();
-    collectionTimers = [120, 520].map((delay) => window.setTimeout(markElements, delay));
+    collectionTimers = [140, 460].map((delay) => window.setTimeout(markElements, delay));
 
     window.addEventListener("scroll", scheduleProgress, { passive: true });
     window.addEventListener("resize", scheduleProgress, { passive: true });
@@ -125,19 +139,32 @@ export default function ScrollDirector() {
   }, [pathname]);
 
   return (
-    <div className="scroll-director" aria-hidden="true">
-      <div ref={progressRef} className="scroll-liquid-progress">
-        <span className="scroll-liquid-progress__glass" />
-        <span className="scroll-liquid-progress__track">
-          <i className="scroll-liquid-progress__fill" />
-          <b className="scroll-liquid-progress__bead" />
+    <div className="scroll-director">
+      <button
+        ref={progressRef}
+        className="scroll-spool-progress"
+        type="button"
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        aria-label="Back to top. Circular spool shows page scroll progress."
+        title="Back to top"
+      >
+        <svg className="scroll-spool-progress__svg" viewBox="0 0 40 40" aria-hidden="true">
+          <defs>
+            <linearGradient id="spool-progress-gradient" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stopColor="var(--app-rose, #b95776)" />
+              <stop offset="0.5" stopColor="var(--app-gold, #8a6b25)" />
+              <stop offset="1" stopColor="var(--app-teal, #2a8c82)" />
+            </linearGradient>
+          </defs>
+          <circle className="scroll-spool-progress__track" cx="20" cy="20" r="16" pathLength="100" />
+          <circle ref={ringRef} className="scroll-spool-progress__ring" cx="20" cy="20" r="16" pathLength="100" />
+        </svg>
+        <span ref={hubRef} className="scroll-spool-progress__hub" aria-hidden="true">
+          <small ref={labelRef}>0</small>
         </span>
-        <span className="scroll-liquid-progress__ticks">
-          <i />
-          <i />
-          <i />
-        </span>
-      </div>
+        <span className="scroll-spool-progress__thread" aria-hidden="true" />
+        <span className="scroll-spool-progress__shine" aria-hidden="true" />
+      </button>
     </div>
   );
 }

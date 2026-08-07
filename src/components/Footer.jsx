@@ -36,7 +36,6 @@ export default function Footer() {
             <span>Explore</span>
             <Link to="/products">Catalogue</Link>
             <Link to="/yarn-guide">Yarn & project guide</Link>
-            <Link to="/gallery">Gallery</Link>
             <Link to="/blog">Craft guides</Link>
             <Link to="/wishlist">Wishlist</Link>
           </div>

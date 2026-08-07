@@ -18,13 +18,13 @@ import {
   productCategories,
 } from "../data/siteData.js";
 import SearchDialog from "./SearchDialog.jsx";
+import ThemeToggle from "./ThemeToggle.jsx";
 import WhatsAppIcon from "./WhatsAppIcon.jsx";
 
 const OPEN_SEARCH_EVENT = "fakhri:open-search";
 
 const primaryLinks = [
   { to: "/products", key: "catalogue" },
-  { to: "/gallery", key: "gallery" },
   { to: "/about", key: "about" },
   { to: "/blog", key: "guides" },
   { to: "/contact", key: "contact" },
@@ -239,6 +239,8 @@ export default function Header() {
               </button>
             </div>
 
+            <ThemeToggle compact />
+
             <Link className="icon-button desktop-icon-action" to="/wishlist" aria-label={`${t("wishlist")}: ${wishlistCount}`}>
               <Heart size={21} />
               <Counter value={wishlistCount} />
@@ -301,10 +303,13 @@ export default function Header() {
           </button>
         </div>
 
-        <button className="mobile-search-button" type="button" onClick={openSearch}>
-          <MagnifyingGlass size={20} />
-          <span>{t("searchHint")}</span>
-        </button>
+        <div className="mobile-drawer-utilities">
+          <button className="mobile-search-button" type="button" onClick={openSearch}>
+            <MagnifyingGlass size={20} />
+            <span>{t("searchHint")}</span>
+          </button>
+          <ThemeToggle />
+        </div>
 
         <nav className="mobile-primary-links" aria-label="Mobile primary">
           {primaryLinks.map((item) => (
