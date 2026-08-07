@@ -38,7 +38,9 @@ export default function HeaderEnhancer() {
       }
 
       if (Math.abs(shift - lastShift) > 0.05) {
-        header.style.setProperty("--header-shift", `${shift.toFixed(2)}px`);
+        // Store the final signed transform value so CSS does not depend on
+        // multiplication syntax that is less reliable in older Safari builds.
+        header.style.setProperty("--header-shift", `${(-shift).toFixed(2)}px`);
         lastShift = shift;
       }
     };
