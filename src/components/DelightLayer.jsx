@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 const STORAGE_KEY = "fakhri_delight_hint_dismissed";
+const BACK_TO_TOP_THRESHOLD = 760;
 
 export default function DelightLayer() {
   const { pathname } = useLocation();
@@ -16,18 +17,25 @@ export default function DelightLayer() {
 
   useEffect(() => {
     let frame = 0;
-    const update = () => {
-      if (frame) return;
-      frame = requestAnimationFrame(() => {
-        setShowTop(window.scrollY > 760);
-        frame = 0;
-      });
+    let visible = null;
+
+    const render = () => {
+      frame = 0;
+      const nextVisible = window.scrollY > BACK_TO_TOP_THRESHOLD;
+      if (nextVisible === visible) return;
+      visible = nextVisible;
+      setShowTop(nextVisible);
     };
-    update();
+
+    const update = () => {
+      if (!frame) frame = window.requestAnimationFrame(render);
+    };
+
+    render();
     window.addEventListener("scroll", update, { passive: true });
     return () => {
       window.removeEventListener("scroll", update);
-      if (frame) cancelAnimationFrame(frame);
+      if (frame) window.cancelAnimationFrame(frame);
     };
   }, []);
 

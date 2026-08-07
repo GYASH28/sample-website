@@ -21,6 +21,33 @@ const viewports = [
   { name: "wide", width: 1728, height: 1080, mobile: false },
 ];
 
+async function auditScrollLayoutReads(page) {
+  await page.evaluate(() => {
+    const prototype = Element.prototype;
+    const original = prototype.getBoundingClientRect;
+    window.__scrollLayoutReads = 0;
+    prototype.getBoundingClientRect = function instrumentedGetBoundingClientRect(...args) {
+      window.__scrollLayoutReads += 1;
+      return original.apply(this, args);
+    };
+  });
+
+  await page.evaluate(async () => {
+    window.__scrollLayoutReads = 0;
+    const root = document.documentElement;
+    const maximum = Math.max(0, Math.min(root.scrollHeight - window.innerHeight, 2600));
+    const steps = 42;
+
+    for (let step = 0; step <= steps; step += 1) {
+      const progress = step / steps;
+      window.scrollTo(0, Math.round(maximum * progress));
+      await new Promise((resolve) => window.requestAnimationFrame(() => resolve()));
+    }
+  });
+
+  return page.evaluate(() => window.__scrollLayoutReads || 0);
+}
+
 (async () => {
   const browser = await chromium.launch({
     ...(executablePath ? { executablePath } : {}),
@@ -105,16 +132,33 @@ const viewports = [
             const headerState = await page.evaluate(() => {
               const header = document.querySelector(".site-header");
               const announcement = document.querySelector(".announcement-bar");
+              const liquidProgress = document.querySelector(".scroll-liquid-progress");
               const styles = announcement ? getComputedStyle(announcement) : null;
+              const progressStyles = liquidProgress ? getComputedStyle(liquidProgress) : null;
               return {
                 scrolled: Boolean(header?.classList.contains("is-scrolled")),
                 announcementHeight: announcement?.getBoundingClientRect().height || 0,
                 announcementOpacity: Number.parseFloat(styles?.opacity || "1"),
+                liquidProgressPresent: Boolean(liquidProgress),
+                liquidProgressOpacity: Number.parseFloat(progressStyles?.opacity || "0"),
               };
             });
             if (!headerState.scrolled) throw new Error("smart header did not enter scrolled state");
             if (headerState.announcementHeight > 2 || headerState.announcementOpacity > 0.08) {
               throw new Error(`announcement bar did not fade/collapse: ${JSON.stringify(headerState)}`);
+            }
+            if (!headerState.liquidProgressPresent) {
+              throw new Error("liquid scroll progress control is missing");
+            }
+            if (!viewport.mobile && viewport.width > 1024 && headerState.liquidProgressOpacity < 0.5) {
+              throw new Error(`liquid scroll progress did not become visible: ${JSON.stringify(headerState)}`);
+            }
+          }
+
+          if (!viewport.mobile && route === "/products") {
+            const layoutReads = await auditScrollLayoutReads(page);
+            if (layoutReads > 24) {
+              throw new Error(`scroll triggered too many JS layout reads: ${layoutReads}`);
             }
           }
 
@@ -146,7 +190,7 @@ const viewports = [
     console.error(JSON.stringify({ failures }, null, 2));
     process.exit(1);
   }
-  console.log("\nViewport integrity suite passed.");
+  console.log("\nViewport integrity and scroll layout-read suite passed.");
 })().catch((error) => {
   console.error(error);
   process.exit(1);

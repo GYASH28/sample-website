@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 
-const FADE_DISTANCE = 96;
+const SCROLLED_THRESHOLD = 28;
 const DEEP_SCROLL = 180;
-const DIRECTION_THRESHOLD = 6;
+const IDLE_DELAY = 140;
 
 export default function HeaderEnhancer() {
   useEffect(() => {
@@ -10,41 +10,46 @@ export default function HeaderEnhancer() {
     if (!header) return undefined;
 
     let frame = 0;
-    let lastY = Math.max(0, window.scrollY);
+    let idleTimer = 0;
+    let scrolled = null;
+    let deep = null;
 
     const render = () => {
       frame = 0;
       const y = Math.max(0, window.scrollY);
-      const progress = Math.min(1, y / FADE_DISTANCE);
-      const delta = y - lastY;
+      const nextScrolled = y > SCROLLED_THRESHOLD;
+      const nextDeep = y > DEEP_SCROLL;
 
-      header.style.setProperty("--header-fade-progress", progress.toFixed(3));
-      header.classList.toggle("is-scrolled", y > 28);
-      header.classList.toggle("is-deep", y > DEEP_SCROLL);
-
-      if (Math.abs(delta) >= DIRECTION_THRESHOLD) {
-        header.dataset.scrollDirection = delta > 0 ? "down" : "up";
+      if (nextScrolled !== scrolled) {
+        header.classList.toggle("is-scrolled", nextScrolled);
+        scrolled = nextScrolled;
       }
 
-      if (y < 12) header.dataset.scrollDirection = "top";
-      lastY = y;
+      if (nextDeep !== deep) {
+        header.classList.toggle("is-deep", nextDeep);
+        deep = nextDeep;
+      }
     };
 
-    const update = () => {
+    const onScroll = () => {
+      if (!header.classList.contains("is-scrolling")) header.classList.add("is-scrolling");
+      if (idleTimer) window.clearTimeout(idleTimer);
+      idleTimer = window.setTimeout(() => {
+        header.classList.remove("is-scrolling");
+        idleTimer = 0;
+      }, IDLE_DELAY);
+
       if (!frame) frame = window.requestAnimationFrame(render);
     };
 
     render();
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
 
     return () => {
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", onScroll);
       if (frame) window.cancelAnimationFrame(frame);
-      header.classList.remove("is-scrolled", "is-deep");
-      header.removeAttribute("data-scroll-direction");
-      header.style.removeProperty("--header-fade-progress");
+      if (idleTimer) window.clearTimeout(idleTimer);
+      header.classList.remove("is-scrolled", "is-deep", "is-scrolling");
     };
   }, []);
 

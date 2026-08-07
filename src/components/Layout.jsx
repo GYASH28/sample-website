@@ -8,7 +8,6 @@ import ScrollDirector from "./ScrollDirector.jsx";
 import MobileBottomNav from "./MobileBottomNav.jsx";
 import EnquiryDrawerLauncher from "./EnquiryDrawerLauncher.jsx";
 import CommerceIntro from "./CommerceIntro.jsx";
-import ScrollProgress from "./ScrollProgress.jsx";
 import DelightLayer from "./DelightLayer.jsx";
 import MobileProductDock from "./MobileProductDock.jsx";
 import HeaderEnhancer from "./HeaderEnhancer.jsx";
@@ -85,7 +84,6 @@ export default function Layout() {
     <>
       <a href="#main-content" className="skip-link">Skip to main content</a>
       <CommerceIntro />
-      <ScrollProgress />
       <ScrollDirector />
       <ScrollToTop />
       <HeaderEnhancer />

@@ -1,0 +1,283 @@
+/* Fakhri Mart — liquid scroll/performance v9
+   Loaded last. Keeps scroll-time work transform-only and turns the scrolled
+   navigation/progress UI into a restrained liquid-glass system. */
+
+:root {
+  --scroll-liquid-y: 0px;
+}
+
+/* ─────────────────────────────────────────────
+   1) Scroll director: one tiny fixed compositor layer.
+   ───────────────────────────────────────────── */
+.scroll-director {
+  position: fixed;
+  z-index: 68;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: auto;
+  width: 48px;
+  overflow: visible;
+  contain: layout paint style;
+  pointer-events: none;
+  isolation: isolate;
+}
+
+.scroll-director__aurora,
+.scroll-director__rail,
+.scroll-director__thread,
+.scroll-director__needle {
+  display: none !important;
+}
+
+.scroll-liquid-progress {
+  position: absolute;
+  top: 50%;
+  right: max(14px, env(safe-area-inset-right, 0px));
+  width: 22px;
+  height: 174px;
+  opacity: 0;
+  transform: translate3d(10px, -50%, 0) scale(0.96);
+  transition:
+    opacity 280ms ease,
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.scroll-liquid-progress.is-active {
+  opacity: 1;
+  transform: translate3d(0, -50%, 0) scale(1);
+}
+
+.scroll-liquid-progress__glass {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(255, 255, 255, 0.68);
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.64), rgba(255, 247, 238, 0.24)),
+    radial-gradient(circle at 35% 12%, rgba(255, 255, 255, 0.82), transparent 28%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(74, 38, 54, 0.08),
+    0 12px 32px rgba(61, 43, 35, 0.12);
+}
+
+.scroll-liquid-progress__glass::after {
+  position: absolute;
+  top: 9px;
+  left: 4px;
+  width: 3px;
+  height: 52px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,0));
+  content: "";
+  opacity: 0.74;
+}
+
+.scroll-liquid-progress__track {
+  position: absolute;
+  top: 11px;
+  right: 8px;
+  bottom: 11px;
+  left: 8px;
+  overflow: visible;
+  border-radius: 999px;
+  background: rgba(69, 39, 53, 0.10);
+  box-shadow: inset 0 0 0 1px rgba(69, 39, 53, 0.035);
+}
+
+.scroll-liquid-progress__fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+      180deg,
+      var(--pink, #d9a5b3),
+      var(--gold-soft, #c9b36a) 38%,
+      var(--teal, #2a8c82) 76%,
+      var(--pink-dark, #b95776)
+    );
+  box-shadow: 0 0 12px rgba(42, 140, 130, 0.14);
+  transform: scaleY(var(--page-scroll, 0));
+  transform-origin: top center;
+  will-change: transform;
+}
+
+.scroll-liquid-progress__bead {
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  width: 9px;
+  height: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 28%, #fff 0 16%, rgba(255,255,255,.72) 17% 27%, transparent 28%),
+    linear-gradient(135deg, var(--pink-dark, #b95776), var(--teal, #2a8c82));
+  box-shadow:
+    0 0 0 3px rgba(255, 250, 244, 0.64),
+    0 4px 14px rgba(74, 38, 54, 0.24);
+  transform: translate3d(-50%, var(--scroll-liquid-y), 0);
+  will-change: transform;
+}
+
+.scroll-liquid-progress__ticks {
+  position: absolute;
+  inset: 11px 0;
+}
+
+.scroll-liquid-progress__ticks i {
+  position: absolute;
+  right: -4px;
+  width: 4px;
+  height: 1px;
+  border-radius: 999px;
+  background: rgba(31, 27, 22, 0.22);
+}
+
+.scroll-liquid-progress__ticks i:nth-child(1) { top: 25%; }
+.scroll-liquid-progress__ticks i:nth-child(2) { top: 50%; }
+.scroll-liquid-progress__ticks i:nth-child(3) { top: 75%; }
+
+/* ─────────────────────────────────────────────
+   2) Liquid-glass sticky navigation.
+   The blur drops while the finger/wheel is actively moving, then returns on idle.
+   That keeps the look without paying for live backdrop sampling every frame.
+   ───────────────────────────────────────────── */
+.site-header.is-scrolled,
+.site-header.is-deep {
+  overflow: visible;
+  border-bottom-color: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+.site-header.is-scrolled .nav-shell {
+  position: relative;
+  min-height: 60px;
+  padding-inline: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  border-radius: 22px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.70), rgba(255,247,238,.46) 48%, rgba(223,246,243,.36)),
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.82), transparent 33%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.9),
+    inset 0 -1px 0 rgba(74,38,54,.06),
+    0 14px 34px rgba(54, 39, 32, 0.10);
+  transform: translate3d(0, 7px, 0);
+  transition:
+    min-height 320ms cubic-bezier(0.22,1,0.36,1),
+    transform 320ms cubic-bezier(0.22,1,0.36,1),
+    background-color 220ms ease,
+    border-color 220ms ease,
+    box-shadow 260ms ease;
+}
+
+.site-header.is-scrolled .nav-shell::before {
+  position: absolute;
+  z-index: -1;
+  top: 2px;
+  right: 16px;
+  left: 16px;
+  height: 1px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.95), transparent);
+  content: "";
+  opacity: 0.86;
+  pointer-events: none;
+}
+
+.site-header.is-deep .nav-shell {
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.60), rgba(255,247,238,.34) 52%, rgba(223,246,243,.28)),
+    radial-gradient(circle at 20% -20%, rgba(255,255,255,.84), transparent 38%);
+  backdrop-filter: blur(20px) saturate(1.28);
+  -webkit-backdrop-filter: blur(20px) saturate(1.28);
+}
+
+.site-header.is-deep:not(.is-scrolling) .brand,
+.site-header.is-deep:not(.is-scrolling) .header-search-trigger,
+.site-header.is-deep:not(.is-scrolling) .language-control,
+.site-header.is-deep:not(.is-scrolling) .icon-button,
+.site-header.is-deep:not(.is-scrolling) .header-whatsapp {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.site-header.is-scrolling .nav-shell,
+.site-header.is-scrolling .brand,
+.site-header.is-scrolling .header-search-trigger,
+.site-header.is-scrolling .language-control,
+.site-header.is-scrolling .icon-button,
+.site-header.is-scrolling .header-whatsapp {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.site-header.is-scrolling .nav-shell {
+  background: rgba(255, 250, 244, 0.84);
+}
+
+.site-header.is-deep .brand {
+  background: rgba(255,255,255,.46);
+  border-color: rgba(255,255,255,.58);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.78);
+}
+
+.site-header.is-deep .header-search-trigger,
+.site-header.is-deep .language-control,
+.site-header.is-deep .icon-button {
+  border-color: rgba(255,255,255,.52);
+  background: rgba(255,255,255,.34);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.62);
+}
+
+/* Remove legacy scroll-linked content translation. Entrance reveals remain. */
+.motion-ready [data-scroll-scene="true"] > .container,
+.motion-ready [data-scroll-card="true"],
+.motion-ready [data-scroll-media="true"] {
+  --scene-shift: 0px !important;
+  --scroll-lift: 0px !important;
+  --scroll-media-shift: 0px !important;
+  --scroll-media-scale: 1 !important;
+}
+
+/* Lower-power devices get the same glass silhouette without live blur. */
+html[data-motion-profile="compact"] .site-header.is-deep .nav-shell,
+html[data-motion-profile="lite"] .site-header.is-deep .nav-shell {
+  background: rgba(255, 250, 244, 0.94);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+html[data-motion-profile="compact"] .scroll-liquid-progress__glass,
+html[data-motion-profile="lite"] .scroll-liquid-progress__glass {
+  background: rgba(255, 250, 244, 0.88);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.82),
+    0 10px 24px rgba(61,43,35,.09);
+}
+
+@media (max-width: 1024px) {
+  .scroll-director {
+    display: none !important;
+  }
+
+  .site-header.is-scrolled .nav-shell {
+    border-radius: 18px;
+    transform: translate3d(0, 5px, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-director {
+    display: none !important;
+  }
+
+  .site-header.is-scrolled .nav-shell {
+    transition: none !important;
+  }
+}
