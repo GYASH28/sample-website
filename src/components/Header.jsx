@@ -20,6 +20,8 @@ import {
 import SearchDialog from "./SearchDialog.jsx";
 import WhatsAppIcon from "./WhatsAppIcon.jsx";
 
+const OPEN_SEARCH_EVENT = "fakhri:open-search";
+
 const primaryLinks = [
   { to: "/products", key: "catalogue" },
   { to: "/gallery", key: "gallery" },
@@ -44,28 +46,40 @@ export default function Header() {
   const { count: wishlistCount } = useWishlist();
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
+  const openSearch = useCallback(() => {
+    setMenuOpen(false);
+    setMegaOpen(false);
+    setSearchOpen(true);
+  }, []);
 
   useEffect(() => {
     closeMenu();
     setMegaOpen(false);
+    setSearchOpen(false);
   }, [location.pathname, closeMenu]);
 
   useEffect(() => {
-    const openSearch = (event) => {
+    const onKeyDown = (event) => {
       if ((event.ctrlKey || event.metaKey) && event.key.toLocaleLowerCase() === "k") {
         event.preventDefault();
-        setSearchOpen(true);
+        openSearch();
       }
     };
-    document.addEventListener("keydown", openSearch);
-    return () => document.removeEventListener("keydown", openSearch);
-  }, []);
+    const onOpenSearch = () => openSearch();
+
+    document.addEventListener("keydown", onKeyDown);
+    window.addEventListener(OPEN_SEARCH_EVENT, onOpenSearch);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener(OPEN_SEARCH_EVENT, onOpenSearch);
+    };
+  }, [openSearch]);
 
   useEffect(() => {
     if (!menuOpen) return undefined;
     document.body.classList.add("menu-lock");
     const previous = document.activeElement;
-    window.requestAnimationFrame(() => drawerRef.current?.querySelector("input")?.focus());
+    window.requestAnimationFrame(() => drawerRef.current?.querySelector("button, a")?.focus());
 
     const onKeyDown = (event) => {
       if (event.key === "Escape") closeMenu();
@@ -137,9 +151,12 @@ export default function Header() {
                 <span aria-hidden="true">⌄</span>
               </button>
               {megaOpen && (
-                <div className="category-mega-menu" onBlur={(event) => {
-                  if (!event.currentTarget.contains(event.relatedTarget)) setMegaOpen(false);
-                }}>
+                <div
+                  className="category-mega-menu"
+                  onBlur={(event) => {
+                    if (!event.currentTarget.contains(event.relatedTarget)) setMegaOpen(false);
+                  }}
+                >
                   <div className="mega-intro">
                     <span className="eyebrow">Material library</span>
                     <strong>Find the right fibre, finish and hardware.</strong>
@@ -168,7 +185,7 @@ export default function Header() {
             <button
               className="header-search-trigger"
               type="button"
-              onClick={() => setSearchOpen(true)}
+              onClick={openSearch}
               aria-label={t("search")}
             >
               <MagnifyingGlass size={19} />
@@ -257,10 +274,7 @@ export default function Header() {
           </button>
         </div>
 
-        <button className="mobile-search-button" type="button" onClick={() => {
-          closeMenu();
-          setSearchOpen(true);
-        }}>
+        <button className="mobile-search-button" type="button" onClick={openSearch}>
           <MagnifyingGlass size={20} />
           <span>{t("searchHint")}</span>
         </button>
