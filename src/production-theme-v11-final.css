@@ -1,0 +1,29 @@
+/* Final v11 rendered-audit corrections. */
+
+:root[data-theme="dark"] .commerce-order-flow ol > li,
+:root[data-theme="dark"] .commerce-order-flow ol > .reveal {
+  border-color: var(--ui-border) !important;
+  background: var(--ui-surface) !important;
+  color: var(--ui-text) !important;
+  box-shadow: var(--ui-shadow-soft) !important;
+}
+
+:root[data-theme="dark"] .commerce-order-flow ol > li > span,
+:root[data-theme="dark"] .commerce-order-flow ol > .reveal > span {
+  color: #f2d695 !important;
+}
+
+:root[data-theme="dark"] .commerce-order-flow ol > li > strong,
+:root[data-theme="dark"] .commerce-order-flow ol > .reveal > strong {
+  color: var(--ui-text-strong) !important;
+}
+
+:root[data-theme="dark"] .commerce-order-flow ol > li > p,
+:root[data-theme="dark"] .commerce-order-flow ol > .reveal > p {
+  color: var(--ui-text-muted) !important;
+}
+
+:root[data-theme="dark"] .commerce-order-flow ol > li > svg,
+:root[data-theme="dark"] .commerce-order-flow ol > .reveal > svg {
+  color: var(--ui-accent) !important;
+}
