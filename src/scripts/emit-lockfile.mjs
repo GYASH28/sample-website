@@ -1,13 +1,15 @@
-import { readFileSync } from "node:fs";
-import { deflateRawSync } from "node:zlib";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const lock = readFileSync("package-lock.json");
-const encoded = deflateRawSync(lock, { level: 9 }).toString("base64");
-const chunkSize = 3600;
-const total = Math.ceil(encoded.length / chunkSize);
+const encoded = lock.toString("base64");
 
-console.log(`LOCKFILE_EXPORT_BEGIN:${total}`);
-for (let index = 0; index < total; index += 1) {
-  console.log(`LOCKFILE_EXPORT:${String(index).padStart(3, "0")}:${encoded.slice(index * chunkSize, (index + 1) * chunkSize)}`);
-}
-console.log("LOCKFILE_EXPORT_END");
+mkdirSync("public", { recursive: true });
+writeFileSync("public/resolved-lock.b64", encoded, "utf8");
+
+const parsed = JSON.parse(lock.toString("utf8"));
+const router = parsed.packages?.["node_modules/react-router"];
+const routerDom = parsed.packages?.["node_modules/react-router-dom"];
+console.log("Resolved router packages:", JSON.stringify({
+  reactRouter: router?.version,
+  reactRouterDom: routerDom?.version,
+}));
