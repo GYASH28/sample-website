@@ -26,7 +26,9 @@ export default function MobileProductDock() {
   if (!product) return null;
 
   const saved = has(product.slug);
+  const isUnavailable = product.stock === "out";
   const addDefault = () => {
+    if (isUnavailable) return;
     add({
       slug: product.slug,
       name: product.name,
@@ -53,13 +55,19 @@ export default function MobileProductDock() {
         className={`mobile-product-dock__save ${saved ? "is-saved" : ""}`}
         type="button"
         onClick={() => toggle(product.slug)}
-        aria-label={saved ? "Remove from wishlist" : "Save to wishlist"}
+        aria-label={saved ? `Remove ${product.name} from wishlist` : `Save ${product.name} to wishlist`}
       >
         <Heart size={19} weight={saved ? "fill" : "regular"} />
       </button>
-      <button className="mobile-product-dock__add" type="button" onClick={addDefault} disabled={product.stock === "out"}>
-        <ShoppingBagOpen size={18} />
-        <span>{product.stock === "out" ? "Unavailable" : added ? "Added" : "Add"}</span>
+      <button
+        className="mobile-product-dock__add"
+        type="button"
+        onClick={addDefault}
+        disabled={isUnavailable}
+        aria-label={isUnavailable ? `${product.name} is currently unavailable` : added ? `${product.name} added to enquiry` : `Add ${product.name} to enquiry`}
+      >
+        <ShoppingBagOpen size={18} aria-hidden="true" />
+        <span>{isUnavailable ? "Unavailable" : added ? "Added" : "Add"}</span>
       </button>
     </aside>
   );

@@ -1,64 +1,103 @@
 import { useEffect, useState } from "react";
 
 const STORAGE_KEY = "fakhri_enquiry_basket";
+const UPDATE_EVENT = "enquiry-basket-updated";
+const MAX_BASKET_ITEMS = 100;
+const MAX_ITEM_QUANTITY = 10_000;
+
+function normalizeQuantity(value, fallback = 1) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return fallback;
+  return Math.min(MAX_ITEM_QUANTITY, Math.max(1, Math.round(numeric)));
+}
+
+function normalizeBasket(value) {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .filter((item) => item && typeof item === "object" && typeof item.slug === "string")
+    .slice(0, MAX_BASKET_ITEMS)
+    .map((item) => ({
+      ...item,
+      name: typeof item.name === "string" ? item.name : item.slug,
+      category: typeof item.category === "string" ? item.category : "Catalogue",
+      image: typeof item.image === "string" ? item.image : "",
+      shade: item.shade && typeof item.shade === "object" ? item.shade : null,
+      quantity: normalizeQuantity(item.quantity),
+      unit: typeof item.unit === "string" && item.unit.trim() ? item.unit : "pcs",
+      variant: item.variant ?? null,
+      note: typeof item.note === "string" ? item.note : "",
+    }));
+}
 
 export function getEnquiryBasket() {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch (e) {
-    console.error("Failed to load enquiry basket from localStorage", e);
+    return stored ? normalizeBasket(JSON.parse(stored)) : [];
+  } catch {
     return [];
   }
 }
 
 export function saveEnquiryBasket(basket) {
+  const normalized = normalizeBasket(basket);
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(basket));
-    window.dispatchEvent(new Event("enquiry-basket-updated"));
-  } catch (e) {
-    console.error("Failed to save enquiry basket to localStorage", e);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
+    window.dispatchEvent(new Event(UPDATE_EVENT));
+  } catch {
+    // Storage can be unavailable in private/restricted browser contexts.
   }
+  return normalized;
 }
 
 export function addToEnquiryBasket(item) {
+  if (!item || typeof item.slug !== "string") return;
+
+  const incoming = normalizeBasket([item])[0];
+  if (!incoming) return;
+
   const basket = getEnquiryBasket();
-  // Find if same product, same shade, and same variant already exists
   const existingIndex = basket.findIndex(
-    (i) => i.slug === item.slug && 
-           i.shade?.name === item.shade?.name && 
-           i.variant === item.variant
+    (entry) =>
+      entry.slug === incoming.slug &&
+      entry.shade?.name === incoming.shade?.name &&
+      entry.variant === incoming.variant,
   );
 
   if (existingIndex > -1) {
-    // Add quantity
-    basket[existingIndex].quantity += item.quantity;
-  } else {
-    basket.push(item);
+    basket[existingIndex] = {
+      ...basket[existingIndex],
+      quantity: normalizeQuantity(
+        basket[existingIndex].quantity + incoming.quantity,
+        basket[existingIndex].quantity,
+      ),
+    };
+  } else if (basket.length < MAX_BASKET_ITEMS) {
+    basket.push(incoming);
   }
+
   saveEnquiryBasket(basket);
 }
 
 export function removeFromEnquiryBasket(index) {
   const basket = getEnquiryBasket();
+  if (!Number.isInteger(index) || index < 0 || index >= basket.length) return;
   basket.splice(index, 1);
   saveEnquiryBasket(basket);
 }
 
 export function updateBasketItemQuantity(index, quantity) {
   const basket = getEnquiryBasket();
-  if (basket[index]) {
-    basket[index].quantity = quantity;
-    saveEnquiryBasket(basket);
-  }
+  if (!basket[index]) return;
+  basket[index].quantity = normalizeQuantity(quantity, basket[index].quantity);
+  saveEnquiryBasket(basket);
 }
 
 export function updateBasketItem(index, updates) {
   const basket = getEnquiryBasket();
-  if (basket[index]) {
-    basket[index] = { ...basket[index], ...updates };
-    saveEnquiryBasket(basket);
-  }
+  if (!basket[index] || !updates || typeof updates !== "object") return;
+  basket[index] = normalizeBasket([{ ...basket[index], ...updates }])[0] || basket[index];
+  saveEnquiryBasket(basket);
 }
 
 export function clearEnquiryBasket() {
@@ -69,12 +108,16 @@ export function useEnquiryBasket() {
   const [basket, setBasket] = useState(() => getEnquiryBasket());
 
   useEffect(() => {
-    const handleUpdate = () => {
-      setBasket(getEnquiryBasket());
+    const handleUpdate = () => setBasket(getEnquiryBasket());
+    const handleStorage = (event) => {
+      if (!event || event.key === STORAGE_KEY) handleUpdate();
     };
-    window.addEventListener("enquiry-basket-updated", handleUpdate);
+
+    window.addEventListener(UPDATE_EVENT, handleUpdate);
+    window.addEventListener("storage", handleStorage);
     return () => {
-      window.removeEventListener("enquiry-basket-updated", handleUpdate);
+      window.removeEventListener(UPDATE_EVENT, handleUpdate);
+      window.removeEventListener("storage", handleStorage);
     };
   }, []);
 
@@ -85,7 +128,7 @@ export function useEnquiryBasket() {
     updateQuantity: updateBasketItemQuantity,
     updateItem: updateBasketItem,
     clear: clearEnquiryBasket,
-    count: basket.reduce((acc, item) => acc + item.quantity, 0),
+    count: basket.reduce((total, item) => total + normalizeQuantity(item.quantity), 0),
     itemsCount: basket.length,
   };
 }

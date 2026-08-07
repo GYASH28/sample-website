@@ -1,27 +1,6 @@
-// src/components/ProductCard.jsx
-// The product PREVIEW card — used in grids on Home.jsx and Products.jsx.
-// Prompt 2 scope note: this is a glanceable preview, NOT a duplicate of the detail page.
-// Do NOT add an interactive quantity stepper or full color picker here.
-//
-// ── Prompt 2 Part 1: Real palette integration ─────────────────────────
-//   - Palette identity strip (top edge, 3px gradient from product.palette)
-//   - Swatches upgraded from <span> to <button> (focusable, aria-label, aria-pressed)
-//   - Hover/focus a swatch → crossfade product image to that color via CSS filter
-//     (graceful: falls back to default image when no per-color asset exists)
-//   - Custom tooltip (replaces native title attribute) — appears above dot on hover/focus
-//   - Selected swatch state is local useState — resets on scroll-out via IntersectionObserver
-//   - "+N more" overflow tag stays a static count, not a dropdown (per spec)
-//
-// ── Prompt 2 Part 3: Quantity type label ──────────────────────────────
-//   - One small caption "Sold per {soldAs}" near the variants line
-//   - Optional "Bulk available" hint when presets include 50 or 100
-//
-// ── Phase 1: Rating display ──────────────────────────────────────────
-//   - Compact StarRating + count next to the product title
-
 import { ChatCircle, ClipboardText, Heart, Tag } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { productCategories } from "../data/siteData.js";
 import { useWishlist } from "../hooks/useWishlist.js";
 import { useEnquiryBasket } from "../hooks/useEnquiryBasket.js";
@@ -29,182 +8,173 @@ import { smartWhatsAppLink } from "../i18n.jsx";
 
 const MAX_SWATCHES_ON_CARD = 5;
 
+function getDefaultVariant(product) {
+  if (product.slug === "t-shirt-yarn") return "250gm";
+  if (product.slug.includes("macrame-cord")) return "3MM";
+  if (product.slug === "crochet-hook") return "2.0mm";
+  return null;
+}
+
 export default function ProductCard({
   product,
   compact = false,
   showWishlistAction = true,
 }) {
-  const categoryData = productCategories.find((c) => c.name === product.category);
-  const productBaseImage = product.image || categoryData?.image;
+  const categoryData = productCategories.find((category) => category.name === product.category);
+  const productBaseImage = product.image || categoryData?.image || null;
+  const [imageSrc, setImageSrc] = useState(productBaseImage);
+  const [activeColor, setActiveColor] = useState(null);
+  const [hoveredSwatch, setHoveredSwatch] = useState(null);
 
   const { has: isInWishlist, toggle: toggleWishlist } = useWishlist();
   const { add: addToBasket } = useEnquiryBasket();
-
   const isFavorited = isInWishlist(product.slug);
+  const isUnavailable = product.stock === "out";
 
-  // Smart pre-filled WhatsApp link
+  useEffect(() => {
+    setImageSrc(productBaseImage);
+    setActiveColor(null);
+    setHoveredSwatch(null);
+  }, [product.slug, productBaseImage]);
+
   const enquireLink = smartWhatsAppLink({
     type: "product-card",
     productName: product.name,
     category: product.category,
   });
 
-  // ── Prompt 2 Part 1.4 — Local swatch state, resets on scroll-out ──
-  const [activeColor, setActiveColor] = useState(null); // { name, hex } or null
-  const [hoveredSwatch, setHoveredSwatch] = useState(null); // color name (for tooltip)
-
   const colorsToShow = (product.colors || []).slice(0, MAX_SWATCHES_ON_CARD);
-  const overflowCount = (product.colors?.length || 0) - MAX_SWATCHES_ON_CARD;
-
-  // Prompt 2 Part 3 — Sold-per label
+  const overflowCount = Math.max(0, (product.colors?.length || 0) - MAX_SWATCHES_ON_CARD);
   const soldAs = product.quantityOptions?.soldAs;
   const presets = product.quantityOptions?.presets || [];
-  const bulkAvailable = presets.some((p) => p >= 50);
+  const bulkAvailable = presets.some((preset) => preset >= 50);
 
-  // Prompt 2 Part 1.3 — Color-swap-on-hover via CSS filter on the <img>
-  // We don't have per-color image assets for every product, so we use a CSS hue-rotate
-  // filter as a graceful visual preview. When real per-color images exist at the
-  // /assets/images/products/{slug}/color-{colorSlug}.webp path convention, the
-  // detail page can swap <img src> directly; here we keep it CSS-only to avoid
-  // broken-image flashes on cards where the asset doesn't exist yet.
   const addDefaultToBasket = () => {
+    if (isUnavailable) return;
     addToBasket({
       slug: product.slug,
       name: product.name,
       category: product.category,
-      image: productBaseImage,
-      shade: activeColor,
-      quantity: 1,
+      image: productBaseImage || "",
+      shade: activeColor || product.colors?.[0] || null,
+      quantity: product.quantityOptions?.min || 1,
       unit: product.quantityOptions?.unit || "pcs",
-      variant: null,
-      note: "",
+      variant: getDefaultVariant(product),
+      note: "Added from product card",
     });
   };
 
+  const handleImageError = () => {
+    if (categoryData?.image && imageSrc !== categoryData.image) {
+      setImageSrc(categoryData.image);
+      return;
+    }
+    setImageSrc(null);
+  };
+
   return (
-    <article
-      className={`product-card ${compact ? "product-card--compact" : ""}`}
-    >
-      {/* ── Prompt 2 Part 1.1 — Palette identity strip (top edge) ─────── */}
+    <article className={`product-card ${compact ? "product-card--compact" : ""}`}>
       <div
         className="product-card-palette-strip"
         aria-hidden="true"
         style={{
-          height: "3px",
           background: `linear-gradient(90deg, ${(product.palette || ["#E8DCC4"]).join(", ")})`,
-          borderRadius: "var(--radius-md, 8px) var(--radius-md, 8px) 0 0",
         }}
       />
 
       <div className="product-card-link-wrapper-container">
-        {/* Floating Quick Action Buttons on Image */}
         {showWishlistAction ? (
           <div className="product-card-floating-actions">
-          {/* Favorite Toggle */}
-          <button
-            type="button"
-            className={`card-floating-btn favorite-toggle-btn-card ${isFavorited ? "active" : ""}`}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              toggleWishlist(product.slug);
-            }}
-            title={isFavorited ? "Remove from Wishlist" : "Add to Wishlist"}
-            aria-label={isFavorited ? `Remove ${product.name} from Wishlist` : `Add ${product.name} to Wishlist`}
-            aria-pressed={isFavorited}
-          >
-            <Heart
-              size={16}
-              weight={isFavorited ? "fill" : "regular"}
-              aria-hidden="true"
-            />
-          </button>
+            <button
+              type="button"
+              className={`card-floating-btn favorite-toggle-btn-card ${isFavorited ? "active" : ""}`}
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                toggleWishlist(product.slug);
+              }}
+              aria-label={isFavorited ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
+              aria-pressed={isFavorited}
+            >
+              <Heart
+                size={16}
+                weight={isFavorited ? "fill" : "regular"}
+                aria-hidden="true"
+              />
+            </button>
           </div>
         ) : null}
 
         <div className="product-card-link-wrapper">
-          {productBaseImage && (
-            <Link
-              to={`/products/${product.slug}`}
-              className="product-card-image-link"
-              aria-label={`Representative photo for ${product.name}`}
-            >
-              <div className="product-image-wrapper">
+          <Link
+            to={`/products/${product.slug}`}
+            className="product-card-image-link"
+            aria-label={`View details for ${product.name}`}
+          >
+            <div className={`product-image-wrapper ${!imageSrc ? "is-missing-image" : ""}`}>
+              {imageSrc ? (
                 <img
-                  src={productBaseImage}
+                  src={imageSrc}
                   alt={`Representative ${product.category} material photograph for ${product.name}`}
+                  width="640"
+                  height="640"
                   loading="lazy"
                   decoding="async"
                   className="product-image"
+                  onError={handleImageError}
                 />
-                <span className="product-card-badge-floating">Representative photo</span>
-              </div>
-            </Link>
-          )}
+              ) : (
+                <span className="product-image-placeholder" aria-hidden="true">FM</span>
+              )}
+              <span className="product-card-badge-floating">Representative photo</span>
+            </div>
+          </Link>
+
           <div className="product-content">
             <div className="product-card-topline">
               <div className="product-badges" aria-label="Product highlights">
                 {(product.badges || ["Catalogue"]).slice(0, 2).map((badge) => (
                   <span key={badge} className="badge-highlight">{badge}</span>
                 ))}
+                {isUnavailable ? <span className="badge-highlight product-stock-badge">Unavailable</span> : null}
               </div>
             </div>
+
             <h3 className="product-card-title">
               <Link to={`/products/${product.slug}`}>{product.name}</Link>
             </h3>
 
-            {/* ── Prompt 2 Part 1.2–1.6 — Interactive swatches ─────────── */}
-            {product.colors && product.colors.length > 0 && (
+            {product.colors?.length ? (
               <div className="product-card-swatches" aria-label={`Available shades: ${product.colors.length} options`}>
                 <div className="swatch-dots-row">
                   {colorsToShow.map((color) => (
                     <SwatchButton
-                      key={color.hex}
+                      key={`${product.slug}-${color.name}`}
                       color={color}
                       isActive={activeColor?.name === color.name}
                       isHovered={hoveredSwatch === color.name}
-                      onSelect={(col) => setActiveColor(col)}
-                      onHover={(name) => setHoveredSwatch(name)}
+                      onSelect={setActiveColor}
+                      onHover={setHoveredSwatch}
                     />
                   ))}
-                  {overflowCount > 0 && (
+                  {overflowCount > 0 ? (
                     <span className="swatch-more-tag" aria-hidden="true">+{overflowCount}</span>
-                  )}
+                  ) : null}
                 </div>
-                <span className="swatches-count-label">{product.colors.length} Shades</span>
+                <span className="swatches-count-label">
+                  {activeColor?.name || `${product.colors.length} shades`}
+                </span>
               </div>
-            )}
+            ) : null}
 
             <p className="product-card-variants">{product.variants}</p>
 
-            {/* ── Prompt 2 Part 3 — Sold-per label ────────────────────── */}
-            {soldAs && (
-              <div className="product-card-sold-as" style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                fontSize: "0.72rem",
-                color: "var(--muted)",
-                marginTop: "2px",
-              }}>
-                <span style={{ fontWeight: 600, letterSpacing: "0.04em", color: "var(--pink-dark, #6B1F2A)" }}>
-                  Sold per {soldAs}
-                </span>
-                {bulkAvailable && (
-                  <span style={{
-                    fontSize: "0.62rem",
-                    padding: "1px 6px",
-                    borderRadius: "9px",
-                    background: "rgba(184,137,60,0.15)",
-                    color: "var(--gold-deep, #8E6824)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.08em",
-                  }}>
-                    Bulk available
-                  </span>
-                )}
+            {soldAs ? (
+              <div className="product-card-sold-as">
+                <span>Sold per {soldAs}</span>
+                {bulkAvailable ? <em>Bulk available</em> : null}
               </div>
-            )}
+            ) : null}
 
             <dl className="product-card-specs">
               <div>
@@ -215,31 +185,36 @@ export default function ProductCard({
           </div>
         </div>
       </div>
-      <div className="product-actions" onClick={(e) => e.stopPropagation()}>
+
+      <div className="product-actions">
         <Link to={`/products/${product.slug}`} className="btn btn-outline btn-small">
           <Tag size={16} aria-hidden="true" />
           Details
         </Link>
-        <button className="btn btn-primary btn-small" type="button" onClick={addDefaultToBasket}>
+        <button
+          className="btn btn-primary btn-small"
+          type="button"
+          onClick={addDefaultToBasket}
+          disabled={isUnavailable}
+        >
           <ClipboardText size={16} aria-hidden="true" />
-          Add to enquiry
+          {isUnavailable ? "Unavailable" : "Add to enquiry"}
         </button>
         <a
           className="btn btn-whatsapp btn-small"
           href={enquireLink}
           target="_blank"
           rel="noreferrer"
-          aria-label={`Ask price for ${product.name} on WhatsApp`}
+          aria-label={`Ask about ${product.name} on WhatsApp`}
         >
           <ChatCircle size={16} aria-hidden="true" />
-          Ask price
+          {isUnavailable ? "Ask availability" : "Ask price"}
         </a>
       </div>
     </article>
   );
 }
 
-// ── Swatch button with custom tooltip (Prompt 2 Part 1.2, 1.5) ─────────
 function SwatchButton({ color, isActive, isHovered, onSelect, onHover }) {
   const [focused, setFocused] = useState(false);
   const showTooltip = isHovered || focused;
@@ -248,21 +223,12 @@ function SwatchButton({ color, isActive, isHovered, onSelect, onHover }) {
     <button
       type="button"
       className={`swatch-dot swatch-dot-button ${isActive ? "selected" : ""}`}
-      style={{
-        backgroundColor: color.hex,
-        width: "24px",
-        height: "24px",
-        padding: 0,
-        border: `1px solid ${isActive ? "var(--pink-dark, #6B1F2A)" : "rgba(58,43,36,0.2)"}`,
-        borderRadius: "50%",
-        cursor: "pointer",
-        position: "relative",
-      }}
-      aria-label={`Preview ${color.name}`}
+      style={{ backgroundColor: color.hex }}
+      aria-label={`${isActive ? "Deselect" : "Select"} ${color.name} for enquiry`}
       aria-pressed={isActive}
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
+      onClick={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
         onSelect(isActive ? null : color);
       }}
       onMouseEnter={() => onHover(color.name)}
@@ -276,35 +242,11 @@ function SwatchButton({ color, isActive, isHovered, onSelect, onHover }) {
         onHover(null);
       }}
     >
-      {showTooltip && (
-        <span
-          role="tooltip"
-          style={{
-            position: "absolute",
-            bottom: "calc(100% + 6px)",
-            left: "50%",
-            transform: "translateX(-50%)",
-            background: "var(--pink-dark, #4A141C)",
-            color: "#F8F1E7",
-            fontSize: "0.65rem",
-            padding: "3px 8px",
-            borderRadius: "3px",
-            whiteSpace: "nowrap",
-            pointerEvents: "none",
-            zIndex: 20,
-            letterSpacing: "0.04em",
-          }}
-        >
+      {showTooltip ? (
+        <span role="tooltip" className="swatch-tooltip">
           {color.name}
         </span>
-      )}
+      ) : null}
     </button>
   );
 }
-
-// ── Color-swap-on-hover helper ─────────────────────────────────────────
-// Computes a CSS filter that shifts the default image's hue/saturation toward
-// the active swatch color. This is the graceful-fallback path — when real
-// per-color image assets exist at /assets/images/products/{slug}/color-{slug}.webp,
-// the detail page swaps <img src> directly. On the card we use a CSS filter to
-// avoid broken-image flashes for products that don't have full color coverage yet.

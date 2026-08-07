@@ -15,6 +15,8 @@ import "./commerce-upgrade.css";
 import "./product-first-v2.css";
 import "./delight-v3.css";
 import "./delight-v3-fixes.css";
+import "./production-hardening-v4.css";
+import "./production-a11y-fixes.css";
 
 applyMotionProfile();
 
