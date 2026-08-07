@@ -21,6 +21,7 @@ import "./motion-performance-v5.css";
 import "./hero-v6.css";
 import "./hero-cinematic-v7.css";
 import "./site-experience-v8.css";
+import "./site-experience-v8-fixes.css";
 
 applyMotionProfile();
 
