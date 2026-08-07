@@ -7,6 +7,7 @@ import {
   Truck,
 } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
+import BrandModelHighlight from "../components/BrandModelHighlight.jsx";
 import Reveal from "../components/Reveal.jsx";
 import { aboutCopy, aboutPoints, businessInfo } from "../data/siteData.js";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
@@ -92,6 +93,8 @@ export default function About() {
           </Reveal>
         </div>
       </section>
+
+      <BrandModelHighlight />
 
       <section className="section about-values-section">
         <div className="container">
