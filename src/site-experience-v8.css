@@ -20,19 +20,22 @@
    Smart header: announcement fades away, nav remains useful.
    ───────────────────────────────────────────── */
 .site-header {
-  --header-fade-progress: 0;
   overflow: clip;
   background: rgba(255, 250, 244, 0.88);
   transform: translateZ(0);
 }
 
 .announcement-bar {
-  max-height: calc(34px * (1 - var(--header-fade-progress)));
-  border-bottom-color: rgba(50, 48, 45, calc(0.08 * (1 - var(--header-fade-progress))));
-  opacity: calc(1 - var(--header-fade-progress));
-  transform: translateY(calc(-9px * var(--header-fade-progress)));
+  max-height: 34px;
+  border-bottom-color: rgba(50, 48, 45, 0.08);
+  opacity: 1;
+  transform: translateY(0);
   transform-origin: top center;
-  will-change: max-height, opacity, transform;
+  transition:
+    max-height 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 220ms ease,
+    transform 340ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 220ms ease;
 }
 
 .announcement-bar__inner {
@@ -67,12 +70,22 @@
 }
 
 .site-header.is-scrolled .announcement-bar {
+  max-height: 0;
+  border-bottom-color: transparent;
+  opacity: 0;
   pointer-events: none;
+  transform: translateY(-8px);
 }
 
 .nav-shell {
-  min-height: calc(74px - (10px * var(--header-fade-progress)));
-  transform: translateY(calc(-1px * var(--header-fade-progress)));
+  min-height: 74px;
+  transition:
+    min-height 360ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.site-header.is-scrolled .nav-shell {
+  min-height: 64px;
 }
 
 .site-header.is-scrolled {
@@ -110,8 +123,7 @@
 }
 
 .site-header .brand,
-.site-header .brand small,
-.site-header .nav-shell {
+.site-header .brand small {
   transition:
     transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
     background-color 240ms ease,
@@ -344,7 +356,11 @@ html[data-motion-profile="lite"] .site-header.is-deep {
   }
 
   .nav-shell {
-    min-height: calc(68px - (6px * var(--header-fade-progress)));
+    min-height: 68px;
+  }
+
+  .site-header.is-scrolled .nav-shell {
+    min-height: 62px;
   }
 
   .site-header.is-deep .brand small {
@@ -372,14 +388,18 @@ html[data-motion-profile="lite"] .site-header.is-deep {
 }
 
 @media (max-width: 560px) {
+  .announcement-bar {
+    max-height: 30px;
+  }
+
+  .site-header.is-scrolled .announcement-bar {
+    max-height: 0;
+  }
+
   .announcement-bar__inner {
     min-height: 30px;
     padding-block: 6px;
     font-size: 0.58rem;
-  }
-
-  .announcement-bar {
-    max-height: calc(30px * (1 - var(--header-fade-progress)));
   }
 
   .announcement-bar__inner span::before {
