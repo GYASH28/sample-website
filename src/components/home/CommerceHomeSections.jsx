@@ -109,7 +109,13 @@ export function CommerceProductRail({ eyebrow, title, text, products, href = "/p
             <Link to={href}>View collection <ArrowRight size={17} /></Link>
           </div>
         </Reveal>
-        <div ref={railRef} className="commerce-product-rail" role="list" tabIndex="0" aria-label={title}>
+        <div
+          ref={railRef}
+          className="commerce-product-rail"
+          role="region"
+          tabIndex="0"
+          aria-label={`${title} product scroller`}
+        >
           {products.map((product, index) => (
             <Reveal key={product.slug} delay={(index % 5) * 34} variant="fade-up">
               <ProductShowcaseCard product={product} />
@@ -231,13 +237,13 @@ export function CommerceOrderFlow() {
       number: "01",
       icon: Heart,
       title: "Browse and save",
-      text: "Use search, quick view, categories, filters and the wishlist to shortlist products.",
+      text: "Use search, categories, filters and the wishlist to shortlist products.",
     },
     {
       number: "02",
       icon: ShoppingBagOpen,
       title: "Build one enquiry",
-      text: "Add quantities, shades and variants without leaving the collection page.",
+      text: "Add quantities, shades and variants to your enquiry basket.",
     },
     {
       number: "03",
@@ -253,8 +259,8 @@ export function CommerceOrderFlow() {
         <Reveal className="commerce-heading" variant="fade-up">
           <div>
             <p className="eyebrow">How ordering works</p>
-            <h2 id="order-flow-title">Fast to browse. Clear before payment.</h2>
-            <p>Pricing still depends on shade, pack and quantity, but the shopping experience should feel immediate.</p>
+            <h2 id="order-flow-title">Clear ordering, confirmed before payment.</h2>
+            <p>Because yarn shades, pack sizes and wholesale rates change, the website helps you prepare a complete enquiry and the store confirms the final order.</p>
           </div>
         </Reveal>
         <ol>
@@ -280,7 +286,7 @@ export function CommerceWholesaleCta() {
         <div>
           <p className="eyebrow">Wholesale and resale support</p>
           <h2 id="wholesale-title">Need multiple colours, cartons or regular supply?</h2>
-          <p>Send product names, preferred shades, quantities and delivery city. The team will share current pack details, alternatives and quantity-based pricing.</p>
+          <p>Send the product names, preferred shades, quantities and delivery city. The team will share current pack details, alternatives and quantity-based pricing.</p>
           <div className="commerce-wholesale__actions">
             <Link className="btn btn-light" to="/enquiry">
               Prepare enquiry <ArrowRight size={18} />
