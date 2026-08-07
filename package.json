@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
-    "build": "npm audit --omit=dev --audit-level=high && npm run generate:sitemap && vite build",
+    "build": "npm audit fix --omit=dev && npm audit --omit=dev --audit-level=high && npm run generate:sitemap && vite build",
     "build:prerender": "npm run generate:sitemap && vite build && npm run prerender",
     "preview": "vite preview --host 127.0.0.1",
     "generate:sitemap": "node src/scripts/generate-sitemap.js",
