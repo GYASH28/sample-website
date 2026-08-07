@@ -59,6 +59,12 @@
   color: var(--ui-accent) !important;
 }
 
+:root[data-theme="dark"] .commerce-category-nav__all {
+  border-color: var(--ui-border-strong) !important;
+  background: var(--ui-surface) !important;
+  color: var(--ui-accent) !important;
+}
+
 :root[data-theme="dark"] .card-floating-btn,
 :root[data-theme="dark"] .favorite-toggle-btn-card,
 :root[data-theme="dark"] .product-showcase-card__quick,
@@ -66,7 +72,9 @@
 :root[data-theme="dark"] .mobile-product-dock__save,
 :root[data-theme="dark"] .btn-detail-action-circle,
 :root[data-theme="dark"] .thumbnail-rect-btn,
-:root[data-theme="dark"] .enquiry-launcher {
+:root[data-theme="dark"] .enquiry-launcher,
+:root[data-theme="dark"] .back-to-top,
+:root[data-theme="dark"] main[data-route-family="home"] button[aria-label^="Scroll "] {
   border-color: var(--ui-border-strong) !important;
   background: var(--ui-surface) !important;
   color: var(--ui-text-strong) !important;
@@ -80,7 +88,9 @@
 
 :root[data-theme="dark"] .enquiry-launcher:hover,
 :root[data-theme="dark"] .product-showcase-card__quick:hover,
-:root[data-theme="dark"] .card-floating-btn:hover {
+:root[data-theme="dark"] .card-floating-btn:hover,
+:root[data-theme="dark"] .back-to-top:hover,
+:root[data-theme="dark"] main[data-route-family="home"] button[aria-label^="Scroll "]:hover {
   border-color: var(--ui-accent) !important;
   color: var(--ui-accent) !important;
 }
@@ -88,6 +98,57 @@
 :root[data-theme="dark"] .commerce-section button:not(.btn):not(.product-showcase-card__quick),
 :root[data-theme="dark"] .hero-v6 button:not(.btn) {
   border-color: var(--ui-border) !important;
+}
+
+/* Shade/craft selectors had literal translucent-white fills that made dark-mode
+   text fail even though the containing section was correctly dark. */
+:root[data-theme="dark"] .shade-mood-tabs > button[role="tab"] {
+  border-color: var(--ui-border-strong) !important;
+  background: var(--ui-surface) !important;
+  color: var(--ui-text-strong) !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme="dark"] .shade-mood-tabs > button[role="tab"][aria-selected="true"] {
+  border-color: #155f5e !important;
+  background: #155f5e !important;
+  color: #fff !important;
+}
+
+:root[data-theme="dark"] .commerce-craft-finder__tabs > button[role="tab"] {
+  border-color: var(--ui-border-strong) !important;
+  background: var(--ui-surface) !important;
+  color: var(--ui-text-strong) !important;
+}
+
+:root[data-theme="dark"] .commerce-craft-finder__tabs > .is-active[role="tab"] {
+  border-color: #155f5e !important;
+  background: #155f5e !important;
+  color: #fff !important;
+}
+
+/* Product microcopy needs its own dark-mode palette. The original dusty-rose
+   label and brown bulk text were designed for cream cards. */
+:root[data-theme="dark"] .product-card .badge-highlight,
+:root[data-theme="dark"] .product-showcase-card .badge-highlight {
+  color: #ffd5df !important;
+  background: #492c36 !important;
+  border: 1px solid rgba(255, 213, 223, 0.22) !important;
+  border-radius: 999px;
+  padding: 0.22rem 0.42rem;
+}
+
+:root[data-theme="dark"] .product-card-sold-as,
+:root[data-theme="dark"] .product-card-sold-as em {
+  color: #f2d695 !important;
+}
+
+:root[data-theme="dark"] .header-search-trigger > kbd {
+  border-color: var(--ui-border-strong) !important;
+  background: var(--ui-surface-soft) !important;
+  color: var(--ui-text-muted) !important;
+  font-size: 0.64rem !important;
+  font-weight: 700;
 }
 
 :root[data-theme="dark"] .thumbnail-rect-btn img,
