@@ -1,0 +1,57 @@
+name: SEO and performance integrity
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  seo-performance:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium
+
+      - name: Build and prerender public routes
+        run: npm run build:prerender
+
+      - name: Start preview server
+        run: |
+          npm run preview -- --port 4173 --strictPort > /tmp/v13-preview.log 2>&1 &
+          echo $! > /tmp/v13-preview.pid
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/v13-preview.log
+          exit 1
+
+      - name: SEO and business identity integrity
+        run: node seo-integrity-test.cjs
+
+      - name: Bundle and scroll performance budgets
+        run: node performance-budget-test.cjs
+
+      - name: Stop preview server
+        if: always()
+        run: |
+          if [ -f /tmp/v13-preview.pid ]; then
+            kill "$(cat /tmp/v13-preview.pid)" || true
+          fi
