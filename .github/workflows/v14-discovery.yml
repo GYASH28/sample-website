@@ -46,6 +46,18 @@ jobs:
       - name: Run v14 discovery and conversion regression
         run: node v14-discovery-test.cjs
 
+      - name: Render v14 feature matrix
+        run: node v14-visual-audit.cjs
+
+      - name: Upload rendered v14 audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v14-visual-audit
+          path: v14-visual-artifacts
+          if-no-files-found: warn
+          retention-days: 3
+
       - name: Stop preview server
         if: always()
         run: |
