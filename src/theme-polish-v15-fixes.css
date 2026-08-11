@@ -1,0 +1,16 @@
+/* v15 targeted corrections discovered by the production accessibility gate. */
+
+.commerce-category-nav__all {
+  border-color: color-mix(in srgb, var(--ui-accent) 34%, var(--ui-border-strong)) !important;
+  background: var(--ui-accent-soft) !important;
+  color: var(--ui-accent-strong) !important;
+  font-weight: 850 !important;
+  box-shadow: none !important;
+}
+
+.commerce-category-nav__all:hover,
+.commerce-category-nav__all:focus-visible {
+  border-color: var(--ui-accent) !important;
+  background: var(--ui-accent-strong) !important;
+  color: var(--ui-on-accent) !important;
+}
