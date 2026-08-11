@@ -12,6 +12,9 @@ const Enquiry = lazy(() => import("./pages/Enquiry.jsx"));
 const Contact = lazy(() => import("./pages/Contact.jsx"));
 const Wishlist = lazy(() => import("./pages/Wishlist.jsx"));
 const YarnGuide = lazy(() => import("./pages/YarnGuide.jsx"));
+const Projects = lazy(() => import("./pages/Projects.jsx"));
+const Compare = lazy(() => import("./pages/Compare.jsx"));
+const CollectionLanding = lazy(() => import("./pages/CollectionLanding.jsx"));
 const Blog = lazy(() => import("./pages/Blog.jsx"));
 const BlogPost = lazy(() => import("./pages/BlogPost.jsx"));
 const NotFound = lazy(() => import("./pages/NotFound.jsx"));
@@ -27,6 +30,9 @@ export default function App() {
             <Route path="about" element={<About />} />
             <Route path="products" element={<Products />} />
             <Route path="products/:slug" element={<ProductDetail />} />
+            <Route path="projects" element={<Projects />} />
+            <Route path="collections/:slug" element={<CollectionLanding />} />
+            <Route path="compare" element={<Compare />} />
             <Route path="enquiry" element={<Enquiry />} />
             <Route path="wishlist" element={<Wishlist />} />
             <Route path="yarn-guide" element={<YarnGuide />} />
