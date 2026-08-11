@@ -1,4 +1,4 @@
-/* v15 targeted corrections discovered by the production accessibility gate. */
+/* v15 targeted corrections discovered by production and theme accessibility gates. */
 
 .commerce-category-nav__all {
   border-color: color-mix(in srgb, var(--ui-accent) 34%, var(--ui-border-strong)) !important;
@@ -12,5 +12,14 @@
 .commerce-category-nav__all:focus-visible {
   border-color: var(--ui-accent) !important;
   background: var(--ui-accent-strong) !important;
+  color: var(--ui-on-accent) !important;
+}
+
+/* Dark mode's accent-strong is intentionally pale, so active segmented
+   controls must use the semantic on-accent foreground instead of hard white. */
+.language-control > .active,
+.language-control button.active,
+.shade-mood-tabs > button[role="tab"][aria-selected="true"],
+.commerce-craft-finder__tabs > .is-active[role="tab"] {
   color: var(--ui-on-accent) !important;
 }
