@@ -1,0 +1,66 @@
+name: Validate v14 discovery and conversion
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  discovery-conversion:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium
+
+      - name: Build and prerender
+        run: npm run build:prerender
+
+      - name: Start preview server
+        run: |
+          npm run preview -- --port 4173 --strictPort > /tmp/v14-preview.log 2>&1 &
+          echo $! > /tmp/v14-preview.pid
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/v14-preview.log
+          exit 1
+
+      - name: Run v14 discovery and conversion regression
+        run: node v14-discovery-test.cjs
+
+      - name: Render v14 feature matrix
+        run: node v14-visual-audit.cjs
+
+      - name: Upload rendered v14 audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v14-visual-audit
+          path: v14-visual-artifacts
+          if-no-files-found: warn
+          retention-days: 3
+
+      - name: Stop preview server
+        if: always()
+        run: |
+          if [ -f /tmp/v14-preview.pid ]; then
+            kill "$(cat /tmp/v14-preview.pid)" || true
+          fi

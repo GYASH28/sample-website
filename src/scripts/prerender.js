@@ -14,36 +14,36 @@ if (!existsSync(distDir)) {
 }
 
 const { featuredProducts, blogPosts } = await import("../data/siteData.js");
+const { SEO_COLLECTIONS } = await import("../data/discoveryData.js");
 const { INTRO_SESSION_KEY } = await import("../lib/introPlayback.js");
 const { COMMERCE_INTRO_SESSION_KEY } = await import("../lib/commerceIntro.js");
 
 const staticRoutes = [
   "/",
   "/products",
+  "/projects",
   "/yarn-guide",
   "/about",
   "/contact",
   "/wishlist",
   "/enquiry",
+  "/compare",
   "/blog",
   "/privacy",
   "/terms",
   "/delivery-enquiries",
 ];
+const collectionRoutes = SEO_COLLECTIONS.map((collection) => `/collections/${collection.slug}`);
 const productRoutes = featuredProducts.map((product) => `/products/${product.slug}`);
 const blogRoutes = blogPosts.map((post) => `/blog/${post.slug}`);
-const allRoutes = [...staticRoutes, ...productRoutes, ...blogRoutes];
+const allRoutes = [...staticRoutes, ...collectionRoutes, ...productRoutes, ...blogRoutes];
 
 let preview;
 let browser;
 try {
   console.log("▶ Starting vite preview on port 4173…");
   const viteCli = resolve(projectRoot, "node_modules/vite/bin/vite.js");
-  preview = spawn(
-    process.execPath,
-    [viteCli, "preview", "--port", "4173", "--strictPort", "--host", "127.0.0.1"],
-    { cwd: projectRoot, stdio: "pipe" },
-  );
+  preview = spawn(process.execPath, [viteCli, "preview", "--port", "4173", "--strictPort", "--host", "127.0.0.1"], { cwd: projectRoot, stdio: "pipe" });
 
   await new Promise((resolveReady, rejectReady) => {
     const timer = setTimeout(() => rejectReady(new Error("Preview server did not start in 30s")), 30000);
@@ -79,13 +79,10 @@ try {
   }
 
   const page = await browser.newPage();
-  await page.addInitScript(
-    ({ legacyKey, commerceKey }) => {
-      sessionStorage.setItem(legacyKey, "played");
-      sessionStorage.setItem(commerceKey, "played");
-    },
-    { legacyKey: INTRO_SESSION_KEY, commerceKey: COMMERCE_INTRO_SESSION_KEY },
-  );
+  await page.addInitScript(({ legacyKey, commerceKey }) => {
+    sessionStorage.setItem(legacyKey, "played");
+    sessionStorage.setItem(commerceKey, "played");
+  }, { legacyKey: INTRO_SESSION_KEY, commerceKey: COMMERCE_INTRO_SESSION_KEY });
 
   let successCount = 0;
   let failCount = 0;
@@ -97,21 +94,13 @@ try {
       await page.waitForTimeout(500);
       await page.evaluate(() => {
         document.documentElement.classList.remove("motion-ready", "intro-booting", "intro-handoff");
-        document.body.classList.remove(
-          "intro-running",
-          "intro-hold-hero",
-          "commerce-intro-open",
-          "quick-view-open",
-        );
+        document.body.classList.remove("intro-running", "intro-hold-hero", "commerce-intro-open", "quick-view-open");
         document.querySelector(".commerce-intro")?.remove();
         document.querySelector(".quick-view-layer")?.remove();
       });
 
       const html = await page.content();
-      const finalPath = route === "/"
-        ? resolve(distDir, "index.html")
-        : resolve(distDir, route.slice(1), "index.html");
-
+      const finalPath = route === "/" ? resolve(distDir, "index.html") : resolve(distDir, route.slice(1), "index.html");
       mkdirSync(dirname(finalPath), { recursive: true });
       writeFileSync(finalPath, html, "utf-8");
       successCount += 1;
