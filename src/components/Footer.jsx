@@ -1,6 +1,7 @@
 import {
   ArrowSquareOut,
   ArrowUpRight,
+  Envelope,
   InstagramLogo,
   MapPin,
   Phone,
@@ -24,7 +25,7 @@ export default function Footer() {
             loading="lazy"
           />
           <span className="eyebrow">Fakhri Mart · Pune</span>
-          <h2>Good materials make the making easier.</h2>
+          <h2>{businessInfo.tagline}</h2>
           <p>Yarn, thread, cord and craft supplies for makers, boutiques, resellers and wholesale buyers across India.</p>
           <a className="btn btn-whatsapp" href={createWhatsAppLink()} target="_blank" rel="noreferrer">
             <WhatsAppIcon size={18} /> Ask on WhatsApp
@@ -53,6 +54,10 @@ export default function Footer() {
           <span>Contact</span>
           <p><MapPin size={18} /> {businessInfo.location}</p>
           <a href={businessInfo.phoneHref}><Phone size={18} /> {businessInfo.phoneDisplay}</a>
+          {businessInfo.secondaryPhoneDisplay ? (
+            <a href={businessInfo.secondaryPhoneHref}><Phone size={18} /> {businessInfo.secondaryPhoneDisplay}</a>
+          ) : null}
+          <a href={businessInfo.emailHref}><Envelope size={18} /> {businessInfo.email}</a>
           <a href={businessInfo.instagramUrl} target="_blank" rel="noreferrer">
             <InstagramLogo size={18} /> @{businessInfo.instagram} <ArrowUpRight size={14} />
           </a>
@@ -68,8 +73,8 @@ export default function Footer() {
         </address>
       </div>
       <div className="container footer-bottom">
-        <p>© {new Date().getFullYear()} Fakhri Mart. All-India delivery.</p>
-        <p>Prices are confirmed by quantity, shade, size and availability.</p>
+        <p>© {new Date().getFullYear()} Fakhri Mart. {businessInfo.tagline}</p>
+        <p>Prices, shades and availability are confirmed against your requirement.</p>
       </div>
     </footer>
   );
