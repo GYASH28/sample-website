@@ -9,13 +9,12 @@ const defaults = {
   robots: "index, follow, max-image-preview:large",
 };
 
-const NOINDEX_ROUTES = new Set(["/wishlist", "/enquiry"]);
+const NOINDEX_ROUTES = new Set(["/wishlist", "/enquiry", "/compare"]);
 const MAX_DESCRIPTION_LENGTH = 168;
 
 function normalizeDescription(value) {
   const normalized = String(value || "").replace(/\s+/g, " ").trim();
   if (normalized.length <= MAX_DESCRIPTION_LENGTH) return normalized;
-
   const slice = normalized.slice(0, MAX_DESCRIPTION_LENGTH - 1);
   const lastSpace = slice.lastIndexOf(" ");
   const clean = (lastSpace > 120 ? slice.slice(0, lastSpace) : slice).replace(/[,:;\-\s]+$/g, "");
