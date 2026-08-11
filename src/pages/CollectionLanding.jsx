@@ -10,32 +10,28 @@ import { breadcrumbJsonLd, useJsonLd } from "../hooks/useJsonLd.js";
 export default function CollectionLanding() {
   const { slug } = useParams();
   const collection = getCollectionBySlug(slug);
+  const canonical = collection ? `/collections/${collection.slug}` : "/products";
 
-  if (!collection) return <Navigate to="/404" replace />;
-
-  const canonical = `/collections/${collection.slug}`;
   useDocumentMeta({
-    title: `${collection.title} | Fakhri Mart`,
-    description: collection.description,
+    title: collection ? `${collection.title} | Fakhri Mart` : "Material collections | Fakhri Mart",
+    description: collection?.description || "Browse Fakhri Mart materials by project, craft and catalogue family.",
     canonical,
+    robots: collection ? undefined : "noindex, follow",
   });
 
-  useJsonLd(breadcrumbJsonLd([
+  useJsonLd(collection ? breadcrumbJsonLd([
     { name: "Home", url: businessInfo.url },
     { name: "Products", url: `${businessInfo.url}/products` },
     { name: collection.title, url: `${businessInfo.url}${canonical}` },
-  ]));
+  ]) : null);
+
+  if (!collection) return <Navigate to="/404" replace />;
 
   const products = featuredProducts.filter((product) => productMatchesCollection(product, collection));
 
   return (
     <>
-      <PageHero
-        motif="weave"
-        eyebrow={collection.eyebrow}
-        title={collection.title}
-        text={collection.description}
-      />
+      <PageHero motif="weave" eyebrow={collection.eyebrow} title={collection.title} text={collection.description} />
 
       <section className="section collection-intro">
         <div className="container collection-intro__grid">
@@ -45,9 +41,7 @@ export default function CollectionLanding() {
             <p>{collection.intro}</p>
           </div>
           <ul className="collection-guidance">
-            {collection.guidance.map((item) => (
-              <li key={item}><CheckCircle size={17} weight="fill" aria-hidden="true" /> {item}</li>
-            ))}
+            {collection.guidance.map((item) => <li key={item}><CheckCircle size={17} weight="fill" aria-hidden="true" /> {item}</li>)}
           </ul>
         </div>
       </section>
@@ -66,9 +60,7 @@ export default function CollectionLanding() {
           </div>
 
           {products.length ? (
-            <div className="card-grid product-grid">
-              {products.map((product) => <ProductCard key={product.slug} product={product} />)}
-            </div>
+            <div className="card-grid product-grid">{products.map((product) => <ProductCard key={product.slug} product={product} />)}</div>
           ) : (
             <div className="collection-empty">
               <p>Use the full catalogue or WhatsApp enquiry if you are looking for something outside the current public catalogue.</p>
