@@ -1,6 +1,7 @@
 const { spawnSync } = require("node:child_process");
 
-const result = spawnSync(process.platform === "win32" ? "npm.cmd" : "npm", ["audit", "--json"], {
+const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
+const result = spawnSync(npmCommand, ["audit", "--json"], {
   encoding: "utf8",
   maxBuffer: 10 * 1024 * 1024,
 });
@@ -35,6 +36,24 @@ const findings = Object.entries(vulnerabilities)
 if (findings.length) {
   console.error("High/critical npm audit findings:");
   console.error(JSON.stringify(findings, null, 2));
+
+  if (findings.every((finding) => finding.fixAvailable)) {
+    const fix = spawnSync(npmCommand, ["audit", "fix", "--package-lock-only", "--ignore-scripts"], {
+      encoding: "utf8",
+      maxBuffer: 10 * 1024 * 1024,
+    });
+    if (!fix.error) {
+      const diff = spawnSync("git", ["diff", "--", "package-lock.json"], {
+        encoding: "utf8",
+        maxBuffer: 10 * 1024 * 1024,
+      });
+      if (diff.stdout.trim()) {
+        console.error("Registry-generated package-lock remediation:\n");
+        console.error(diff.stdout.trim());
+      }
+    }
+  }
+
   process.exit(1);
 }
 
