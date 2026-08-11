@@ -53,6 +53,7 @@ export default function ShoppingWorkspace() {
         type="button"
         className="shopping-workspace-launcher"
         onClick={openWorkspace}
+        aria-label="Open My shortlist workspace"
         aria-expanded={open}
         aria-controls="shopping-workspace"
       >
@@ -68,9 +69,15 @@ export default function ShoppingWorkspace() {
         aria-label="Close shortlist workspace"
         tabIndex={open ? 0 : -1}
         aria-hidden={!open}
+        disabled={!open}
       />
 
-      <aside id="shopping-workspace" className={`shopping-workspace ${open ? "is-open" : ""}`} aria-hidden={!open}>
+      <aside
+        id="shopping-workspace"
+        className={`shopping-workspace ${open ? "is-open" : ""}`}
+        aria-hidden={!open}
+        inert={!open}
+      >
         <div className="shopping-workspace__head">
           <div>
             <span className="eyebrow">Your local workspace</span>
