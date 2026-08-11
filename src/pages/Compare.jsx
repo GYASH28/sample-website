@@ -79,7 +79,7 @@ export default function Compare() {
                 </div>
               </div>
 
-              <div className="compare-table-scroll" tabIndex="0" aria-label="Scrollable material comparison">
+              <div className="compare-table-scroll compare-desktop-table" tabIndex="0" aria-label="Scrollable material comparison">
                 <table className="compare-table">
                   <thead>
                     <tr>
@@ -108,6 +108,35 @@ export default function Compare() {
                     ))}
                   </tbody>
                 </table>
+              </div>
+
+              <div className="compare-mobile-list" aria-label="Material comparison cards">
+                {products.map((product, index) => {
+                  const facts = getCompareFacts(product);
+                  return (
+                    <article key={product.slug} className="compare-mobile-card">
+                      <div className="compare-mobile-card__head">
+                        <img src={product.image} alt="" width="120" height="120" loading="lazy" decoding="async" />
+                        <div>
+                          <span>{String(index + 1).padStart(2, "0")} / {String(products.length).padStart(2, "0")}</span>
+                          <Link to={`/products/${product.slug}`}>{product.name}</Link>
+                          <small>{product.category}</small>
+                        </div>
+                        <button type="button" onClick={() => remove(product.slug)} aria-label={`Remove ${product.name} from comparison`}>
+                          <Trash size={17} aria-hidden="true" />
+                        </button>
+                      </div>
+                      <dl className="compare-mobile-card__facts">
+                        {ROWS.map(([key, label]) => (
+                          <div key={key}>
+                            <dt>{label}</dt>
+                            <dd>{facts[key]}</dd>
+                          </div>
+                        ))}
+                      </dl>
+                    </article>
+                  );
+                })}
               </div>
 
               <div className="compare-page__decision">
