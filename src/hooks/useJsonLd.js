@@ -40,11 +40,10 @@ export function productJsonLd(product, canonicalUrl) {
     url,
     name: product.name,
     description: product.description,
-    image: [product.image, ...(product.galleryImages || [])].filter(Boolean).map(absoluteUrl),
+    image: [product.image, ...(product.galleryImages || [])].filter(Boolean).map((image) => absoluteUrl(image)),
     category: product.category,
     brand: { "@type": "Brand", name: product.brand || product.category },
     additionalProperty: properties.length ? properties : undefined,
-    seller: { "@id": `${PUBLIC_SITE_URL}/#store` },
   };
 }
 
