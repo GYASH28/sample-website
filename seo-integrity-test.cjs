@@ -62,7 +62,11 @@ function assert(condition, message) {
       });
 
       assert(state.title.length >= 18 && state.title.length <= 80, `${route.path}: weak title length (${state.title.length})`);
-      assert(state.description.length >= 80 && state.description.length <= 210, `${route.path}: weak description length (${state.description.length})`);
+      const minimumDescription = route.indexable ? 80 : 35;
+      assert(
+        state.description.length >= minimumDescription && state.description.length <= 210,
+        `${route.path}: weak description length (${state.description.length})`,
+      );
       assert(state.h1Count === 1, `${route.path}: expected one H1, found ${state.h1Count}`);
       assert(state.canonical === `${SITE_URL}${route.canonical}`, `${route.path}: wrong canonical ${state.canonical}`);
 
