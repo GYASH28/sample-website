@@ -34,6 +34,7 @@ import "./brand-highlight-v12.css";
 import "./header-glass-tuning-v12.css";
 import "./ux-performance-v13.css";
 import "./discovery-v14.css";
+import "./discovery-v14-fixes.css";
 
 applyCatalogueIntegrity();
 applyMotionProfile();
