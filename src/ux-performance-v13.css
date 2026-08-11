@@ -1,18 +1,5 @@
 /* Fakhri Mart v13 — conversion, accessibility and rendering polish. */
 
-/* Defer work for genuinely below-the-fold sections while preserving their
-   remembered size after first render. This reduces initial paint/layout cost
-   on the long storefront and catalogue routes. */
-@supports (content-visibility: auto) {
-  .fm-home > section:not(:first-child),
-  .route-stage[data-route-family="catalogue"] > section:not(:first-child),
-  .route-stage[data-route-family="editorial"] > section:not(:first-child),
-  .route-stage[data-route-family="detail"] > section:not(:first-child) {
-    content-visibility: auto;
-    contain-intrinsic-size: auto 720px;
-  }
-}
-
 /* Contact actions should read like a decision point, not another card pile. */
 .contact-card--identity {
   border-color: color-mix(in srgb, var(--teal, #2a8c82) 26%, transparent);
