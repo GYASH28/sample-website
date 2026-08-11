@@ -35,6 +35,7 @@ import "./header-glass-tuning-v12.css";
 import "./ux-performance-v13.css";
 import "./discovery-v14.css";
 import "./discovery-v14-fixes.css";
+import "./theme-polish-v15.css";
 
 applyCatalogueIntegrity();
 applyMotionProfile();
