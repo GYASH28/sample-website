@@ -9,6 +9,8 @@ const defaults = {
   robots: "index, follow, max-image-preview:large",
 };
 
+const NOINDEX_ROUTES = new Set(["/wishlist", "/enquiry"]);
+
 function setMeta(name, content, attr = "name") {
   let el = document.querySelector(`meta[${attr}="${name}"]`);
   if (!el) {
@@ -44,7 +46,7 @@ export default function useDocumentMeta({ title, description, pathname, canonica
     const path = pathname || canonical || window.location.pathname;
     const canonicalUrl = setCanonical(path);
     const socialImage = image ? new URL(image, PUBLIC_SITE_URL).href : defaults.image;
-    const robotsValue = robots || defaults.robots;
+    const robotsValue = robots || (NOINDEX_ROUTES.has(path) ? "noindex, follow" : defaults.robots);
 
     document.title = fullTitle;
     setMeta("description", desc);
