@@ -18,7 +18,7 @@ export default function Contact() {
   useDocumentMeta({
     title: "Contact Fakhri Mart",
     description:
-      "Reach Fakhri Mart on WhatsApp, phone, Instagram or the official Google listing. Pune, Maharashtra. Monday to Saturday, 10 AM to 8 PM.",
+      "Contact Fakhri Mart in Pune by WhatsApp, phone or email for current yarn shades, quantity pricing, bulk requirements and India-wide delivery enquiries.",
     pathname: "/contact",
   });
   useJsonLd(contactPageJsonLd());
@@ -29,7 +29,7 @@ export default function Contact() {
         motif="line"
         eyebrow="Contact"
         title="Talk through the material before you order"
-        text="Ask about current shades, quantities, delivery, sample cards or a repeat supply requirement."
+        text="Ask about current shades, quantities, delivery, sample cards or repeat supply. We will help you turn a shortlist into a clear enquiry."
       >
         <picture className="catalogue-hero-photo">
           <source srcSet="/assets/images/editorial/craft-stock-room.avif" type="image/avif" />
@@ -45,22 +45,36 @@ export default function Contact() {
       <section className="section">
         <div className="container contact-layout">
           <Reveal className="contact-details" variant="slide-left">
-            <div className="contact-card">
+            <div className="contact-card contact-card--identity">
               <MapPin size={24} aria-hidden="true" />
               <div>
-                <h3>Business name</h3>
-                <p>{businessInfo.name}</p>
+                <h3>{businessInfo.name}</h3>
+                <p>{businessInfo.tagline}</p>
               </div>
             </div>
             <div className="contact-card">
               <Phone size={24} aria-hidden="true" />
               <div>
-                <h3>Phone</h3>
+                <h3>Primary phone</h3>
                 <a href={businessInfo.phoneHref} aria-label={`Call Fakhri Mart at ${businessInfo.phoneDisplay}`}>
                   {businessInfo.phoneDisplay}
                 </a>
               </div>
             </div>
+            {businessInfo.secondaryPhoneDisplay ? (
+              <div className="contact-card">
+                <Phone size={24} aria-hidden="true" />
+                <div>
+                  <h3>Second phone</h3>
+                  <a
+                    href={businessInfo.secondaryPhoneHref}
+                    aria-label={`Call Fakhri Mart at ${businessInfo.secondaryPhoneDisplay}`}
+                  >
+                    {businessInfo.secondaryPhoneDisplay}
+                  </a>
+                </div>
+              </div>
+            ) : null}
             <div className="contact-card">
               <ChatCircleDots size={24} aria-hidden="true" />
               <div>
@@ -111,11 +125,20 @@ export default function Contact() {
             <div className="map-pin" aria-hidden="true">
               <MapPin size={28} />
             </div>
-            <h3>Confirm before travelling</h3>
+            <p className="eyebrow">Before you travel or order</p>
+            <h3>Confirm the exact material first</h3>
             <p>{businessInfo.location}</p>
             <span>
-              Message the store for live stock, shade and visit details, then use the official Google listing below for navigation.
+              Send the product name, shade or colour family, quantity and delivery city. We can then confirm the current material, quote and visit details before you make the trip.
             </span>
+            <div className="button-row contact-direct-actions">
+              <a className="btn btn-whatsapp btn-small" href={createWhatsAppLink()} target="_blank" rel="noreferrer">
+                <ChatCircleDots size={17} /> WhatsApp enquiry
+              </a>
+              <a className="btn btn-outline btn-small" href={businessInfo.phoneHref}>
+                <Phone size={17} /> Call now
+              </a>
+            </div>
             <div className="delivery-chip">
               <Truck size={18} aria-hidden="true" />
               {businessInfo.delivery}
