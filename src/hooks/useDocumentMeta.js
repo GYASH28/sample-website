@@ -10,6 +10,17 @@ const defaults = {
 };
 
 const NOINDEX_ROUTES = new Set(["/wishlist", "/enquiry"]);
+const MAX_DESCRIPTION_LENGTH = 168;
+
+function normalizeDescription(value) {
+  const normalized = String(value || "").replace(/\s+/g, " ").trim();
+  if (normalized.length <= MAX_DESCRIPTION_LENGTH) return normalized;
+
+  const slice = normalized.slice(0, MAX_DESCRIPTION_LENGTH - 1);
+  const lastSpace = slice.lastIndexOf(" ");
+  const clean = (lastSpace > 120 ? slice.slice(0, lastSpace) : slice).replace(/[,:;\-\s]+$/g, "");
+  return `${clean}…`;
+}
 
 function setMeta(name, content, attr = "name") {
   let el = document.querySelector(`meta[${attr}="${name}"]`);
@@ -42,7 +53,7 @@ export default function useDocumentMeta({ title, description, pathname, canonica
         ? trimmed
         : trimmed + suffix
       : defaults.title;
-    const desc = description || defaults.description;
+    const desc = normalizeDescription(description || defaults.description);
     const path = pathname || canonical || window.location.pathname;
     const canonicalUrl = setCanonical(path);
     const socialImage = image ? new URL(image, PUBLIC_SITE_URL).href : defaults.image;
@@ -62,13 +73,13 @@ export default function useDocumentMeta({ title, description, pathname, canonica
 
     return () => {
       document.title = defaults.title;
-      setMeta("description", defaults.description);
+      setMeta("description", normalizeDescription(defaults.description));
       setMeta("robots", defaults.robots);
       setMeta("og:type", "website", "property");
       setMeta("og:title", defaults.title, "property");
-      setMeta("og:description", defaults.description, "property");
+      setMeta("og:description", normalizeDescription(defaults.description), "property");
       setMeta("twitter:title", defaults.title);
-      setMeta("twitter:description", defaults.description);
+      setMeta("twitter:description", normalizeDescription(defaults.description));
     };
   }, [title, description, pathname, canonical, image, robots, type]);
 }
