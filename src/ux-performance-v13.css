@@ -1,0 +1,95 @@
+/* Fakhri Mart v13 — conversion, accessibility and rendering polish. */
+
+/* Defer work for genuinely below-the-fold sections while preserving their
+   remembered size after first render. This reduces initial paint/layout cost
+   on the long storefront and catalogue routes. */
+@supports (content-visibility: auto) {
+  .fm-home > section:not(:first-child),
+  .route-stage[data-route-family="catalogue"] > section:not(:first-child),
+  .route-stage[data-route-family="editorial"] > section:not(:first-child),
+  .route-stage[data-route-family="detail"] > section:not(:first-child) {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 720px;
+  }
+}
+
+/* Contact actions should read like a decision point, not another card pile. */
+.contact-card--identity {
+  border-color: color-mix(in srgb, var(--teal, #2a8c82) 26%, transparent);
+}
+
+.contact-card--identity h3 {
+  margin-bottom: 4px;
+}
+
+.contact-card--identity p {
+  margin: 0;
+  color: var(--ui-text-muted, var(--muted));
+  font-weight: 700;
+}
+
+.contact-direct-actions {
+  margin-top: 22px;
+}
+
+/* Conversion controls: comfortably tappable without making cards bulky. */
+.product-actions .btn,
+.contact-direct-actions .btn,
+.footer-contact a,
+.footer-google-links a {
+  min-height: 44px;
+}
+
+.product-card-swatches .swatch-dot-button {
+  min-width: 30px;
+  min-height: 30px;
+}
+
+/* A selected representative shade is useful context, so make the state easy
+   to see without relying only on a tiny outline. */
+.product-card-swatches .swatch-dot-button.selected {
+  box-shadow:
+    0 0 0 2px var(--ui-bg, #fff7ec),
+    0 0 0 4px color-mix(in srgb, var(--teal, #2a8c82) 68%, var(--pink-dark, #b95776));
+}
+
+/* Decorative route-thread work adds little value on compact/lite devices. */
+html[data-motion-profile="compact"] .route-thread-transition,
+html[data-motion-profile="lite"] .route-thread-transition {
+  display: none !important;
+}
+
+/* Keep hover effects on devices that actually hover. Touch users get stable
+   controls instead of sticky hover states. */
+@media (hover: none), (pointer: coarse) {
+  .product-card,
+  .contact-card,
+  .btn {
+    transform: none !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .product-actions {
+    gap: 8px;
+  }
+
+  .product-actions .btn {
+    min-height: 46px;
+  }
+
+  .contact-direct-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .contact-direct-actions .btn {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-thread-transition {
+    display: none !important;
+  }
+}
