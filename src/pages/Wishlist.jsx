@@ -7,7 +7,7 @@ import {
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { useWishlist } from "../hooks/useWishlist.js";
-import { featuredProducts, createWhatsAppLink } from "../data/siteData.js";
+import { featuredProducts } from "../data/siteData.js";
 import { smartWhatsAppLink } from "../i18n.jsx";
 import Reveal from "../components/Reveal.jsx";
 import ProductCard from "../components/ProductCard.jsx";
@@ -18,6 +18,7 @@ export default function Wishlist() {
     title: "Wishlist | Fakhri Mart",
     description: "Your saved favourite yarns and craft products.",
     canonical: "/wishlist",
+    robots: "noindex, follow",
   });
   const { wishlist, add, remove, clear, count } = useWishlist();
   const [recovery, setRecovery] = useState(null);
@@ -61,7 +62,6 @@ export default function Wishlist() {
 
   return (
     <>
-      {/* Hero */}
       <section className="page-hero" style={{ padding: "120px 0 40px" }}>
         <div className="container">
           <Reveal variant="fade-up">
@@ -70,8 +70,6 @@ export default function Wishlist() {
               Wishlist
             </h1>
             <p style={{ fontSize: "1.05rem", color: "var(--muted)", maxWidth: "560px" }}>
-              {/* A2 fix: hero copy was unconditionally showing empty-state text.
-                  Now state-dependent — shows "saved favourites" copy when populated. */}
               {wishlistProducts.length > 0
                 ? "Your saved favourites are ready. Enquire all at once on WhatsApp, or open a product detail page."
                 : "Your wishlist is empty. Browse products and save your favourites."}
@@ -83,7 +81,6 @@ export default function Wishlist() {
       <section className="section" style={{ paddingTop: "20px" }}>
         <div className="container">
           {wishlistProducts.length === 0 ? (
-            /* Empty state */
             <Reveal variant="scale-in" className="empty-wishlist">
               <div style={{ textAlign: "center", padding: "60px 20px", maxWidth: "480px", margin: "0 auto" }}>
                 <div style={{
@@ -108,7 +105,6 @@ export default function Wishlist() {
             </Reveal>
           ) : (
             <>
-              {/* Wishlist header bar */}
               <div style={{
                 display: "flex", justifyContent: "space-between", alignItems: "center",
                 flexWrap: "wrap", gap: "16px", marginBottom: "24px",
@@ -147,22 +143,21 @@ export default function Wishlist() {
                 </div>
               </div>
 
-              {/* Product grid */}
               <div className="card-grid product-grid">
-                  {wishlistProducts.map((product) => (
-                    <div key={product.slug} className="wishlist-card-shell">
-                      <ProductCard product={product} showWishlistAction={false} />
-                      <button
-                        type="button"
-                        className="wishlist-remove-action"
-                        onClick={() => removeWithRecovery(product)}
-                        aria-label={`Remove ${product.name} from wishlist`}
-                      >
-                        <Trash size={15} aria-hidden="true" />
-                        Remove
-                      </button>
-                    </div>
-                  ))}
+                {wishlistProducts.map((product) => (
+                  <div key={product.slug} className="wishlist-card-shell">
+                    <ProductCard product={product} showWishlistAction={false} />
+                    <button
+                      type="button"
+                      className="wishlist-remove-action"
+                      onClick={() => removeWithRecovery(product)}
+                      aria-label={`Remove ${product.name} from wishlist`}
+                    >
+                      <Trash size={15} aria-hidden="true" />
+                      Remove
+                    </button>
+                  </div>
+                ))}
               </div>
             </>
           )}
