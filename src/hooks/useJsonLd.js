@@ -23,27 +23,34 @@ function absoluteUrl(pathOrUrl) {
   }
 }
 
+// Fakhri Mart is enquiry-led: live price, stock and exact shade are confirmed
+// personally. Google Product rich results require a genuine Offer, review or
+// aggregate rating, so we intentionally describe the page/entity without
+// manufacturing commercial fields that are not verified in real time.
 export function productJsonLd(product, canonicalUrl) {
   const url = canonicalUrl || `${PUBLIC_SITE_URL}/products/${product.slug}`;
-  const properties = [
-    product.variants ? { "@type": "PropertyValue", name: "Options", value: product.variants } : null,
-    product.suitableFor ? { "@type": "PropertyValue", name: "Best for", value: product.suitableFor } : null,
-    product.colors?.length
-      ? { "@type": "PropertyValue", name: "Shade guidance", value: `${product.colors.length} representative shade options shown; current shades confirmed on enquiry` }
-      : null,
-  ].filter(Boolean);
+  const images = [product.image, ...(product.galleryImages || [])]
+    .filter(Boolean)
+    .map((image) => absoluteUrl(image));
 
   return {
     "@context": "https://schema.org",
-    "@type": "Product",
-    "@id": `${url}#product`,
+    "@type": "ItemPage",
+    "@id": `${url}#webpage`,
     url,
-    name: product.name,
+    name: `${product.name} | Fakhri Mart`,
     description: product.description,
-    image: [product.image, ...(product.galleryImages || [])].filter(Boolean).map((image) => absoluteUrl(image)),
-    category: product.category,
-    brand: { "@type": "Brand", name: product.brand || product.category },
-    additionalProperty: properties.length ? properties : undefined,
+    isPartOf: { "@id": `${PUBLIC_SITE_URL}/#website` },
+    primaryImageOfPage: images[0]
+      ? { "@type": "ImageObject", contentUrl: images[0] }
+      : undefined,
+    about: {
+      "@type": "Thing",
+      name: product.name,
+      description: product.description,
+      image: images,
+      sameAs: url,
+    },
   };
 }
 
