@@ -13,6 +13,7 @@ import HeaderEnhancer from "./HeaderEnhancer.jsx";
 import ConnectionStatus from "./ConnectionStatus.jsx";
 import ShoppingWorkspace from "./ShoppingWorkspace.jsx";
 import AnalyticsBridge from "./AnalyticsBridge.jsx";
+import ProductRouteEnhancements from "./ProductRouteEnhancements.jsx";
 
 function ScrollToTop() {
   const { hash, pathname } = useLocation();
@@ -86,6 +87,7 @@ export default function Layout() {
         <div key={location.pathname} className="route-stage" data-route-family={routeFamily}>
           <Outlet />
         </div>
+        <ProductRouteEnhancements />
       </main>
       <Footer />
       <FloatingWhatsApp />
