@@ -4,10 +4,16 @@ import { trackEngagement } from "../lib/engagementAnalytics.js";
 
 const SCRIPT_ID = "fakhri-vercel-analytics";
 
+function isVercelHost() {
+  const host = window.location.hostname.toLocaleLowerCase();
+  return host === "fakhriyarns.vercel.app" || host.endsWith(".vercel.app");
+}
+
 export default function AnalyticsBridge() {
   const location = useLocation();
 
   useEffect(() => {
+    if (!isVercelHost()) return;
     window.va = window.va || function vercelAnalyticsQueue(...args) {
       (window.vaq = window.vaq || []).push(args);
     };
