@@ -6,37 +6,68 @@ const path = require("node:path");
 const BASE_URL = process.env.THEME_AUDIT_BASE_URL || "http://127.0.0.1:4173";
 const OUTPUT = path.resolve(process.cwd(), "theme-audit-artifacts");
 const routes = [
-  ["home", "/"], ["catalogue", "/products"], ["product", "/products/makhhi-thread"],
-  ["about", "/about"], ["contact", "/contact"], ["guides", "/blog"],
-  ["yarn-guide", "/yarn-guide"], ["enquiry", "/enquiry"], ["wishlist", "/wishlist"],
+  ["home", "/"],
+  ["catalogue", "/products"],
+  ["product", "/products/makhhi-thread"],
+  ["projects", "/projects"],
+  ["collection", "/collections/crochet-yarn"],
+  ["compare", "/compare"],
+  ["about", "/about"],
+  ["contact", "/contact"],
+  ["guides", "/blog"],
+  ["yarn-guide", "/yarn-guide"],
+  ["enquiry", "/enquiry"],
+  ["wishlist", "/wishlist"],
   ["delivery", "/delivery-enquiries"],
 ];
 const viewports = [["desktop", { width: 1440, height: 960 }], ["mobile", { width: 390, height: 844 }]];
 const themes = ["light", "dark"];
-const SECTION_VISUAL_ROUTES = new Set(["home", "catalogue", "product", "contact", "yarn-guide"]);
+const SECTION_VISUAL_ROUTES = new Set(["home", "catalogue", "product", "projects", "collection", "contact", "yarn-guide", "enquiry"]);
+const THEME_SURFACE_SELECTORS = [
+  ".site-header .brand",
+  ".category-mega-menu",
+  ".mobile-nav-drawer",
+  ".search-dialog",
+  ".page-hero",
+  ".product-card",
+  ".project-card",
+  ".guided-question",
+  ".guided-finder__summary",
+  ".compare-table-scroll",
+  ".compare-mobile-card",
+  ".contact-card",
+  ".map-panel",
+  ".store-location__copy",
+  ".store-location__identity",
+  ".enquiry-basket-items-panel",
+  ".enquiry-form-panel",
+  ".shopping-workspace",
+  ".workspace-product-row",
+  ".brand-model-highlight__stage",
+];
 
 async function settleEntirePage(page) {
   await page.evaluate(async () => {
     const max = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-    const steps = Math.max(1, Math.ceil(max / Math.max(window.innerHeight * 0.8, 500)));
+    const steps = Math.max(1, Math.ceil(max / Math.max(window.innerHeight * 0.72, 460)));
     for (let index = 0; index <= steps; index += 1) {
       window.scrollTo(0, Math.round(max * (index / steps)));
       await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     }
     window.scrollTo(0, 0);
   });
-  await page.waitForTimeout(180);
+  await page.waitForTimeout(220);
 }
 
 async function inspectSectionsInViewport(page, { name, viewportName, theme }) {
-  if (theme !== "dark" || !SECTION_VISUAL_ROUTES.has(name)) return [];
+  if (!SECTION_VISUAL_ROUTES.has(name)) return [];
   const count = await page.locator("#main-content section").count();
   const failures = [];
 
   for (let index = 0; index < count; index += 1) {
     const section = page.locator("#main-content section").nth(index);
     await section.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
-    await page.waitForTimeout(90);
+    await page.waitForTimeout(80);
 
     const state = await section.evaluate((element) => {
       const visible = (node) => {
@@ -44,8 +75,7 @@ async function inspectSectionsInViewport(page, { name, viewportName, theme }) {
         const style = getComputedStyle(node);
         return rect.width > 2 && rect.height > 2 && style.display !== "none" && style.visibility !== "hidden" && Number(style.opacity || 1) > 0.08;
       };
-      const content = [...element.querySelectorAll("h1,h2,h3,h4,p,a,button,strong,img,picture,iframe,input,textarea,select")]
-        .filter(visible);
+      const content = [...element.querySelectorAll("h1,h2,h3,h4,p,a,button,strong,img,picture,iframe,input,textarea,select,summary")].filter(visible);
       const rect = element.getBoundingClientRect();
       return {
         className: String(element.className || ""),
@@ -56,11 +86,9 @@ async function inspectSectionsInViewport(page, { name, viewportName, theme }) {
       };
     });
 
-    if (state.height > 100 && state.meaningfulVisible === 0) {
-      failures.push({ index, ...state });
-    }
+    if (state.height > 100 && state.meaningfulVisible === 0) failures.push({ index, ...state });
 
-    if (viewportName === "desktop" || name === "home" || name === "yarn-guide") {
+    if (viewportName === "desktop" || ["home", "catalogue", "contact", "projects", "compare", "yarn-guide"].includes(name)) {
       await page.screenshot({
         path: path.join(OUTPUT, `${viewportName}-${theme}-${name}-section-${String(index).padStart(2, "0")}.png`),
         fullPage: false,
@@ -75,7 +103,7 @@ async function inspectSectionsInViewport(page, { name, viewportName, theme }) {
 }
 
 async function inspectRenderedState(page) {
-  return page.evaluate(() => {
+  return page.evaluate(({ surfaceSelectors }) => {
     const parse = (value) => {
       const match = String(value).match(/rgba?\((\d+(?:\.\d+)?)[ ,]+(\d+(?:\.\d+)?)[ ,]+(\d+(?:\.\d+)?)(?:[ ,/]+([\d.]+))?/i);
       return match ? [Number(match[1]), Number(match[2]), Number(match[3]), match[4] == null ? 1 : Number(match[4])] : null;
@@ -85,48 +113,63 @@ async function inspectRenderedState(page) {
       const style = getComputedStyle(element);
       return rect.width > 2 && rect.height > 2 && style.visibility !== "hidden" && style.display !== "none" && Number(style.opacity || 1) > 0.03;
     };
-    const selectors = [
-      "header", "nav", "main section", "article", "button", "input", "textarea", "select",
-      ".product-card", ".category-card", ".contact-card", ".blog-story-card", ".wishlist-card-shell",
-      ".enquiry-basket-items-panel", ".enquiry-form-panel", ".basket-item-card-row", ".tabs-navigation-strip",
-      ".mobile-nav-drawer", ".search-dialog", ".quick-view-panel", ".enquiry-drawer", ".site-footer",
-      ".catalogue-cta", ".commerce-category-nav", ".commerce-wholesale", ".enquiry-launcher",
-      ".project-choice", ".project-recommendation", ".store-location__copy", ".guide-faqs__list details"
-    ];
-    const lightSurfaceLeaks = [];
-    if (document.documentElement.dataset.theme === "dark") {
-      const seen = new Set();
-      document.querySelectorAll(selectors.join(",")).forEach((element) => {
-        if (!(element instanceof HTMLElement) || !visible(element) || seen.has(element)) return;
-        seen.add(element);
+    const brightness = (rgb) => rgb ? (rgb[0] + rgb[1] + rgb[2]) / 3 : null;
+    const theme = document.documentElement.dataset.theme;
+    const surfaceMismatches = [];
+
+    for (const selector of surfaceSelectors) {
+      document.querySelectorAll(selector).forEach((element) => {
+        if (!(element instanceof HTMLElement) || !visible(element)) return;
         if (element.closest("picture, figure, .product-card-media, .product-gallery, .catalogue-hero-photo")) return;
         const style = getComputedStyle(element);
         const bg = parse(style.backgroundColor);
-        if (!bg || bg[3] < 0.82) return;
-        const average = (bg[0] + bg[1] + bg[2]) / 3;
+        if (!bg || bg[3] < 0.72) return;
+        const average = brightness(bg);
         const rect = element.getBoundingClientRect();
-        if (average > 225 && rect.width * rect.height > 900) {
-          lightSurfaceLeaks.push({
-            selector: String(element.className || element.tagName).trim(),
+        if (rect.width * rect.height < 600) return;
+        const wrongForDark = theme === "dark" && average > 150;
+        const wrongForLight = theme === "light" && average < 92;
+        if (wrongForDark || wrongForLight) {
+          surfaceMismatches.push({
+            selector,
+            className: String(element.className || ""),
             background: style.backgroundColor,
+            color: style.color,
+            average: Math.round(average),
             area: Math.round(rect.width * rect.height),
-            html: element.outerHTML.slice(0, 260),
+            text: element.innerText?.trim().slice(0, 120) || "",
           });
         }
       });
     }
+
+    const announcement = document.querySelector(".announcement-bar__inner");
+    const brand = document.querySelector(".site-header .brand");
+    const storeCopy = document.querySelector(".store-location__copy");
+    const semanticChecks = [];
+    const pushCheck = (name, element) => {
+      if (!element || !visible(element)) return;
+      const style = getComputedStyle(element);
+      semanticChecks.push({ name, color: style.color, background: style.backgroundColor, backgroundImage: style.backgroundImage });
+    };
+    pushCheck("announcement", announcement);
+    pushCheck("header-brand", brand);
+    pushCheck("store-location-copy", storeCopy);
+
     const unresolvedReveals = [...document.querySelectorAll(".reveal")]
       .filter((element) => visible(element) && !element.classList.contains("is-visible"))
       .map((element) => String(element.className).slice(0, 160));
+
     return {
-      theme: document.documentElement.dataset.theme,
+      theme,
       overflow: Math.max(0, document.documentElement.scrollWidth - document.documentElement.clientWidth),
       h1Count: document.querySelectorAll("h1").length,
-      lightSurfaceLeaks,
+      surfaceMismatches,
+      semanticChecks,
       unresolvedReveals,
       brokenImages: [...document.images].filter((image) => image.complete && image.naturalWidth === 0).map((image) => image.currentSrc || image.src),
     };
-  });
+  }, { surfaceSelectors: THEME_SURFACE_SELECTORS });
 }
 
 async function verifyThemeControls(browser) {
@@ -137,31 +180,18 @@ async function verifyThemeControls(browser) {
   await page.evaluate(() => localStorage.removeItem("fakhri_theme"));
   await page.reload({ waitUntil: "networkidle" });
   await page.waitForFunction(() => document.querySelectorAll(".theme-toggle").length >= 2);
-  const before = await page.evaluate(() => ({
-    theme: document.documentElement.dataset.theme,
-    states: [...document.querySelectorAll(".theme-toggle")].map((button) => button.getAttribute("aria-pressed")),
-  }));
+  const before = await page.evaluate(() => ({ theme: document.documentElement.dataset.theme, states: [...document.querySelectorAll(".theme-toggle")].map((button) => button.getAttribute("aria-pressed")) }));
   if (before.theme !== "light") throw new Error(`Expected system-light fallback, got ${before.theme}`);
 
   await page.locator(".theme-toggle").first().click();
   await page.waitForFunction(() => document.documentElement.dataset.theme === "dark");
-  const synchronized = await page.evaluate(() => ({
-    stored: localStorage.getItem("fakhri_theme"),
-    states: [...document.querySelectorAll(".theme-toggle")].map((button) => button.getAttribute("aria-pressed")),
-  }));
-  if (synchronized.stored !== "dark" || synchronized.states.some((state) => state !== "true")) {
-    throw new Error(`Theme controls did not synchronize: ${JSON.stringify(synchronized)}`);
-  }
+  const synchronized = await page.evaluate(() => ({ stored: localStorage.getItem("fakhri_theme"), states: [...document.querySelectorAll(".theme-toggle")].map((button) => button.getAttribute("aria-pressed")) }));
+  if (synchronized.stored !== "dark" || synchronized.states.some((state) => state !== "true")) throw new Error(`Theme controls did not synchronize: ${JSON.stringify(synchronized)}`);
 
   await page.reload({ waitUntil: "networkidle" });
   await page.waitForFunction(() => document.querySelectorAll(".theme-toggle").length >= 2);
-  const persisted = await page.evaluate(() => ({
-    theme: document.documentElement.dataset.theme,
-    states: [...document.querySelectorAll(".theme-toggle")].map((button) => button.getAttribute("aria-pressed")),
-  }));
-  if (persisted.theme !== "dark" || persisted.states.some((state) => state !== "true")) {
-    throw new Error(`Dark preference did not persist: ${JSON.stringify(persisted)}`);
-  }
+  const persisted = await page.evaluate(() => ({ theme: document.documentElement.dataset.theme, states: [...document.querySelectorAll(".theme-toggle")].map((button) => button.getAttribute("aria-pressed")) }));
+  if (persisted.theme !== "dark" || persisted.states.some((state) => state !== "true")) throw new Error(`Dark preference did not persist: ${JSON.stringify(persisted)}`);
   await context.close();
 }
 
@@ -179,7 +209,9 @@ async function verifyThemeControls(browser) {
         await context.addInitScript(({ selectedTheme }) => {
           localStorage.setItem("fakhri_theme", selectedTheme);
           sessionStorage.setItem("fakhri_intro_cinematic_v2", "played");
+          localStorage.setItem("fakhri_compare_v1", JSON.stringify(["makhhi-thread", "4-ply-cotton-thread", "single-macrame-cord"]));
         }, { selectedTheme: theme });
+
         for (const [name, route] of routes) {
           const page = await context.newPage();
           const errors = [];
@@ -192,13 +224,10 @@ async function verifyThemeControls(browser) {
           const blankSections = await inspectSectionsInViewport(page, { name, viewportName, theme });
           const metrics = await inspectRenderedState(page);
           const axe = await new AxeBuilder({ page }).withRules(["color-contrast"]).analyze();
-          const contrastViolations = axe.violations.map((violation) => ({
-            id: violation.id,
-            nodes: violation.nodes.map((node) => ({ target: node.target, html: node.html, summary: node.failureSummary })),
-          }));
+          const contrastViolations = axe.violations.map((violation) => ({ id: violation.id, nodes: violation.nodes.map((node) => ({ target: node.target, html: node.html, summary: node.failureSummary })) }));
           const entry = { viewport: viewportName, theme, route, errors, blankSections, ...metrics, contrastViolations };
           report.push(entry);
-          if (metrics.theme !== theme || metrics.overflow > 1 || metrics.h1Count !== 1 || errors.length || blankSections.length || metrics.lightSurfaceLeaks.length || metrics.unresolvedReveals.length || metrics.brokenImages.length || contrastViolations.length) failures.push(entry);
+          if (metrics.theme !== theme || metrics.overflow > 1 || metrics.h1Count !== 1 || errors.length || blankSections.length || metrics.surfaceMismatches.length || metrics.unresolvedReveals.length || metrics.brokenImages.length || contrastViolations.length) failures.push(entry);
           await page.screenshot({ path: path.join(OUTPUT, `${viewportName}-${theme}-${name}.png`), fullPage: true, animations: "disabled" });
           await page.close();
         }
@@ -208,6 +237,7 @@ async function verifyThemeControls(browser) {
   } finally {
     await browser.close();
   }
+
   fs.writeFileSync(path.join(OUTPUT, "report.json"), JSON.stringify(report, null, 2));
   if (failures.length) {
     fs.writeFileSync(path.join(OUTPUT, "failures.json"), JSON.stringify(failures, null, 2));
@@ -215,5 +245,8 @@ async function verifyThemeControls(browser) {
     console.error(JSON.stringify(failures.slice(0, 6), null, 2));
     process.exit(1);
   }
-  console.log(`Theme visual audit passed ${report.length} rendered route/theme/viewport combinations, in-viewport section checks, and persistence/synchronization checks.`);
-})();
+  console.log(`Theme visual audit passed ${report.length} route/theme/viewport combinations with semantic surface contracts, Axe contrast, section visibility, overflow and persistence checks.`);
+})().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});
