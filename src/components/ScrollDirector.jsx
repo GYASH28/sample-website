@@ -41,6 +41,7 @@ export default function ScrollDirector() {
 
   useEffect(() => {
     const root = document.documentElement;
+    const body = document.body;
     const main = document.querySelector("#main-content");
     const reducedQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     const markedElements = new Set();
@@ -144,13 +145,12 @@ export default function ScrollDirector() {
       : null;
     mutationObserver?.observe(main, { childList: true, subtree: true });
 
+    // Body resize happens when lazy content, fonts or responsive sections alter
+    // document height. Recalculate only then — never from the scroll callback.
     const resizeObserver = typeof ResizeObserver !== "undefined"
-      ? new ResizeObserver(() => {
-          measureScrollRange();
-          scheduleProgress();
-        })
+      ? new ResizeObserver(onResize)
       : null;
-    if (resizeObserver) resizeObserver.observe(root);
+    if (resizeObserver && body) resizeObserver.observe(body);
 
     window.addEventListener("scroll", scheduleProgress, { passive: true });
     window.addEventListener("resize", onResize, { passive: true });
