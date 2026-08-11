@@ -7,7 +7,7 @@ import {
   ShoppingBagOpen,
   X,
 } from "@phosphor-icons/react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useLanguage } from "../context/LanguageContext.jsx";
 import { useEnquiryBasket } from "../hooks/useEnquiryBasket.js";
@@ -17,10 +17,10 @@ import {
   createWhatsAppLink,
   productCategories,
 } from "../data/siteData.js";
-import SearchDialog from "./SearchDialog.jsx";
 import ThemeToggle from "./ThemeToggle.jsx";
 import WhatsAppIcon from "./WhatsAppIcon.jsx";
 
+const SearchDialog = lazy(() => import("./SearchDialog.jsx"));
 const OPEN_SEARCH_EVENT = "fakhri:open-search";
 
 const primaryLinks = [
@@ -125,26 +125,20 @@ export default function Header() {
       <header className="site-header">
         <div className="announcement-bar" aria-label="Store information">
           <div className="container announcement-bar__inner">
-            <span>{t("allIndia")}</span>
-            <span>{t("wholesale")}</span>
-            <span>{t("shades")}</span>
+            <span>{t("allIndia")}</span><span>{t("wholesale")}</span><span>{t("shades")}</span>
           </div>
         </div>
 
         <div className="container nav-shell">
           <Link className="brand" to="/" aria-label="Fakhri Mart home">
-            <span className="brand-mark" aria-hidden="true">
-              <img src="/assets/brand/fakhri-logo-96.webp" alt="" width="96" height="96" />
-            </span>
+            <span className="brand-mark" aria-hidden="true"><img src="/assets/brand/fakhri-logo-96.webp" alt="" width="96" height="96" /></span>
             <span><strong>Fakhri Mart</strong><small>Yarn & craft materials</small></span>
           </Link>
 
           <nav className="desktop-nav" aria-label="Primary navigation">
             <div className="catalogue-nav-item" onMouseEnter={() => setMegaOpen(true)} onMouseLeave={() => setMegaOpen(false)}>
               <NavLink to="/products" onFocus={() => setMegaOpen(true)}>{t("catalogue")}</NavLink>
-              <button type="button" className="mega-toggle" onClick={() => setMegaOpen((value) => !value)} aria-expanded={megaOpen} aria-label="Show catalogue categories">
-                <span aria-hidden="true">⌄</span>
-              </button>
+              <button type="button" className="mega-toggle" onClick={() => setMegaOpen((value) => !value)} aria-expanded={megaOpen} aria-label="Show catalogue categories"><span aria-hidden="true">⌄</span></button>
               {megaOpen ? (
                 <div className="category-mega-menu" onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setMegaOpen(false); }}>
                   <div className="mega-intro">
@@ -170,17 +164,14 @@ export default function Header() {
             <button className="header-search-trigger" type="button" onClick={openSearch} aria-label={t("search")} aria-keyshortcuts="Control+K Meta+K /" title={`Search (${shortcutLabel} or /)`}>
               <MagnifyingGlass size={19} /><span>{t("search")}</span><kbd>{shortcutLabel}</kbd>
             </button>
-
             <div className="language-control" aria-label="Language">
               <button type="button" className={language === "en" ? "active" : ""} onClick={() => setLanguage("en")} aria-pressed={language === "en"}>EN</button>
               <button type="button" className={language === "hi" ? "active" : ""} onClick={() => setLanguage("hi")} aria-pressed={language === "hi"}>हिं</button>
             </div>
-
             <ThemeToggle compact />
             <Link className="icon-button desktop-icon-action" to="/wishlist" aria-label={`${t("wishlist")}: ${wishlistCount}`}><Heart size={21} /><Counter value={wishlistCount} /></Link>
             <Link className="icon-button desktop-icon-action" to="/enquiry" aria-label={`${t("enquiry")}: ${itemsCount}`}><ShoppingBagOpen size={22} /><Counter value={itemsCount} /></Link>
             <a className="header-whatsapp" href={createWhatsAppLink()} target="_blank" rel="noreferrer"><WhatsAppIcon size={17} /><span>{t("whatsapp")}</span></a>
-
             <button ref={menuButtonRef} className="menu-toggle" type="button" onClick={() => setMenuOpen(true)} aria-label={t("menu")} aria-expanded={menuOpen}><List size={25} /></button>
           </div>
         </div>
@@ -195,33 +186,32 @@ export default function Header() {
           </Link>
           <button className="icon-button" type="button" onClick={closeMenu} aria-label={t("close")}><X size={24} /></button>
         </div>
-
         <div className="mobile-drawer-utilities">
           <button className="mobile-search-button" type="button" onClick={openSearch}><MagnifyingGlass size={20} /><span>{t("searchHint")}</span></button>
           <ThemeToggle />
         </div>
-
         <nav className="mobile-primary-links" aria-label="Mobile primary">
           {primaryLinks.map((item) => <NavLink key={item.to} to={item.to} onClick={closeMenu}>{t(item.key)}</NavLink>)}
         </nav>
-
         <div className="mobile-category-group">
           <span className="eyebrow">{t("discover")}</span>
           <div>{productCategories.map((category) => <Link key={category.name} to={`/products?category=${encodeURIComponent(category.name)}`} onClick={closeMenu}>{category.shortName}</Link>)}</div>
         </div>
-
         <div className="mobile-saved-actions">
           <Link to="/wishlist" onClick={closeMenu}><Heart size={20} /> {t("wishlist")} <Counter value={wishlistCount} /></Link>
           <Link to="/enquiry" onClick={closeMenu}><ShoppingBagOpen size={20} /> {t("enquiry")} <Counter value={itemsCount} /></Link>
         </div>
-
         <address className="mobile-business-details">
           <span><MapPin size={18} /> {businessInfo.location}</span>
           <a href={businessInfo.phoneHref}><Phone size={18} /> {businessInfo.phoneDisplay}</a>
         </address>
       </aside>
 
-      <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} />
+      {searchOpen ? (
+        <Suspense fallback={null}>
+          <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} />
+        </Suspense>
+      ) : null}
     </>
   );
 }
