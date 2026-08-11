@@ -40,6 +40,77 @@
   bottom: 148px;
 }
 
+/* Desktop gets the true side-by-side comparison. Phones get cards instead of a
+   horizontally clipped spreadsheet pretending to be mobile UI. */
+.compare-mobile-list { display: none; }
+.compare-mobile-card {
+  border: 1px solid var(--ui-border);
+  border-radius: 18px;
+  background: var(--ui-surface);
+  box-shadow: var(--ui-shadow-soft);
+  overflow: hidden;
+}
+.compare-mobile-card__head {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr) auto;
+  gap: 11px;
+  align-items: center;
+  padding: 13px;
+  border-bottom: 1px solid var(--ui-border);
+  background: color-mix(in srgb, var(--ui-accent-soft) 28%, var(--ui-surface));
+}
+.compare-mobile-card__head img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 13px;
+}
+.compare-mobile-card__head > div { min-width: 0; display: grid; gap: 2px; }
+.compare-mobile-card__head span {
+  color: var(--ui-accent-strong);
+  font-size: .65rem;
+  font-weight: 900;
+  letter-spacing: .07em;
+}
+.compare-mobile-card__head a {
+  color: var(--ui-text-strong);
+  font-size: 1rem;
+  font-weight: 900;
+}
+.compare-mobile-card__head small { color: var(--ui-text-muted); }
+.compare-mobile-card__head button {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--ui-border);
+  border-radius: 12px;
+  background: var(--ui-bg-elevated);
+  color: var(--ui-text-muted);
+  cursor: pointer;
+}
+.compare-mobile-card__facts { margin: 0; }
+.compare-mobile-card__facts > div {
+  display: grid;
+  grid-template-columns: minmax(95px, .78fr) minmax(0, 1.22fr);
+  gap: 12px;
+  padding: 10px 13px;
+  border-bottom: 1px solid var(--ui-border);
+}
+.compare-mobile-card__facts > div:last-child { border-bottom: 0; }
+.compare-mobile-card__facts dt {
+  color: var(--ui-text-muted);
+  font-size: .7rem;
+  font-weight: 850;
+}
+.compare-mobile-card__facts dd {
+  min-width: 0;
+  margin: 0;
+  color: var(--ui-text);
+  font-size: .76rem;
+  line-height: 1.4;
+}
+
 /* Footer gained a third useful internal-link group in v14. Let it wrap without
    squeezing the verified contact column. */
 .footer-navigation {
@@ -73,11 +144,14 @@
     right: 12px;
     bottom: 140px;
   }
+  .compare-desktop-table { display: none; }
+  .compare-mobile-list { display: grid; gap: 12px; }
 }
 
 @media (max-width: 480px) {
   .footer-navigation { grid-template-columns: 1fr; }
   .shopping-workspace-launcher { box-shadow: 0 8px 22px rgba(0,0,0,.14); }
+  .compare-mobile-card__facts > div { grid-template-columns: 92px minmax(0, 1fr); gap: 9px; }
 }
 
 :root[data-theme="dark"] .shopping-workspace-launcher,
