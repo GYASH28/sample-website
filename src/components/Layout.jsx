@@ -11,6 +11,8 @@ import CommerceIntro from "./CommerceIntro.jsx";
 import MobileProductDock from "./MobileProductDock.jsx";
 import HeaderEnhancer from "./HeaderEnhancer.jsx";
 import ConnectionStatus from "./ConnectionStatus.jsx";
+import ShoppingWorkspace from "./ShoppingWorkspace.jsx";
+import AnalyticsBridge from "./AnalyticsBridge.jsx";
 
 function ScrollToTop() {
   const { hash, pathname } = useLocation();
@@ -30,15 +32,9 @@ function ScrollToTop() {
 
 function getRouteFamily(pathname) {
   if (pathname === "/") return "home";
-  if (pathname === "/products") return "catalogue";
+  if (pathname === "/products" || pathname === "/projects" || pathname.startsWith("/collections/")) return "catalogue";
   if (pathname.startsWith("/products/")) return "detail";
-  if (
-    pathname === "/about" ||
-    pathname === "/blog" ||
-    pathname.startsWith("/blog/")
-  ) {
-    return "editorial";
-  }
+  if (pathname === "/about" || pathname === "/blog" || pathname.startsWith("/blog/")) return "editorial";
   return "utility";
 }
 
@@ -46,12 +42,16 @@ function getRouteLabel(pathname) {
   if (pathname === "/") return "Home";
   if (pathname === "/products") return "Catalogue";
   if (pathname.startsWith("/products/")) return "Product details";
+  if (pathname === "/projects") return "Shop by project";
+  if (pathname.startsWith("/collections/")) return "Material collection";
+  if (pathname === "/compare") return "Material comparison";
   if (pathname === "/about") return "About";
   if (pathname === "/blog") return "Guides";
   if (pathname.startsWith("/blog/")) return "Guide";
   if (pathname === "/contact") return "Contact";
   if (pathname === "/wishlist") return "Wishlist";
   if (pathname === "/enquiry") return "Enquiry";
+  if (pathname === "/yarn-guide") return "Material finder";
   return "Page";
 }
 
@@ -60,17 +60,11 @@ function RouteAnnouncer() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setMessage(`${getRouteLabel(pathname)} page opened`);
-    }, 120);
+    const timer = window.setTimeout(() => setMessage(`${getRouteLabel(pathname)} page opened`), 120);
     return () => window.clearTimeout(timer);
   }, [pathname]);
 
-  return (
-    <div className="route-announcer" role="status" aria-live="polite" aria-atomic="true">
-      {message}
-    </div>
-  );
+  return <div className="route-announcer" role="status" aria-live="polite" aria-atomic="true">{message}</div>;
 }
 
 export default function Layout() {
@@ -80,6 +74,7 @@ export default function Layout() {
   return (
     <>
       <a href="#main-content" className="skip-link">Skip to main content</a>
+      <AnalyticsBridge />
       <CommerceIntro />
       <ScrollDirector />
       <ScrollToTop />
@@ -87,16 +82,8 @@ export default function Layout() {
       <Header />
       <RouteAnnouncer />
       <main id="main-content" data-route-family={routeFamily}>
-        <div
-          key={`thread-${location.pathname}`}
-          className="route-thread-transition"
-          aria-hidden="true"
-        />
-        <div
-          key={location.pathname}
-          className="route-stage"
-          data-route-family={routeFamily}
-        >
+        <div key={`thread-${location.pathname}`} className="route-thread-transition" aria-hidden="true" />
+        <div key={location.pathname} className="route-stage" data-route-family={routeFamily}>
           <Outlet />
         </div>
       </main>
@@ -104,6 +91,7 @@ export default function Layout() {
       <FloatingWhatsApp />
       <BasketToast />
       <EnquiryDrawerLauncher />
+      <ShoppingWorkspace />
       <MobileProductDock />
       <MobileBottomNav />
       <ConnectionStatus />
