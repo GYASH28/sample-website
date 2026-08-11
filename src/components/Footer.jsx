@@ -16,14 +16,7 @@ export default function Footer() {
     <footer className="site-footer">
       <div className="container footer-main">
         <div className="footer-statement">
-          <img
-            className="footer-brand-seal"
-            src="/assets/brand/fakhri-logo-256.webp"
-            alt="Fakhri Mart Yarn Store"
-            width="256"
-            height="256"
-            loading="lazy"
-          />
+          <img className="footer-brand-seal" src="/assets/brand/fakhri-logo-256.webp" alt="Fakhri Mart Yarn Store" width="256" height="256" loading="lazy" />
           <span className="eyebrow">Fakhri Mart · Pune</span>
           <h2>{businessInfo.tagline}</h2>
           <p>Yarn, thread, cord and craft supplies for makers, boutiques, resellers and wholesale buyers across India.</p>
@@ -36,9 +29,18 @@ export default function Footer() {
           <div>
             <span>Explore</span>
             <Link to="/products">Catalogue</Link>
-            <Link to="/yarn-guide">Yarn & project guide</Link>
+            <Link to="/projects">Shop by project</Link>
+            <Link to="/yarn-guide">Guided material finder</Link>
             <Link to="/blog">Craft guides</Link>
             <Link to="/wishlist">Wishlist</Link>
+          </div>
+          <div>
+            <span>Popular material paths</span>
+            <Link to="/collections/crochet-yarn">Crochet yarn & thread</Link>
+            <Link to="/collections/macrame-cord">Macramé cord</Link>
+            <Link to="/collections/embroidery-thread">Embroidery thread</Link>
+            <Link to="/collections/yarn-for-bags">Materials for bags</Link>
+            <Link to="/collections/wholesale-yarn-pune">Wholesale enquiries</Link>
           </div>
           <div>
             <span>Information</span>
@@ -54,21 +56,13 @@ export default function Footer() {
           <span>Contact</span>
           <p><MapPin size={18} /> {businessInfo.location}</p>
           <a href={businessInfo.phoneHref}><Phone size={18} /> {businessInfo.phoneDisplay}</a>
-          {businessInfo.secondaryPhoneDisplay ? (
-            <a href={businessInfo.secondaryPhoneHref}><Phone size={18} /> {businessInfo.secondaryPhoneDisplay}</a>
-          ) : null}
+          {businessInfo.secondaryPhoneDisplay ? <a href={businessInfo.secondaryPhoneHref}><Phone size={18} /> {businessInfo.secondaryPhoneDisplay}</a> : null}
           <a href={businessInfo.emailHref}><Envelope size={18} /> {businessInfo.email}</a>
-          <a href={businessInfo.instagramUrl} target="_blank" rel="noreferrer">
-            <InstagramLogo size={18} /> @{businessInfo.instagram} <ArrowUpRight size={14} />
-          </a>
+          <a href={businessInfo.instagramUrl} target="_blank" rel="noreferrer"><InstagramLogo size={18} /> @{businessInfo.instagram} <ArrowUpRight size={14} /></a>
           <small>{businessInfo.hours}</small>
           <div className="footer-google-links">
-            <a href={googlePresence.mapsUrl} target="_blank" rel="noopener noreferrer">
-              <MapPin size={17} /> Google Maps <ArrowSquareOut size={14} />
-            </a>
-            <a href={googlePresence.businessProfileUrl} target="_blank" rel="noopener noreferrer">
-              Google Business Profile <ArrowSquareOut size={14} />
-            </a>
+            <a href={googlePresence.mapsUrl} target="_blank" rel="noopener noreferrer"><MapPin size={17} /> Google Maps <ArrowSquareOut size={14} /></a>
+            <a href={googlePresence.businessProfileUrl} target="_blank" rel="noopener noreferrer">Google Business Profile <ArrowSquareOut size={14} /></a>
           </div>
         </address>
       </div>
