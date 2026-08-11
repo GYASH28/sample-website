@@ -32,6 +32,7 @@ import "./production-theme-v11-final.css";
 import "./seamless-header-v12.css";
 import "./brand-highlight-v12.css";
 import "./header-glass-tuning-v12.css";
+import "./ux-performance-v13.css";
 
 applyCatalogueIntegrity();
 applyMotionProfile();
