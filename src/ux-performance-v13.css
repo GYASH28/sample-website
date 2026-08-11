@@ -1,0 +1,101 @@
+/* Fakhri Mart v13 — conversion, accessibility and rendering polish. */
+
+/* Contact actions should read like a decision point, not another card pile. */
+.contact-card--identity {
+  border-color: color-mix(in srgb, var(--teal, #2a8c82) 26%, transparent);
+}
+
+.contact-card--identity h3 {
+  margin-bottom: 4px;
+}
+
+.contact-card--identity p {
+  margin: 0;
+  color: var(--ui-text-muted, var(--muted));
+  font-weight: 700;
+}
+
+.contact-direct-actions {
+  margin-top: 22px;
+}
+
+/* Conversion controls: comfortably tappable without making cards bulky. */
+.product-actions .btn,
+.contact-direct-actions .btn,
+.footer-contact a,
+.footer-google-links a {
+  min-height: 44px;
+}
+
+/* Product cards had three equal-width CTAs competing in one narrow row. Keep
+   Details + Add together, then give the direct WhatsApp enquiry the full row. */
+.product-card > .product-actions {
+  display: grid;
+  grid-template-columns: minmax(88px, 0.8fr) minmax(122px, 1.2fr);
+  gap: 8px;
+}
+
+.product-card > .product-actions > .btn {
+  width: 100%;
+  min-width: 0;
+  padding-inline: 10px;
+  white-space: nowrap;
+}
+
+.product-card > .product-actions > .btn-whatsapp {
+  grid-column: 1 / -1;
+}
+
+.product-card-swatches .swatch-dot-button {
+  min-width: 30px;
+  min-height: 30px;
+}
+
+/* A selected representative shade is useful context, so make the state easy
+   to see without relying only on a tiny outline. */
+.product-card-swatches .swatch-dot-button.selected {
+  box-shadow:
+    0 0 0 2px var(--ui-bg, #fff7ec),
+    0 0 0 4px color-mix(in srgb, var(--teal, #2a8c82) 68%, var(--pink-dark, #b95776));
+}
+
+/* Decorative route-thread work adds little value on compact/lite devices. */
+html[data-motion-profile="compact"] .route-thread-transition,
+html[data-motion-profile="lite"] .route-thread-transition {
+  display: none !important;
+}
+
+/* Keep hover effects on devices that actually hover. Touch users get stable
+   controls instead of sticky hover states. */
+@media (hover: none), (pointer: coarse) {
+  .product-card,
+  .contact-card,
+  .btn {
+    transform: none !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .product-card > .product-actions {
+    grid-template-columns: minmax(84px, 0.78fr) minmax(118px, 1.22fr);
+  }
+
+  .product-actions .btn {
+    min-height: 46px;
+  }
+
+  .contact-direct-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .contact-direct-actions .btn {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-thread-transition {
+    display: none !important;
+  }
+}

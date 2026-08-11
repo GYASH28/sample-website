@@ -30,18 +30,21 @@ function uniqueElements(selector) {
 
 export default function ScrollDirector() {
   const { pathname } = useLocation();
-  const frameRef = useRef(0);
+  const progressFrameRef = useRef(0);
+  const collectionFrameRef = useRef(0);
   const progressRef = useRef(null);
   const ringRef = useRef(null);
   const hubRef = useRef(null);
   const labelRef = useRef(null);
   const lastPercentRef = useRef(-1);
+  const scrollableRef = useRef(1);
 
   useEffect(() => {
     const root = document.documentElement;
+    const body = document.body;
+    const main = document.querySelector("#main-content");
     const reducedQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     const markedElements = new Set();
-    let collectionTimers = [];
 
     const revealObserver = new IntersectionObserver(
       (entries, observer) => {
@@ -51,17 +54,16 @@ export default function ScrollDirector() {
           observer.unobserve(entry.target);
         });
       },
-      { rootMargin: "0px 0px -7% 0px", threshold: 0.08 },
+      { rootMargin: "140px 0px -6% 0px", threshold: 0.02 },
     );
 
     const prepareReveal = (element, index = 0) => {
       if (element.dataset.scrollPrepared === "true") return;
       element.dataset.scrollPrepared = "true";
-      element.style.setProperty("--reveal-delay", `${Math.min(index % 5, 4) * 34}ms`);
+      element.style.setProperty("--reveal-delay", `${Math.min(index % 5, 4) * 28}ms`);
       markedElements.add(element);
 
-      const rect = element.getBoundingClientRect();
-      if (rect.top < window.innerHeight * 0.88 || reducedQuery.matches) {
+      if (reducedQuery.matches) {
         element.classList.add("is-scroll-revealed");
       } else {
         revealObserver.observe(element);
@@ -69,6 +71,7 @@ export default function ScrollDirector() {
     };
 
     const markElements = () => {
+      collectionFrameRef.current = 0;
       const scenes = uniqueElements(SCENE_SELECTOR);
       const cards = uniqueElements(CARD_SELECTOR);
 
@@ -77,8 +80,8 @@ export default function ScrollDirector() {
           element.dataset.scrollScene = "true";
           markedElements.add(element);
         }
-        if (index > 0) prepareReveal(element, index);
-        else element.classList.add("is-scroll-revealed");
+        if (index === 0) element.classList.add("is-scroll-revealed");
+        else prepareReveal(element, index);
       });
 
       cards.forEach((element, index) => {
@@ -90,11 +93,20 @@ export default function ScrollDirector() {
       });
     };
 
-    const updateProgress = () => {
-      frameRef.current = 0;
+    const scheduleCollection = () => {
+      if (!collectionFrameRef.current) {
+        collectionFrameRef.current = window.requestAnimationFrame(markElements);
+      }
+    };
+
+    const measureScrollRange = () => {
       const viewportHeight = Math.max(window.innerHeight, 1);
-      const scrollable = Math.max(root.scrollHeight - viewportHeight, 1);
-      const progress = clamp(window.scrollY / scrollable);
+      scrollableRef.current = Math.max(root.scrollHeight - viewportHeight, 1);
+    };
+
+    const updateProgress = () => {
+      progressFrameRef.current = 0;
+      const progress = clamp(window.scrollY / scrollableRef.current);
       const percent = Math.round(progress * 100);
 
       if (ringRef.current) ringRef.current.style.strokeDashoffset = `${100 - progress * 100}`;
@@ -107,26 +119,50 @@ export default function ScrollDirector() {
         if (labelRef.current) labelRef.current.textContent = `${percent}`;
       }
 
-      progressRef.current?.classList.toggle("is-active", window.scrollY > 22 && scrollable > 90);
+      progressRef.current?.classList.toggle(
+        "is-active",
+        window.scrollY > 22 && scrollableRef.current > 90,
+      );
     };
 
     const scheduleProgress = () => {
-      if (!frameRef.current) frameRef.current = window.requestAnimationFrame(updateProgress);
+      if (!progressFrameRef.current) {
+        progressFrameRef.current = window.requestAnimationFrame(updateProgress);
+      }
+    };
+
+    const onResize = () => {
+      measureScrollRange();
+      scheduleProgress();
     };
 
     markElements();
+    measureScrollRange();
     updateProgress();
-    collectionTimers = [140, 460].map((delay) => window.setTimeout(markElements, delay));
+
+    const mutationObserver = main
+      ? new MutationObserver(scheduleCollection)
+      : null;
+    mutationObserver?.observe(main, { childList: true, subtree: true });
+
+    // Body resize happens when lazy content, fonts or responsive sections alter
+    // document height. Recalculate only then — never from the scroll callback.
+    const resizeObserver = typeof ResizeObserver !== "undefined"
+      ? new ResizeObserver(onResize)
+      : null;
+    if (resizeObserver && body) resizeObserver.observe(body);
 
     window.addEventListener("scroll", scheduleProgress, { passive: true });
-    window.addEventListener("resize", scheduleProgress, { passive: true });
+    window.addEventListener("resize", onResize, { passive: true });
 
     return () => {
-      if (frameRef.current) window.cancelAnimationFrame(frameRef.current);
-      collectionTimers.forEach((timer) => window.clearTimeout(timer));
+      if (progressFrameRef.current) window.cancelAnimationFrame(progressFrameRef.current);
+      if (collectionFrameRef.current) window.cancelAnimationFrame(collectionFrameRef.current);
       revealObserver.disconnect();
+      mutationObserver?.disconnect();
+      resizeObserver?.disconnect();
       window.removeEventListener("scroll", scheduleProgress);
-      window.removeEventListener("resize", scheduleProgress);
+      window.removeEventListener("resize", onResize);
 
       markedElements.forEach((element) => {
         delete element.dataset.scrollScene;
