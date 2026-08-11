@@ -10,6 +10,8 @@ import {
   createWhatsAppLink,
   productInterestOptions,
 } from "../data/siteData.js";
+import EnquirySummaryTools from "./EnquirySummaryTools.jsx";
+import { trackEngagement } from "../lib/engagementAnalytics.js";
 
 export default function EnquiryForm({ compact = false, basket = [], onClearBasket }) {
   const formRef = useRef(null);
@@ -20,14 +22,11 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
   const [copied, setCopied] = useState(false);
   const submitTimer = useRef(null);
   const copyTimer = useRef(null);
-
   const hasBasket = basket && basket.length > 0;
 
-  useEffect(() => {
-    return () => {
-      if (submitTimer.current) window.clearTimeout(submitTimer.current);
-      if (copyTimer.current) window.clearTimeout(copyTimer.current);
-    };
+  useEffect(() => () => {
+    if (submitTimer.current) window.clearTimeout(submitTimer.current);
+    if (copyTimer.current) window.clearTimeout(copyTimer.current);
   }, []);
 
   function buildMessage(formData) {
@@ -36,7 +35,6 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
     const businessType = formData.get("businessType") || "";
     const city = formData.get("city") || "";
     const message = formData.get("message") || "";
-
     let text = `Hello Fakhri Mart, I submitted an enquiry on the website.\n\n`;
     text += `*Name:* ${name}\n`;
     text += `*Phone:* ${phone}\n`;
@@ -63,7 +61,6 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
 
     if (message) text += `\n*Delivery question / notes:* ${message}\n`;
     text += `\nPlease share availability, current shade photos, quantity-based price and delivery timing. Thank you.`;
-
     return text;
   }
 
@@ -73,52 +70,44 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
     const formData = new FormData(form);
     const message = buildMessage(formData);
     const link = createWhatsAppLink(message);
-
     setSubmitted(false);
     setSubmitting(true);
     setWhatsappLink(link);
     setCompiledMessage(message);
-
+    trackEngagement("enquiry_submit", { count: basket.length, source: hasBasket ? "basket-form" : "general-form" });
     window.open(link, "_blank", "noopener,noreferrer");
 
     submitTimer.current = window.setTimeout(() => {
       setSubmitting(false);
       setSubmitted(true);
-
-      // Clear the basket if callback is present
-      if (hasBasket && onClearBasket) {
-        onClearBasket();
-      }
+      if (hasBasket && onClearBasket) onClearBasket();
       form.reset();
     }, 240);
   }
 
-  const handleCopySummary = () => {
-    if (compiledMessage) {
-      navigator.clipboard.writeText(compiledMessage);
+  const handleCopySummary = async () => {
+    if (!compiledMessage) return;
+    try {
+      await navigator.clipboard.writeText(compiledMessage);
       setCopied(true);
+      trackEngagement("enquiry_summary_copy", { count: basket.length, source: "submitted-form" });
       window.clearTimeout(copyTimer.current);
       copyTimer.current = window.setTimeout(() => setCopied(false), 2_000);
+    } catch {
+      // Clipboard can be disabled by browser privacy settings.
     }
   };
 
   return (
     <div className={`enquiry-card ${compact ? "enquiry-card--compact" : ""} ${hasBasket ? "enquiry-card--has-basket" : ""}`}>
+      {hasBasket && !compact ? <EnquirySummaryTools basket={basket} /> : null}
+
       <form ref={formRef} className="enquiry-form" onSubmit={handleSubmit}>
         <div className="form-grid">
-          <label>
-            Name
-            <input type="text" name="name" autoComplete="name" required />
-          </label>
+          <label>Name<input type="text" name="name" autoComplete="name" required /></label>
           <label>
             Phone Number
-            <input
-              type="tel"
-              name="phone"
-              autoComplete="tel"
-              inputMode="tel"
-              required
-            />
+            <input type="tel" name="phone" autoComplete="tel" inputMode="tel" required />
           </label>
         </div>
 
@@ -126,14 +115,8 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
           <label>
             Business Type
             <select name="businessType" defaultValue="" required>
-              <option value="" disabled>
-                Select business type
-              </option>
-              {businessTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
+              <option value="" disabled>Select business type</option>
+              {businessTypes.map((type) => <option key={type} value={type}>{type}</option>)}
             </select>
           </label>
 
@@ -141,51 +124,28 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
             <label>
               Product Interested In
               <select name="product" defaultValue="" required>
-                <option value="" disabled>
-                  Select product
-                </option>
-                {productInterestOptions.map((product) => (
-                  <option key={product} value={product}>
-                    {product}
-                  </option>
-                ))}
+                <option value="" disabled>Select product</option>
+                {productInterestOptions.map((product) => <option key={product} value={product}>{product}</option>)}
               </select>
             </label>
           ) : (
-            <label>
-              City / State
-              <input type="text" name="city" autoComplete="address-level2" required />
-            </label>
+            <label>City / State<input type="text" name="city" autoComplete="address-level2" required /></label>
           )}
         </div>
 
         {!hasBasket ? (
           <>
             <div className="form-grid">
-              <label>
-                Quantity Required
-                <input type="text" name="quantity" />
-              </label>
-              <label>
-                City / State
-                <input type="text" name="city" autoComplete="address-level2" />
-              </label>
+              <label>Quantity Required<input type="text" name="quantity" /></label>
+              <label>City / State<input type="text" name="city" autoComplete="address-level2" /></label>
             </div>
-
-            <label>
-              Colour/Shade Requirement
-              <input type="text" name="shade" />
-            </label>
+            <label>Colour/Shade Requirement<input type="text" name="shade" /></label>
           </>
         ) : null}
 
         <label>
           Delivery question / notes
-          <textarea
-            name="message"
-            placeholder="Any specific requests, delivery directions or custom shade codes..."
-            rows={compact ? 4 : 5}
-          />
+          <textarea name="message" placeholder="Any specific requests, delivery directions or custom shade codes..." rows={compact ? 4 : 5} />
         </label>
 
         <button className="btn btn-primary submit-button" type="submit" disabled={submitting}>
@@ -201,14 +161,9 @@ export default function EnquiryForm({ compact = false, basket = [], onClearBaske
           </span>
           <div className="success-actions-flex">
             <a className="btn btn-whatsapp" href={whatsappLink} target="_blank" rel="noreferrer">
-              <ChatCircleDots size={18} aria-hidden="true" />
-              Continue on WhatsApp
+              <ChatCircleDots size={18} aria-hidden="true" /> Continue on WhatsApp
             </a>
-            <button
-              type="button"
-              className="btn btn-outline"
-              onClick={handleCopySummary}
-            >
+            <button type="button" className="btn btn-outline" onClick={handleCopySummary}>
               {copied ? <Check size={16} aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />}
               {copied ? "Summary Copied!" : "Copy Summary Text"}
             </button>
