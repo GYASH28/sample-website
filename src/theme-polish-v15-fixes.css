@@ -1,0 +1,73 @@
+/* v15 targeted corrections discovered by production, theme and screenshot audits. */
+
+.commerce-category-nav__all {
+  border-color: color-mix(in srgb, var(--ui-accent) 34%, var(--ui-border-strong)) !important;
+  background: var(--ui-accent-soft) !important;
+  color: var(--ui-accent-strong) !important;
+  font-weight: 850 !important;
+  box-shadow: none !important;
+}
+
+.commerce-category-nav__all:hover,
+.commerce-category-nav__all:focus-visible {
+  border-color: var(--ui-accent) !important;
+  background: var(--ui-accent-strong) !important;
+  color: var(--ui-on-accent) !important;
+}
+
+/* Dark mode's accent-strong is intentionally pale, so active segmented
+   controls must use the semantic on-accent foreground instead of hard white. */
+.language-control > .active,
+.language-control button.active,
+.shade-mood-tabs > button[role="tab"][aria-selected="true"],
+.commerce-craft-finder__tabs > .is-active[role="tab"] {
+  color: var(--ui-on-accent) !important;
+}
+
+/* Intentional inverse surfaces. The global semantic heading/body rules are
+   deliberately forceful; these contexts are photographs or cinematic/deep
+   surfaces and therefore need a stable inverse foreground in BOTH themes. */
+.commerce-category-card__copy,
+.commerce-craft-product > span,
+.hero-v6__stage-caption,
+.hero-v7__stage-caption,
+.product-first-hero__image-label,
+.commerce-intro {
+  color: #fffaf5 !important;
+}
+
+.commerce-category-card__copy strong,
+.commerce-category-card__copy em,
+.commerce-craft-product > span strong,
+.commerce-craft-product > span em,
+.hero-v6__stage-caption strong,
+.hero-v7__stage-caption strong,
+.product-first-hero__image-label strong,
+.commerce-intro :is(h1, h2, h3, h4, strong) {
+  color: #fffaf5 !important;
+}
+
+.commerce-category-card__copy small,
+.commerce-craft-product > span small,
+.hero-v6__stage-caption :is(span, p, small),
+.hero-v7__stage-caption :is(span, p, small),
+.product-first-hero__image-label :is(span, p, small),
+.commerce-intro :is(p, small, span) {
+  color: rgba(255, 250, 245, 0.80) !important;
+}
+
+.commerce-category-card__copy em,
+.commerce-craft-product > span em {
+  color: rgba(255, 250, 245, 0.92) !important;
+}
+
+/* The opening brand should read as a deliberate light-on-deep lockup rather
+   than inheriting page theme typography. */
+.commerce-intro__brand strong,
+.commerce-intro__reveal {
+  color: #fffaf5 !important;
+}
+
+.commerce-intro__brand :is(span, small) {
+  color: rgba(255, 249, 241, 0.78) !important;
+}

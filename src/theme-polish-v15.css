@@ -1,0 +1,1049 @@
+/* Fakhri Mart v15 — semantic theme visibility + thoughtful UI polish.
+   Loaded after every historical visual layer so later legacy paints cannot
+   reintroduce cream-on-white or light-text-on-light-surface regressions. */
+
+:root {
+  color-scheme: light;
+  --ui-bg: #fbf6f0;
+  --ui-bg-elevated: #fffdf9;
+  --ui-surface: #fffdfa;
+  --ui-surface-soft: #f3ebe5;
+  --ui-surface-muted: #eadfd8;
+  --ui-text: #3a3037;
+  --ui-text-strong: #241d24;
+  --ui-text-muted: #594b54;
+  --ui-text-subtle: #6b5d65;
+  --ui-border: rgba(57, 43, 52, 0.16);
+  --ui-border-strong: rgba(57, 43, 52, 0.28);
+  --ui-accent: #0f746c;
+  --ui-accent-strong: #0a5b55;
+  --ui-accent-soft: #d8efec;
+  --ui-rose: #a94062;
+  --ui-rose-soft: #f6e1e8;
+  --ui-gold: #705314;
+  --ui-gold-soft: #f3ead1;
+  --ui-focus: #0b746c;
+  --ui-on-accent: #ffffff;
+  --ui-on-deep: #fff8f2;
+  --ui-deep: #3e2532;
+  --ui-deep-2: #263438;
+  --ui-success: #16745f;
+  --ui-danger: #a53c4c;
+  --ui-shadow: 0 20px 52px rgba(57, 42, 50, 0.12);
+  --ui-shadow-soft: 0 8px 24px rgba(57, 42, 50, 0.085);
+  --ui-shadow-hover: 0 16px 36px rgba(46, 82, 76, 0.12);
+  --ui-ring: 0 0 0 3px color-mix(in srgb, var(--ui-focus) 20%, transparent);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ui-bg: #121512;
+  --ui-bg-elevated: #181c18;
+  --ui-surface: #1e231f;
+  --ui-surface-soft: #252a25;
+  --ui-surface-muted: #2d332d;
+  --ui-text: #f2eee7;
+  --ui-text-strong: #fffaf3;
+  --ui-text-muted: #d0c9bf;
+  --ui-text-subtle: #b8b0a6;
+  --ui-border: rgba(244, 238, 228, 0.15);
+  --ui-border-strong: rgba(244, 238, 228, 0.26);
+  --ui-accent: #72c9bd;
+  --ui-accent-strong: #93ddd3;
+  --ui-accent-soft: #173d38;
+  --ui-rose: #f0acc1;
+  --ui-rose-soft: #462a35;
+  --ui-gold: #e3cc86;
+  --ui-gold-soft: #40391f;
+  --ui-focus: #8bdacf;
+  --ui-on-accent: #10211f;
+  --ui-on-deep: #fff9f4;
+  --ui-deep: #281a22;
+  --ui-deep-2: #152221;
+  --ui-success: #79d3b7;
+  --ui-danger: #ffabb5;
+  --ui-shadow: 0 22px 58px rgba(0, 0, 0, 0.34);
+  --ui-shadow-soft: 0 9px 26px rgba(0, 0, 0, 0.27);
+  --ui-shadow-hover: 0 18px 42px rgba(0, 0, 0, 0.34);
+  --ui-ring: 0 0 0 3px color-mix(in srgb, var(--ui-focus) 24%, transparent);
+
+  /* Keep every historical alias pointed at the final semantic palette. */
+  --bg: var(--ui-bg);
+  --bg-warm: var(--ui-surface-soft);
+  --surface: var(--ui-surface);
+  --surface-soft: var(--ui-surface-soft);
+  --paper: var(--ui-surface);
+  --cream: var(--ui-bg);
+  --ink: var(--ui-text);
+  --charcoal: var(--ui-text-strong);
+  --text: var(--ui-text);
+  --muted: var(--ui-text-muted);
+  --muted-soft: var(--ui-text-subtle);
+  --primary: var(--ui-accent);
+  --primary-dark: var(--ui-accent-strong);
+  --teal: var(--ui-accent);
+  --teal-dark: var(--ui-accent-strong);
+  --teal-soft: var(--ui-accent-soft);
+  --pink: var(--ui-rose);
+  --pink-dark: var(--ui-rose);
+  --pink-soft: var(--ui-rose-soft);
+  --craft: var(--ui-gold);
+  --gold: var(--ui-gold);
+  --gold-deep: var(--ui-gold);
+  --app-bg: var(--ui-bg);
+  --app-bg-2: #151815;
+  --app-surface: color-mix(in srgb, var(--ui-surface) 91%, transparent);
+  --app-surface-solid: var(--ui-surface);
+  --app-surface-raised: var(--ui-surface-soft);
+  --app-glass: rgba(24, 28, 24, 0.78);
+  --app-glass-strong: rgba(24, 28, 24, 0.95);
+  --app-border: var(--ui-border);
+  --app-border-strong: var(--ui-border-strong);
+  --app-text: var(--ui-text);
+  --app-muted: var(--ui-text-muted);
+  --app-soft-text: var(--ui-text-subtle);
+}
+
+html,
+body,
+#root {
+  background-color: var(--ui-bg) !important;
+  color: var(--ui-text);
+}
+
+body {
+  background:
+    radial-gradient(circle at 8% 8%, color-mix(in srgb, var(--ui-rose) 5%, transparent), transparent 31rem),
+    radial-gradient(circle at 91% 6%, color-mix(in srgb, var(--ui-accent) 5%, transparent), transparent 34rem),
+    var(--ui-bg) !important;
+}
+
+:root[data-theme="dark"] body {
+  background:
+    radial-gradient(circle at 8% 6%, rgba(240, 172, 193, 0.035), transparent 31rem),
+    radial-gradient(circle at 92% 4%, rgba(114, 201, 189, 0.04), transparent 34rem),
+    var(--ui-bg) !important;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--ui-accent) 28%, transparent);
+  color: var(--ui-text-strong);
+}
+
+/* ---------- Typography/readability ---------- */
+h1,
+h2,
+h3,
+h4,
+h5,
+strong,
+legend,
+summary {
+  color: var(--ui-text-strong) !important;
+}
+
+p,
+small,
+.page-hero-text,
+.product-card-description,
+.product-card-meta {
+  color: var(--ui-text-muted) !important;
+}
+
+label,
+dt,
+.filter-label {
+  color: var(--ui-text-strong) !important;
+}
+
+.eyebrow {
+  color: var(--ui-gold) !important;
+  font-weight: 820 !important;
+  letter-spacing: 0.11em;
+}
+
+.section-heading p:not(.eyebrow),
+.page-hero p:not(.eyebrow),
+.page-hero-section p:not(.eyebrow),
+.article-header p:not(.eyebrow),
+.large-copy {
+  color: var(--ui-text-muted) !important;
+}
+
+.text-link,
+.craft-browse-link,
+.search-results-heading a,
+.collection-links a:not(.btn) {
+  color: var(--ui-accent-strong) !important;
+  text-underline-offset: 3px;
+}
+
+/* ---------- Announcement + single-surface header ---------- */
+.site-header .announcement-bar,
+.site-header.is-scrolled .announcement-bar,
+.site-header.is-deep .announcement-bar {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: linear-gradient(90deg, #422432 0%, #30343a 52%, #17615a 100%) !important;
+  color: var(--ui-on-deep) !important;
+}
+
+:root[data-theme="dark"] .site-header .announcement-bar,
+:root[data-theme="dark"] .site-header.is-scrolled .announcement-bar,
+:root[data-theme="dark"] .site-header.is-deep .announcement-bar {
+  background: linear-gradient(90deg, #241820 0%, #17201e 48%, #17463f 100%) !important;
+}
+
+.site-header .announcement-bar__inner,
+.site-header .announcement-bar__inner span {
+  color: rgba(255, 250, 245, 0.94) !important;
+  font-weight: 760;
+  letter-spacing: 0.075em;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.16);
+}
+
+:root[data-theme="light"] .site-header .nav-shell,
+:root[data-theme="light"] .site-header.is-scrolled .nav-shell,
+:root[data-theme="light"] .site-header.is-deep .nav-shell,
+:root[data-theme="light"] .site-header.is-scrolling .nav-shell {
+  border-color: rgba(73, 55, 65, 0.14) !important;
+  background:
+    linear-gradient(135deg, rgba(255, 253, 249, 0.92), rgba(250, 244, 238, 0.90) 52%, rgba(224, 243, 239, 0.72)) !important;
+  color: var(--ui-text-strong) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.86),
+    0 12px 34px rgba(63, 45, 55, 0.09) !important;
+}
+
+:root[data-theme="dark"] .site-header .nav-shell,
+:root[data-theme="dark"] .site-header.is-scrolled .nav-shell,
+:root[data-theme="dark"] .site-header.is-deep .nav-shell,
+:root[data-theme="dark"] .site-header.is-scrolling .nav-shell {
+  border-color: rgba(244, 238, 228, 0.14) !important;
+  background:
+    linear-gradient(135deg, rgba(35, 40, 35, 0.95), rgba(20, 24, 20, 0.94) 54%, rgba(23, 61, 56, 0.72)) !important;
+  color: var(--ui-text-strong) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 15px 38px rgba(0, 0, 0, 0.32) !important;
+}
+
+:root[data-theme="light"] .site-header :is(.brand, .header-search-trigger, .language-control, .icon-button, .theme-toggle) {
+  border-color: rgba(58, 45, 54, 0.13) !important;
+  background: rgba(255, 253, 249, 0.78) !important;
+  color: var(--ui-text-strong) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.92), 0 4px 13px rgba(58,45,54,.045) !important;
+}
+
+:root[data-theme="dark"] .site-header :is(.brand, .header-search-trigger, .language-control, .icon-button, .theme-toggle) {
+  border-color: var(--ui-border) !important;
+  background: rgba(28, 33, 29, 0.88) !important;
+  color: var(--ui-text-strong) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.045), 0 5px 14px rgba(0,0,0,.12) !important;
+}
+
+.site-header .brand strong {
+  color: var(--ui-text-strong) !important;
+}
+
+.site-header .brand small {
+  color: var(--ui-text-muted) !important;
+  opacity: 1 !important;
+}
+
+.site-header .desktop-nav > a,
+.site-header .catalogue-nav-item > a,
+.site-header .mega-toggle,
+.site-header .header-search-trigger,
+.site-header .language-control button,
+.site-header .icon-button {
+  color: var(--ui-text-muted) !important;
+}
+
+.site-header .desktop-nav > a:hover,
+.site-header .catalogue-nav-item > a:hover,
+.site-header .desktop-nav > a.active,
+.site-header .catalogue-nav-item > a.active,
+.site-header .mega-toggle:hover,
+.site-header .header-search-trigger:hover,
+.site-header .icon-button:hover {
+  color: var(--ui-accent-strong) !important;
+}
+
+.header-search-trigger > kbd {
+  border-color: var(--ui-border-strong) !important;
+  background: var(--ui-surface-soft) !important;
+  color: var(--ui-text-muted) !important;
+}
+
+.language-control > .active,
+.language-control button.active {
+  border-color: color-mix(in srgb, var(--ui-accent) 50%, var(--ui-border)) !important;
+  background: var(--ui-accent-strong) !important;
+  color: #fff !important;
+}
+
+.category-mega-menu,
+.mobile-nav-drawer,
+.search-dialog,
+.quick-view-panel,
+.enquiry-drawer {
+  border-color: var(--ui-border) !important;
+  background: color-mix(in srgb, var(--ui-bg-elevated) 98%, transparent) !important;
+  color: var(--ui-text) !important;
+}
+
+/* ---------- Core surfaces ---------- */
+.page-hero,
+.page-hero-section,
+.article-header,
+.section-tinted {
+  border-color: var(--ui-border) !important;
+  background:
+    radial-gradient(circle at 90% 14%, color-mix(in srgb, var(--ui-accent) 5%, transparent), transparent 28rem),
+    radial-gradient(circle at 10% 86%, color-mix(in srgb, var(--ui-rose) 5%, transparent), transparent 25rem),
+    var(--ui-surface-soft) !important;
+  color: var(--ui-text) !important;
+}
+
+:root[data-theme="dark"] .page-hero,
+:root[data-theme="dark"] .page-hero-section,
+:root[data-theme="dark"] .article-header,
+:root[data-theme="dark"] .section-tinted {
+  background:
+    radial-gradient(circle at 90% 14%, rgba(114, 201, 189, 0.05), transparent 28rem),
+    radial-gradient(circle at 10% 86%, rgba(240, 172, 193, 0.035), transparent 25rem),
+    var(--ui-surface-soft) !important;
+}
+
+:is(
+  .product-card,
+  .category-card,
+  .arrival-card,
+  .contact-card,
+  .map-panel,
+  .about-value-card,
+  .about-process-card,
+  .blog-story-card,
+  .wishlist-card-shell,
+  .empty-wishlist,
+  .enquiry-basket-items-panel,
+  .enquiry-form-panel,
+  .basket-item-card-row,
+  .project-card,
+  .guided-question,
+  .guided-finder__summary,
+  .compare-table-scroll,
+  .compare-mobile-card,
+  .collection-guidance,
+  .workspace-product-row,
+  .product-at-glance,
+  .product-decision-layer,
+  .product-fact-card
+) {
+  border-color: var(--ui-border) !important;
+  background: var(--ui-surface) !important;
+  color: var(--ui-text) !important;
+  box-shadow: var(--ui-shadow-soft);
+}
+
+:is(
+  .product-card,
+  .contact-card,
+  .project-card,
+  .compare-mobile-card,
+  .about-value-card,
+  .about-process-card,
+  .blog-story-card,
+  .wishlist-card-shell
+) :is(h2,h3,h4,strong,a:not(.btn)) {
+  color: var(--ui-text-strong) !important;
+}
+
+:is(
+  .product-card,
+  .contact-card,
+  .project-card,
+  .compare-mobile-card,
+  .about-value-card,
+  .about-process-card,
+  .blog-story-card,
+  .wishlist-card-shell
+) :is(p,small,dd) {
+  color: var(--ui-text-muted) !important;
+}
+
+/* ---------- Inputs, buttons and focus ---------- */
+input,
+textarea,
+select,
+.catalogue-search-box,
+.filter-control,
+.mobile-search-button,
+.product-sort-select {
+  border-color: var(--ui-border-strong) !important;
+  background: var(--ui-bg-elevated) !important;
+  color: var(--ui-text-strong) !important;
+  box-shadow: none !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--ui-text-subtle) !important;
+  opacity: 1;
+}
+
+select option {
+  background: var(--ui-bg-elevated);
+  color: var(--ui-text-strong);
+}
+
+:is(input, textarea, select, button, a):focus-visible {
+  outline: 2px solid var(--ui-focus) !important;
+  outline-offset: 2px !important;
+  box-shadow: var(--ui-ring) !important;
+}
+
+.btn {
+  font-weight: 800;
+}
+
+.btn:not(.btn-small) {
+  min-height: 43px;
+}
+
+.btn-small {
+  min-height: 38px;
+}
+
+.btn-primary {
+  border-color: transparent !important;
+  background: #0f746c !important;
+  color: #fff !important;
+  box-shadow: 0 8px 18px rgba(15, 116, 108, 0.16) !important;
+}
+
+.btn-primary:hover {
+  background: #0b625c !important;
+}
+
+.btn-whatsapp {
+  color: #fff !important;
+}
+
+.btn-outline,
+.btn-secondary {
+  border-color: var(--ui-border-strong) !important;
+  background: color-mix(in srgb, var(--ui-bg-elevated) 72%, transparent) !important;
+  color: var(--ui-text-strong) !important;
+  box-shadow: none !important;
+}
+
+.btn-outline:hover,
+.btn-secondary:hover {
+  border-color: color-mix(in srgb, var(--ui-accent) 58%, var(--ui-border-strong)) !important;
+  background: var(--ui-accent-soft) !important;
+  color: var(--ui-accent-strong) !important;
+}
+
+/* ---------- Catalogue + product decision UX ---------- */
+.catalogue-controls-sticky,
+.catalogue-toolbar,
+.catalogue-filter-panel,
+.catalogue-filter-row,
+.tabs-navigation-strip {
+  border-color: var(--ui-border) !important;
+  background: color-mix(in srgb, var(--ui-bg-elevated) 96%, transparent) !important;
+  color: var(--ui-text) !important;
+}
+
+.filter-label,
+.result-count-text,
+.suggestion-group-label,
+.swatches-count-label,
+.product-card-specs,
+.product-card-variants,
+.product-card-sold-as {
+  color: var(--ui-text-muted) !important;
+}
+
+.filter-label,
+.suggestion-group-label {
+  font-weight: 850 !important;
+}
+
+.active-filter-chip,
+.project-discovery-scroll button,
+.search-project-suggestions a {
+  border-color: var(--ui-border) !important;
+  background: var(--ui-bg-elevated) !important;
+  color: var(--ui-text-strong) !important;
+}
+
+.active-filter-chip:hover,
+.project-discovery-scroll button:hover,
+.project-discovery-scroll button.is-active,
+.search-project-suggestions a:hover {
+  border-color: color-mix(in srgb, var(--ui-accent) 46%, var(--ui-border)) !important;
+  background: var(--ui-accent-soft) !important;
+  color: var(--ui-accent-strong) !important;
+}
+
+.product-image-wrapper,
+.catalogue-hero-photo {
+  border-color: var(--ui-border) !important;
+  background: var(--ui-surface-muted) !important;
+}
+
+.product-card .badge-highlight,
+.product-showcase-card .badge-highlight {
+  border: 1px solid color-mix(in srgb, var(--ui-rose) 18%, var(--ui-border)) !important;
+  border-radius: 999px;
+  background: var(--ui-rose-soft) !important;
+  color: color-mix(in srgb, var(--ui-rose) 82%, var(--ui-text-strong)) !important;
+  font-weight: 850;
+}
+
+:root[data-theme="dark"] .product-card .badge-highlight,
+:root[data-theme="dark"] .product-showcase-card .badge-highlight {
+  color: #ffd8e2 !important;
+}
+
+.product-card-badge-floating {
+  background: rgba(45, 28, 37, 0.86) !important;
+  color: #fff8f3 !important;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.product-card-specs dt {
+  color: var(--ui-text-strong) !important;
+  font-weight: 800;
+}
+
+.product-card-specs dd {
+  color: var(--ui-text-muted) !important;
+}
+
+.product-card-sold-as em {
+  color: var(--ui-gold) !important;
+}
+
+.compare-action,
+.card-floating-btn,
+.favorite-toggle-btn-card,
+.product-showcase-card__quick,
+.mobile-filter-trigger,
+.mobile-product-dock__save,
+.btn-detail-action-circle,
+.thumbnail-rect-btn,
+.enquiry-launcher,
+.back-to-top,
+.shopping-workspace-launcher {
+  border-color: var(--ui-border-strong) !important;
+  background: color-mix(in srgb, var(--ui-bg-elevated) 92%, transparent) !important;
+  color: var(--ui-text-strong) !important;
+  box-shadow: var(--ui-shadow-soft) !important;
+}
+
+.compare-action:hover,
+.compare-action.is-selected,
+.card-floating-btn:hover,
+.favorite-toggle-btn-card.active,
+.product-showcase-card__quick:hover,
+.mobile-filter-trigger:hover,
+.mobile-product-dock__save:hover,
+.thumbnail-rect-btn.active,
+.enquiry-launcher:hover,
+.back-to-top:hover,
+.shopping-workspace-launcher:hover {
+  border-color: color-mix(in srgb, var(--ui-accent) 55%, var(--ui-border)) !important;
+  background: var(--ui-accent-soft) !important;
+  color: var(--ui-accent-strong) !important;
+}
+
+/* ---------- Projects + guided finder ---------- */
+.project-discovery-strip {
+  border-color: var(--ui-border) !important;
+  background: color-mix(in srgb, var(--ui-surface) 94%, transparent) !important;
+}
+
+.project-material-chip,
+.guided-choice-grid button,
+.project-choice,
+.project-recommendation {
+  border-color: var(--ui-border) !important;
+  background: var(--ui-bg-elevated) !important;
+  color: var(--ui-text) !important;
+}
+
+.guided-choice-grid button strong,
+.project-choice strong,
+.project-recommendation :is(h2,h3,strong) {
+  color: var(--ui-text-strong) !important;
+}
+
+.guided-choice-grid button small,
+.project-choice small,
+.project-recommendation :is(p,li,small) {
+  color: var(--ui-text-muted) !important;
+}
+
+.guided-choice-grid button:hover,
+.guided-choice-grid button.is-selected,
+.project-choice:hover,
+.project-choice:focus-visible,
+.project-choice--active {
+  border-color: color-mix(in srgb, var(--ui-accent) 58%, var(--ui-border)) !important;
+  background: var(--ui-accent-soft) !important;
+  color: var(--ui-text-strong) !important;
+}
+
+.guided-finder__summary {
+  background:
+    radial-gradient(circle at 92% 8%, color-mix(in srgb, var(--ui-accent) 8%, transparent), transparent 18rem),
+    var(--ui-surface) !important;
+}
+
+.guide-faqs__list details {
+  border-color: var(--ui-border) !important;
+  background: var(--ui-surface) !important;
+  color: var(--ui-text) !important;
+}
+
+.guide-faqs__list summary {
+  color: var(--ui-text-strong) !important;
+}
+
+.guide-faqs__list details p {
+  color: var(--ui-text-muted) !important;
+}
+
+/* ---------- Compare ---------- */
+.compare-table th,
+.compare-table td {
+  border-color: var(--ui-border) !important;
+  color: var(--ui-text) !important;
+}
+
+.compare-table thead th,
+.compare-table th:first-child,
+.compare-mobile-card__facts dt {
+  color: var(--ui-text-muted) !important;
+  font-weight: 800;
+}
+
+.compare-table tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--ui-surface-soft) 58%, transparent);
+}
+
+.compare-mobile-card__head > div > span,
+.compare-mobile-card__head small {
+  color: var(--ui-text-muted) !important;
+}
+
+.compare-mobile-card__head a,
+.compare-mobile-card__facts dd {
+  color: var(--ui-text-strong) !important;
+}
+
+.compare-mobile-card__head > button {
+  border: 1px solid var(--ui-border) !important;
+  background: var(--ui-surface-soft) !important;
+  color: var(--ui-text-muted) !important;
+}
+
+.compare-page__decision {
+  border-color: color-mix(in srgb, var(--ui-accent) 20%, var(--ui-border)) !important;
+  background:
+    linear-gradient(135deg, var(--ui-accent-soft), color-mix(in srgb, var(--ui-rose-soft) 42%, var(--ui-surface))) !important;
+}
+
+.compare-page__decision p:not(.eyebrow) {
+  color: var(--ui-text-muted) !important;
+}
+
+/* ---------- Enquiry + shortlist workspace ---------- */
+.shopping-workspace {
+  border-color: var(--ui-border) !important;
+  background: color-mix(in srgb, var(--ui-bg-elevated) 98%, transparent) !important;
+  color: var(--ui-text) !important;
+  box-shadow: -26px 0 72px color-mix(in srgb, #000 24%, transparent) !important;
+}
+
+.shopping-workspace__tabs button {
+  border-color: var(--ui-border) !important;
+  background: var(--ui-surface) !important;
+  color: var(--ui-text-muted) !important;
+}
+
+.shopping-workspace__tabs button.is-active {
+  border-color: color-mix(in srgb, var(--ui-accent) 45%, var(--ui-border)) !important;
+  background: var(--ui-accent-soft) !important;
+  color: var(--ui-accent-strong) !important;
+}
+
+.shopping-workspace__footer {
+  border-color: var(--ui-border) !important;
+  background: var(--ui-bg-elevated) !important;
+}
+
+.enquiry-summary-tools,
+.enquiry-summary-preview,
+.enquiry-mode-selector,
+.enquiry-brief-field {
+  border-color: var(--ui-border) !important;
+  background: var(--ui-surface) !important;
+  color: var(--ui-text) !important;
+}
+
+.enquiry-summary-preview,
+.enquiry-summary-preview pre,
+.enquiry-summary-preview code {
+  color: var(--ui-text-strong) !important;
+}
+
+/* ---------- Contact + store location ---------- */
+.contact-card {
+  min-height: 92px;
+}
+
+.contact-card > svg,
+.map-panel > svg,
+.map-pin,
+.store-location__identity > svg {
+  color: var(--ui-accent) !important;
+}
+
+.contact-card h3,
+.map-panel h3 {
+  color: var(--ui-text-strong) !important;
+}
+
+.contact-card :is(p,a),
+.map-panel :is(p,span) {
+  color: var(--ui-text-muted) !important;
+}
+
+.contact-card a:hover {
+  color: var(--ui-accent-strong) !important;
+}
+
+.delivery-chip {
+  border-color: var(--ui-border) !important;
+  background: var(--ui-accent-soft) !important;
+  color: var(--ui-accent-strong) !important;
+}
+
+.store-location,
+.store-location__copy,
+.store-location__identity,
+.store-location__map {
+  border-color: var(--ui-border) !important;
+  color: var(--ui-text) !important;
+}
+
+.store-location {
+  background: var(--ui-surface) !important;
+  box-shadow: var(--ui-shadow) !important;
+}
+
+.store-location__copy {
+  background:
+    radial-gradient(circle at 12% 10%, color-mix(in srgb, var(--ui-rose) 6%, transparent), transparent 20rem),
+    radial-gradient(circle at 88% 90%, color-mix(in srgb, var(--ui-accent) 6%, transparent), transparent 22rem),
+    var(--ui-surface) !important;
+}
+
+.store-location__copy :is(h2,strong) {
+  color: var(--ui-text-strong) !important;
+}
+
+.store-location__copy :is(p,span) {
+  color: var(--ui-text-muted) !important;
+}
+
+.store-location__identity {
+  background: var(--ui-surface-soft) !important;
+}
+
+.store-location__map {
+  overflow: hidden;
+  background: var(--ui-surface-muted) !important;
+}
+
+:root[data-theme="dark"] .store-location__copy {
+  background:
+    radial-gradient(circle at 12% 10%, rgba(240, 172, 193, 0.04), transparent 20rem),
+    radial-gradient(circle at 88% 90%, rgba(114, 201, 189, 0.05), transparent 22rem),
+    var(--ui-surface) !important;
+}
+
+/* ---------- About / editorial ---------- */
+.brand-model-highlight__notes span,
+.brand-model-highlight__stage,
+.brand-model-highlight__caption,
+.brand-model-highlight__poster button {
+  border-color: var(--ui-border) !important;
+  color: var(--ui-text-strong) !important;
+}
+
+:root[data-theme="light"] .brand-model-highlight__notes span,
+:root[data-theme="light"] .brand-model-highlight__caption,
+:root[data-theme="light"] .brand-model-highlight__poster button {
+  background: rgba(255, 253, 249, 0.84) !important;
+}
+
+:root[data-theme="dark"] .brand-model-highlight__notes span,
+:root[data-theme="dark"] .brand-model-highlight__caption,
+:root[data-theme="dark"] .brand-model-highlight__poster button {
+  background: rgba(31, 36, 31, 0.88) !important;
+}
+
+/* ---------- Home commerce sections ---------- */
+.commerce-product-section,
+.commerce-craft-finder,
+.commerce-category-nav,
+.commerce-section.shade-discovery,
+.commerce-section.commerce-order-flow {
+  border-color: var(--ui-border) !important;
+  color: var(--ui-text) !important;
+}
+
+.commerce-product-section,
+.commerce-craft-finder,
+.commerce-section.shade-discovery,
+.commerce-section.commerce-order-flow {
+  background: var(--ui-bg-elevated) !important;
+}
+
+.commerce-category-nav {
+  background: var(--ui-surface-soft) !important;
+}
+
+.commerce-category-nav :is(button,a) {
+  color: var(--ui-text-muted) !important;
+}
+
+.commerce-category-nav :is(button,a).active,
+.commerce-category-nav :is(button,a):hover {
+  color: var(--ui-accent-strong) !important;
+}
+
+.shade-mood-tabs > button[role="tab"],
+.commerce-craft-finder__tabs > button[role="tab"] {
+  border-color: var(--ui-border-strong) !important;
+  background: var(--ui-surface) !important;
+  color: var(--ui-text-strong) !important;
+}
+
+.shade-mood-tabs > button[role="tab"][aria-selected="true"],
+.commerce-craft-finder__tabs > .is-active[role="tab"] {
+  border-color: var(--ui-accent-strong) !important;
+  background: var(--ui-accent-strong) !important;
+  color: var(--ui-on-accent) !important;
+}
+
+.commerce-order-flow ol > li,
+.commerce-order-flow ol > .reveal {
+  border-color: var(--ui-border) !important;
+  background: var(--ui-surface) !important;
+  color: var(--ui-text) !important;
+  box-shadow: var(--ui-shadow-soft) !important;
+}
+
+.commerce-order-flow ol > li > strong,
+.commerce-order-flow ol > .reveal > strong {
+  color: var(--ui-text-strong) !important;
+}
+
+.commerce-order-flow ol > li > p,
+.commerce-order-flow ol > .reveal > p {
+  color: var(--ui-text-muted) !important;
+}
+
+.commerce-order-flow ol > li > span,
+.commerce-order-flow ol > .reveal > span {
+  color: var(--ui-gold) !important;
+}
+
+.commerce-wholesale,
+.catalogue-cta {
+  border-color: rgba(255,255,255,.12) !important;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(114,201,189,.08), transparent 24rem),
+    linear-gradient(135deg, var(--ui-deep), var(--ui-deep-2)) !important;
+  color: var(--ui-on-deep) !important;
+  box-shadow: var(--ui-shadow) !important;
+}
+
+.commerce-wholesale :is(h2,h3,strong),
+.catalogue-cta :is(h2,h3,strong) {
+  color: var(--ui-on-deep) !important;
+}
+
+.commerce-wholesale p:not(.eyebrow),
+.catalogue-cta p:not(.eyebrow) {
+  color: rgba(255, 248, 242, 0.82) !important;
+}
+
+.commerce-wholesale .eyebrow,
+.catalogue-cta .eyebrow {
+  color: #f0d88f !important;
+}
+
+.catalogue-cta::after {
+  background: linear-gradient(135deg, var(--ui-deep), var(--ui-deep-2)) !important;
+}
+
+/* ---------- Footer ---------- */
+.site-footer {
+  border-top: 1px solid rgba(255,255,255,.09) !important;
+  background: linear-gradient(115deg, #452335 0%, #2e2931 48%, #203435 100%) !important;
+  color: var(--ui-on-deep) !important;
+}
+
+:root[data-theme="dark"] .site-footer {
+  background: linear-gradient(115deg, #271822 0%, #1d1d20 48%, #132322 100%) !important;
+}
+
+.site-footer :is(h2,h3,strong) {
+  color: #fffaf5 !important;
+}
+
+.site-footer .eyebrow,
+.footer-navigation > div > span,
+.footer-contact > span {
+  color: #ead28b !important;
+}
+
+.footer-statement p,
+.footer-contact p,
+.footer-contact small,
+.footer-bottom p {
+  color: rgba(255, 248, 242, 0.78) !important;
+}
+
+.footer-navigation a,
+.footer-contact a,
+.footer-google-links a {
+  color: rgba(255, 250, 246, 0.88) !important;
+}
+
+.footer-navigation a:hover,
+.footer-contact a:hover,
+.footer-google-links a:hover {
+  color: #9ee2d8 !important;
+}
+
+.footer-navigation > div {
+  border-left: 1px solid rgba(255,255,255,.10);
+  padding-left: 18px;
+}
+
+.footer-bottom {
+  border-color: rgba(255,255,255,.10) !important;
+}
+
+/* ---------- Thoughtful motion and interaction polish ---------- */
+@media (hover: hover) and (pointer: fine) {
+  :is(
+    .product-card,
+    .project-card,
+    .contact-card,
+    .about-value-card,
+    .about-process-card,
+    .blog-story-card,
+    .wishlist-card-shell,
+    .compare-mobile-card
+  ) {
+    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  }
+
+  :is(
+    .product-card,
+    .project-card,
+    .contact-card,
+    .about-value-card,
+    .about-process-card,
+    .blog-story-card,
+    .wishlist-card-shell,
+    .compare-mobile-card
+  ):hover {
+    border-color: color-mix(in srgb, var(--ui-accent) 24%, var(--ui-border)) !important;
+    box-shadow: var(--ui-shadow-hover) !important;
+    transform: translateY(-2px);
+  }
+
+  .btn,
+  .guided-choice-grid button,
+  .project-discovery-scroll button,
+  .shopping-workspace__tabs button {
+    transition: transform 160ms ease, border-color 160ms ease, background-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
+  }
+
+  .btn:hover,
+  .guided-choice-grid button:hover,
+  .project-discovery-scroll button:hover,
+  .shopping-workspace__tabs button:hover {
+    transform: translateY(-1px);
+  }
+}
+
+/* ---------- Mobile finishing ---------- */
+@media (max-width: 720px) {
+  .catalogue-controls-sticky {
+    border-color: var(--ui-border-strong) !important;
+    background: color-mix(in srgb, var(--ui-bg-elevated) 98%, transparent) !important;
+    box-shadow: 0 8px 22px color-mix(in srgb, #000 9%, transparent) !important;
+  }
+
+  .site-header .brand small {
+    color: var(--ui-text-muted) !important;
+  }
+
+  :is(
+    .mobile-search-button,
+    .mobile-filter-trigger,
+    .shopping-workspace-launcher,
+    .enquiry-launcher,
+    .menu-toggle,
+    .theme-toggle,
+    .icon-button
+  ) {
+    min-width: 42px;
+    min-height: 42px;
+  }
+
+  .guided-choice-grid button,
+  .project-discovery-scroll button,
+  .shopping-workspace__tabs button {
+    min-height: 44px;
+  }
+
+  .footer-navigation > div {
+    border-left: 0;
+    border-top: 1px solid rgba(255,255,255,.10);
+    padding: 16px 0 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .contact-card {
+    min-height: 82px;
+  }
+
+  .project-card,
+  .guided-question,
+  .compare-mobile-card,
+  .enquiry-basket-items-panel,
+  .enquiry-form-panel {
+    border-radius: 20px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(.product-card,.project-card,.contact-card,.about-value-card,.about-process-card,.blog-story-card,.wishlist-card-shell,.compare-mobile-card,.btn) {
+    transition: none !important;
+    transform: none !important;
+  }
+}
