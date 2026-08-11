@@ -32,6 +32,14 @@
 }
 .search-project-suggestions a:hover { background: var(--ui-accent-soft); color: var(--ui-accent-strong); }
 
+/* Keep the shortlist and enquiry basket as two distinct decisions instead of
+   stacking them on the same pointer target. The existing enquiry launcher owns
+   the lower-right slot; the shortlist sits one control above it. */
+.shopping-workspace-launcher {
+  right: 18px;
+  bottom: 148px;
+}
+
 /* Footer gained a third useful internal-link group in v14. Let it wrap without
    squeezing the verified contact column. */
 .footer-navigation {
@@ -61,6 +69,10 @@
   .sorting-controls-wrapper { min-width: 0; flex: 1; }
   .product-sort-select { width: 100%; }
   .footer-navigation { grid-template-columns: 1fr 1fr; }
+  .shopping-workspace-launcher {
+    right: 12px;
+    bottom: 140px;
+  }
 }
 
 @media (max-width: 480px) {
