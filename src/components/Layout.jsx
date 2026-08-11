@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import FloatingWhatsApp from "./FloatingWhatsApp.jsx";
 import Footer from "./Footer.jsx";
@@ -11,9 +11,10 @@ import CommerceIntro from "./CommerceIntro.jsx";
 import MobileProductDock from "./MobileProductDock.jsx";
 import HeaderEnhancer from "./HeaderEnhancer.jsx";
 import ConnectionStatus from "./ConnectionStatus.jsx";
-import ShoppingWorkspace from "./ShoppingWorkspace.jsx";
 import AnalyticsBridge from "./AnalyticsBridge.jsx";
-import ProductRouteEnhancements from "./ProductRouteEnhancements.jsx";
+
+const ShoppingWorkspace = lazy(() => import("./ShoppingWorkspace.jsx"));
+const ProductRouteEnhancements = lazy(() => import("./ProductRouteEnhancements.jsx"));
 
 function ScrollToTop() {
   const { hash, pathname } = useLocation();
@@ -71,6 +72,7 @@ function RouteAnnouncer() {
 export default function Layout() {
   const location = useLocation();
   const routeFamily = getRouteFamily(location.pathname);
+  const isProductDetail = location.pathname.startsWith("/products/");
 
   return (
     <>
@@ -87,13 +89,19 @@ export default function Layout() {
         <div key={location.pathname} className="route-stage" data-route-family={routeFamily}>
           <Outlet />
         </div>
-        <ProductRouteEnhancements />
+        {isProductDetail ? (
+          <Suspense fallback={null}>
+            <ProductRouteEnhancements />
+          </Suspense>
+        ) : null}
       </main>
       <Footer />
       <FloatingWhatsApp />
       <BasketToast />
       <EnquiryDrawerLauncher />
-      <ShoppingWorkspace />
+      <Suspense fallback={null}>
+        <ShoppingWorkspace />
+      </Suspense>
       <MobileProductDock />
       <MobileBottomNav />
       <ConnectionStatus />
