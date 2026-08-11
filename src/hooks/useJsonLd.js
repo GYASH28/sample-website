@@ -25,43 +25,63 @@ function absoluteUrl(pathOrUrl) {
 
 export function productJsonLd(product, canonicalUrl) {
   const url = canonicalUrl || `${PUBLIC_SITE_URL}/products/${product.slug}`;
+  const properties = [
+    product.variants ? { "@type": "PropertyValue", name: "Options", value: product.variants } : null,
+    product.suitableFor ? { "@type": "PropertyValue", name: "Best for", value: product.suitableFor } : null,
+    product.colors?.length
+      ? { "@type": "PropertyValue", name: "Shade guidance", value: `${product.colors.length} representative shade options shown; current shades confirmed on enquiry` }
+      : null,
+  ].filter(Boolean);
+
   return {
     "@context": "https://schema.org",
     "@type": "Product",
+    "@id": `${url}#product`,
+    url,
     name: product.name,
     description: product.description,
-    image: product.image ? [absoluteUrl(product.image)] : undefined,
+    image: [product.image, ...(product.galleryImages || [])].filter(Boolean).map(absoluteUrl),
     category: product.category,
     brand: { "@type": "Brand", name: product.brand || product.category },
-    offers: {
-      "@type": "Offer",
-      priceCurrency: "INR",
-      availability:
-        product.stock === "out"
-          ? "https://schema.org/OutOfStock"
-          : "https://schema.org/InStock",
-      url,
-      seller: { "@id": `${PUBLIC_SITE_URL}/#store` },
-    },
+    additionalProperty: properties.length ? properties : undefined,
+    seller: { "@id": `${PUBLIC_SITE_URL}/#store` },
   };
 }
 
 export function localBusinessJsonLd(info = businessInfo) {
+  const contactPoints = [
+    {
+      "@type": "ContactPoint",
+      telephone: info.phoneDisplay,
+      email: info.email,
+      contactType: "sales and catalogue enquiries",
+      areaServed: "IN",
+      availableLanguage: ["English", "Hindi", "Marathi"],
+    },
+    info.secondaryPhoneDisplay
+      ? {
+          "@type": "ContactPoint",
+          telephone: info.secondaryPhoneDisplay,
+          contactType: "sales and catalogue enquiries",
+          areaServed: "IN",
+          availableLanguage: ["English", "Hindi", "Marathi"],
+        }
+      : null,
+  ].filter(Boolean);
+
   return {
     "@context": "https://schema.org",
     "@type": "Store",
     "@id": `${PUBLIC_SITE_URL}/#store`,
     name: info.name,
+    slogan: info.tagline,
     description:
-      "Yarns, crochet threads, macrame cords, embroidery threads, beads, purse accessories, bases, handles and craft essentials from Pune with all-India delivery and bulk enquiry support.",
+      "Yarns, crochet threads, macrame cords, embroidery threads, beads, purse accessories, bases, handles and craft essentials from Pune with all-India delivery and retail or bulk enquiry support.",
     url: PUBLIC_SITE_URL,
     logo: `${PUBLIC_SITE_URL}/assets/brand/fakhri-logo-640.webp`,
     image: `${PUBLIC_SITE_URL}/assets/images/editorial/atelier-hero-960.webp`,
     telephone: info.phoneDisplay,
     email: info.email,
-    priceRange: "₹₹",
-    currenciesAccepted: "INR",
-    paymentAccepted: "Cash, UPI, bank transfer",
     hasMap: googlePresence.mapsUrl,
     address: {
       "@type": "PostalAddress",
@@ -81,13 +101,7 @@ export function localBusinessJsonLd(info = businessInfo) {
         closes: "20:00",
       },
     ],
-    contactPoint: {
-      "@type": "ContactPoint",
-      telephone: info.phoneDisplay,
-      contactType: "sales and catalogue enquiries",
-      areaServed: "IN",
-      availableLanguage: ["English", "Hindi", "Marathi"],
-    },
+    contactPoint: contactPoints,
     knowsAbout: [
       "Yarn",
       "Crochet thread",
@@ -127,6 +141,7 @@ export function websiteJsonLd() {
     "@type": "WebSite",
     "@id": `${PUBLIC_SITE_URL}/#website`,
     name: businessInfo.name,
+    alternateName: businessInfo.tagline,
     url: PUBLIC_SITE_URL,
     publisher: { "@id": `${PUBLIC_SITE_URL}/#store` },
   };
