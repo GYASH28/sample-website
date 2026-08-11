@@ -27,6 +27,25 @@
   min-height: 44px;
 }
 
+/* Product cards had three equal-width CTAs competing in one narrow row. Keep
+   Details + Add together, then give the direct WhatsApp enquiry the full row. */
+.product-card > .product-actions {
+  display: grid;
+  grid-template-columns: minmax(88px, 0.8fr) minmax(122px, 1.2fr);
+  gap: 8px;
+}
+
+.product-card > .product-actions > .btn {
+  width: 100%;
+  min-width: 0;
+  padding-inline: 10px;
+  white-space: nowrap;
+}
+
+.product-card > .product-actions > .btn-whatsapp {
+  grid-column: 1 / -1;
+}
+
 .product-card-swatches .swatch-dot-button {
   min-width: 30px;
   min-height: 30px;
@@ -57,8 +76,8 @@ html[data-motion-profile="lite"] .route-thread-transition {
 }
 
 @media (max-width: 720px) {
-  .product-actions {
-    gap: 8px;
+  .product-card > .product-actions {
+    grid-template-columns: minmax(84px, 0.78fr) minmax(118px, 1.22fr);
   }
 
   .product-actions .btn {
