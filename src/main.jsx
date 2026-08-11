@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
 import { LanguageProvider } from "./context/LanguageContext.jsx";
+import { applyCatalogueIntegrity } from "./lib/catalogueIntegrity.js";
 import { applyMotionProfile } from "./lib/motionProfile.js";
 import "@fontsource-variable/archivo";
 import "@fontsource-variable/manrope";
@@ -32,6 +33,7 @@ import "./seamless-header-v12.css";
 import "./brand-highlight-v12.css";
 import "./header-glass-tuning-v12.css";
 
+applyCatalogueIntegrity();
 applyMotionProfile();
 
 createRoot(document.getElementById("root")).render(
