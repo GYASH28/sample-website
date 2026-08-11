@@ -29,7 +29,6 @@ export default function ProductCard({
   const { has: isInWishlist, toggle: toggleWishlist } = useWishlist();
   const { add: addToBasket } = useEnquiryBasket();
   const isFavorited = isInWishlist(product.slug);
-  const isUnavailable = product.stock === "out";
 
   useEffect(() => {
     setImageSrc(productBaseImage);
@@ -41,6 +40,7 @@ export default function ProductCard({
     type: "product-card",
     productName: product.name,
     category: product.category,
+    shade: activeColor?.name,
   });
 
   const colorsToShow = (product.colors || []).slice(0, MAX_SWATCHES_ON_CARD);
@@ -50,7 +50,6 @@ export default function ProductCard({
   const bulkAvailable = presets.some((preset) => preset >= 50);
 
   const addDefaultToBasket = () => {
-    if (isUnavailable) return;
     addToBasket({
       slug: product.slug,
       name: product.name,
@@ -60,7 +59,7 @@ export default function ProductCard({
       quantity: product.quantityOptions?.min || 1,
       unit: product.quantityOptions?.unit || "pcs",
       variant: getDefaultVariant(product),
-      note: "Added from product card",
+      note: activeColor ? `Selected ${activeColor.name} from catalogue card; please confirm current shade.` : "Please confirm current shade and availability.",
     });
   };
 
@@ -120,6 +119,7 @@ export default function ProductCard({
                   height="640"
                   loading="lazy"
                   decoding="async"
+                  fetchPriority="low"
                   className="product-image"
                   onError={handleImageError}
                 />
@@ -136,7 +136,6 @@ export default function ProductCard({
                 {(product.badges || ["Catalogue"]).slice(0, 2).map((badge) => (
                   <span key={badge} className="badge-highlight">{badge}</span>
                 ))}
-                {isUnavailable ? <span className="badge-highlight product-stock-badge">Unavailable</span> : null}
               </div>
             </div>
 
@@ -145,7 +144,7 @@ export default function ProductCard({
             </h3>
 
             {product.colors?.length ? (
-              <div className="product-card-swatches" aria-label={`Available shades: ${product.colors.length} options`}>
+              <div className="product-card-swatches" aria-label={`Representative shades: ${product.colors.length} options`}>
                 <div className="swatch-dots-row">
                   {colorsToShow.map((color) => (
                     <SwatchButton
@@ -162,7 +161,7 @@ export default function ProductCard({
                   ) : null}
                 </div>
                 <span className="swatches-count-label">
-                  {activeColor?.name || `${product.colors.length} shades`}
+                  {activeColor?.name || `${product.colors.length} representative shades`}
                 </span>
               </div>
             ) : null}
@@ -171,8 +170,8 @@ export default function ProductCard({
 
             {soldAs ? (
               <div className="product-card-sold-as">
-                <span>Sold per {soldAs}</span>
-                {bulkAvailable ? <em>Bulk available</em> : null}
+                <span>Listed as {soldAs}</span>
+                {bulkAvailable ? <em>Bulk enquiries welcome</em> : null}
               </div>
             ) : null}
 
@@ -195,20 +194,19 @@ export default function ProductCard({
           className="btn btn-primary btn-small"
           type="button"
           onClick={addDefaultToBasket}
-          disabled={isUnavailable}
         >
           <ClipboardText size={16} aria-hidden="true" />
-          {isUnavailable ? "Unavailable" : "Add to enquiry"}
+          Add to enquiry
         </button>
         <a
           className="btn btn-whatsapp btn-small"
           href={enquireLink}
           target="_blank"
           rel="noreferrer"
-          aria-label={`Ask about ${product.name} on WhatsApp`}
+          aria-label={`Ask about ${product.name}${activeColor ? ` in ${activeColor.name}` : ""} on WhatsApp`}
         >
           <ChatCircle size={16} aria-hidden="true" />
-          {isUnavailable ? "Ask availability" : "Ask price"}
+          {activeColor ? `Ask about ${activeColor.name}` : "Ask price & availability"}
         </a>
       </div>
     </article>
@@ -224,7 +222,7 @@ function SwatchButton({ color, isActive, isHovered, onSelect, onHover }) {
       type="button"
       className={`swatch-dot swatch-dot-button ${isActive ? "selected" : ""}`}
       style={{ backgroundColor: color.hex }}
-      aria-label={`${isActive ? "Deselect" : "Select"} ${color.name} for enquiry`}
+      aria-label={`${isActive ? "Deselect" : "Select"} representative ${color.name} shade for enquiry`}
       aria-pressed={isActive}
       onClick={(event) => {
         event.preventDefault();
@@ -244,7 +242,7 @@ function SwatchButton({ color, isActive, isHovered, onSelect, onHover }) {
     >
       {showTooltip ? (
         <span role="tooltip" className="swatch-tooltip">
-          {color.name}
+          {color.name} · confirm current shade
         </span>
       ) : null}
     </button>
