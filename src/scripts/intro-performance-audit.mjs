@@ -45,7 +45,6 @@ const runs = [
     viewport: { width: 390, height: 844 },
     mobile: true,
     cpuRate: 1,
-    lite: true,
     expectIntro: true,
   },
   {
@@ -93,13 +92,23 @@ try {
     });
 
     await context.addInitScript(
-      ({ lite, repeat }) => {
-        if (lite) {
-          Object.defineProperty(navigator, "deviceMemory", {
-            configurable: true,
-            get: () => 1,
-          });
+      ({ expectedProfile, repeat }) => {
+        const hardware = {
+          lite: { deviceMemory: 1, hardwareConcurrency: 2 },
+          compact: { deviceMemory: 4, hardwareConcurrency: 4 },
+          full: { deviceMemory: 8, hardwareConcurrency: 8 },
+          reduced: { deviceMemory: 8, hardwareConcurrency: 8 },
+        }[expectedProfile];
+
+        if (hardware) {
+          for (const [property, value] of Object.entries(hardware)) {
+            Object.defineProperty(navigator, property, {
+              configurable: true,
+              get: () => value,
+            });
+          }
         }
+
         if (repeat) {
           sessionStorage.setItem("fakhri_intro_cinematic_v2", "played");
           sessionStorage.setItem("fakhri_commerce_intro_v3", "played");
@@ -177,7 +186,7 @@ try {
 
         requestAnimationFrame(frame);
       },
-      { lite: Boolean(run.lite), repeat: Boolean(run.repeat) },
+      { expectedProfile: run.expectedProfile, repeat: Boolean(run.repeat) },
     );
 
     const page = await context.newPage();
