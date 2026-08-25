@@ -7,12 +7,28 @@ function check(condition, message) {
   if (!condition) throw new Error(message);
 }
 
+function faqGroupSelector(productSlug) {
+  return `[data-product-faq][data-product-slug="${productSlug}"]`;
+}
+
+async function waitForProductFaq(page, productSlug) {
+  const selector = faqGroupSelector(productSlug);
+  await page.locator(selector).waitFor({ state: "visible", timeout: 5_000 });
+  await page.waitForFunction(
+    ({ groupSelector }) => {
+      const group = document.querySelector(groupSelector);
+      if (!group) return false;
+      const buttons = [...group.querySelectorAll(".faq-question-toggle-btn")];
+      return buttons.length >= 3 && buttons.every((button) => button.getAttribute("aria-expanded") === "false");
+    },
+    { groupSelector: selector },
+  );
+}
+
 async function waitForFaqState(page, index, expanded) {
   await page.waitForFunction(
     ({ itemIndex, shouldExpand }) => {
-      const button = document.querySelectorAll(".faq-question-toggle-btn")[
-        itemIndex
-      ];
+      const button = document.querySelectorAll(".faq-question-toggle-btn")[itemIndex];
       if (!button) return false;
       return button.getAttribute("aria-expanded") === String(shouldExpand);
     },
@@ -23,9 +39,7 @@ async function waitForFaqState(page, index, expanded) {
 async function waitForPanelState(page, index, open) {
   await page.waitForFunction(
     ({ itemIndex, shouldOpen }) => {
-      const panel = document.querySelectorAll(".faq-answer-collapsible")[
-        itemIndex
-      ];
+      const panel = document.querySelectorAll(".faq-answer-collapsible")[itemIndex];
       if (!panel) return false;
       const style = getComputedStyle(panel);
       const height = panel.getBoundingClientRect().height;
@@ -43,10 +57,12 @@ async function waitForPanelState(page, index, open) {
   );
 }
 
-async function verifyInitialState(page) {
-  const faqState = await page.evaluate(() => {
-    const buttons = [...document.querySelectorAll(".faq-question-toggle-btn")];
-    const answers = [...document.querySelectorAll(".faq-answer-collapsible")];
+async function verifyInitialState(page, productSlug = "makhhi-thread") {
+  await waitForProductFaq(page, productSlug);
+  const selector = faqGroupSelector(productSlug);
+  const faqState = await page.locator(selector).evaluate((group) => {
+    const buttons = [...group.querySelectorAll(".faq-question-toggle-btn")];
+    const answers = [...group.querySelectorAll(".faq-answer-collapsible")];
     return {
       buttons: buttons.map((button) => ({
         id: button.id,
@@ -57,7 +73,6 @@ async function verifyInitialState(page) {
         id: answer.id,
         role: answer.getAttribute("role"),
         labelledBy: answer.getAttribute("aria-labelledby"),
-        hidden: answer.hidden,
         ariaHidden: answer.getAttribute("aria-hidden"),
         inert: answer.hasAttribute("inert"),
         height: answer.getBoundingClientRect().height,
@@ -69,10 +84,7 @@ async function verifyInitialState(page) {
   check(faqState.buttons.length >= 3, "expected at least three FAQ buttons");
   check(
     faqState.buttons.every(
-      (button) =>
-        button.id &&
-        button.expanded === "false" &&
-        button.controls,
+      (button) => button.id && button.expanded === "false" && button.controls,
     ),
     "FAQ buttons are missing stable closed-state relationships",
   );
@@ -129,6 +141,7 @@ async function verifyInitialState(page) {
         waitUntil: "networkidle",
         timeout: 30_000,
       });
+      await waitForProductFaq(page, "makhhi-thread");
       await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
       await page.evaluate(() => { window.__faqCls = 0; });
       await task(page);
@@ -216,23 +229,21 @@ async function verifyInitialState(page) {
             .find((value) => value && value !== activePath);
         }, currentPath);
       check(Boolean(href), "no related product route was available");
-      const relatedLink = page
-        .locator(`.card-grid.product-grid a[href="${href}"]`)
-        .first();
+      const relatedSlug = href.split("/").filter(Boolean).at(-1);
+      check(Boolean(relatedSlug), "related product route did not contain a slug");
+
+      const relatedLink = page.locator(`.card-grid.product-grid a[href="${href}"]`).first();
       await relatedLink.click();
       await page.waitForURL(`**${href}`);
-      await page.locator(".faq-question-toggle-btn").first().waitFor();
-      await verifyInitialState(page);
+      await verifyInitialState(page, relatedSlug);
 
       await page.goBack();
       await page.waitForURL(currentUrl);
-      await page.locator(".faq-question-toggle-btn").first().waitFor();
-      await verifyInitialState(page);
+      await verifyInitialState(page, "makhhi-thread");
 
       await page.goForward();
       await page.waitForURL(`**${href}`);
-      await page.locator(".faq-question-toggle-btn").first().waitFor();
-      await verifyInitialState(page);
+      await verifyInitialState(page, relatedSlug);
     },
   );
 
