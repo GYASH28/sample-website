@@ -46,6 +46,14 @@ const THEME_SURFACE_SELECTORS = [
   ".brand-model-highlight__stage",
 ];
 
+function isIgnorableGoogleMapsConsoleNoise(message) {
+  const text = message.text();
+  const sourceUrl = message.location()?.url || "";
+  const googleMapsSource = /(?:^|\.)maps\.googleapis\.com|google\.com\/maps/i.test(sourceUrl);
+  const googleMapsRpc = text.includes("maps.googleapis.com/$rpc/google.internal.maps.mapsjs");
+  return googleMapsSource || googleMapsRpc;
+}
+
 async function settleEntirePage(page) {
   await page.evaluate(async () => {
     const max = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
@@ -216,7 +224,11 @@ async function verifyThemeControls(browser) {
           const page = await context.newPage();
           const errors = [];
           page.on("pageerror", (error) => errors.push(error.stack || error.message));
-          page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
+          page.on("console", (message) => {
+            if (message.type() === "error" && !isIgnorableGoogleMapsConsoleNoise(message)) {
+              errors.push(message.text());
+            }
+          });
           await page.goto(`${BASE_URL}${route}`, { waitUntil: "networkidle", timeout: 30_000 });
           await page.waitForFunction(() => document.readyState === "complete" && document.querySelector("#main-content"));
           await page.evaluate(() => document.fonts.ready);
