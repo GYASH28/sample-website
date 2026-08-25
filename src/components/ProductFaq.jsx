@@ -34,7 +34,11 @@ export default function ProductFaq({ productSlug, faqs }) {
   };
 
   return (
-    <div className={styles.group} data-product-faq>
+    <div
+      className={styles.group}
+      data-product-faq
+      data-product-slug={productSlug}
+    >
       {faqs.map((faq, index) => {
         const isOpen = openIndex === index;
         const buttonId = `${idBase}-question-${index}`;
