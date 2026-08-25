@@ -3,11 +3,12 @@ import { chromium } from "playwright";
 
 const baseUrl = process.argv[2] ?? "http://127.0.0.1:4173";
 const outputPath = process.argv[3];
+const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE;
 const routes = [
   "/",
   "/products",
   "/products/makhhi-thread",
-  "/gallery",
+  "/projects",
   "/about",
   "/blog",
   "/contact",
@@ -26,9 +27,7 @@ function percentile(values, quantile) {
 }
 
 const browser = await chromium.launch({
-  ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE
-    ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE }
-    : {}),
+  ...(executablePath ? { executablePath } : {}),
 });
 const results = [];
 
@@ -46,22 +45,31 @@ try {
       page.on("pageerror", (error) => errors.push(error.message));
 
       await page.addInitScript(() => {
-        sessionStorage.setItem("fakhri_intro_cinematic_v1", "played");
+        sessionStorage.setItem("fakhri_intro_cinematic_v2", "played");
+        sessionStorage.setItem("fakhri_commerce_intro_v3", "played");
         window.__motionAudit = { cls: 0, lcp: 0 };
 
-        new PerformanceObserver((list) => {
-          const entries = list.getEntries();
-          const last = entries.at(-1);
-          if (last) window.__motionAudit.lcp = last.startTime;
-        }).observe({ type: "largest-contentful-paint", buffered: true });
-
-        new PerformanceObserver((list) => {
-          for (const entry of list.getEntries()) {
-            if (!entry.hadRecentInput) {
-              window.__motionAudit.cls += entry.value;
-            }
+        if (typeof PerformanceObserver !== "undefined") {
+          try {
+            new PerformanceObserver((list) => {
+              const entries = list.getEntries();
+              const last = entries.at(-1);
+              if (last) window.__motionAudit.lcp = last.startTime;
+            }).observe({ type: "largest-contentful-paint", buffered: true });
+          } catch {
+            // Optional in some browser/runtime combinations.
           }
-        }).observe({ type: "layout-shift", buffered: true });
+
+          try {
+            new PerformanceObserver((list) => {
+              for (const entry of list.getEntries()) {
+                if (!entry.hadRecentInput) window.__motionAudit.cls += entry.value;
+              }
+            }).observe({ type: "layout-shift", buffered: true });
+          } catch {
+            // Optional in some browser/runtime combinations.
+          }
+        }
       });
 
       const startedAt = performance.now();
@@ -74,28 +82,30 @@ try {
           document.readyState === "complete" &&
           document.documentElement.dataset.motionProfile &&
           document.querySelector(".route-stage") &&
-          !document.body.classList.contains("intro-running")
+          !document.body.classList.contains("commerce-intro-open")
         );
       });
       await page.evaluate(() => document.fonts.ready);
 
       const visual = await page.evaluate(async () => {
         window.scrollTo({ top: 0, behavior: "instant" });
-        await new Promise((resolve) =>
-          requestAnimationFrame(() => requestAnimationFrame(resolve)),
-        );
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
         const frameGaps = [];
         const longTasks = [];
-        const longTaskObserver = new PerformanceObserver((list) => {
-          for (const entry of list.getEntries()) longTasks.push(entry.duration);
-        });
-        longTaskObserver.observe({ type: "longtask", buffered: false });
+        let longTaskObserver;
+        if (typeof PerformanceObserver !== "undefined") {
+          try {
+            longTaskObserver = new PerformanceObserver((list) => {
+              for (const entry of list.getEntries()) longTasks.push(entry.duration);
+            });
+            longTaskObserver.observe({ type: "longtask", buffered: false });
+          } catch {
+            longTaskObserver = undefined;
+          }
+        }
 
-        const maxScroll = Math.max(
-          0,
-          document.documentElement.scrollHeight - window.innerHeight,
-        );
+        const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
         const duration = maxScroll > 0 ? 2_200 : 900;
         const start = performance.now();
         let previous = start;
@@ -114,7 +124,7 @@ try {
           requestAnimationFrame(tick);
         });
 
-        longTaskObserver.disconnect();
+        longTaskObserver?.disconnect?.();
         const navigation = performance.getEntriesByType("navigation")[0];
         const images = [...document.images];
 
@@ -122,9 +132,7 @@ try {
           frameGaps,
           longTasks,
           pageHeight: document.documentElement.scrollHeight,
-          overflow:
-            document.documentElement.scrollWidth >
-            document.documentElement.clientWidth,
+          overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
           brokenImages: images
             .filter((image) => image.complete && image.naturalWidth === 0)
             .map((image) => image.currentSrc || image.src),
@@ -145,10 +153,11 @@ try {
         domContentLoaded: Math.round(visual.domContentLoaded),
         load: Math.round(visual.load),
         frameP95: Number(percentile(visual.frameGaps, 0.95).toFixed(2)),
-        frameMax: Number(Math.max(...visual.frameGaps).toFixed(2)),
+        frameMax: Number(Math.max(0, ...visual.frameGaps).toFixed(2)),
         framesOver33: visual.frameGaps.filter((gap) => gap > 33).length,
         framesOver50: visual.frameGaps.filter((gap) => gap > 50).length,
         longTaskMax: Number(Math.max(0, ...visual.longTasks).toFixed(2)),
+        longTaskCount: visual.longTasks.length,
         pageHeight: visual.pageHeight,
         overflow: visual.overflow,
         brokenImages: visual.brokenImages,
@@ -171,3 +180,11 @@ const serialized = `${JSON.stringify(report, null, 2)}\n`;
 
 if (outputPath) await writeFile(outputPath, serialized, "utf8");
 process.stdout.write(serialized);
+
+const correctnessFailures = results.filter(
+  (result) => result.overflow || result.brokenImages.length || result.consoleErrors.length,
+);
+if (correctnessFailures.length) {
+  console.error(`Motion audit found ${correctnessFailures.length} route/profile correctness failure(s).`);
+  process.exitCode = 1;
+}
