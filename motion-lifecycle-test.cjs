@@ -110,15 +110,15 @@ async function createRememberedContext(browser, options = {}) {
     await waitForStablePage(page);
     await waitForRouteFamily(page, "home");
 
-    await page.locator('.desktop-nav a[href="/products"]').click();
+    await page.getByRole("link", { name: "Products", exact: true }).click();
     await page.waitForURL("**/products");
     await waitForRouteFamily(page, "catalogue");
 
-    await page.locator('.desktop-nav a[href="/projects"]').click();
+    await page.getByRole("link", { name: "Projects", exact: true }).click();
     await page.waitForURL("**/projects");
     await waitForRouteFamily(page, "catalogue");
 
-    await page.locator('.desktop-nav a[href="/about"]').click();
+    await page.getByRole("link", { name: "About", exact: true }).click();
     await page.waitForURL("**/about");
     await waitForRouteFamily(page, "editorial");
 
