@@ -1,5 +1,5 @@
 import { CaretDown } from "@phosphor-icons/react";
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import styles from "./ProductFaq.module.css";
 
 function faqIdPart(value) {
@@ -14,6 +14,11 @@ export default function ProductFaq({ productSlug, faqs }) {
     productSlug,
     index: null,
   });
+
+  useLayoutEffect(() => {
+    setOpenState({ productSlug, index: null });
+  }, [productSlug]);
+
   const openIndex =
     openState.productSlug === productSlug ? openState.index : null;
   const idBase = `product-faq-${faqIdPart(productSlug)}`;
@@ -29,7 +34,11 @@ export default function ProductFaq({ productSlug, faqs }) {
   };
 
   return (
-    <div className={styles.group} data-product-faq>
+    <div
+      className={styles.group}
+      data-product-faq
+      data-product-slug={productSlug}
+    >
       {faqs.map((faq, index) => {
         const isOpen = openIndex === index;
         const buttonId = `${idBase}-question-${index}`;

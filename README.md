@@ -33,23 +33,23 @@ The experience is designed around how the business actually sells: customers exp
 - Category and product filtering
 - Featured products and new-arrival sections
 - WhatsApp-focused enquiry calls to action
-- Gallery, testimonials, FAQs, and business information
+- Projects, testimonials, FAQs, and business information
 - Search-engine metadata and generated sitemap
-- Prerendered production output
+- Prerender-capable production output
 - Reduced-motion and viewport integrity testing
 
 ## Technology Stack
 
 | Area | Technology |
 |---|---|
-| Frontend | React 19, React Router 7 |
+| Frontend | React 19, React Router 8 |
 | Build tool | Vite 6 |
 | Language | JavaScript |
 | Icons | Phosphor Icons |
 | Typography | Archivo Variable, Manrope Variable |
 | Testing | Playwright, axe-core, jsdom |
 | Image processing | Sharp |
-| Deployment output | Prerendered static website |
+| Deployment output | Vite static bundle with optional prerendered public routes |
 
 ## Quick Start
 
@@ -68,17 +68,26 @@ http://127.0.0.1:5173/
 
 ## Production Build
 
+Create the normal Vite production bundle with:
+
 ```bash
 npm run build
 ```
 
-The build workflow:
+That command:
 
 1. Generates the sitemap
 2. Creates the Vite production bundle
-3. Prerenders the website for deployment
 
-Preview the result with:
+For a fully prerendered validation/deployment build, use:
+
+```bash
+npm run build:prerender
+```
+
+That command generates the sitemap, creates the Vite bundle, and prerenders the public routes. The production quality workflows use this stricter build so route-level SEO and rendering failures are caught before merge.
+
+Preview either build with:
 
 ```bash
 npm run preview
@@ -100,7 +109,7 @@ Update this file to change:
 - Product categories
 - Featured products and filter tags
 - New arrivals
-- Gallery cards
+- Project and showcase content
 - Testimonials
 - Calls to action
 
@@ -113,15 +122,22 @@ index.html
 ## Quality Workflows
 
 ```bash
+npm run test:deps        # High/critical dependency vulnerability gate
 npm run test:smoke       # Core journey smoke test
 npm run test:a11y        # Accessibility audit
-npm run test:motion      # Motion lifecycle checks
-npm run test:cinematic   # Cinematic experience regression test
+npm run test:motion      # Motion lifecycle and route-transition checks
+npm run test:cinematic   # Opening, hero and scroll regression test
 npm run test:faq         # FAQ interaction checks
-npm run test:viewports   # Responsive viewport integrity
-npm run audit:intro      # Intro performance audit
-npm run audit:motion     # Motion implementation audit
+npm run test:viewports   # Responsive/mobile viewport integrity
+npm run test:discovery   # Product discovery and conversion regression
+npm run test:seo         # SEO, structured data, sitemap and business identity
+npm run test:performance # Bundle and scroll performance budgets
+npm run test:theme       # Light/dark visual regression
+npm run audit:intro      # Opening-sequence performance diagnostics
+npm run audit:motion     # Route scroll/motion performance diagnostics
 ```
+
+The main production workflow runs the complete quality gate against a persistent preview server and uploads performance/visual diagnostics for inspection.
 
 ## Commerce Model
 
@@ -134,7 +150,7 @@ Yarn pricing can depend on quantity, shade, material, size, and current availabi
 - Never commit private customer information or credentials
 - Keep production contact values in the approved business data file
 - Review third-party links before deployment
-- Run the accessibility and viewport checks after major visual changes
+- Run the production quality gate after major visual or interaction changes
 
 ## License
 
