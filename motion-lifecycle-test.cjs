@@ -18,6 +18,14 @@ async function waitForStablePage(page) {
   });
 }
 
+async function waitForRouteFamily(page, family) {
+  await page.waitForFunction(
+    (expected) => document.querySelector(".route-stage")?.dataset.routeFamily === expected,
+    family,
+    { timeout: 5_000 },
+  );
+}
+
 async function createRememberedContext(browser, options = {}) {
   const context = await browser.newContext(options);
   await context.addInitScript(() => {
@@ -100,36 +108,26 @@ async function createRememberedContext(browser, options = {}) {
 
     await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
     await waitForStablePage(page);
-    check(
-      await page.locator(".route-stage").getAttribute("data-route-family") === "home",
-      "home route family was not assigned",
-    );
+    await waitForRouteFamily(page, "home");
 
     await page.locator('.desktop-nav a[href="/products"]').click();
     await page.waitForURL("**/products");
-    check(
-      await page.locator(".route-stage").getAttribute("data-route-family") === "catalogue",
-      "products route family was not assigned",
-    );
+    await waitForRouteFamily(page, "catalogue");
 
     await page.locator('.desktop-nav a[href="/projects"]').click();
     await page.waitForURL("**/projects");
-    check(
-      await page.locator(".route-stage").getAttribute("data-route-family") === "catalogue",
-      "projects route family was not assigned",
-    );
+    await waitForRouteFamily(page, "catalogue");
 
     await page.locator('.desktop-nav a[href="/about"]').click();
     await page.waitForURL("**/about");
-    check(
-      await page.locator(".route-stage").getAttribute("data-route-family") === "editorial",
-      "about route family was not assigned",
-    );
+    await waitForRouteFamily(page, "editorial");
 
     await page.goBack();
     await page.waitForURL("**/projects");
+    await waitForRouteFamily(page, "catalogue");
     await page.goForward();
     await page.waitForURL("**/about");
+    await waitForRouteFamily(page, "editorial");
 
     check(errors.length === 0, `route lifecycle logged errors: ${errors.join(" | ")}`);
     check(
@@ -149,9 +147,9 @@ async function createRememberedContext(browser, options = {}) {
     await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
     await waitForStablePage(page);
 
+    const drawer = page.locator(".mobile-nav-drawer");
     await page.getByRole("button", { name: "Menu", exact: true }).click();
-    const drawer = page.getByRole("dialog", { name: "Mobile navigation" });
-    await drawer.waitFor({ state: "visible" });
+    await page.waitForFunction(() => document.querySelector(".mobile-nav-drawer")?.getAttribute("aria-hidden") === "false");
     check(await drawer.getAttribute("aria-hidden") === "false", "mobile drawer did not open");
     check(
       await page.locator("body").evaluate((node) => node.classList.contains("menu-lock")),
