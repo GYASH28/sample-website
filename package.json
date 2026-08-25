@@ -16,6 +16,11 @@
     "test:cinematic": "node cinematic-regression-test.cjs",
     "test:faq": "node faq-interaction-test.cjs",
     "test:viewports": "node viewport-integrity-test.cjs",
+    "test:deps": "node dependency-audit.cjs",
+    "test:seo": "node seo-integrity-test.cjs",
+    "test:performance": "node performance-budget-test.cjs",
+    "test:discovery": "node v14-discovery-test.cjs",
+    "test:theme": "node theme-visual-audit.cjs",
     "audit:intro": "node src/scripts/intro-performance-audit.mjs",
     "audit:motion": "node src/scripts/motion-audit.mjs"
   },
