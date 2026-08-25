@@ -107,7 +107,8 @@ async function verifyInitialState(page) {
       hasTouch: Boolean(options.mobile),
     });
     await context.addInitScript(() => {
-      sessionStorage.setItem("fakhri_intro_cinematic_v1", "played");
+      sessionStorage.setItem("fakhri_intro_cinematic_v2", "played");
+      sessionStorage.setItem("fakhri_commerce_intro_v3", "played");
       window.__faqCls = 0;
       new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
@@ -128,6 +129,8 @@ async function verifyInitialState(page) {
         waitUntil: "networkidle",
         timeout: 30_000,
       });
+      await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+      await page.evaluate(() => { window.__faqCls = 0; });
       await task(page);
       check(errors.length === 0, `console errors: ${errors.join(" | ")}`);
       if (!options.routeNavigation) {
