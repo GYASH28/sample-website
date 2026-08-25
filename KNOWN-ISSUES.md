@@ -1,65 +1,45 @@
-# Fakhri Mart — Known Issues & Intentional Design Choices
+# Fakhri Mart — Current Operational Limits & Intentional Design Choices
 
-This file documents things that look like bugs but are deliberate decisions, so a future audit doesn't re-flag them as defects.
+Last reviewed: 2026-08-25
 
-## PincodeChecker returns "Yes, we deliver here!" for any syntactically valid 6-digit pincode
+This file records current, verified constraints that can look like defects during an audit. Stale notes for removed components and old structured-data behavior have been removed.
 
-**File:** `src/components/PincodeChecker.jsx`
+## Enquiry-led catalogue: no live price or inventory promise
 
-**Behavior:** Any 6-digit number entered into the pincode checker gets a confident "Yes, we deliver here!" response.
+Fakhri Mart currently operates as a catalogue and enquiry experience rather than a transactional store. Live price, stock, exact composition, shade availability and order timing are confirmed personally through the enquiry flow.
 
-**Why this is intentional:** Fakhri Mart genuinely delivers all-India. There is no real pincode-serviceability API behind this — the check is purely syntactic (6 digits). The confirmation message is designed to reassure users, not to gate them.
+This is deliberate. The structured data does not manufacture `Offer`, availability, review or rating data that the site cannot verify.
 
-**Risk:** A user who types an obviously fake code (e.g. `000000` or `999999`) still gets a confident, specific-sounding confirmation. This could feel dishonest if a user notices.
-
-**Status:** Flagged for client review. If the client prefers softer copy, change the response to something like:
-
-> "We deliver across India — we'll confirm exact timing for your area on WhatsApp."
-
-instead of a hard yes/no. The current copy was confirmed acceptable as of the last audit, but should be re-confirmed periodically.
+**Status:** Intentional until a trusted inventory/pricing backend exists.
 
 ---
 
-## No real review system behind the `rating` / `reviewCount` fields
+## Opening motion adapts to the visitor and device
 
-**File:** `src/data/siteData.js`, `src/hooks/useJsonLd.js`
+The commerce opening sequence uses the site's motion profile. Reduced-motion visitors skip the animated opening, lower-resource/touch devices receive lighter motion, and the intro is remembered for the session unless explicitly forced for testing.
 
-**Behavior:** Each product has `rating` (4.3–4.9) and `reviewCount` (12–60) fields, displayed as stars on cards and product pages, and emitted as `aggregateRating` in JSON-LD structured data.
-
-**Why this is intentional:** There is no backend, no accounts, no verified-purchase flow. The values are manually entered by the business owner from real WhatsApp/Instagram feedback. A `// TODO: replace with real review system when backend exists` comment marks the spot in the code.
-
-**Risk:** The numbers look like live data but aren't dynamically updated. Google's Rich Results Test may flag `aggregateRating` without a backing review system.
-
-**Status:** Acceptable for the WhatsApp-enquiry catalogue model. When a real review API exists, replace the `aggregateRating` block in `useJsonLd.js → productJsonLd` with verified data.
+**Status:** Intentional accessibility/performance behavior. Covered by cinematic, lifecycle and intro-performance regression tests.
 
 ---
 
-## No live inventory sync
+## Public route prerendering uses the explicit prerender build
 
-**File:** `src/data/siteData.js` (`stock` field per product)
+`npm run build` creates the normal sitemap + Vite production bundle.
 
-**Behavior:** Each product has a `stock` field (`"in"` | `"low"` | `"out"`) that drives the `StockBadge` and the Notify-me-on-WhatsApp block.
+`npm run build:prerender` additionally prerenders the public route set. CI uses the stricter prerender build before route, SEO and performance validation.
 
-**Why this is intentional:** There is no inventory system to sync with. The field is a static, editor-maintained flag.
-
-**Risk:** A product marked "in stock" on the site may have sold out in the physical store. The WhatsApp-enquiry model absorbs this — the owner confirms availability in the reply.
-
-**Status:** Acceptable for the current business model.
+**Status:** Intentional separation between a fast bundle build and full prerender validation/deployment output.
 
 ---
 
-## No real-time "users online" counter
+## No fake social-proof or concurrency counters
 
-**Status:** Intentionally omitted. Fake concurrency counters are a dark pattern; the site does not and will not include one.
+The site does not invent live visitor counts, real-time purchase counters, verified-review totals or other dynamic signals without a trusted backing data source.
+
+**Status:** Intentional trust requirement.
 
 ---
 
-## ScrollProgressThread is desktop-only
+## Current audit status
 
-**File:** `src/components/ScrollProgressThread.jsx`
-
-**Behavior:** The vertical gold thread on the right edge of the viewport only renders on non-touch devices with `prefers-reduced-motion: no-preference`.
-
-**Why this is intentional:** The thread would clutter small mobile screens, and reduced-motion users should not see continuous scroll-linked animation.
-
-**Status:** Deliberate. The CSS `@media (max-width: 768px) { .scroll-thread-container { display: none; } }` rule enforces this; the component also early-returns `null` under reduced motion.
+As of the review date above, no unresolved runtime defect is intentionally accepted in this file. New reproducible issues should be added here only when they are genuine current constraints and should include the affected route/component, user impact, and planned resolution.
