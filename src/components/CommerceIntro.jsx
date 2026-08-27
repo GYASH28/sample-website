@@ -2,6 +2,7 @@ import { ArrowRight } from "@phosphor-icons/react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { COMMERCE_INTRO_SESSION_KEY } from "../lib/commerceIntro.js";
+import { COMMERCE_INTRO_STYLES } from "../lib/commerceIntroStyles.js";
 
 const PHASES = {
   thread: "thread",
@@ -187,6 +188,7 @@ export default function CommerceIntro() {
       aria-modal="true"
       aria-label="Fakhri Mart opening sequence"
     >
+      <style>{COMMERCE_INTRO_STYLES}</style>
       <div className="commerce-intro__wash" aria-hidden="true" />
       <div className="commerce-intro__grain" aria-hidden="true" />
 
