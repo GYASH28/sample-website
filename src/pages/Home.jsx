@@ -1,4 +1,5 @@
 import CommerceHero from "../components/home/CommerceHero.jsx";
+import MakerHelpStrip from "../components/home/MakerHelpStrip.jsx";
 import {
   CommerceBenefits,
   CommerceCategoryGrid,
@@ -47,7 +48,7 @@ export default function Home() {
     <div className="fm-home commerce-home product-first-home">
       <CommerceHero />
       <CommerceCategoryNav categories={productCategories} />
-      <RecentlyViewedHome />
+      <MakerHelpStrip />
 
       <CommerceProductRail
         eyebrow="Popular right now"
@@ -57,9 +58,10 @@ export default function Home() {
         href="/products"
       />
 
+      <CommerceCraftFinder products={featuredProducts} />
       <CommerceCategoryGrid categories={productCategories.slice(0, 8)} />
       <ShadeDiscovery />
-      <CommerceCraftFinder products={featuredProducts} />
+      <RecentlyViewedHome />
 
       <CommerceProductRail
         eyebrow="Yarn collection"
