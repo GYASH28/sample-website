@@ -16,47 +16,47 @@ const PHASES = {
 const TIMELINES = {
   full: {
     steps: [
-      [PHASES.materials, 650],
-      [PHASES.making, 1_850],
-      [PHASES.creation, 3_050],
-      [PHASES.brand, 4_250],
-      [PHASES.reveal, 5_350],
+      [PHASES.materials, 360],
+      [PHASES.making, 1_050],
+      [PHASES.creation, 1_760],
+      [PHASES.brand, 2_480],
+      [PHASES.reveal, 3_180],
     ],
-    finishAt: 6_200,
-    exitMs: 620,
+    finishAt: 3_850,
+    exitMs: 520,
   },
   compact: {
     steps: [
-      [PHASES.materials, 560],
-      [PHASES.making, 1_650],
-      [PHASES.creation, 2_730],
-      [PHASES.brand, 3_800],
-      [PHASES.reveal, 4_820],
+      [PHASES.materials, 300],
+      [PHASES.making, 880],
+      [PHASES.creation, 1_480],
+      [PHASES.brand, 2_080],
+      [PHASES.reveal, 2_650],
     ],
-    finishAt: 5_650,
-    exitMs: 560,
+    finishAt: 3_200,
+    exitMs: 460,
   },
   lite: {
     steps: [
-      [PHASES.materials, 500],
-      [PHASES.making, 1_450],
-      [PHASES.creation, 2_400],
-      [PHASES.brand, 3_350],
-      [PHASES.reveal, 4_250],
+      [PHASES.materials, 220],
+      [PHASES.making, 720],
+      [PHASES.creation, 1_180],
+      [PHASES.brand, 1_650],
+      [PHASES.reveal, 2_080],
     ],
-    finishAt: 5_000,
-    exitMs: 480,
+    finishAt: 2_550,
+    exitMs: 360,
   },
 };
 
 const PHASE_META = {
-  thread: ["01", "Thread"],
-  materials: ["02", "Colour"],
-  making: ["03", "Making"],
-  creation: ["04", "Possibility"],
-  brand: ["05", "Fakhri Mart"],
-  reveal: ["05", "Fakhri Mart"],
-  exit: ["05", "Fakhri Mart"],
+  thread: ["Find", "the colour"],
+  materials: ["Find", "the colour"],
+  making: ["Feel", "the texture"],
+  creation: ["Make", "the idea"],
+  brand: ["Fakhri", "Mart"],
+  reveal: ["Fakhri", "Mart"],
+  exit: ["Fakhri", "Mart"],
 };
 
 function shouldShowIntro(pathname) {
@@ -174,12 +174,12 @@ export default function CommerceIntro() {
 
   if (!visible) return null;
 
-  const [phaseNumber, phaseLabel] = PHASE_META[phase] || PHASE_META.thread;
-  const enterLabel = phase === PHASES.reveal || phase === PHASES.exit ? "Enter site" : "Skip intro";
+  const [verb, subject] = PHASE_META[phase] || PHASE_META.thread;
+  const enterLabel = phase === PHASES.reveal || phase === PHASES.exit ? "Enter catalogue" : "Skip intro";
 
   return (
     <div
-      className="commerce-intro"
+      className="commerce-intro commerce-intro--v17"
       data-phase={phase}
       data-duration={timeline.finishAt}
       style={{ "--intro-duration": `${timeline.finishAt}ms` }}
@@ -189,9 +189,20 @@ export default function CommerceIntro() {
     >
       <div className="commerce-intro__wash" aria-hidden="true" />
       <div className="commerce-intro__grain" aria-hidden="true" />
-      <svg className="commerce-intro__thread" viewBox="0 0 1400 700" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M-80 500 C220 230 410 630 700 350 C910 145 1100 425 1480 140" pathLength="1" />
-      </svg>
+
+      <div className="commerce-intro__mast" aria-hidden="true">
+        <span className="commerce-intro__mast-brand">
+          <img src="/assets/brand/fakhri-logo-256.webp" alt="" width="48" height="48" decoding="async" />
+          <strong>FAKHRI MART</strong>
+        </span>
+        <span>Yarn · thread · craft materials</span>
+        <span>Pune</span>
+      </div>
+
+      <div className="commerce-intro__statement" aria-hidden="true">
+        <span>{verb}</span>
+        <strong>{subject}</strong>
+      </div>
 
       <div className="commerce-intro__materials" aria-hidden="true">
         <figure>
@@ -199,48 +210,42 @@ export default function CommerceIntro() {
             <source srcSet="/assets/images/editorial/shade-library-640.avif" type="image/avif" />
             <img src="/assets/images/editorial/shade-library-640.webp" alt="" width="640" height="427" decoding="async" fetchPriority="high" />
           </picture>
-          <figcaption><span>01 · Colour</span><strong>Every project starts with a shade.</strong></figcaption>
+          <figcaption><span>Colour</span><strong>Choose the shade first.</strong></figcaption>
         </figure>
         <figure>
           <picture>
             <source srcSet="/assets/images/editorial/atelier-hero-640.avif" type="image/avif" />
             <img src="/assets/images/editorial/atelier-hero-640.webp" alt="" width="640" height="427" decoding="async" />
           </picture>
-          <figcaption><span>02 · Material</span><strong>Texture changes how an idea feels.</strong></figcaption>
+          <figcaption><span>Texture</span><strong>Then find the right feel.</strong></figcaption>
         </figure>
         <figure>
           <picture>
             <source srcSet="/assets/images/editorial/crochet-bag-worktable-640.avif" type="image/avif" />
             <img src="/assets/images/editorial/crochet-bag-worktable-640.webp" alt="" width="640" height="427" decoding="async" />
           </picture>
-          <figcaption><span>03 · Making</span><strong>Good materials make making easier.</strong></figcaption>
+          <figcaption><span>Make</span><strong>Turn material into something real.</strong></figcaption>
         </figure>
       </div>
 
       <div className="commerce-intro__brand" aria-hidden="true">
         <img src="/assets/brand/fakhri-logo-256.webp" alt="" width="256" height="256" decoding="async" />
         <div>
-          <span>From thread to finished piece</span>
+          <span>For makers, studios and resellers</span>
           <strong>Fakhri Mart</strong>
-          <small>Yarns · craft materials · Pune</small>
+          <small>Find the material. Pick the shade. Start making.</small>
         </div>
       </div>
 
       <div className="commerce-intro__reveal" aria-hidden="true">
-        <span>Explore the collection</span>
-        <ArrowRight size={22} />
-      </div>
-
-      <div className="commerce-intro__meta" aria-hidden="true">
-        <span>{phaseNumber}</span>
-        <i />
-        <strong>{phaseLabel}</strong>
+        <span>Enter the catalogue</span>
+        <ArrowRight size={21} />
       </div>
 
       <div className="commerce-intro__progress" aria-hidden="true"><i /></div>
 
       <button ref={skipRef} className="commerce-intro__skip" type="button" onClick={finish}>
-        {enterLabel} <span aria-hidden="true">↗</span>
+        {enterLabel} <ArrowRight size={16} aria-hidden="true" />
       </button>
     </div>
   );
