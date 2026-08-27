@@ -37,6 +37,7 @@ import "./discovery-v14.css";
 import "./discovery-v14-fixes.css";
 import "./theme-polish-v15.css";
 import "./theme-polish-v15-fixes.css";
+import "./premium-polish-v16.css";
 
 applyCatalogueIntegrity();
 applyMotionProfile();
