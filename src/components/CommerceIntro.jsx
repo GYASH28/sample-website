@@ -199,7 +199,7 @@ export default function CommerceIntro() {
         <span>Pune</span>
       </div>
 
-      <div className="commerce-intro__statement" aria-hidden="true">
+      <div key={phase} className="commerce-intro__statement" aria-hidden="true">
         <span>{verb}</span>
         <strong>{subject}</strong>
       </div>
