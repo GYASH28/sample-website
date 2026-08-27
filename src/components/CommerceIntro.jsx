@@ -175,12 +175,14 @@ export default function CommerceIntro() {
   if (!visible) return null;
 
   const [phaseNumber, phaseLabel] = PHASE_META[phase] || PHASE_META.thread;
+  const enterLabel = phase === PHASES.reveal || phase === PHASES.exit ? "Enter site" : "Skip intro";
 
   return (
     <div
       className="commerce-intro"
       data-phase={phase}
       data-duration={timeline.finishAt}
+      style={{ "--intro-duration": `${timeline.finishAt}ms` }}
       role="dialog"
       aria-modal="true"
       aria-label="Fakhri Mart opening sequence"
@@ -238,7 +240,7 @@ export default function CommerceIntro() {
       <div className="commerce-intro__progress" aria-hidden="true"><i /></div>
 
       <button ref={skipRef} className="commerce-intro__skip" type="button" onClick={finish}>
-        Skip intro <span aria-hidden="true">↗</span>
+        {enterLabel} <span aria-hidden="true">↗</span>
       </button>
     </div>
   );
