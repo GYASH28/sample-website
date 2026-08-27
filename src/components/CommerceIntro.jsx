@@ -2,7 +2,6 @@ import { ArrowRight } from "@phosphor-icons/react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { COMMERCE_INTRO_SESSION_KEY } from "../lib/commerceIntro.js";
-import { COMMERCE_INTRO_STYLES } from "../lib/commerceIntroStyles.js";
 
 const PHASES = {
   thread: "thread",
@@ -60,12 +59,28 @@ const PHASE_META = {
   exit: ["Fakhri", "Mart"],
 };
 
+function safeSessionGet(key) {
+  try {
+    return window.sessionStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function safeSessionSet(key, value) {
+  try {
+    window.sessionStorage.setItem(key, value);
+  } catch {
+    // Storage can be blocked in privacy modes. The intro must still close.
+  }
+}
+
 function shouldShowIntro(pathname) {
   if (pathname !== "/" || typeof window === "undefined") return false;
   const params = new URLSearchParams(window.location.search);
   if (params.get("intro") === "1") return true;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
-  return window.sessionStorage.getItem(COMMERCE_INTRO_SESSION_KEY) !== "played";
+  return safeSessionGet(COMMERCE_INTRO_SESSION_KEY) !== "played";
 }
 
 function readTimeline() {
@@ -100,25 +115,29 @@ export default function CommerceIntro() {
     timersRef.current.clear();
   }, []);
 
-  const finishImmediately = useCallback(() => {
+  const finalize = useCallback(() => {
     clearTimers();
-    finishingRef.current = true;
-    window.sessionStorage.setItem(COMMERCE_INTRO_SESSION_KEY, "played");
+    safeSessionSet(COMMERCE_INTRO_SESSION_KEY, "played");
     document.body.classList.remove("commerce-intro-open");
     setVisible(false);
   }, [clearTimers]);
+
+  const finishImmediately = useCallback(() => {
+    finishingRef.current = true;
+    finalize();
+  }, [finalize]);
 
   const finish = useCallback(() => {
     if (finishingRef.current) return;
     finishingRef.current = true;
     clearTimers();
-    window.sessionStorage.setItem(COMMERCE_INTRO_SESSION_KEY, "played");
+    safeSessionSet(COMMERCE_INTRO_SESSION_KEY, "played");
     setPhase(PHASES.exit);
-    schedule(() => {
-      document.body.classList.remove("commerce-intro-open");
-      setVisible(false);
-    }, timeline.exitMs);
-  }, [clearTimers, schedule, timeline.exitMs]);
+
+    // Fallback cleanup guarantees the overlay cannot trap the page if a CSS
+    // transition is interrupted by tab switching, device throttling or browser quirks.
+    schedule(finalize, timeline.exitMs + 120);
+  }, [clearTimers, finalize, schedule, timeline.exitMs]);
 
   useLayoutEffect(() => {
     if (!visible) return undefined;
@@ -180,15 +199,19 @@ export default function CommerceIntro() {
 
   return (
     <div
-      className="commerce-intro commerce-intro--v17"
+      className="commerce-intro commerce-intro--v18"
       data-phase={phase}
       data-duration={timeline.finishAt}
       style={{ "--intro-duration": `${timeline.finishAt}ms` }}
       role="dialog"
       aria-modal="true"
       aria-label="Fakhri Mart opening sequence"
+      onTransitionEnd={(event) => {
+        if (phase === PHASES.exit && event.target === event.currentTarget && event.propertyName === "opacity") {
+          finalize();
+        }
+      }}
     >
-      <style>{COMMERCE_INTRO_STYLES}</style>
       <div className="commerce-intro__wash" aria-hidden="true" />
       <div className="commerce-intro__grain" aria-hidden="true" />
 
