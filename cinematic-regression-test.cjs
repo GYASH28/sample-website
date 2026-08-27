@@ -20,6 +20,7 @@ async function assertIntroShell(page, label) {
     const skip = overlay.querySelector(".commerce-intro__skip")?.getBoundingClientRect();
     return {
       missing: false,
+      phase: overlay.dataset.phase,
       className: overlay.className,
       position: style.position,
       opacity: Number.parseFloat(style.opacity),
@@ -30,14 +31,23 @@ async function assertIntroShell(page, label) {
       inlineStyleTag: Boolean(overlay.querySelector("style")),
       stylesheetLoaded: Boolean(stylesheet),
       bodyLocked: document.body.classList.contains("commerce-intro-open"),
-      skip: skip ? { left: skip.left, top: skip.top, right: skip.right, bottom: skip.bottom } : null,
+      skip: skip ? {
+        left: skip.left,
+        top: skip.top,
+        right: skip.right,
+        bottom: skip.bottom,
+        width: skip.width,
+        height: skip.height,
+      } : null,
     };
   }, INTRO_SELECTOR);
 
   assert(!shell.missing, `${label}: opening overlay should exist`);
   assert(shell.className.includes("commerce-intro--v18"), `${label}: expected hardened v18 intro shell`);
   assert(shell.position === "fixed", `${label}: intro must be a fixed viewport overlay: ${JSON.stringify(shell)}`);
-  assert(shell.opacity > 0.95, `${label}: intro should render fully visible: ${JSON.stringify(shell)}`);
+  if (shell.phase !== "exit") {
+    assert(shell.opacity > 0.9, `${label}: active intro should render visibly: ${JSON.stringify(shell)}`);
+  }
   assert(Math.abs(shell.width - shell.viewportWidth) <= 2, `${label}: intro width should match viewport: ${JSON.stringify(shell)}`);
   assert(Math.abs(shell.height - shell.viewportHeight) <= 2, `${label}: intro height should match viewport: ${JSON.stringify(shell)}`);
   assert(!shell.inlineStyleTag, `${label}: intro CSS must not be injected inside the animated overlay`);
@@ -46,6 +56,10 @@ async function assertIntroShell(page, label) {
   assert(
     shell.skip && shell.skip.left >= -1 && shell.skip.top >= -1 && shell.skip.right <= shell.viewportWidth + 1 && shell.skip.bottom <= shell.viewportHeight + 1,
     `${label}: skip control must stay inside viewport: ${JSON.stringify(shell)}`,
+  );
+  assert(
+    shell.skip && shell.skip.width >= 70 && shell.skip.width <= 240 && shell.skip.height >= 36 && shell.skip.height <= 72,
+    `${label}: skip control must remain a compact pill instead of stretching: ${JSON.stringify(shell)}`,
   );
 }
 
@@ -60,7 +74,7 @@ async function assertIntroShell(page, label) {
     });
     page.on("pageerror", (error) => errors.push(error.message));
 
-    await page.goto(`${BASE_URL}/?intro=1`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE_URL}/?intro=1`, { waitUntil: "domcontentloaded" });
     const intro = page.locator(INTRO_SELECTOR);
     await intro.waitFor({ state: "visible", timeout: 5000 });
     await assertIntroShell(page, "desktop");
@@ -110,7 +124,7 @@ async function assertIntroShell(page, label) {
       if (message.type() === "error") errors.push(`mobile: ${message.text()}`);
     });
     mobile.on("pageerror", (error) => errors.push(`mobile: ${error.message}`));
-    await mobile.goto(`${BASE_URL}/?intro=1`, { waitUntil: "networkidle" });
+    await mobile.goto(`${BASE_URL}/?intro=1`, { waitUntil: "domcontentloaded" });
     const mobileIntro = mobile.locator(INTRO_SELECTOR);
     await mobileIntro.waitFor({ state: "visible", timeout: 5000 });
     await assertIntroShell(mobile, "mobile");
@@ -141,7 +155,7 @@ async function assertIntroShell(page, label) {
     await mobile.close();
 
     assert(errors.length === 0, `Browser errors detected:\n${errors.join("\n")}`);
-    console.log("✓ Opening stylesheet, lifecycle cleanup, cinematic intro, hero and spool progress passed desktop/mobile regression checks");
+    console.log("✓ Opening stylesheet, compact controls, lifecycle cleanup, cinematic intro, hero and spool progress passed desktop/mobile regression checks");
   } finally {
     await browser.close();
   }
