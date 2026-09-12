@@ -803,6 +803,13 @@ const realRange = [
   ["Macrame Cord", "Macrame Cord", "Fakhri Mart", "Cord collection for knots, décor, hangers and handmade bags", "Accessories"],
   ["Glace Cotton Thread Art 545", "Bliss Threads", "Fakhri Mart", "Glacé cotton thread for crochet and detailed handwork", "Threads"],
   ["Kasab", "Decorative Threads", "Fakhri Mart", "Decorative kasab thread for festive and embellishment work", "Threads"],
+  ["Baby Soft", "Vardhaman Products", "Vardhaman", "Soft yarn line; consult the supplied card for current shades", "Yarns"],
+  ["Cotone", "Vardhaman Products", "Vardhaman", "Cotton yarn line; consult the supplied card for current shades", "Yarns"],
+  ["Faux Fur", "Taj Yarns", "Taj", "Faux fur yarn collection; current shades confirmed on enquiry", "Yarns"],
+  ["Kiddos", "Taj Yarns", "Taj", "Soft yarn collection; current shades confirmed on enquiry", "Yarns"],
+  ["Metallic T-Shirt Yarn", "Taj Yarns", "Taj", "Metallic T-shirt yarn collection for bags and décor", "Yarns"],
+  ["Taj Caramel", "Taj Yarns", "Taj", "Caramel yarn collection; current shades confirmed on enquiry", "Yarns"],
+  ["Velvet Taj", "Taj Yarns", "Taj", "Velvet yarn collection; current shades confirmed on enquiry", "Yarns"],
 ];
 
 const verifiedProducts = realRange.map(([name, category, brand, variants, masterCategory]) => ({
@@ -862,6 +869,18 @@ productCategories.splice(0, productCategories.length,
     count: "Kasab", image: REAL_RANGE_IMAGE,
     description: "Kasab decorative thread for festive embellishment and detailed craft work.",
     products: ["Kasab"],
+  },
+  {
+    name: "Vardhaman Products", shortName: "Vardhaman", icon: "Sparkles", tone: "pink",
+    count: "2 verified lines", image: "/assets/images/products/verified/cotone.png",
+    description: "Baby Soft and Cotone yarn lines supported by the supplied product cards.",
+    products: ["Baby Soft", "Cotone"],
+  },
+  {
+    name: "Taj Yarns", shortName: "Taj", icon: "Sparkles", tone: "rose",
+    count: "5 verified lines", image: "/assets/images/products/verified/velvet-taj.png",
+    description: "Faux Fur, Kiddos, Metallic T-Shirt Yarn, Caramel and Velvet Taj product lines.",
+    products: ["Faux Fur", "Kiddos", "Metallic T-Shirt Yarn", "Taj Caramel", "Velvet Taj"],
   },
 );
 
