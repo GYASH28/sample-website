@@ -762,10 +762,110 @@ const galleryByMasterCategory = {
   ],
 };
 
-export const featuredProducts = rawProducts.map(
+// Supplier-confirmed range, transcribed from the shade cards and WhatsApp
+// handover on 12 September 2026. We deliberately do not publish weights,
+// fibre claims, or pack specifications where the supplied material did not
+// confirm them. Those details stay part of the quote conversation.
+const REAL_RANGE_IMAGE = "/assets/images/editorial/fakhri-real-range-hero.png";
+const STANDARD_SHADES = [
+  { name: "Pastel", hex: "#d8b9de" },
+  { name: "Warm", hex: "#e59b82" },
+  { name: "Sage", hex: "#94ad91" },
+  { name: "Blue", hex: "#8baed1" },
+  { name: "Natural", hex: "#e5d2b5" },
+];
+
+const realRange = [
+  ["Desire", "Ganga Products", "Ganga", "Soft yarn range for handmade projects", "Yarns"],
+  ["Olivia", "Ganga Products", "Ganga", "Olivia collection; consult the supplied shade card", "Yarns"],
+  ["Blankie Solid", "Ganga Products", "Ganga", "Solid-colour blanket yarn collection", "Yarns"],
+  ["Blankie Multi", "Ganga Products", "Ganga", "Multi-colour blanket yarn collection", "Yarns"],
+  ["Nova", "Ganga Products", "Ganga", "Yarn collection; shades confirmed on enquiry", "Yarns"],
+  ["Picnic", "Ganga Products", "Ganga", "Yarn collection; shades confirmed on enquiry", "Yarns"],
+  ["Cotton Delight", "Ganga Products", "Ganga", "Cotton yarn collection for crochet and knitting", "Yarns"],
+  ["Souffle", "Ganga Products", "Ganga", "Soft yarn collection; shade card available", "Yarns"],
+  ["Summer Love", "Ganga Products", "Ganga", "Summer yarn collection; shade card available", "Yarns"],
+  ["Alisha", "Ganga Products", "Ganga", "Yarn collection; shades confirmed on enquiry", "Yarns"],
+  ["Milka", "Ganga Products", "Ganga", "Yarn collection; shade card available", "Yarns"],
+  ["Spectrum", "Ganga Products", "Ganga", "Colourful yarn collection; shade card available", "Yarns"],
+  ["Plush", "Ganga Products", "Ganga", "Plush yarn collection; shade card available", "Yarns"],
+  ["Cotton Candy", "Ganga Products", "Ganga", "Soft yarn collection; shades confirmed on enquiry", "Yarns"],
+  ["Hobby India", "Ganga Products", "Ganga", "Everyday yarn collection; shade card available", "Yarns"],
+  ["Superstitch", "Ganga Products", "Ganga", "Chunky yarn collection for quick, cosy makes", "Yarns"],
+  ["Starlite", "Ganga Products", "Ganga", "Yarn collection; shades confirmed on enquiry", "Yarns"],
+  ["Anchor Embroidery Thread", "Embroidery Threads", "Anchor", "Embroidery skeins; select shades from the current shade card", "Threads"],
+  ["Ambika Embroidery Thread", "Embroidery Threads", "Ambika", "Embroidery skeins; select shades from the current shade card", "Threads"],
+  ["Dolly Embroidery Skeins", "Embroidery Threads", "Dolly", "Embroidery skeins; select shades from the current shade card", "Threads"],
+  ["Malai Dori 0.8 mm", "Macrame Cord", "Fakhri Mart", "Fine malai dori for detailed craft work", "Accessories"],
+  ["Malai Dori 1 mm", "Macrame Cord", "Fakhri Mart", "Fine malai dori for detailed craft work", "Accessories"],
+  ["Malai Dori 2 mm", "Macrame Cord", "Fakhri Mart", "Malai dori for craft and decor projects", "Accessories"],
+  ["Malai Dori 3 mm & 4 mm", "Macrame Cord", "Fakhri Mart", "Malai dori options for larger craft and decor projects", "Accessories"],
+  ["Macrame Cord", "Macrame Cord", "Fakhri Mart", "Cord collection for knots, décor, hangers and handmade bags", "Accessories"],
+  ["Glace Cotton Thread Art 545", "Bliss Threads", "Fakhri Mart", "Glacé cotton thread for crochet and detailed handwork", "Threads"],
+  ["Kasab", "Decorative Threads", "Fakhri Mart", "Decorative kasab thread for festive and embellishment work", "Threads"],
+];
+
+const verifiedProducts = realRange.map(([name, category, brand, variants, masterCategory]) => ({
+  name,
+  slug: slugify(name),
+  category,
+  filters: masterCategory === "Yarns" ? ["Yarns"] : masterCategory === "Threads" ? ["Crochet Threads", "Embroidery"] : ["Macrame", "Accessories"],
+  variants,
+  description: `${name} is part of the current Fakhri Mart supplier-confirmed range. Please request the latest shade card, product photo, availability and quotation before placing an order.`,
+  suitableFor: masterCategory === "Yarns" ? "Crochet, knitting and handmade yarn projects" : masterCategory === "Threads" ? "Crochet, embroidery and decorative handwork" : "Macramé, craft décor and handmade accessories",
+  image: masterCategory === "Threads" ? "/assets/images/editorial/fakhri-thread-collection.png" : REAL_RANGE_IMAGE,
+  type: masterCategory === "Yarns" ? "yarn-ball" : masterCategory === "Threads" ? "crochet-thread" : "macrame-cord",
+  brand,
+  tags: ["Shade Card", "Retail", "Bulk Orders"],
+  palette: STANDARD_SHADES.map((shade) => shade.hex),
+  colors: STANDARD_SHADES,
+  quantityOptions: { unit: "pcs", min: 1, max: 500, step: 1, presets: [1, 12, 50, 100], soldAs: "Product" },
+  badges: ["Verified range", "Quote on request"],
+  relatedSlugs: [],
+  bundleWith: [],
+  masterCategory,
+  stock: "enquire",
+}));
+
+// Replace the previous illustrative departments with the categories actually
+// represented by the supplier handover.
+productCategories.splice(0, productCategories.length,
+  {
+    name: "Ganga Products", shortName: "Ganga", icon: "Waves", tone: "mint",
+    count: "17 current collections", image: REAL_RANGE_IMAGE,
+    description: "Ganga yarn collections in solid, multi, cotton, plush and everyday options. Ask for the current shade card.",
+    products: ["Desire", "Olivia", "Blankie Solid", "Blankie Multi", "Spectrum", "Superstitch"],
+  },
+  {
+    name: "Embroidery Threads", shortName: "Embroidery", icon: "Palette", tone: "violet",
+    count: "3 skein brands", image: "/assets/reference/product-photos/glace-cotton-thread.jpeg",
+    description: "Anchor, Ambika and Dolly embroidery skeins. Shade selection is confirmed against the current shade card.",
+    products: ["Anchor", "Ambika", "Dolly"],
+  },
+  {
+    name: "Macrame Cord", shortName: "Cord", icon: "Cable", tone: "gold",
+    count: "5 size options", image: "/assets/reference/product-photos/mousse-shade-card.jpeg",
+    description: "Malai dori in listed sizes plus macramé cord for craft décor, bags and knotting projects.",
+    products: ["Malai Dori", "Macrame Cord"],
+  },
+  {
+    name: "Bliss Threads", shortName: "Glacé Cotton", icon: "Sparkles", tone: "teal",
+    count: "Art 545", image: "/assets/reference/product-photos/glace-cotton-thread.jpeg",
+    description: "Glacé Cotton Thread Art 545 for crochet and detailed handwork.",
+    products: ["Glacé Cotton Thread Art 545"],
+  },
+  {
+    name: "Decorative Threads", shortName: "Kasab", icon: "WandSparkles", tone: "charcoal",
+    count: "Kasab", image: REAL_RANGE_IMAGE,
+    description: "Kasab decorative thread for festive embellishment and detailed craft work.",
+    products: ["Kasab"],
+  },
+);
+
+export const featuredProducts = verifiedProducts.map(
   ({ rating: _rating, reviewCount: _reviewCount, ...product }) => ({
     ...product,
-    image: representativeImages[product.slug],
+    image: product.image || representativeImages[product.slug],
     galleryImages:
       product.masterCategory === "Accessories" && product.slug === "purse-handles"
         ? [
@@ -789,22 +889,22 @@ export const featuredProducts = rawProducts.map(
 );
 
 export const newArrivals = [
-  "Vardhaman Baby Soft",
-  "Ganga Spectrum",
-  "T-Shirt Yarn Multi",
-  "Macrame Cord 4MM",
-  "Pearl Beads",
-  "Purse Locks",
+  "Blankie Multi",
+  "Olivia",
+  "Superstitch",
+  "Malai Dori 3 mm & 4 mm",
+  "Glace Cotton Thread Art 545",
+  "Kasab",
 ].map((name, index) => ({
   name,
-  category: ["Yarns", "Yarns", "T-Shirt Yarn", "Macrame", "Beads", "Purse Accessories"][index],
+  category: ["Ganga Products", "Ganga Products", "Ganga Products", "Macrame Cord", "Bliss Threads", "Decorative Threads"][index],
   note: [
-    "Soft yarn line for delicate creations",
-    "Colour-rich yarn for standout projects",
-    "Multi-colour chunky yarn options",
-    "Structured cord for decor and bags",
-    "Elegant beads for finishing touches",
-    "Functional purse finishing hardware",
+    "Multi-colour blanket yarn collection",
+    "Supplier-confirmed yarn collection",
+    "Chunky, cosy yarn collection",
+    "Listed cord sizes for craft and décor",
+    "Glacé cotton thread for detailed work",
+    "Decorative thread for embellishment",
   ][index],
   palette: [
     ["#f7a9bd", "#d8f2ee", "#b7dfd8"],
@@ -1012,4 +1112,3 @@ export const blogPosts = [
     readMinutes: 5,
   },
 ];
-
