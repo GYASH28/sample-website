@@ -813,7 +813,10 @@ const verifiedProducts = realRange.map(([name, category, brand, variants, master
   variants,
   description: `${name} is part of the current Fakhri Mart supplier-confirmed range. Please request the latest shade card, product photo, availability and quotation before placing an order.`,
   suitableFor: masterCategory === "Yarns" ? "Crochet, knitting and handmade yarn projects" : masterCategory === "Threads" ? "Crochet, embroidery and decorative handwork" : "Macramé, craft décor and handmade accessories",
-  image: masterCategory === "Threads" ? "/assets/images/editorial/fakhri-thread-collection.png" : REAL_RANGE_IMAGE,
+  // Every listed product line has a separate generated studio image. These are
+  // representative of the material family; shade cards remain the authority
+  // for the exact live colour chosen by the customer.
+  image: `/assets/images/products/verified/${slugify(name)}.png`,
   type: masterCategory === "Yarns" ? "yarn-ball" : masterCategory === "Threads" ? "crochet-thread" : "macrame-cord",
   brand,
   tags: ["Shade Card", "Retail", "Bulk Orders"],
