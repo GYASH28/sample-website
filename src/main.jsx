@@ -30,7 +30,6 @@ import "./production-theme-v11.css";
 import "./production-theme-v11-fixes.css";
 import "./production-theme-v11-final.css";
 import "./seamless-header-v12.css";
-import "./brand-highlight-v12.css";
 import "./header-glass-tuning-v12.css";
 import "./ux-performance-v13.css";
 import "./discovery-v14.css";
@@ -42,6 +41,7 @@ import "./commerce-intro-v19.css";
 import "./performance-foundation.css";
 import "./catalogue-integrity-v20.css";
 import "./shade-preview-v21.css";
+import "./guide-about-v22.css";
 
 applyCatalogueIntegrity();
 applyMotionProfile();
