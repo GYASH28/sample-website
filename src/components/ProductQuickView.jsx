@@ -16,13 +16,12 @@ import ShadePreviewStudio, { ShadePreviewTint } from "./ShadePreviewStudio.jsx";
 import WhatsAppIcon from "./WhatsAppIcon.jsx";
 
 function getVariantOptions(product) {
-  // Only render selectable variants when the verified product record supplies
-  // explicit options. Do not infer sizes from legacy slugs or sample products.
   return Array.isArray(product.variantOptions) ? product.variantOptions : [];
 }
 
 export default function ProductQuickView({ product, open, onClose }) {
   const closeRef = useRef(null);
+  const panelRef = useRef(null);
   const addedTimerRef = useRef(null);
   const { add } = useEnquiryBasket();
   const { has, toggle } = useWishlist();
@@ -54,7 +53,24 @@ export default function ProductQuickView({ product, open, onClose }) {
     window.requestAnimationFrame(() => closeRef.current?.focus());
 
     const onKeyDown = (event) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const focusable = panelRef.current?.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+      if (!focusable?.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
 
     document.addEventListener("keydown", onKeyDown);
@@ -98,7 +114,7 @@ export default function ProductQuickView({ product, open, onClose }) {
   return (
     <div className="quick-view-layer" role="presentation">
       <button className="quick-view-backdrop" type="button" onClick={onClose} aria-label="Close quick view" />
-      <section className="quick-view" role="dialog" aria-modal="true" aria-labelledby={`quick-view-${product.slug}`}>
+      <section ref={panelRef} className="quick-view" role="dialog" aria-modal="true" aria-labelledby={`quick-view-${product.slug}`}>
         <button ref={closeRef} className="quick-view__close" type="button" onClick={onClose} aria-label="Close quick view">
           <X size={22} />
         </button>
