@@ -371,7 +371,12 @@ export default function CommerceHero() {
           onPointerMove={onPointerMove}
           onPointerEnter={onPointerEnter}
           onPointerLeave={resetPointer}
-          onFocusCapture={() => setInteractionPaused(true)}
+          onFocusCapture={(event) => {
+            // Pause for keyboard users while they are interacting with carousel
+            // controls. Pointer clicks also focus buttons in Chromium; using
+            // :focus-visible prevents that mouse focus from freezing autoplay.
+            if (event.target.matches?.(":focus-visible")) setInteractionPaused(true);
+          }}
           onBlurCapture={(event) => {
             if (!event.currentTarget.contains(event.relatedTarget)) {
               setInteractionPaused(false);
