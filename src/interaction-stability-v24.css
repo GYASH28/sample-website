@@ -3,8 +3,6 @@
    notifications and sticky mobile controls. Loaded after all legacy layers. */
 
 :root {
-  /* Keep legacy components that still consume the old tokens on the same
-     architecture as liquid-navigation-v23. */
   --z-sticky: 600;
   --z-drawer: 900;
   --z-dialog: 1100;
@@ -20,6 +18,69 @@
 .floating-whatsapp,
 .floating-whatsapp-button {
   z-index: 510 !important;
+}
+
+/* The search item is a button while the other bottom-nav items are links.
+   Treat both as identical tabs; older CSS only styled anchors. */
+@media (max-width: 800px) {
+  .mobile-bottom-nav {
+    right: 8px !important;
+    bottom: max(8px, env(safe-area-inset-bottom)) !important;
+    left: 8px !important;
+    min-height: 62px !important;
+    padding: 6px !important;
+    border: 1px solid rgba(255, 255, 255, 0.66) !important;
+    border-radius: 22px !important;
+    background: rgba(252, 252, 248, 0.78) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.90),
+      0 14px 44px rgba(24, 37, 33, 0.16) !important;
+    backdrop-filter: blur(18px) saturate(1.20) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(1.20) !important;
+  }
+
+  .mobile-bottom-nav > :is(a, button) {
+    display: grid !important;
+    min-width: 0;
+    min-height: 48px;
+    padding: 4px 2px;
+    place-items: center;
+    align-content: center;
+    gap: 3px;
+    border: 0;
+    border-radius: 15px !important;
+    background: transparent;
+    color: var(--muted);
+    font-size: 0.61rem;
+    font-weight: 760;
+    line-height: 1.15;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .mobile-bottom-nav > :is(a, button):is(:hover, :focus-visible),
+  .mobile-bottom-nav > a.is-active {
+    background: rgba(222, 242, 238, 0.72) !important;
+    color: var(--teal-dark) !important;
+  }
+
+  :root[data-theme="dark"] .mobile-bottom-nav {
+    border-color: rgba(255, 255, 255, 0.09) !important;
+    background: rgba(27, 32, 28, 0.86) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 14px 44px rgba(0, 0, 0, 0.34) !important;
+  }
+
+  :root[data-theme="dark"] .mobile-bottom-nav > :is(a, button) {
+    color: var(--ui-text-muted, #b8b8b1);
+  }
+
+  :root[data-theme="dark"] .mobile-bottom-nav > :is(a, button):is(:hover, :focus-visible),
+  :root[data-theme="dark"] .mobile-bottom-nav > a.is-active {
+    background: rgba(93, 190, 177, 0.10) !important;
+    color: var(--ui-accent, #85d5cb) !important;
+  }
 }
 
 /* Enquiry drawer must always cover navigation/page chrome. */
@@ -48,8 +109,6 @@
   -webkit-backdrop-filter: blur(18px) saturate(1.18);
 }
 
-/* Quick View used to sit below the header (520 vs 600). Make it a true
-   application modal, with its backdrop and panel above every navigation layer. */
 .quick-view-layer {
   z-index: 1040 !important;
   isolation: isolate;
@@ -68,18 +127,14 @@
     0 30px 100px rgba(18, 28, 25, 0.28) !important;
 }
 
-/* Search/lightbox are deliberate top-level dialogs. CSS-module ImageZoom uses
-   --z-dialog, so the token above lifts it automatically too. */
 .search-dialog-backdrop {
   z-index: var(--z-dialog) !important;
 }
 
-/* Non-blocking feedback should not disappear underneath a modal or header. */
 .basket-toast {
   z-index: var(--z-toast) !important;
 }
 
-/* Horizontal rails should never offer dead controls. */
 .commerce-rail-actions button:disabled {
   cursor: default !important;
   opacity: 0.34;
@@ -92,7 +147,6 @@
   outline-offset: 6px;
 }
 
-/* Dark overlay materials follow the same liquid-glass family as navigation. */
 :root[data-theme="dark"] .enquiry-drawer {
   border-color: rgba(255, 255, 255, 0.10) !important;
   background:
@@ -106,9 +160,7 @@
   border-color: rgba(255, 255, 255, 0.10) !important;
 }
 
-/* Low-resource visitors retain layering and contrast without paying for
-   multiple live backdrop blurs. */
-html[data-motion-profile="lite"] :is(.enquiry-drawer, .enquiry-drawer-backdrop, .quick-view-backdrop) {
+html[data-motion-profile="lite"] :is(.enquiry-drawer, .enquiry-drawer-backdrop, .quick-view-backdrop, .mobile-bottom-nav) {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
@@ -116,7 +168,8 @@ html[data-motion-profile="lite"] :is(.enquiry-drawer, .enquiry-drawer-backdrop, 
 @media (prefers-reduced-transparency: reduce) {
   .enquiry-drawer,
   .enquiry-drawer-backdrop,
-  .quick-view-backdrop {
+  .quick-view-backdrop,
+  .mobile-bottom-nav {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
