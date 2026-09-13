@@ -51,7 +51,7 @@ async function settle(page) {
           localStorage.setItem("fakhri_theme", selectedTheme);
           sessionStorage.setItem("fakhri_intro_cinematic_v2", "played");
           sessionStorage.setItem("fakhri_commerce_intro_v2", "played");
-          if (!localStorage.getItem("fakhri_compare_v1")) localStorage.setItem("fakhri_compare_v1", JSON.stringify(["makhhi-thread", "4-ply-cotton-thread"]));
+          if (!localStorage.getItem("fakhri_compare_v1")) localStorage.setItem("fakhri_compare_v1", JSON.stringify(["blankie-solid", "cotone"]));
         }, { selectedTheme: theme });
 
         for (const [name, route] of routes) {

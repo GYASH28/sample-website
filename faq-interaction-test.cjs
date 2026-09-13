@@ -57,7 +57,7 @@ async function waitForPanelState(page, index, open) {
   );
 }
 
-async function verifyInitialState(page, productSlug = "makhhi-thread") {
+async function verifyInitialState(page, productSlug = "blankie-solid") {
   await waitForProductFaq(page, productSlug);
   const selector = faqGroupSelector(productSlug);
   const faqState = await page.locator(selector).evaluate((group) => {
@@ -137,11 +137,11 @@ async function verifyInitialState(page, productSlug = "makhhi-thread") {
     });
 
     try {
-      await page.goto(`${baseUrl}/products/makhhi-thread`, {
+      await page.goto(`${baseUrl}/products/blankie-solid`, {
         waitUntil: "networkidle",
         timeout: 30_000,
       });
-      await waitForProductFaq(page, "makhhi-thread");
+      await waitForProductFaq(page, "blankie-solid");
       await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
       await page.evaluate(() => { window.__faqCls = 0; });
       await task(page);
@@ -239,7 +239,7 @@ async function verifyInitialState(page, productSlug = "makhhi-thread") {
 
       await page.goBack();
       await page.waitForURL(currentUrl);
-      await verifyInitialState(page, "makhhi-thread");
+      await verifyInitialState(page, "blankie-solid");
 
       await page.goForward();
       await page.waitForURL(`**${href}`);

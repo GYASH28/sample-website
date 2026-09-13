@@ -106,7 +106,7 @@ async function goto(page, path) {
     // SEO collection pages are indexable, canonical, and stay offer-free.
     await goto(page, "/collections/crochet-yarn");
     const canonical = await page.locator('link[rel="canonical"]').getAttribute("href");
-    assert(canonical === "https://fakhriyarns.vercel.app/collections/crochet-yarn", `wrong collection canonical: ${canonical}`);
+    assert(canonical === "https://fakhri-mart.vercel.app/collections/crochet-yarn", `wrong collection canonical: ${canonical}`);
     const robots = await page.locator('meta[name="robots"]').getAttribute("content");
     assert(!robots.includes("noindex"), "collection landing page should be indexable");
     const scripts = await page.locator('script[type="application/ld+json"]').allTextContents();

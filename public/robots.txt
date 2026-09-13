@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://fakhriyarns.vercel.app/sitemap.xml
+Sitemap: https://fakhri-mart.vercel.app/sitemap.xml

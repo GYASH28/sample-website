@@ -4,7 +4,7 @@ const baseUrl = "http://127.0.0.1:4173";
 const routes = [
   { name: "Home", path: "/" },
   { name: "Products", path: "/products" },
-  { name: "Product detail", path: "/products/makhhi-thread" },
+  { name: "Product detail", path: "/products/blankie-solid" },
   { name: "Enquiry", path: "/enquiry" },
   { name: "Blog", path: "/blog" },
 ];

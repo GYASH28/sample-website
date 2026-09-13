@@ -13,7 +13,7 @@ const routes = [
   "/privacy",
   "/terms",
   "/delivery-enquiries",
-  "/products/makhhi-thread",
+  "/products/blankie-solid",
   "/products/single-macrame-cord",
   "/products/purse-handles",
   "/blog/how-to-choose-yarn-weight",
@@ -80,7 +80,7 @@ const routes = [
   await search.fill("");
 
   console.log("\n=== Product detail interactions ===");
-  await page.goto(`${baseUrl}/products/makhhi-thread`, { waitUntil: "networkidle" });
+  await page.goto(`${baseUrl}/products/blankie-solid`, { waitUntil: "networkidle" });
   const swatches = page.locator(".swatch-btn");
   if (await swatches.count()) await swatches.first().click();
   const quantityPresets = page.locator(".quantity-preset");

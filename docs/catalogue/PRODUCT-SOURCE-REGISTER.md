@@ -13,7 +13,7 @@ Prepared from the supplier WhatsApp handover and the downloaded shade cards on 1
 
 ## Reference assets
 
-Supplier files are intentionally organized under `public/assets/reference/` so a future upload can reuse them without searching a Downloads folder:
+Supplier files are intentionally organized in the repository so a future upload can reuse them without searching a Downloads folder. The original PDFs live in `docs/catalogue/source-shade-cards/`, outside the public website bundle, so they do not slow down customer visits:
 
 - `shade-cards/` holds the supplied PDF catalogues and shade cards.
 - `product-photos/` holds selected source product photos that establish the real range.

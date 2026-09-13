@@ -8,7 +8,7 @@ const OUTPUT = path.resolve(process.cwd(), "theme-audit-artifacts");
 const routes = [
   ["home", "/"],
   ["catalogue", "/products"],
-  ["product", "/products/makhhi-thread"],
+  ["product", "/products/blankie-solid"],
   ["projects", "/projects"],
   ["collection", "/collections/crochet-yarn"],
   ["compare", "/compare"],
@@ -217,7 +217,7 @@ async function verifyThemeControls(browser) {
         await context.addInitScript(({ selectedTheme }) => {
           localStorage.setItem("fakhri_theme", selectedTheme);
           sessionStorage.setItem("fakhri_intro_cinematic_v2", "played");
-          localStorage.setItem("fakhri_compare_v1", JSON.stringify(["makhhi-thread", "4-ply-cotton-thread", "single-macrame-cord"]));
+          localStorage.setItem("fakhri_compare_v1", JSON.stringify(["blankie-solid", "cotone", "macrame-cord"]));
         }, { selectedTheme: theme });
 
         for (const [name, route] of routes) {

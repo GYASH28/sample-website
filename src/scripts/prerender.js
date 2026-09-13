@@ -90,7 +90,11 @@ try {
   for (const route of allRoutes) {
     const url = `http://localhost:4173${route}`;
     try {
-      await page.goto(url, { waitUntil: "networkidle", timeout: 15000 });
+      // Some third-party browser connections can keep the network technically
+      // busy even after the application is ready. DOM content plus the short
+      // settle below gives deterministic prerender output without dropping a
+      // valid route on a transient network-idle timeout.
+      await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30_000 });
       await page.waitForTimeout(500);
       await page.evaluate(() => {
         document.documentElement.classList.remove("motion-ready", "intro-booting", "intro-handoff");

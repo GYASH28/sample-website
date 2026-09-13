@@ -17,7 +17,7 @@ export const businessInfo = {
   instagram: "fakhrimart53",
   instagramUrl: "https://www.instagram.com/fakhrimart53/",
   hours: "Monday to Saturday, 10:00 AM to 8:00 PM",
-  url: "https://fakhriyarns.vercel.app",
+  url: "https://fakhri-mart.vercel.app",
 };
 
 export const announcementItems = [
@@ -823,7 +823,7 @@ const verifiedProducts = realRange.map(([name, category, brand, variants, master
   // Every listed product line has a separate generated studio image. These are
   // representative of the material family; shade cards remain the authority
   // for the exact live colour chosen by the customer.
-  image: `/assets/images/products/verified/${slugify(name)}.png`,
+  image: `/assets/images/products/verified-web/${slugify(name)}.webp`,
   type: masterCategory === "Yarns" ? "yarn-ball" : masterCategory === "Threads" ? "crochet-thread" : "macrame-cord",
   brand,
   tags: ["Shade Card", "Retail", "Bulk Orders"],
@@ -836,6 +836,16 @@ const verifiedProducts = realRange.map(([name, category, brand, variants, master
   masterCategory,
   stock: "enquire",
 }));
+
+// Surface genuine neighbouring lines on each detail page. This replaces the
+// retired sample-product relationships with useful links within the verified
+// supplier range, without inventing bundles or availability claims.
+verifiedProducts.forEach((product) => {
+  product.relatedSlugs = verifiedProducts
+    .filter((candidate) => candidate.masterCategory === product.masterCategory && candidate.slug !== product.slug)
+    .slice(0, 3)
+    .map((candidate) => candidate.slug);
+});
 
 // Replace the previous illustrative departments with the categories actually
 // represented by the supplier handover.
@@ -872,13 +882,13 @@ productCategories.splice(0, productCategories.length,
   },
   {
     name: "Vardhaman Products", shortName: "Vardhaman", icon: "Sparkles", tone: "pink",
-    count: "2 verified lines", image: "/assets/images/products/verified/cotone.png",
+    count: "2 verified lines", image: "/assets/images/products/verified-web/cotone.webp",
     description: "Baby Soft and Cotone yarn lines supported by the supplied product cards.",
     products: ["Baby Soft", "Cotone"],
   },
   {
     name: "Taj Yarns", shortName: "Taj", icon: "Sparkles", tone: "rose",
-    count: "5 verified lines", image: "/assets/images/products/verified/velvet-taj.png",
+    count: "5 verified lines", image: "/assets/images/products/verified-web/velvet-taj.webp",
     description: "Faux Fur, Kiddos, Metallic T-Shirt Yarn, Caramel and Velvet Taj product lines.",
     products: ["Faux Fur", "Kiddos", "Metallic T-Shirt Yarn", "Taj Caramel", "Velvet Taj"],
   },

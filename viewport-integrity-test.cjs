@@ -5,7 +5,7 @@ const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE;
 const routes = [
   "/",
   "/products",
-  "/products/makhhi-thread",
+  "/products/blankie-solid",
   "/about",
   "/blog",
   "/contact",

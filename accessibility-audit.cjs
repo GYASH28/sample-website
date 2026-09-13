@@ -5,7 +5,7 @@ const baseUrl = "http://127.0.0.1:4173";
 const allRoutes = [
   "/",
   "/products",
-  "/products/makhhi-thread",
+  "/products/blankie-solid",
   "/enquiry",
   "/wishlist",
   "/about",

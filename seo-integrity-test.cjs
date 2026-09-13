@@ -1,7 +1,7 @@
 const { chromium } = require("playwright");
 
 const BASE_URL = process.env.SEO_BASE_URL || "http://127.0.0.1:4173";
-const SITE_URL = "https://fakhriyarns.vercel.app";
+const SITE_URL = "https://fakhri-mart.vercel.app";
 const TAGLINE = "Colorful Threads, Endless Creation";
 const EMAIL = "fakhrimart2025@gmail.com";
 const PRIMARY_PHONE = "+91 88307 37551";
@@ -13,7 +13,7 @@ const routes = [
   { path: "/projects", canonical: "/projects", indexable: true },
   { path: "/collections/crochet-yarn", canonical: "/collections/crochet-yarn", indexable: true },
   { path: "/collections/wholesale-yarn-pune", canonical: "/collections/wholesale-yarn-pune", indexable: true },
-  { path: "/products/makhhi-thread", canonical: "/products/makhhi-thread", indexable: true },
+  { path: "/products/blankie-solid", canonical: "/products/blankie-solid", indexable: true },
   { path: "/contact", canonical: "/contact", indexable: true },
   { path: "/wishlist", canonical: "/wishlist", indexable: false },
   { path: "/enquiry", canonical: "/enquiry", indexable: false },
@@ -105,7 +105,7 @@ function assert(condition, message) {
     assert(sitemapResponse.ok(), `sitemap request failed: ${sitemapResponse.status()}`);
     const sitemap = await sitemapResponse.text();
     for (const expected of [
-      "/products/makhhi-thread",
+      "/products/blankie-solid",
       "/contact",
       "/projects",
       "/collections/crochet-yarn",

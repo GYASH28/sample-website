@@ -1,4 +1,4 @@
-export const PUBLIC_SITE_URL = "https://fakhriyarns.vercel.app";
+export const PUBLIC_SITE_URL = "https://fakhri-mart.vercel.app";
 
 export const googlePresence = {
   mapsUrl:
