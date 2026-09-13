@@ -9,7 +9,7 @@ import {
   Swatches,
   Truck,
 } from "@phosphor-icons/react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import ProductShowcaseCard from "../ProductShowcaseCard.jsx";
 import Reveal from "../Reveal.jsx";
@@ -84,14 +84,51 @@ export function CommerceCategoryGrid({ categories }) {
 
 export function CommerceProductRail({ eyebrow, title, text, products, href = "/products" }) {
   const railRef = useRef(null);
+  const [scrollState, setScrollState] = useState({ left: false, right: false, overflow: false });
   if (!products.length) return null;
   const titleId = `rail-${title.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`;
 
+  useEffect(() => {
+    const rail = railRef.current;
+    if (!rail) return undefined;
+
+    const update = () => {
+      const max = Math.max(0, rail.scrollWidth - rail.clientWidth);
+      const left = rail.scrollLeft > 3;
+      const right = rail.scrollLeft < max - 3;
+      setScrollState({ left, right, overflow: max > 4 });
+    };
+
+    const frame = window.requestAnimationFrame(update);
+    rail.addEventListener("scroll", update, { passive: true });
+    const observer = typeof ResizeObserver !== "undefined" ? new ResizeObserver(update) : null;
+    observer?.observe(rail);
+    Array.from(rail.children).forEach((child) => observer?.observe(child));
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      rail.removeEventListener("scroll", update);
+      observer?.disconnect();
+    };
+  }, [products.length]);
+
   const move = (direction) => {
-    railRef.current?.scrollBy({
-      left: direction * Math.min(760, railRef.current.clientWidth * 0.78),
+    const rail = railRef.current;
+    if (!rail) return;
+    rail.scrollBy({
+      left: direction * Math.min(760, rail.clientWidth * 0.78),
       behavior: "smooth",
     });
+  };
+
+  const onRailKeyDown = (event) => {
+    if (event.key === "ArrowLeft" && scrollState.left) {
+      event.preventDefault();
+      move(-1);
+    } else if (event.key === "ArrowRight" && scrollState.right) {
+      event.preventDefault();
+      move(1);
+    }
   };
 
   return (
@@ -104,8 +141,12 @@ export function CommerceProductRail({ eyebrow, title, text, products, href = "/p
             <p>{text}</p>
           </div>
           <div className="commerce-rail-actions">
-            <button type="button" onClick={() => move(-1)} aria-label={`Scroll ${title} left`}><ArrowLeft size={18} /></button>
-            <button type="button" onClick={() => move(1)} aria-label={`Scroll ${title} right`}><ArrowRight size={18} /></button>
+            {scrollState.overflow ? (
+              <>
+                <button type="button" onClick={() => move(-1)} disabled={!scrollState.left} aria-label={`Scroll ${title} left`}><ArrowLeft size={18} /></button>
+                <button type="button" onClick={() => move(1)} disabled={!scrollState.right} aria-label={`Scroll ${title} right`}><ArrowRight size={18} /></button>
+              </>
+            ) : null}
             <Link to={href}>View collection <ArrowRight size={17} /></Link>
           </div>
         </Reveal>
@@ -114,6 +155,7 @@ export function CommerceProductRail({ eyebrow, title, text, products, href = "/p
           className="commerce-product-rail"
           role="region"
           tabIndex="0"
+          onKeyDown={onRailKeyDown}
           aria-label={`${title} product scroller`}
         >
           {products.map((product, index) => (
