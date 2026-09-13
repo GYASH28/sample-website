@@ -15,10 +15,22 @@
   position: absolute;
   inset: 0;
   z-index: 2;
+  display: block;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
   pointer-events: none;
   background: var(--shade-preview-color);
+  color: transparent;
+  font-size: 0;
+  line-height: 0;
   mix-blend-mode: color;
   opacity: 0.92;
+  transform: none;
   transition: background-color 180ms ease, opacity 180ms ease;
 }
 
