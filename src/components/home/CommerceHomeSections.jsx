@@ -47,7 +47,7 @@ export function CommerceCategoryGrid({ categories }) {
           <div>
             <p className="eyebrow">Shop by category</p>
             <h2 id="shop-category-title">Start with the material you need</h2>
-            <p>Jump directly into the product family instead of reading through a long brand story first.</p>
+            <p>Browse by material family first. Brand names remain attached to the products instead of being mixed into the category hierarchy.</p>
           </div>
           <Link to="/products">View full catalogue <ArrowRight size={17} /></Link>
         </Reveal>
@@ -128,10 +128,10 @@ export function CommerceProductRail({ eyebrow, title, text, products, href = "/p
 }
 
 const crafts = [
-  { name: "Crochet", test: /crochet|amigurumi|hook/i },
+  { name: "Crochet", test: /crochet|amigurumi/i },
   { name: "Knitting", test: /knit|wearable|scarf|baby/i },
-  { name: "Macrame", test: /macrame|cord|plant hanger/i },
-  { name: "Bag Making", test: /bag|purse|handle|base|lock|charm/i },
+  { name: "Macrame", test: /macrame|cord|dori|plant hanger/i },
+  { name: "Bag Making", test: /bag|purse|t-shirt yarn|cord/i },
   { name: "Embroidery", test: /embroidery|lacchi|stitch/i },
 ];
 
@@ -150,8 +150,8 @@ export function CommerceCraftFinder({ products }) {
       <div className="container commerce-craft-finder__grid">
         <Reveal className="commerce-craft-finder__intro" variant="slide-left">
           <p className="eyebrow">Shop by what you make</p>
-          <h2 id="craft-finder-title">Not sure which category name to choose?</h2>
-          <p>Pick the project. The catalogue narrows itself to useful materials and tools.</p>
+          <h2 id="craft-finder-title">Not sure which material name to choose?</h2>
+          <p>Pick the project. The catalogue narrows itself to useful verified material lines.</p>
           <div className="commerce-craft-finder__tabs" role="tablist" aria-label="Choose a craft">
             {crafts.map((craft) => (
               <button
@@ -177,9 +177,9 @@ export function CommerceCraftFinder({ products }) {
               <Link to={`/products/${product.slug}`} className="commerce-craft-product">
                 <img src={product.image} alt={product.name} width="420" height="420" loading="lazy" decoding="async" />
                 <span>
-                  <small>{product.category}</small>
+                  <small>{product.brand || product.category}</small>
                   <strong>{product.name}</strong>
-                  <em>{product.colors?.length || 0} listed shades <ArrowRight size={14} /></em>
+                  <em>Current shades on request <ArrowRight size={14} /></em>
                 </span>
               </Link>
             </Reveal>
@@ -195,12 +195,12 @@ export function CommerceBenefits() {
     {
       icon: Swatches,
       title: "Live shade confirmation",
-      text: "Ask for current shade photos before finalising your order.",
+      text: "Ask for the current supplier shade card or live stock photo before finalising your order.",
     },
     {
       icon: Package,
-      title: "Retail and bulk quantities",
-      text: "Build one list for a single project, boutique stock or resale order.",
+      title: "Retail and bulk enquiries",
+      text: "Build one material list for a single project, boutique stock or resale requirement.",
     },
     {
       icon: Truck,
@@ -237,19 +237,19 @@ export function CommerceOrderFlow() {
       number: "01",
       icon: Heart,
       title: "Browse and save",
-      text: "Use search, categories, filters and the wishlist to shortlist products.",
+      text: "Use search, material categories, project discovery and the wishlist to shortlist products.",
     },
     {
       number: "02",
       icon: ShoppingBagOpen,
       title: "Build one enquiry",
-      text: "Add quantities, shades and variants to your enquiry basket.",
+      text: "Add the product lines and quantities you need to one enquiry basket.",
     },
     {
       number: "03",
       icon: WhatsAppIcon,
       title: "Confirm before ordering",
-      text: "Fakhri Mart replies with live stock, final price and delivery details.",
+      text: "Fakhri Mart replies with live shades, pack details, final price and delivery information.",
     },
   ];
 
@@ -260,7 +260,7 @@ export function CommerceOrderFlow() {
           <div>
             <p className="eyebrow">How ordering works</p>
             <h2 id="order-flow-title">Clear ordering, confirmed before payment.</h2>
-            <p>Because yarn shades, pack sizes and wholesale rates change, the website helps you prepare a complete enquiry and the store confirms the final order.</p>
+            <p>Because shades, pack details and wholesale rates can change, the website helps you prepare a complete enquiry and the store confirms the current order details.</p>
           </div>
         </Reveal>
         <ol>
@@ -285,7 +285,7 @@ export function CommerceWholesaleCta() {
       <div className="container commerce-wholesale__grid">
         <div>
           <p className="eyebrow">Wholesale and resale support</p>
-          <h2 id="wholesale-title">Need multiple colours, cartons or regular supply?</h2>
+          <h2 id="wholesale-title">Need multiple shades, larger quantities or regular supply?</h2>
           <p>Send the product names, preferred shades, quantities and delivery city. The team will share current pack details, alternatives and quantity-based pricing.</p>
           <div className="commerce-wholesale__actions">
             <Link className="btn btn-light" to="/enquiry">
@@ -300,7 +300,7 @@ export function CommerceWholesaleCta() {
           <source srcSet="/assets/images/editorial/craft-stock-room.avif" type="image/avif" />
           <img
             src="/assets/images/editorial/craft-stock-room.webp"
-            alt="Organised shelves of yarn and craft materials"
+            alt="Representative display of yarn, thread and cord materials"
             width="1536"
             height="1024"
             loading="lazy"
