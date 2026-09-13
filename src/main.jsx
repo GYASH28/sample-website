@@ -41,6 +41,7 @@ import "./premium-polish-v16.css";
 import "./commerce-intro-v19.css";
 import "./performance-foundation.css";
 import "./catalogue-integrity-v20.css";
+import "./shade-preview-v21.css";
 
 applyCatalogueIntegrity();
 applyMotionProfile();
