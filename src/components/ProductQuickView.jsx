@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { createWhatsAppLink } from "../data/siteData.js";
 import { useEnquiryBasket } from "../hooks/useEnquiryBasket.js";
 import { useWishlist } from "../hooks/useWishlist.js";
+import ShadePreviewStudio, { ShadePreviewTint } from "./ShadePreviewStudio.jsx";
 import WhatsAppIcon from "./WhatsAppIcon.jsx";
 
 function getVariantOptions(product) {
@@ -26,6 +27,7 @@ export default function ProductQuickView({ product, open, onClose }) {
   const { add } = useEnquiryBasket();
   const { has, toggle } = useWishlist();
   const [color, setColor] = useState(product.colors?.[0] || null);
+  const [previewHex, setPreviewHex] = useState(null);
   const variants = useMemo(() => getVariantOptions(product), [product]);
   const gallery = useMemo(() => [product.image, ...(product.galleryImages || [])].filter(Boolean), [product]);
   const [variant, setVariant] = useState(variants[0] || null);
@@ -36,6 +38,7 @@ export default function ProductQuickView({ product, open, onClose }) {
 
   useEffect(() => {
     setColor(product.colors?.[0] || null);
+    setPreviewHex(null);
     setVariant(variants[0] || null);
     setQuantity(product.quantityOptions?.min || 1);
     setAdded(false);
@@ -68,6 +71,10 @@ export default function ProductQuickView({ product, open, onClose }) {
   const min = product.quantityOptions?.min || 1;
   const max = product.quantityOptions?.max || 500;
   const image = product.image;
+  const unit = product.quantityOptions?.unit || "units";
+  const previewNote = previewHex
+    ? `Digital colour preview reference ${previewHex.toUpperCase()} only; please match it to the nearest currently available supplier shade.`
+    : "";
 
   const addToEnquiry = () => {
     add({
@@ -77,16 +84,16 @@ export default function ProductQuickView({ product, open, onClose }) {
       image,
       shade: color,
       quantity,
-      unit: product.quantityOptions?.unit || "pcs",
+      unit,
       variant,
-      note: "",
+      note: previewNote,
     });
     setAdded(true);
     window.clearTimeout(addedTimerRef.current);
     addedTimerRef.current = window.setTimeout(() => setAdded(false), 1_600);
   };
 
-  const message = `Hello Fakhri Mart, I want to enquire about *${product.name}*${color ? ` in *${color.name}*` : ""}${variant ? ` (${variant})` : ""}, quantity *${quantity} ${product.quantityOptions?.unit || "pcs"}*. Please share current availability, shade photos, pack details and price.`;
+  const message = `Hello Fakhri Mart, I want to enquire about *${product.name}*${color ? ` in *${color.name}*` : ""}${variant ? ` (${variant})` : ""}, quantity *${quantity} ${unit}*.${previewHex ? ` I used the website's digital colour preview at *${previewHex.toUpperCase()}* as a visual reference only; please show me the nearest currently available supplier shade.` : ""} Please share current availability, shade photos, pack details and price.`;
 
   return (
     <div className="quick-view-layer" role="presentation">
@@ -96,8 +103,9 @@ export default function ProductQuickView({ product, open, onClose }) {
           <X size={22} />
         </button>
 
-        <div className="quick-view__media">
+        <div className="quick-view__media shade-preview-surface">
           <img key={gallery[imageIndex]} className="quick-view__main-image" src={gallery[imageIndex]} alt={product.name} width="720" height="720" decoding="async" />
+          <ShadePreviewTint value={imageIndex === 0 ? previewHex : null} />
           <span>Availability confirmed on enquiry</span>
           {gallery.length > 1 ? (
             <div className="quick-view__gallery" aria-label="Material views">
@@ -115,7 +123,7 @@ export default function ProductQuickView({ product, open, onClose }) {
               ))}
             </div>
           ) : null}
-          <small className="quick-view__photo-note">Representative material photos · ask for current shade photos before ordering.</small>
+          <small className="quick-view__photo-note">Representative material photos · use colour preview for visual exploration, then confirm the current supplier shade.</small>
         </div>
 
         <div className="quick-view__content">
@@ -130,7 +138,7 @@ export default function ProductQuickView({ product, open, onClose }) {
 
           {product.colors?.length ? (
             <fieldset className="quick-view__choices">
-              <legend>Choose a listed shade</legend>
+              <legend>Choose a supplier-listed shade</legend>
               <div className="quick-view__swatches">
                 {product.colors.slice(0, 8).map((shade) => (
                   <button
@@ -149,6 +157,8 @@ export default function ProductQuickView({ product, open, onClose }) {
               </div>
             </fieldset>
           ) : null}
+
+          <ShadePreviewStudio value={previewHex} onChange={(hex) => { setPreviewHex(hex); setImageIndex(0); }} compact />
 
           {variants.length ? (
             <fieldset className="quick-view__choices">
