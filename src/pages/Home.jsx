@@ -26,23 +26,16 @@ import {
 // Two full-resolution material cards fit the initial journey without asking a
 // phone to decode an entire shelf before the customer starts browsing.
 const RAIL_SIZE = 2;
-const popularProducts = featuredProducts.slice(0, RAIL_SIZE);
+const featuredCatalogueProducts = featuredProducts.slice(0, RAIL_SIZE);
 const yarnProducts = featuredProducts.filter((product) => product.masterCategory === "Yarns").slice(0, RAIL_SIZE);
 const threadProducts = featuredProducts.filter((product) => product.masterCategory === "Threads").slice(0, RAIL_SIZE);
-const accessoryProducts = featuredProducts.filter((product) => product.masterCategory === "Accessories").slice(0, RAIL_SIZE);
-
-const macrameAndBagProducts = featuredProducts
-  .filter((product) => {
-    const searchable = [product.name, product.category, product.suitableFor, ...(product.tags || []), ...(product.filters || [])].join(" ");
-    return /macrame|cord|bag|purse|handle|base|bead|hook/i.test(searchable);
-  })
-  .slice(0, RAIL_SIZE);
+const macrameProducts = featuredProducts.filter((product) => product.masterCategory === "Macrame & Cords").slice(0, RAIL_SIZE);
 
 export default function Home() {
   useDocumentMeta({
     title: "Fakhri Mart | Shop Yarn, Threads & Craft Materials",
     description:
-      "Shop yarn, crochet thread, macrame cord, embroidery supplies, beads and bag-making materials. Quick-view products, save shades and build a retail or wholesale WhatsApp enquiry.",
+      "Browse verified yarn collections, crochet and decorative threads, embroidery threads, macrame cord and Malai Dori. Build a retail or wholesale WhatsApp enquiry for current shades and pricing.",
   });
   useJsonLd(localBusinessJsonLd(businessInfo));
   useJsonLd(websiteJsonLd());
@@ -54,19 +47,19 @@ export default function Home() {
       <MakerHelpStrip />
 
       <CommerceProductRail
-        eyebrow="Popular right now"
-        title="Start with the products customers ask for most"
-        text="Quick-view shades, choose a quantity and add products to your enquiry without leaving the homepage."
-        products={popularProducts}
+        eyebrow="Verified catalogue"
+        title="Start with a few current material highlights"
+        text="Open a verified product line, choose the quantity you need and add it to one enquiry. Current shades and final pricing are confirmed before ordering."
+        products={featuredCatalogueProducts}
         href="/products"
       />
 
       <DeferredSection label="Project finder" minHeight={640}>
         <CommerceCraftFinder products={featuredProducts} />
-        <CommerceCategoryGrid categories={productCategories.slice(0, 8)} />
+        <CommerceCategoryGrid categories={productCategories} />
       </DeferredSection>
 
-      <DeferredSection label="Shade discovery" minHeight={480}>
+      <DeferredSection label="Shade-card support" minHeight={480}>
         <ShadeDiscovery />
         <RecentlyViewedHome />
       </DeferredSection>
@@ -74,34 +67,27 @@ export default function Home() {
       <DeferredSection label="Material collections" minHeight={760}>
         <CommerceProductRail
           eyebrow="Yarn collection"
-          title="Yarns for crochet, knitting and soft projects"
-          text="Browse cotton, soft, baby and everyday yarn families with shade previews and project guidance."
-          products={yarnProducts.length ? yarnProducts : popularProducts}
+          title="Yarns for crochet, knitting and handmade projects"
+          text="Browse the current verified yarn lines from Ganga, Vardhaman and Taj, then request the latest shade card or stock photo before finalising your choice."
+          products={yarnProducts.length ? yarnProducts : featuredCatalogueProducts}
           href="/products?department=Yarns"
         />
         <CommerceProductRail
           eyebrow="Thread collection"
           title="Crochet, embroidery and decorative threads"
-          text="Compare thread types, available shade families and the projects they suit before requesting current stock."
-          products={threadProducts.length ? threadProducts : featuredProducts.slice(4, 4 + RAIL_SIZE)}
+          text="Compare the verified thread families and their intended uses, then confirm the exact current shade and pack details with the store."
+          products={threadProducts.length ? threadProducts : featuredProducts.slice(0, RAIL_SIZE)}
           href="/products?department=Threads"
         />
       </DeferredSection>
 
-      <DeferredSection label="Project finishing materials" minHeight={760}>
+      <DeferredSection label="Macrame and dori materials" minHeight={520}>
         <CommerceProductRail
-          eyebrow="Macrame and bag making"
-          title="Cords, handles, bases, beads and finishing pieces"
-          text="Build the whole project from one place instead of searching across unrelated category pages."
-          products={macrameAndBagProducts.length ? macrameAndBagProducts : accessoryProducts}
-          href="/products?department=Accessories"
-        />
-        <CommerceProductRail
-          eyebrow="Tools and accessories"
-          title="The useful extras that finish the work"
-          text="Hooks, rings, locks, charms and other practical materials for makers, classes and resale shelves."
-          products={accessoryProducts.length ? accessoryProducts : featuredProducts.slice(-RAIL_SIZE)}
-          href="/products?department=Accessories"
+          eyebrow="Macrame & dori"
+          title="Cord and dori for knotting, decor and handmade projects"
+          text="Browse the supplier-confirmed Macrame Cord and Malai Dori lines, then confirm construction, size, shade and quantity before ordering."
+          products={macrameProducts}
+          href="/products?department=Macrame%20%26%20Cords"
         />
       </DeferredSection>
 
