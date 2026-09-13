@@ -43,6 +43,7 @@ import "./catalogue-integrity-v20.css";
 import "./shade-preview-v21.css";
 import "./guide-about-v22.css";
 import "./liquid-navigation-v23.css";
+import "./interaction-stability-v24.css";
 
 applyCatalogueIntegrity();
 applyMotionProfile();
