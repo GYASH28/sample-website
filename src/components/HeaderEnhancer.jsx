@@ -25,6 +25,9 @@ export default function HeaderEnhancer() {
       const shift = progress * announcementHeight;
 
       if (Math.abs(progress - lastProgress) > 0.001) {
+        // The glass becomes a little denser as content moves underneath it.
+        // Keep the range small so contrast improves without turning the nav
+        // into an opaque slab.
         const glassAlpha = 0.5 + progress * 0.1;
         const edgeAlpha = 0.48 + progress * 0.18;
         const shadowAlpha = 0.07 + progress * 0.045;
@@ -38,9 +41,10 @@ export default function HeaderEnhancer() {
       }
 
       if (Math.abs(shift - lastShift) > 0.05) {
-        // Store the final signed transform value so CSS does not depend on
-        // multiplication syntax that is less reliable in older Safari builds.
-        header.style.setProperty("--header-shift", `${(-shift).toFixed(2)}px`);
+        // Store a positive collapse distance. CSS applies the negative
+        // translation once. The previous double-negative moved the nav down
+        // while scrolling instead of lifting it into the vacated top-bar space.
+        header.style.setProperty("--header-shift", `${shift.toFixed(2)}px`);
         lastShift = shift;
       }
     };
