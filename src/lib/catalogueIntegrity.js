@@ -122,6 +122,38 @@ function rewriteCollection(slug, changes) {
   if (collection) Object.assign(collection, changes);
 }
 
+function sanitizeLegacyCatalogueQuery() {
+  if (typeof window === "undefined" || window.location.pathname !== "/products") return;
+
+  const params = new URLSearchParams(window.location.search);
+  let changed = false;
+
+  // Product-specific colour data is not published yet. Old saved/share links
+  // must not reactivate the retired placeholder colour/shade filters.
+  for (const key of ["color", "shades"]) {
+    if (params.has(key)) {
+      params.delete(key);
+      changed = true;
+    }
+  }
+
+  // Legacy sample-only product types no longer exist in the verified range.
+  if (["hook", "purse-handle"].includes(params.get("type"))) {
+    params.delete("type");
+    changed = true;
+  }
+
+  // Sorting by a placeholder shade count no longer has meaningful semantics.
+  if (params.get("sort") === "most-shades") {
+    params.delete("sort");
+    changed = true;
+  }
+
+  if (!changed) return;
+  const next = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}${window.location.hash}`;
+  window.history.replaceState(window.history.state, "", next);
+}
+
 export function applyCatalogueIntegrity() {
   Object.assign(businessInfo, verifiedBusiness);
 
@@ -189,4 +221,6 @@ export function applyCatalogueIntegrity() {
     description: "Discover verified yarns, crochet and decorative threads, embroidery threads, macrame cord and Malai Dori from Fakhri Mart in Pune.",
     intro: "Browse the verified catalogue by material, craft or project instead of guessing product names. Fakhri Mart confirms current shades, quantity pricing and delivery before the order is finalised.",
   });
+
+  sanitizeLegacyCatalogueQuery();
 }
