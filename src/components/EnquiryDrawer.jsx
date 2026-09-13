@@ -5,7 +5,7 @@ import {
   Trash,
   X,
 } from "@phosphor-icons/react";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
 import {
   businessInfo,
@@ -15,19 +15,41 @@ import { useEnquiryBasket } from "../hooks/useEnquiryBasket.js";
 
 export default function EnquiryDrawer({ open, onClose }) {
   const { basket, itemsCount, remove, clear } = useEnquiryBasket();
+  const panelRef = useRef(null);
+  const closeRef = useRef(null);
 
   useEffect(() => {
     if (!open) return undefined;
+    const previous = document.activeElement;
     document.body.classList.add("commerce-drawer-open");
+    window.requestAnimationFrame(() => closeRef.current?.focus());
 
     const onKeyDown = (event) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const focusable = panelRef.current?.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+      if (!focusable?.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
 
     document.addEventListener("keydown", onKeyDown);
     return () => {
       document.body.classList.remove("commerce-drawer-open");
       document.removeEventListener("keydown", onKeyDown);
+      previous?.focus?.();
     };
   }, [open, onClose]);
 
@@ -36,7 +58,7 @@ export default function EnquiryDrawer({ open, onClose }) {
     const lines = basket.map((item, index) => {
       const shade = item.shade?.name ? `, shade: ${item.shade.name}` : "";
       const variant = item.variant ? `, variant: ${item.variant}` : "";
-      return `${index + 1}. ${item.name} — ${item.quantity} ${item.unit || "pcs"}${shade}${variant}`;
+      return `${index + 1}. ${item.name} — ${item.quantity} ${item.unit || "units"}${shade}${variant}`;
     });
     const message = [
       `Hello ${businessInfo.shortName}, I would like availability and quantity-based pricing for:`,
@@ -59,9 +81,10 @@ export default function EnquiryDrawer({ open, onClose }) {
         onClick={onClose}
       />
       <aside
+        ref={panelRef}
         className={`enquiry-drawer ${open ? "is-open" : ""}`}
         role="dialog"
-        aria-modal="true"
+        aria-modal={open ? "true" : undefined}
         aria-label="Enquiry basket"
         aria-hidden={!open}
         inert={!open}
@@ -71,7 +94,7 @@ export default function EnquiryDrawer({ open, onClose }) {
             <span className="eyebrow">Saved enquiry</span>
             <h2>Your material list</h2>
           </div>
-          <button type="button" className="icon-button" onClick={onClose} aria-label="Close enquiry basket">
+          <button ref={closeRef} type="button" className="icon-button" onClick={onClose} aria-label="Close enquiry basket">
             <X size={23} />
           </button>
         </div>
@@ -86,7 +109,7 @@ export default function EnquiryDrawer({ open, onClose }) {
                     <strong>{item.name}</strong>
                     <span>{item.category}</span>
                     <small>
-                      {item.quantity} {item.unit || "pcs"}
+                      {item.quantity} {item.unit || "units"}
                       {item.shade?.name ? ` · ${item.shade.name}` : ""}
                       {item.variant ? ` · ${item.variant}` : ""}
                     </small>
