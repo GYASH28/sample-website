@@ -1,0 +1,3 @@
+# Keep supplier source PDFs in GitHub for catalogue maintenance, but they are
+# not website assets and should not be uploaded to every hosting build.
+docs/catalogue/source-shade-cards/
