@@ -91,7 +91,7 @@ export default function Layout() {
     <>
       <a href="#main-content" className="skip-link">Skip to main content</a>
       <AnalyticsBridge />
-      {!efficientMode ? <Suspense fallback={null}><CommerceIntro /></Suspense> : null}
+      <Suspense fallback={null}><CommerceIntro /></Suspense>
       <ScrollToTop />
       {!efficientMode ? <Suspense fallback={null}><HeaderEnhancer /></Suspense> : null}
       <Header />
