@@ -9,19 +9,19 @@ import {
 import { Link } from "react-router-dom";
 import BrandModelHighlight from "../components/BrandModelHighlight.jsx";
 import Reveal from "../components/Reveal.jsx";
-import { aboutCopy, aboutPoints, businessInfo } from "../data/siteData.js";
+import { businessInfo } from "../data/siteData.js";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
 
 const values = [
   {
     icon: Palette,
     title: "Choose with more context",
-    text: "Catalogue images help you compare material families, while live shade confirmation handles the final colour decision.",
+    text: "Catalogue images help you compare material families, while the current supplier shade card or a live stock photo handles the final colour decision.",
   },
   {
     icon: ShoppingBagOpen,
     title: "One list, fewer back-and-forth messages",
-    text: "Save materials, choose shades and quantities, then bring the useful details together in one organised enquiry.",
+    text: "Save verified material lines and quantities, then bring the useful details together in one organised enquiry.",
   },
   {
     icon: Truck,
@@ -34,18 +34,26 @@ const process = [
   {
     number: "01",
     title: "Browse the material family",
-    text: "Start with yarn, thread, cord, hooks, beads or bag-making supplies and narrow the catalogue by how you plan to use it.",
+    text: "Start with yarn collections, crochet or decorative threads, embroidery threads, Macrame Cord or Malai Dori and narrow the catalogue by how you plan to use it.",
   },
   {
     number: "02",
     title: "Save the practical details",
-    text: "Choose a listed shade where available, note the quantity or option you need, and keep everything together in the enquiry basket.",
+    text: "Shortlist the exact product line and quantity you need, then add any shade code, packing request or project note to your enquiry.",
   },
   {
     number: "03",
     title: "Confirm what is current",
-    text: "Send the enquiry on WhatsApp so current stock, exact shade, packing, quantity-based pricing and delivery can be confirmed before ordering.",
+    text: "Send the enquiry on WhatsApp so current shades, pack details, quantity-based pricing and delivery can be confirmed before ordering.",
   },
+];
+
+const rangePoints = [
+  "Verified Ganga, Vardhaman and Taj yarn lines",
+  "Crochet, decorative and embroidery thread lines",
+  "Macrame Cord and Malai Dori options",
+  "Retail and bulk enquiries supported",
+  "Current shade cards and live details confirmed on request",
 ];
 
 export default function About() {
@@ -64,7 +72,7 @@ export default function About() {
             <h1>A material partner built around the questions that matter before you order.</h1>
             <p className="large-copy">
               Fakhri Mart helps individual crafters, small labels, resellers and craft stores explore
-              yarns, cords, threads and finishing supplies, then confirm the practical details before buying.
+              verified yarn, thread and cord lines, then confirm the practical details before buying.
             </p>
             <div className="about-hero-actions">
               <Link className="btn btn-primary" to="/products">
@@ -85,7 +93,7 @@ export default function About() {
             <source srcSet="/assets/images/editorial/craft-stock-room.avif" type="image/avif" />
             <img
               src="/assets/images/editorial/craft-stock-room.webp"
-              alt="Organised yarn, cord, embroidery thread, beads and bag hardware in a warm craft stock room"
+              alt="Representative display of yarn, cord and thread materials"
               width="1536"
               height="1024"
               decoding="async"
@@ -102,7 +110,7 @@ export default function About() {
             <p className="eyebrow">A more useful catalogue experience</p>
             <h2>Designed to help you decide, not pretend every order is identical.</h2>
             <p>
-              Shade, size, packing, quantity and availability can change what you actually need. The website keeps discovery simple and leaves final confirmation to the conversation where those details belong.
+              Shade, pack details, quantity and availability can change what you actually need. The website keeps discovery simple and leaves final confirmation to the conversation where those details belong.
             </p>
           </Reveal>
 
@@ -125,9 +133,11 @@ export default function About() {
             <h2>Range when you are exploring. Specific answers when you are ordering.</h2>
           </Reveal>
           <Reveal className="about-story-rail" delay={70} variant="slide-right">
-            <p className="large-copy">{aboutCopy}</p>
+            <p className="large-copy">
+              Fakhri Mart's public catalogue focuses on the product lines currently backed by supplier material: yarn collections, crochet and decorative threads, embroidery threads, Macrame Cord and Malai Dori. Current shades, pack details, pricing and availability are confirmed directly before an order is finalised.
+            </p>
             <div className="about-point-list">
-              {aboutPoints.map((point) => (
+              {rangePoints.map((point) => (
                 <span key={point}><Check size={18} weight="bold" /> {point}</span>
               ))}
             </div>
@@ -164,8 +174,8 @@ export default function About() {
         <div className="container">
           <Reveal as="p" className="eyebrow" variant="thread-draw">How we work</Reveal>
           <div className="principle-list">
-            <Reveal as="article" variant="slide-left"><span>01</span><h3>Show the range honestly</h3><p>Catalogue images explain the material family. Live photos confirm the current stock and exact shade.</p></Reveal>
-            <Reveal as="article" delay={55} variant="fade-up"><span>02</span><h3>Quote for the real requirement</h3><p>Quantity, size, shade and delivery location all affect a useful quote, so prices are confirmed personally.</p></Reveal>
+            <Reveal as="article" variant="slide-left"><span>01</span><h3>Show the range honestly</h3><p>Catalogue images explain the material family. Supplier shade cards or live photos confirm the current colour.</p></Reveal>
+            <Reveal as="article" delay={55} variant="fade-up"><span>02</span><h3>Quote for the real requirement</h3><p>Quantity, product option and delivery location all affect a useful quote, so prices are confirmed personally.</p></Reveal>
             <Reveal as="article" delay={110} variant="slide-right"><span>03</span><h3>Support retail and repeat buying</h3><p>One project, a boutique run or a reseller restock can start from the same structured enquiry list.</p></Reveal>
           </div>
         </div>
