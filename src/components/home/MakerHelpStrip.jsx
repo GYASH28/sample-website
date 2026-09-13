@@ -11,14 +11,14 @@ const shortcuts = [
     eyebrow: "I know the project",
     title: "Shop by what you make",
     text: "Crochet, knitting, macrame, bags or embroidery.",
-    to: "/products?q=Crochet",
+    to: "/projects",
   },
   {
     icon: BookOpen,
     eyebrow: "I need help choosing",
-    title: "Open the yarn guide",
-    text: "Compare weight, fibre, texture and project fit.",
-    to: "/yarn-guide",
+    title: "Open guides & tools",
+    text: "Material choice, quantity, shades and bulk buying.",
+    to: "/blog",
   },
   {
     icon: Package,
