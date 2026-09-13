@@ -1,4 +1,5 @@
 import {
+  CaretDown,
   Heart,
   List,
   MagnifyingGlass,
@@ -26,8 +27,8 @@ const OPEN_SEARCH_EVENT = "fakhri:open-search";
 const primaryLinks = [
   { to: "/products", key: "catalogue" },
   { to: "/projects", key: "projects" },
-  { to: "/about", key: "about" },
   { to: "/blog", key: "guides" },
+  { to: "/about", key: "about" },
   { to: "/contact", key: "contact" },
 ];
 
@@ -122,7 +123,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="site-header">
+      <header className={`site-header${megaOpen ? " has-mega-open" : ""}${menuOpen ? " has-mobile-menu" : ""}`}>
         <div className="announcement-bar" aria-label="Store information">
           <div className="container announcement-bar__inner">
             <span>{t("allIndia")}</span><span>{t("wholesale")}</span><span>{t("shades")}</span>
@@ -138,9 +139,23 @@ export default function Header() {
           <nav className="desktop-nav" aria-label="Primary navigation">
             <div className="catalogue-nav-item" onMouseEnter={() => setMegaOpen(true)} onMouseLeave={() => setMegaOpen(false)}>
               <NavLink to="/products" onFocus={() => setMegaOpen(true)}>{t("catalogue")}</NavLink>
-              <button type="button" className="mega-toggle" onClick={() => setMegaOpen((value) => !value)} aria-expanded={megaOpen} aria-label="Show catalogue categories"><span aria-hidden="true">⌄</span></button>
+              <button
+                type="button"
+                className={`mega-toggle${megaOpen ? " is-open" : ""}`}
+                onClick={() => setMegaOpen((value) => !value)}
+                aria-expanded={megaOpen}
+                aria-haspopup="true"
+                aria-controls="catalogue-navigation-menu"
+                aria-label="Show catalogue categories"
+              >
+                <CaretDown size={14} weight="bold" aria-hidden="true" />
+              </button>
               {megaOpen ? (
-                <div className="category-mega-menu" onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setMegaOpen(false); }}>
+                <div
+                  id="catalogue-navigation-menu"
+                  className="category-mega-menu"
+                  onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setMegaOpen(false); }}
+                >
                   <div className="mega-intro">
                     <span className="eyebrow">Material library</span>
                     <strong>Find the right yarn, thread or cord.</strong>
@@ -190,7 +205,7 @@ export default function Header() {
           <button className="mobile-search-button" type="button" onClick={openSearch}><MagnifyingGlass size={20} /><span>{t("searchHint")}</span></button>
           <ThemeToggle />
         </div>
-        <nav className="mobile-primary-links" aria-label="Mobile primary">
+        <nav className="mobile-primary-links" aria-label="Mobile primary navigation">
           {primaryLinks.map((item) => <NavLink key={item.to} to={item.to} onClick={closeMenu}>{t(item.key)}</NavLink>)}
         </nav>
         <div className="mobile-category-group">
