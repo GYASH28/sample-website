@@ -106,9 +106,13 @@
   border-color: rgba(255, 255, 255, 0.10) !important;
 }
 
-/* Low-resource/reduced-transparency visitors retain layering and contrast
-   without paying for multiple live backdrop blurs. */
-html[data-motion-profile="lite"] :is(.enquiry-drawer, .enquiry-drawer-backdrop, .quick-view-backdrop),
+/* Low-resource visitors retain layering and contrast without paying for
+   multiple live backdrop blurs. */
+html[data-motion-profile="lite"] :is(.enquiry-drawer, .enquiry-drawer-backdrop, .quick-view-backdrop) {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
 @media (prefers-reduced-transparency: reduce) {
   .enquiry-drawer,
   .enquiry-drawer-backdrop,
