@@ -31,7 +31,7 @@ function productPageParts(product) {
   if (product.colors?.length) {
     parts.push({
       "@type": "WebPageElement",
-      name: "Representative shade names",
+      name: "Published shade names",
       text: product.colors.map((shade) => shade.name).join(", "),
     });
   }
@@ -46,9 +46,9 @@ function productPageParts(product) {
 }
 
 // Fakhri Mart is enquiry-led: live price, stock, exact composition and exact
-// shade are confirmed personally. Google Product rich results require genuine
-// merchant/review information, so this describes the page and its *published
-// catalogue options* without manufacturing Offer, availability or rating data.
+// shade are confirmed personally. This describes only information that the
+// current catalogue actually publishes; it does not manufacture Offer,
+// availability, rating or review data.
 export function productJsonLd(product, canonicalUrl) {
   const url = canonicalUrl || `${PUBLIC_SITE_URL}/products/${product.slug}`;
   const images = [product.image, ...(product.galleryImages || [])].filter(Boolean).map((image) => absoluteUrl(image));
@@ -100,7 +100,7 @@ export function localBusinessJsonLd(info = businessInfo) {
     "@id": `${PUBLIC_SITE_URL}/#store`,
     name: info.name,
     slogan: info.tagline,
-    description: "Yarns, crochet threads, macrame cords, embroidery threads, beads, purse accessories, bases, handles and craft essentials from Pune with all-India delivery and retail or bulk enquiry support.",
+    description: "Verified yarn collections, crochet and decorative threads, embroidery threads, macrame cord and Malai Dori from Pune with all-India delivery and retail or bulk enquiry support.",
     url: PUBLIC_SITE_URL,
     logo: `${PUBLIC_SITE_URL}/assets/brand/fakhri-logo-640.webp`,
     image: `${PUBLIC_SITE_URL}/assets/images/editorial/atelier-hero-960.webp`,
@@ -121,7 +121,16 @@ export function localBusinessJsonLd(info = businessInfo) {
       closes: "20:00",
     }],
     contactPoint: contactPoints,
-    knowsAbout: ["Yarn", "Crochet thread", "Knitting yarn", "Macrame cord", "Embroidery thread", "Crochet hooks", "Beads", "Purse handles", "Bag-making accessories", "Bulk yarn orders"],
+    knowsAbout: [
+      "Yarn",
+      "Crochet thread",
+      "Knitting yarn",
+      "Macrame cord",
+      "Malai Dori",
+      "Embroidery thread",
+      "Decorative thread",
+      "Bulk yarn orders",
+    ],
     sameAs: [info.instagramUrl, googlePresence.businessProfileUrl, googlePresence.mapsUrl].filter(Boolean),
   };
 }
