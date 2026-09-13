@@ -21,6 +21,7 @@ import ShareButton from "../components/ShareButton.jsx";
 import ColorSwatchPicker from "../components/ColorSwatchPicker.jsx";
 import QuantitySelector from "../components/QuantitySelector.jsx";
 import ProductFaq from "../components/ProductFaq.jsx";
+import ShadePreviewStudio, { ShadePreviewTint } from "../components/ShadePreviewStudio.jsx";
 import { Lightbox } from "../components/ImageZoom.jsx";
 import StickyBreadcrumb from "../components/StickyBreadcrumb.jsx";
 import { createWhatsAppLink, featuredProducts, businessInfo } from "../data/siteData.js";
@@ -57,6 +58,7 @@ export default function ProductDetail() {
   const { has: isInWishlist, toggle: toggleWishlist } = useWishlist();
   const isFavorited = isInWishlist(product.slug);
   const [activeColor, setActiveColor] = useState(product.colors?.[0] || null);
+  const [previewHex, setPreviewHex] = useState(null);
 
   // Product choices are rendered only when the verified record explicitly
   // supplies selectable options. Legacy slug-based size guesses are not used.
@@ -67,8 +69,10 @@ export default function ProductDetail() {
   const [selectedVariant, setSelectedVariant] = useState(null);
 
   useEffect(() => {
+    setActiveColor(product.colors?.[0] || null);
+    setPreviewHex(null);
     setSelectedVariant(variantOptions[0] || null);
-  }, [variantOptions]);
+  }, [product.slug, product.colors, variantOptions]);
 
   const [isBulkMode, setIsBulkMode] = useState(false);
   const [quantity, setQuantity] = useState(1);
@@ -84,6 +88,11 @@ export default function ProductDetail() {
   const baseImageUrl = product.image || "/assets/images/hero_banner.webp";
   const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+
+  useEffect(() => {
+    setActiveGalleryIndex(0);
+    setLightboxOpen(false);
+  }, [product.slug]);
 
   const productImages = useMemo(() => [
     { type: "hero", src: baseImageUrl, label: "Representative product view" },
@@ -116,13 +125,18 @@ export default function ProductDetail() {
     })
     .filter(Boolean), [recentItems]);
 
+  const unit = product.quantityOptions?.unit || "units";
+  const previewReference = previewHex
+    ? ` I used the website's digital colour preview at *${previewHex.toUpperCase()}* as a visual reference only; please show me the nearest currently available supplier shade.`
+    : "";
+
   const whatsappMessage = useMemo(() => {
-    const qtyText = `${quantity} ${product.quantityOptions?.unit || "pcs"}`;
-    const colorText = activeColor ? ` in *${activeColor.name}* shade` : "";
+    const qtyText = `${quantity} ${unit}`;
+    const colorText = activeColor ? ` in *${activeColor.name}* supplier-listed shade` : "";
     const variantText = selectedVariant ? ` (${selectedVariant})` : "";
     const modeText = isBulkMode ? " [BULK ENQUIRY]" : "";
-    return `Hello Fakhri Mart, I want to enquire about *${product.name}*${colorText}${variantText}, requested quantity *${qtyText}*${modeText}. Please share current availability, shade card/photos, pack details, pricing and delivery information.`;
-  }, [product, activeColor, quantity, selectedVariant, isBulkMode]);
+    return `Hello Fakhri Mart, I want to enquire about *${product.name}*${colorText}${variantText}, requested quantity *${qtyText}*${modeText}.${previewReference} Please share current availability, shade card/photos, pack details, pricing and delivery information.`;
+  }, [product.name, activeColor, quantity, unit, selectedVariant, isBulkMode, previewReference]);
 
   const whatsappLink = createWhatsAppLink(whatsappMessage);
   const [addedAnimation, setAddedAnimation] = useState(false);
@@ -138,9 +152,11 @@ export default function ProductDetail() {
       image: baseImageUrl,
       shade: activeColor,
       quantity,
-      unit: product.quantityOptions?.unit || "pcs",
+      unit,
       variant: selectedVariant,
-      note: "Please confirm current shade, pack details and availability.",
+      note: previewHex
+        ? `Digital colour preview ${previewHex.toUpperCase()} is a visual reference only. Please confirm the nearest current supplier shade, pack details and availability.`
+        : "Please confirm current shade, pack details and availability.",
     });
     setAddedAnimation(true);
     window.clearTimeout(addedTimerRef.current);
@@ -168,7 +184,7 @@ export default function ProductDetail() {
       },
       {
         q: "Can I request more than one shade?",
-        a: "Yes. Mention the shade names or codes and quantities you need in your enquiry. The store will confirm which requested shades are currently available before the order is finalised.",
+        a: "Yes. Mention the shade names or codes and quantities you need in your enquiry. The digital colour preview is only for visual exploration; the store confirms the nearest current supplier shades before the order is finalised.",
       },
     ];
 
@@ -209,7 +225,7 @@ export default function ProductDetail() {
             <div className="product-detail-visual">
               <div className="sticky-visual-wrapper">
                 <div
-                  className="product-image-container group"
+                  className="product-image-container product-detail-image-stage shade-preview-surface group"
                   style={{ position: "relative", display: "flex", width: "100%", aspectRatio: "1/1", borderRadius: "var(--radius)", overflow: "hidden", backgroundColor: "#faf6f0", border: "1px solid rgba(50, 48, 45, 0.05)", cursor: "zoom-in" }}
                   onClick={() => setLightboxOpen(true)}
                 >
@@ -220,6 +236,7 @@ export default function ProductDetail() {
                     className="product-detail-hero-image"
                     style={{ position: "relative", zIndex: 1, width: "100%", height: "100%", objectFit: "cover" }}
                   />
+                  <ShadePreviewTint value={activeGalleryIndex === 0 ? previewHex : null} />
                   <div className="image-zoom-overlay-badge" style={{ position: "absolute", bottom: "16px", right: "16px", zIndex: 5, background: "rgba(0,0,0,0.5)", color: "#fff", padding: "8px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <ArrowsOut size={16} />
                   </div>
@@ -337,6 +354,16 @@ export default function ProductDetail() {
                   <ColorSwatchPicker colors={product.colors} activeColor={activeColor} onSelect={setActiveColor} />
                 </div>
               ) : null}
+
+              <div className="detail-section-configured">
+                <ShadePreviewStudio
+                  value={previewHex}
+                  onChange={(hex) => {
+                    setPreviewHex(hex);
+                    setActiveGalleryIndex(0);
+                  }}
+                />
+              </div>
 
               <div className="detail-section-configured border-split">
                 <div className="mode-toggle-container">
@@ -484,8 +511,9 @@ export default function ProductDetail() {
                     image: baseImageUrl,
                     shade: activeColor,
                     quantity,
-                    unit: product.quantityOptions?.unit || "pcs",
+                    unit,
                     variant: selectedVariant,
+                    note: previewHex ? `Digital colour preview ${previewHex.toUpperCase()} is a visual reference only.` : "",
                   });
                   bundleProducts.forEach((bp) => {
                     addToBasket({
@@ -494,7 +522,7 @@ export default function ProductDetail() {
                       category: bp.category,
                       image: bp.image,
                       quantity: bp.quantityOptions?.min || 1,
-                      unit: bp.quantityOptions?.unit || "pcs",
+                      unit: bp.quantityOptions?.unit || "units",
                     });
                   });
                 }}
@@ -562,6 +590,7 @@ export default function ProductDetail() {
           activeIndex={activeGalleryIndex}
           onIndexChange={setActiveGalleryIndex}
           onClose={() => setLightboxOpen(false)}
+          previewHex={previewHex}
         />
       ) : null}
 
