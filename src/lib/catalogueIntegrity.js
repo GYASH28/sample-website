@@ -1,10 +1,15 @@
 import {
+  aboutPoints,
   blogPosts,
+  bulkOrderCards,
   businessInfo,
   featuredProducts,
+  galleryItems,
   MASTER_CATEGORIES,
+  newArrivals,
   productCategories,
   productInterestOptions,
+  whyChooseUs,
 } from "../data/siteData.js";
 import {
   DISCOVERY_FILTER_OPTIONS,
@@ -157,6 +162,70 @@ Pick a small first project, use a yarn and tool combination recommended by that 
   });
 }
 
+function rewriteDormantCatalogueData() {
+  // These exports are not the primary storefront today, but keeping them honest
+  // prevents a future/reused component from resurrecting the old sample range.
+  newArrivals.splice(0, newArrivals.length);
+
+  galleryItems.splice(
+    0,
+    galleryItems.length,
+    {
+      title: "Yarn Collections",
+      label: "Verified Ganga, Vardhaman and Taj yarn lines for crochet, knitting and handmade projects.",
+      type: "balls",
+      colors: ["#d8c7b6", "#b7dfd8", "#d6bad8", "#e5d2b5"],
+    },
+    {
+      title: "Crochet & Decorative Threads",
+      label: "Glacé cotton thread and Kasab for crochet, detailing and embellishment.",
+      type: "spools",
+      colors: ["#d8c7b6", "#e3a8b7", "#91c8b4", "#c99a2e"],
+    },
+    {
+      title: "Embroidery Threads",
+      label: "Anchor, Ambika and Dolly embroidery lines; confirm exact colours from the current shade card.",
+      type: "shade",
+      colors: ["#b4a0d3", "#c96f90", "#78b5d6", "#e7c95e"],
+    },
+    {
+      title: "Macrame & Dori",
+      label: "Macrame cord and Malai Dori for knotting, décor, handmade bags and craft projects.",
+      type: "cords",
+      colors: ["#d8c4a8", "#b77b4d", "#91c8b4", "#45484d"],
+    },
+  );
+
+  bulkOrderCards.splice(
+    0,
+    bulkOrderCards.length,
+    { title: "Wholesale Enquiries", icon: "BadgeIndianRupee", text: "Share the product, requested quantity, shade reference and delivery location for current quantity-based pricing." },
+    { title: "Shade-Card Confirmation", icon: "Swatches", text: "Use the website colour preview for ideas, then confirm the nearest available supplier shade before ordering." },
+    { title: "Repeat Supply", icon: "Store", text: "Boutiques, resellers and makers can enquire about current availability for repeat or larger requirements." },
+    { title: "All India Delivery", icon: "Truck", text: "Delivery is supported across India for the verified yarn, thread, embroidery and cord catalogue; timing and charges are confirmed per enquiry." },
+  );
+
+  whyChooseUs.splice(
+    0,
+    whyChooseUs.length,
+    { title: "Verified Catalogue", icon: "CheckCircle", text: "The public range is based on the supplier handover instead of sample products or invented stock." },
+    { title: "Colour Preview + Shade Cards", icon: "SwatchBook", text: "Preview colours instantly on one product photo, then confirm the real supplier shade from a current card or live photo." },
+    { title: "Retail & Wholesale Enquiries", icon: "Handshake", text: "Individual makers, boutiques, resellers and bulk buyers can send organised requirements through the same enquiry flow." },
+    { title: "All India Delivery", icon: "Truck", text: "Delivery support is available across India, with timing and charges confirmed for the actual order." },
+    { title: "Direct WhatsApp Confirmation", icon: "MessageCircle", text: "Current availability, pack details, shade photos and quantity pricing are confirmed directly before the order is finalised." },
+  );
+
+  aboutPoints.splice(
+    0,
+    aboutPoints.length,
+    "Verified yarn, thread, embroidery and cord catalogue",
+    "Retail, repeat and bulk enquiries supported",
+    "Digital colour preview with supplier shade-card confirmation",
+    "Delivery support across India",
+    "Direct WhatsApp confirmation for current commercial details",
+  );
+}
+
 function sanitizeLegacyCatalogueQuery() {
   if (typeof window === "undefined" || window.location.pathname !== "/products") return;
 
@@ -179,7 +248,7 @@ function sanitizeLegacyCatalogueQuery() {
   }
 
   // Sorting by a placeholder shade count no longer has meaningful semantics.
-  if (params.get("sort") === "most-shades") {
+  if (["most-shades", "newest"].includes(params.get("sort"))) {
     params.delete("sort");
     changed = true;
   }
@@ -194,6 +263,7 @@ export function applyCatalogueIntegrity() {
 
   featuredProducts.forEach(normaliseProduct);
   rewriteCraftGuides();
+  rewriteDormantCatalogueData();
 
   MASTER_CATEGORIES.splice(0, MASTER_CATEGORIES.length, "Yarns", "Threads", "Macrame & Cords");
 
