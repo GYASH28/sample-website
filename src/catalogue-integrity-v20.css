@@ -1,0 +1,17 @@
+/* Catalogue integrity v20
+ * Controls in this block are hidden because the current verified supplier data
+ * does not contain trustworthy product-specific values for them yet. Keep the
+ * underlying catalogue enquiry-first instead of offering filters that imply
+ * precision the source material cannot support.
+ */
+
+.smart-filter-panel .filter-select-box:has(#catalogue-color),
+.smart-filter-panel .catalogue-checks {
+  display: none;
+}
+
+.product-sort-select option[value="most-shades"],
+#catalogue-product-type option[value="hook"],
+#catalogue-product-type option[value="purse-handle"] {
+  display: none;
+}
