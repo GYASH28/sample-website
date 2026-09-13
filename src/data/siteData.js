@@ -17,7 +17,7 @@ export const businessInfo = {
   instagram: "fakhrimart53",
   instagramUrl: "https://www.instagram.com/fakhrimart53/",
   hours: "Monday to Saturday, 10:00 AM to 8:00 PM",
-  url: "https://fakhri-mart.vercel.app",
+  url: "https://fakhriyarns.vercel.app",
 };
 
 export const announcementItems = [

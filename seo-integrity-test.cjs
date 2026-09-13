@@ -1,7 +1,7 @@
 const { chromium } = require("playwright");
 
 const BASE_URL = process.env.SEO_BASE_URL || "http://127.0.0.1:4173";
-const SITE_URL = "https://fakhri-mart.vercel.app";
+const SITE_URL = "https://fakhriyarns.vercel.app";
 const TAGLINE = "Colorful Threads, Endless Creation";
 const EMAIL = "fakhrimart2025@gmail.com";
 const PRIMARY_PHONE = "+91 88307 37551";
