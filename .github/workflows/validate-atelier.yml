@@ -76,6 +76,9 @@ jobs:
       - name: Run viewport and mobile integrity tests
         run: npm run test:viewports
 
+      - name: Run one-image shade preview regression
+        run: npm run test:shade-preview
+
       - name: Run discovery and conversion regression
         run: npm run test:discovery
 
