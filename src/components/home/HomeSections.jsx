@@ -42,8 +42,8 @@ export function MaterialIndexSection({ categories }) {
           <p className="fm-kicker">The tactile library</p>
           <h2 id="material-title">Find the material that fits the idea</h2>
           <p>
-            Browse by fibre, finish or the part your project still needs.
-            Each category opens into the full searchable catalogue.
+            Browse the verified material families and narrow them by the project
+            you want to make. Each category opens into the searchable catalogue.
           </p>
           <picture>
             <source
@@ -55,7 +55,7 @@ export function MaterialIndexSection({ categories }) {
               src="/assets/images/editorial/crochet-bag-worktable.webp"
               srcSet="/assets/images/editorial/crochet-bag-worktable-640.webp 640w, /assets/images/editorial/crochet-bag-worktable-960.webp 960w, /assets/images/editorial/crochet-bag-worktable.webp 1280w"
               sizes="(max-width: 48rem) calc(100vw - 1.25rem), 50vw"
-              alt="Crochet bag in progress beside yarn and wooden purse handles"
+              alt="Representative crochet worktable with yarn and craft materials"
               width="1536"
               height="1024"
               loading="lazy"
@@ -111,7 +111,7 @@ export function ShadeDeskSection({ products }) {
               src="/assets/images/editorial/shade-library.webp"
               srcSet="/assets/images/editorial/shade-library-640.webp 640w, /assets/images/editorial/shade-library-960.webp 960w, /assets/images/editorial/shade-library.webp 1280w"
               sizes="(max-width: 48rem) calc(100vw - 1.25rem), 50vw"
-              alt="Yarn balls and crochet swatches arranged as a colour reference"
+              alt="Representative yarn and thread colour library"
               width="1536"
               height="1024"
               loading="lazy"
@@ -121,11 +121,10 @@ export function ShadeDeskSection({ products }) {
         </Reveal>
 
         <Reveal className="fm-shade-desk__content" delay={80} variant="slide-right">
-          <p className="fm-kicker">The shade desk</p>
-          <h2 id="shade-title">Turn colour decisions into confidence</h2>
+          <p className="fm-kicker">The colour desk</p>
+          <h2 id="shade-title">Preview colours first. Confirm supplier shades second.</h2>
           <p>
-            Select a material to preview its listed shade family. Current
-            stock and dye lots are confirmed on WhatsApp.
+            Product pages can recolour the same representative photo in your browser without loading duplicate colour images. Exact current shades still come from the supplier shade card or a live stock photo.
           </p>
 
           <div className="fm-shade-tabs" role="tablist" aria-label="Materials">
@@ -154,19 +153,23 @@ export function ShadeDeskSection({ products }) {
               <h3>{activeProduct.name}</h3>
               <p>{activeProduct.variants}</p>
             </div>
-            <div className="fm-shade-swatches" aria-label={`${activeProduct.name} listed shades`}>
-              {activeProduct.colors.map((color) => (
-                <span key={color.name}>
-                  <i style={{ backgroundColor: color.hex }} aria-hidden="true" />
-                  {color.name}
-                </span>
-              ))}
-            </div>
+            {activeProduct.colors?.length ? (
+              <div className="fm-shade-swatches" aria-label={`${activeProduct.name} supplier-listed shades`}>
+                {activeProduct.colors.map((color) => (
+                  <span key={color.name}>
+                    <i style={{ backgroundColor: color.hex }} aria-hidden="true" />
+                    {color.name}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="fm-image-note">No exact supplier shades are published on this product page. Use the digital preview for ideas, then request the current shade card.</p>
+            )}
           </div>
 
           <div className="fm-shade-desk__actions">
             <Link className="btn btn-light" to={`/products/${activeProduct.slug}`}>
-              View material
+              Try colour preview
               <ArrowRight size={18} aria-hidden="true" />
             </Link>
             <a
@@ -193,11 +196,10 @@ export function FeaturedEditSection({ products }) {
         <Reveal className="fm-section-heading" variant="fade-up">
           <div>
             <p className="fm-kicker">The material edit</p>
-            <h2 id="featured-title">Four tactile ways to begin</h2>
+            <h2 id="featured-title">Verified ways to begin</h2>
           </div>
           <p>
-            Useful starting points across thread, yarn, cord and bag hardware,
-            selected to make browsing feel effortless.
+            Useful starting points across the current yarn, thread, embroidery and cord catalogue.
           </p>
         </Reveal>
         <div className="fm-featured-grid">
@@ -224,7 +226,7 @@ export function ProcessSection() {
           <p className="fm-kicker">Simple by design</p>
           <h2 id="process-title">From creative spark to confirmed order</h2>
           <p>
-            Prices depend on quantity, shade, size and availability, so every
+            Prices depend on quantity, current shade, pack details and availability, so every
             order finishes with a direct confirmation.
           </p>
         </Reveal>
@@ -234,7 +236,7 @@ export function ProcessSection() {
             <Package size={28} aria-hidden="true" />
             <span>
               <strong>Choose materials</strong>
-              <small>Browse products and save the shades you want to discuss.</small>
+              <small>Browse products and use the colour preview to communicate the look you want.</small>
             </span>
             <CheckCircle size={20} aria-hidden="true" />
           </Reveal>
@@ -242,7 +244,7 @@ export function ProcessSection() {
             <Swatches size={28} aria-hidden="true" />
             <span>
               <strong>Build an enquiry</strong>
-              <small>Add quantities, shade notes and your delivery city.</small>
+              <small>Add quantities, shade references and your delivery city.</small>
             </span>
             <CheckCircle size={20} aria-hidden="true" />
           </Reveal>
@@ -250,7 +252,7 @@ export function ProcessSection() {
             <ChatCircleDots size={28} aria-hidden="true" />
             <span>
               <strong>Confirm on WhatsApp</strong>
-              <small>Receive current availability, pricing and delivery details.</small>
+              <small>Receive current supplier shades, availability, pricing and delivery details.</small>
             </span>
             <CheckCircle size={20} aria-hidden="true" />
           </Reveal>
@@ -269,7 +271,7 @@ export function TradePanelSection() {
             <source srcSet="/assets/images/editorial/craft-stock-room.avif" type="image/avif" />
             <img
               src="/assets/images/editorial/craft-stock-room.webp"
-              alt="Organised shelves of yarn and craft materials in a stock room"
+              alt="Representative display of yarn, thread and cord materials"
               width="1536"
               height="1024"
               loading="lazy"
@@ -282,8 +284,8 @@ export function TradePanelSection() {
           <p className="fm-kicker">Made to move in volume</p>
           <h2 id="trade-title">Planning a boutique or resale shelf?</h2>
           <p>
-            Send the material, quantity, shade and destination. Fakhri Mart
-            will reply with current pack details and delivery options.
+            Send the material, quantity, preferred shade and destination. Fakhri Mart
+            will reply with current shade options, pack details and delivery information.
           </p>
           <div className="fm-trade-panel__actions">
             <Link className="btn btn-primary" to="/enquiry">
