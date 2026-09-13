@@ -39,17 +39,8 @@
     <link rel="shortcut icon" href="/assets/brand/fakhri-logo-180.png" />
     <link rel="stylesheet" href="/commerce-intro-v18.css" />
     <link rel="stylesheet" href="/commerce-intro-v18-fix.css" />
-    <link rel="preload" as="image" href="/assets/images/editorial/shade-library-640.avif" type="image/avif" fetchpriority="high" />
-    <link rel="preload" as="image" href="/assets/images/editorial/crochet-bag-worktable-640.avif" type="image/avif" fetchpriority="high" />
-    <link
-      rel="preload"
-      as="image"
-      href="/assets/images/editorial/atelier-hero-960.avif"
-      imagesrcset="/assets/images/editorial/atelier-hero-640.avif 640w, /assets/images/editorial/atelier-hero-960.avif 960w, /assets/images/editorial/atelier-hero.avif 1280w"
-      imagesizes="(max-width: 48rem) calc(100vw - 24px), 48vw"
-      type="image/avif"
-      fetchpriority="high"
-    />
+    <!-- The featured product changes dynamically. Let the browser prioritise
+         the actual in-view image instead of competing speculative preloads. -->
     <link rel="preload" as="image" href="/assets/brand/fakhri-logo-256.webp" type="image/webp" />
     <link rel="dns-prefetch" href="https://wa.me" />
     <link rel="dns-prefetch" href="https://maps.google.com" />
