@@ -143,12 +143,12 @@ export default function Header() {
                 <div className="category-mega-menu" onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setMegaOpen(false); }}>
                   <div className="mega-intro">
                     <span className="eyebrow">Material library</span>
-                    <strong>Find the right fibre, finish and hardware.</strong>
-                    <Link to="/products">Browse all {productCategories.length} categories</Link>
+                    <strong>Find the right yarn, thread or cord.</strong>
+                    <Link to="/products">Browse all {productCategories.length} material categories</Link>
                     <Link to="/projects">Or start with your project</Link>
                   </div>
                   <div className="mega-category-grid">
-                    {productCategories.slice(0, 8).map((category) => (
+                    {productCategories.map((category) => (
                       <Link key={category.name} to={`/products?category=${encodeURIComponent(category.name)}`}>
                         <span>{category.shortName}</span><small>{category.products?.length || 0} material lines</small>
                       </Link>
