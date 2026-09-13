@@ -1,5 +1,6 @@
 import CommerceHero from "../components/home/CommerceHero.jsx";
 import MakerHelpStrip from "../components/home/MakerHelpStrip.jsx";
+import GuideHelpSection from "../components/home/GuideHelpSection.jsx";
 import DeferredSection from "../components/DeferredSection.jsx";
 import {
   CommerceBenefits,
@@ -53,6 +54,8 @@ export default function Home() {
         products={featuredCatalogueProducts}
         href="/products"
       />
+
+      <GuideHelpSection />
 
       <DeferredSection label="Project finder" minHeight={640}>
         <CommerceCraftFinder products={featuredProducts} />
