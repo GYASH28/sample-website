@@ -76,6 +76,9 @@ jobs:
       - name: Run viewport and mobile integrity tests
         run: npm run test:viewports
 
+      - name: Run navigation, overlay and carousel integrity
+        run: npm run test:interaction
+
       - name: Run one-image shade preview regression
         run: npm run test:shade-preview
 
