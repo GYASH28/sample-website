@@ -24,6 +24,10 @@ export default function CommerceHero() {
   const [added, setAdded] = useState(false);
   const [autoPaused, setAutoPaused] = useState(false);
   const [interactionPaused, setInteractionPaused] = useState(false);
+  const [heroVisible, setHeroVisible] = useState(true);
+  const [documentVisible, setDocumentVisible] = useState(
+    typeof document === "undefined" ? true : document.visibilityState !== "hidden",
+  );
   const [direction, setDirection] = useState("next");
   const [heroReady, setHeroReady] = useState(false);
   const sectionRef = useRef(null);
@@ -38,6 +42,8 @@ export default function CommerceHero() {
   const { add } = useEnquiryBasket();
   const { has, toggle } = useWishlist();
   const efficientMode = typeof document !== "undefined" && document.documentElement.dataset.experienceTier === "efficient";
+  const reducedMotion = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const autoplayRunning = !autoPaused && !interactionPaused && heroVisible && documentVisible && !reducedMotion;
 
   useEffect(() => {
     setColor(product?.colors?.[0] || null);
@@ -57,14 +63,28 @@ export default function CommerceHero() {
   }, []);
 
   useEffect(() => {
-    if (
-      autoPaused ||
-      interactionPaused ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
-      efficientMode
-    ) {
-      return undefined;
-    }
+    const section = sectionRef.current;
+    if (!section || !("IntersectionObserver" in window)) return undefined;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setHeroVisible(entry.isIntersecting && entry.intersectionRatio > 0.08),
+      { threshold: [0, 0.08, 0.25] },
+    );
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const onVisibilityChange = () => setDocumentVisible(document.visibilityState !== "hidden");
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
+  }, []);
+
+  useEffect(() => {
+    // Autoplay is intentionally cheap: one timeout every 6.5 seconds. Do not
+    // disable it for the efficient hardware tier; that made the carousel look
+    // broken on many ordinary laptops/phones. Reduced-motion still disables it.
+    if (!autoplayRunning || spotlightProducts.length < 2) return undefined;
 
     const timer = window.setTimeout(() => {
       setDirection("next");
@@ -72,7 +92,7 @@ export default function CommerceHero() {
     }, AUTO_ADVANCE_MS);
 
     return () => window.clearTimeout(timer);
-  }, [index, autoPaused, interactionPaused, efficientMode]);
+  }, [index, autoplayRunning]);
 
   useEffect(() => {
     if (efficientMode) return undefined;
@@ -134,7 +154,7 @@ export default function CommerceHero() {
       image: product.image,
       shade: color,
       quantity: product.quantityOptions?.min || 1,
-      unit: product.quantityOptions?.unit || "pcs",
+      unit: product.quantityOptions?.unit || "units",
       variant: null,
       note: "Added from homepage spotlight",
     });
@@ -179,7 +199,8 @@ export default function CommerceHero() {
   };
 
   const onPointerEnter = () => {
-    setInteractionPaused(true);
+    // Hover no longer pauses autoplay. A resting cursor made the carousel look
+    // permanently stopped. The explicit pause control remains available.
     const profile = document.documentElement.dataset.motionProfile;
     pointerMotionEnabledRef.current =
       profile === "full" &&
@@ -214,11 +235,13 @@ export default function CommerceHero() {
     touchStartRef.current = { x: touch.clientX, y: touch.clientY };
   };
 
+  const finishTouch = () => setInteractionPaused(false);
+
   const onTouchEnd = (event) => {
     const start = touchStartRef.current;
     const touch = event.changedTouches?.[0];
     touchStartRef.current = null;
-    setInteractionPaused(false);
+    finishTouch();
     if (!start || !touch) return;
 
     const deltaX = touch.clientX - start.x;
@@ -240,6 +263,7 @@ export default function CommerceHero() {
       className="commerce-hero product-first-hero hero-v6 hero-v7"
       data-ready={heroReady ? "true" : "false"}
       data-direction={direction}
+      data-autoplay={autoplayRunning ? "running" : "paused"}
       aria-labelledby="home-title"
     >
       <div className="hero-v7__ambient" aria-hidden="true">
@@ -266,7 +290,7 @@ export default function CommerceHero() {
           </h1>
 
           <p className="hero-v6__intro hero-v7__intro">
-            Explore yarns, threads, macrame and craft essentials. Choose a shade,
+            Explore yarns, threads, macrame and craft materials. Preview a colour,
             save what you like, and send one organised enquiry.
           </p>
 
@@ -274,7 +298,7 @@ export default function CommerceHero() {
             <Link className="hero-v6__search hero-v7__search" to="/products?q=">
               <MagnifyingGlass size={19} />
               <span>Search materials</span>
-              <small>Yarn, thread, beads, hooks…</small>
+              <small>Yarn, thread, embroidery, macrame…</small>
               <ArrowRight size={17} />
             </Link>
             <span className="hero-v7__scroll-cue" aria-hidden="true">
@@ -346,10 +370,7 @@ export default function CommerceHero() {
           className="hero-v6__visual hero-v7__visual"
           onPointerMove={onPointerMove}
           onPointerEnter={onPointerEnter}
-          onPointerLeave={() => {
-            setInteractionPaused(false);
-            resetPointer();
-          }}
+          onPointerLeave={resetPointer}
           onFocusCapture={() => setInteractionPaused(true)}
           onBlurCapture={(event) => {
             if (!event.currentTarget.contains(event.relatedTarget)) {
@@ -358,12 +379,16 @@ export default function CommerceHero() {
           }}
           onTouchStart={onTouchStart}
           onTouchEnd={onTouchEnd}
+          onTouchCancel={() => {
+            touchStartRef.current = null;
+            finishTouch();
+          }}
         >
           <div className="hero-v7__orbit-label hero-v7__orbit-label--one" aria-hidden="true">
             <span>01</span> Pick a material
           </div>
           <div className="hero-v7__orbit-label hero-v7__orbit-label--two" aria-hidden="true">
-            <span>02</span> Choose a shade
+            <span>02</span> Preview a colour
           </div>
 
           <div className="hero-v7__stage-float">
@@ -415,7 +440,7 @@ export default function CommerceHero() {
                     style={{ "--swatch": color?.hex || "#2a8c82" }}
                     aria-hidden="true"
                   />
-                  {color?.name || "Choose shade"}
+                  {color?.name || "Colour preview"}
                 </p>
               </div>
 
@@ -424,7 +449,7 @@ export default function CommerceHero() {
                 <span>/ {String(spotlightProducts.length).padStart(2, "0")}</span>
               </div>
 
-              {!autoPaused && !interactionPaused ? (
+              {autoplayRunning ? (
                 <span key={`progress-${index}`} className="hero-v6__autoplay hero-v7__autoplay" aria-hidden="true">
                   <i />
                 </span>
