@@ -30,8 +30,8 @@ export default function Footer() {
             <span>Explore</span>
             <Link to="/products">Catalogue</Link>
             <Link to="/projects">Shop by project</Link>
-            <Link to="/yarn-guide">Guided material finder</Link>
-            <Link to="/blog">Craft guides</Link>
+            <Link to="/blog">Guides & calculators</Link>
+            <Link to="/yarn-guide">Material matcher</Link>
             <Link to="/wishlist">Wishlist</Link>
           </div>
           <div>
