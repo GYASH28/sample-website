@@ -3,9 +3,7 @@ import { Link } from "react-router-dom";
 import {
   ArrowRight,
   ChatCircleDots,
-  CheckCircle,
   Compass,
-  Sparkle,
 } from "@phosphor-icons/react";
 import PageHero from "../components/PageHero.jsx";
 import ProductCard from "../components/ProductCard.jsx";
@@ -21,7 +19,7 @@ import { trackEngagement } from "../lib/engagementAnalytics.js";
 const FINISHES = [
   { id: "balanced", label: "No strong preference", hint: "Show the best project matches from the current catalogue." },
   { id: "soft", label: "Soft / comfortable", hint: "Prioritise catalogue text that explicitly mentions softness, cotton or wearables." },
-  { id: "structured", label: "Structured / sturdy", hint: "Prioritise cord, T-shirt yarn and bag-making context." },
+  { id: "structured", label: "Structured / sturdy", hint: "Prioritise current cord, T-shirt yarn and bag-making context." },
   { id: "detailed", label: "Fine / detailed", hint: "Prioritise thread, embroidery and detailed crochet context." },
 ];
 
@@ -38,8 +36,8 @@ function rankRecommendations(projectSlug, finish, experience) {
       let score = entry.score;
       const text = meta.searchableText;
       if (finish === "soft" && /soft|cotton|wearable/.test(text)) score += 7;
-      if (finish === "structured" && /macrame|t shirt|bag making|cord|base|handle/.test(text)) score += 7;
-      if (finish === "detailed" && /embroidery|crochet thread|lacchi|decorative thread/.test(text)) score += 7;
+      if (finish === "structured" && /macrame|t shirt|bag making|cord|dori/.test(text)) score += 7;
+      if (finish === "detailed" && /embroidery|crochet thread|decorative thread|detailed/.test(text)) score += 7;
       if (experience === "beginner" && (entry.product.tags || []).includes("Beginner Friendly")) score += 8;
       return { ...entry, score };
     })
@@ -54,7 +52,7 @@ export default function YarnGuide() {
 
   useDocumentMeta({
     title: "Guided Yarn & Craft Material Finder | Fakhri Mart",
-    description: "Tell Fakhri Mart what you are making, the finish you want and your experience level to shortlist suitable catalogue materials before enquiring.",
+    description: "Tell Fakhri Mart what you are making, the finish you want and your experience level to shortlist suitable verified catalogue materials before enquiring.",
     canonical: "/yarn-guide",
   });
   useJsonLd(faqPageJsonLd(storeFaqs));
@@ -69,10 +67,10 @@ export default function YarnGuide() {
   const selectedExperience = EXPERIENCE.find((item) => item.id === experience);
   const message = [
     `Hello ${businessInfo.name}, I am planning a *${project.name}* project.`,
-    `Finish preference: *${selectedFinish?.label}*.` ,
-    `Experience: *${selectedExperience?.label}*.` ,
+    `Finish preference: *${selectedFinish?.label}*.`,
+    `Experience: *${selectedExperience?.label}*.`,
     recommendations.length ? `The website shortlisted: ${recommendations.map(({ product }) => product.name).join(", ")}.` : "",
-    "Please help me confirm the best current material, shade, pack details, quantity and price. My delivery city is: ____",
+    "Please help me confirm the best current material, shade, pack details, requested quantity and price. My delivery city is: ____",
   ].filter(Boolean).join(" ");
 
   const revealResults = () => {
@@ -92,13 +90,13 @@ export default function YarnGuide() {
         motif="line"
         eyebrow="Guided material finder"
         title="Tell us what you want to make"
-        text="Three practical choices create a shortlist from real catalogue fields. The finder never invents live stock, price or fibre composition."
+        text="Three practical choices create a shortlist from the verified catalogue. The finder never invents live stock, price, shade availability or fibre composition."
       >
         <picture className="catalogue-hero-photo">
           <source srcSet="/assets/images/editorial/shade-library-640.avif" type="image/avif" />
           <img
             src="/assets/images/editorial/shade-library-640.webp"
-            alt="Colourful yarn and thread shade library"
+            alt="Representative yarn and thread shade library"
             width="640"
             height="427"
           />
@@ -185,7 +183,7 @@ export default function YarnGuide() {
             <div>
               <p className="eyebrow">Shortlist</p>
               <h2>{showResults ? `Good catalogue matches for ${project.name.toLowerCase()}` : "Your recommendations will appear here"}</h2>
-              <p>{showResults ? "Open a product to compare shades, request current photos or add it to one organised enquiry." : "Complete the three choices above, then generate your shortlist."}</p>
+              <p>{showResults ? "Open a product to review its verified catalogue context, request the current shade card or stock photo, or add it to one organised enquiry." : "Complete the three choices above, then generate your shortlist."}</p>
             </div>
             {showResults ? (
               <a className="btn btn-whatsapp" href={`https://wa.me/${businessInfo.whatsappNumber}?text=${encodeURIComponent(message)}`} target="_blank" rel="noopener noreferrer">
@@ -211,13 +209,13 @@ export default function YarnGuide() {
           <div>
             <p className="eyebrow">Buying vocabulary</p>
             <h2>Know enough to ask the right question</h2>
-            <p>You do not need to become a yarn expert. These small definitions help you understand the information Fakhri Mart may confirm from the current pack.</p>
+            <p>You do not need to become a yarn expert. These small definitions help you understand the information Fakhri Mart may confirm from the current pack or supplier material.</p>
           </div>
           <div className="guide-literacy__terms">
             <p><GlossaryTerm term="Ply">Ply</GlossaryTerm> — useful construction context, but not a universal thickness standard.</p>
-            <p><GlossaryTerm term="Macramé cord">Macramé cord</GlossaryTerm> — single and twisted structures behave differently.</p>
+            <p><GlossaryTerm term="Macramé cord">Macramé cord</GlossaryTerm> — cord construction affects structure, knots and fringe.</p>
             <p><GlossaryTerm term="Lacchi">Lacchi</GlossaryTerm> — a bundled thread format used for decorative work.</p>
-            <p><GlossaryTerm term="Representative shade">Representative shade</GlossaryTerm> — screen colour is not a substitute for a current photo.</p>
+            <p><GlossaryTerm term="Representative shade">Representative shade</GlossaryTerm> — screen colour is not a substitute for a current supplier card or stock photo.</p>
           </div>
         </div>
       </section>
@@ -231,7 +229,7 @@ export default function YarnGuide() {
               <li>What are you making?</li>
               <li>Which colour or shade family do you need?</li>
               <li>How much material does the pattern require?</li>
-              <li>Do you already have the hook, needle, base or handle?</li>
+              <li>Which material properties or dimensions matter to the project?</li>
               <li>Is it one project, a bulk order or repeat supply?</li>
             </ol>
           </div>
