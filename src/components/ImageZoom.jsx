@@ -1,21 +1,20 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { CaretLeft, CaretRight, X } from "@phosphor-icons/react";
+import { ShadePreviewTint } from "./ShadePreviewStudio.jsx";
 import styles from "./ImageZoom.module.css";
 
 /**
  * Lightbox — fullscreen image gallery modal with prev/next navigation and keyboard support.
- *
- * Phase 2 item 11: the default ImageZoom magnifier export was removed (unused, over-engineered).
- * Only the Lightbox named export remains — it's actively used by ProductDetail.jsx.
  *
  * Props:
  *  - images: [{ src, label }] array
  *  - activeIndex: number (which image is currently shown)
  *  - onIndexChange: (newIndex) => void
  *  - onClose: () => void
+ *  - previewHex: optional browser-only colour preview for the hero image
  */
-export function Lightbox({ images = [], activeIndex = 0, onIndexChange, onClose }) {
+export function Lightbox({ images = [], activeIndex = 0, onIndexChange, onClose, previewHex = null }) {
   const dialogRef = useRef(null);
   const closeRef = useRef(null);
   const previousFocusRef = useRef(null);
@@ -113,14 +112,16 @@ export function Lightbox({ images = [], activeIndex = 0, onIndexChange, onClose 
         <CaretLeft size={36} />
       </button>
 
-      <div className={styles.imageWrapper} onClick={(e) => e.stopPropagation()}>
+      <div className={`${styles.imageWrapper} shade-preview-surface`} onClick={(e) => e.stopPropagation()}>
         <img
           src={images[activeIndex]?.src}
           alt={images[activeIndex]?.label}
           className={styles.image}
         />
+        <ShadePreviewTint value={activeIndex === 0 ? previewHex : null} />
         <span className={styles.index}>
           {activeIndex + 1} / {images.length}: {images[activeIndex]?.label}
+          {activeIndex === 0 && previewHex ? ` · digital preview ${previewHex.toUpperCase()}` : ""}
         </span>
       </div>
 
