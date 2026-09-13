@@ -74,7 +74,6 @@ export default function Layout() {
   const routeFamily = getRouteFamily(location.pathname);
   const isProductDetail = location.pathname.startsWith("/products/");
   const [nonCriticalReady, setNonCriticalReady] = useState(false);
-  const efficientMode = typeof document !== "undefined" && document.documentElement.dataset.experienceTier === "efficient";
 
   useEffect(() => {
     // The shortlist is useful, but it is not needed to paint a product or the
@@ -94,7 +93,7 @@ export default function Layout() {
       <AnalyticsBridge />
       <Suspense fallback={null}><CommerceIntro /></Suspense>
       <ScrollToTop />
-      {!efficientMode ? <Suspense fallback={null}><HeaderEnhancer /></Suspense> : null}
+      <Suspense fallback={null}><HeaderEnhancer /></Suspense>
       <Header />
       <RouteAnnouncer />
       <Suspense fallback={null}><ScrollDirector /></Suspense>
