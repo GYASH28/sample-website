@@ -14,11 +14,11 @@ import {
 import CatalogueCta from "../components/CatalogueCta.jsx";
 import PageHero from "../components/PageHero.jsx";
 import ProductCard from "../components/ProductCard.jsx";
+import ProductShowcaseCard from "../components/ProductShowcaseCard.jsx";
 import Reveal from "../components/Reveal.jsx";
 import {
   featuredProducts,
   MASTER_CATEGORIES,
-  newArrivals,
   productCategories,
 } from "../data/siteData.js";
 import {
@@ -38,16 +38,15 @@ const PRODUCT_TYPES = [
   { label: "Yarn balls", value: "yarn-ball" },
   { label: "Cotton threads", value: "cotton-thread" },
   { label: "Crochet threads", value: "crochet-thread" },
+  { label: "Decorative threads", value: "decorative-thread" },
   { label: "Macramé cords", value: "macrame-cord" },
   { label: "Embroidery floss", value: "embroidery-floss" },
-  { label: "Crochet hooks", value: "hook" },
-  { label: "Purse handles", value: "purse-handle" },
 ];
 
 const USE_CASES = ["All", ...DISCOVERY_FILTER_OPTIONS.crafts];
-const SORT_OPTIONS = new Set(["featured", "relevance", "name-asc", "category-asc", "newest", "most-shades"]);
+const SORT_OPTIONS = new Set(["featured", "relevance", "name-asc", "category-asc"]);
 const VIEW_OPTIONS = new Set(["grid", "list"]);
-const POPULAR_SEARCHES = ["yarn for baby blanket", "crochet bag", "soft yarn", "pink macrame", "embroidery thread", "cotton"];
+const POPULAR_SEARCHES = ["yarn for baby blanket", "crochet bag", "soft yarn", "macrame cord", "embroidery thread", "cotton"];
 const BUYING_MODES = ["All", "Retail", "Bulk"];
 
 function readViewPreference(searchParams) {
@@ -72,8 +71,10 @@ function buildSuggestions(query) {
   const q = normalized.toLocaleLowerCase();
   const rows = [];
 
-  const projectMatches = PROJECTS.filter((item) => `${item.name} ${item.description}`.toLocaleLowerCase().includes(q)).slice(0, 3);
-  projectMatches.forEach((item) => rows.push({ group: "Projects", type: "project", value: item.slug, label: item.name, meta: "Shop by project" }));
+  PROJECTS
+    .filter((item) => `${item.name} ${item.description}`.toLocaleLowerCase().includes(q))
+    .slice(0, 3)
+    .forEach((item) => rows.push({ group: "Projects", type: "project", value: item.slug, label: item.name, meta: "Shop by project" }));
 
   productCategories
     .filter((category) => category.name.toLocaleLowerCase().includes(q))
@@ -100,7 +101,7 @@ function buildSuggestions(query) {
 export default function Products() {
   useDocumentMeta({
     title: "Products | Fakhri Mart",
-    description: "Search Fakhri Mart yarns and craft materials by project, craft, material, shade family, thickness and retail or wholesale enquiry use.",
+    description: "Search Fakhri Mart yarns, threads and cords by project, craft, material, listed size and retail or wholesale enquiry use.",
     canonical: "/products",
   });
 
@@ -111,7 +112,6 @@ export default function Products() {
   const useCaseValues = useMemo(() => new Set(USE_CASES), []);
   const departmentValues = useMemo(() => new Set(["All", ...MASTER_CATEGORIES]), []);
   const materialValues = useMemo(() => new Set(["All", ...DISCOVERY_FILTER_OPTIONS.materials]), []);
-  const colorValues = useMemo(() => new Set(["All", ...DISCOVERY_FILTER_OPTIONS.colors]), []);
   const projectValues = useMemo(() => new Set(["All", ...PROJECTS.map((project) => project.slug)]), []);
   const thicknessOptions = useMemo(() => [...new Set(featuredProducts.flatMap((product) => getProductDiscoveryMeta(product).thicknesses))].sort(), []);
   const thicknessValues = useMemo(() => new Set(["All", ...thicknessOptions]), [thicknessOptions]);
@@ -122,14 +122,12 @@ export default function Products() {
   const [activeType, setActiveType] = useState(() => allowedOrAll(searchParams, "type", productTypeValues));
   const [activeTag, setActiveTag] = useState(() => allowedOrAll(searchParams, "tag", useCaseValues));
   const [activeMaterial, setActiveMaterial] = useState(() => allowedOrAll(searchParams, "material", materialValues));
-  const [activeColor, setActiveColor] = useState(() => allowedOrAll(searchParams, "color", colorValues));
   const [activeThickness, setActiveThickness] = useState(() => allowedOrAll(searchParams, "thickness", thicknessValues));
   const [activeProject, setActiveProject] = useState(() => allowedOrAll(searchParams, "project", projectValues));
   const [buyingMode, setBuyingMode] = useState(() => {
     if (searchParams.get("bulk") === "1") return "Bulk";
     return allowedOrAll(searchParams, "mode", new Set(BUYING_MODES));
   });
-  const [filterHasShades, setFilterHasShades] = useState(() => searchParams.get("shades") === "1");
   const [sortBy, setSortBy] = useState(() => SORT_OPTIONS.has(searchParams.get("sort")) ? searchParams.get("sort") : "featured");
   const [viewMode, setViewMode] = useState(() => readViewPreference(searchParams));
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -145,15 +143,13 @@ export default function Products() {
     setActiveType(allowedOrAll(searchParams, "type", productTypeValues));
     setActiveTag(allowedOrAll(searchParams, "tag", useCaseValues));
     setActiveMaterial(allowedOrAll(searchParams, "material", materialValues));
-    setActiveColor(allowedOrAll(searchParams, "color", colorValues));
     setActiveThickness(allowedOrAll(searchParams, "thickness", thicknessValues));
     setActiveProject(allowedOrAll(searchParams, "project", projectValues));
     setBuyingMode(searchParams.get("bulk") === "1" ? "Bulk" : allowedOrAll(searchParams, "mode", new Set(BUYING_MODES)));
-    setFilterHasShades(searchParams.get("shades") === "1");
     setSortBy(SORT_OPTIONS.has(searchParams.get("sort")) ? searchParams.get("sort") : "featured");
     const requestedView = searchParams.get("view");
     if (VIEW_OPTIONS.has(requestedView)) setViewMode(requestedView);
-  }, [searchParams, departmentValues, categoryNames, productTypeValues, useCaseValues, materialValues, colorValues, thicknessValues, projectValues]);
+  }, [searchParams, departmentValues, categoryNames, productTypeValues, useCaseValues, materialValues, thicknessValues, projectValues]);
 
   useEffect(() => {
     const next = new URLSearchParams();
@@ -163,15 +159,13 @@ export default function Products() {
     if (activeType !== "All") next.set("type", activeType);
     if (activeTag !== "All") next.set("tag", activeTag);
     if (activeMaterial !== "All") next.set("material", activeMaterial);
-    if (activeColor !== "All") next.set("color", activeColor);
     if (activeThickness !== "All") next.set("thickness", activeThickness);
     if (activeProject !== "All") next.set("project", activeProject);
     if (buyingMode !== "All") next.set("mode", buyingMode);
-    if (filterHasShades) next.set("shades", "1");
     if (sortBy !== "featured") next.set("sort", sortBy);
     if (viewMode !== "grid") next.set("view", viewMode);
     if (next.toString() !== searchParams.toString()) setSearchParams(next, { replace: true });
-  }, [searchQuery, activeDepartment, activeCategory, activeType, activeTag, activeMaterial, activeColor, activeThickness, activeProject, buyingMode, filterHasShades, sortBy, viewMode, searchParams, setSearchParams]);
+  }, [searchQuery, activeDepartment, activeCategory, activeType, activeTag, activeMaterial, activeThickness, activeProject, buyingMode, sortBy, viewMode, searchParams, setSearchParams]);
 
   useEffect(() => {
     try { localStorage.setItem("fakhri_catalogue_view", viewMode); } catch { /* optional */ }
@@ -261,25 +255,20 @@ export default function Products() {
     return new Map(searchProducts(featuredProducts, searchQuery).map(({ product, score }) => [product.slug, score]));
   }, [searchQuery]);
 
-  const filteredProducts = useMemo(() => {
-    let result = featuredProducts.filter((product) => {
-      const meta = getProductDiscoveryMeta(product);
-      if (activeDepartment !== "All" && product.masterCategory !== activeDepartment) return false;
-      if (searchQuery.trim() && !searchScoreMap.has(product.slug)) return false;
-      if (activeCategory !== "All" && product.category !== activeCategory) return false;
-      if (activeType !== "All" && product.type !== activeType) return false;
-      if (activeTag !== "All" && !meta.crafts.includes(activeTag) && !(product.tags || []).includes(activeTag)) return false;
-      if (activeMaterial !== "All" && meta.material !== activeMaterial) return false;
-      if (activeColor !== "All" && !meta.colorFamilies.includes(activeColor)) return false;
-      if (activeThickness !== "All" && !meta.thicknesses.includes(activeThickness)) return false;
-      if (activeProject !== "All" && !projectScoreMap.has(product.slug)) return false;
-      if (buyingMode === "Retail" && !meta.retailSuitable) return false;
-      if (buyingMode === "Bulk" && !meta.bulkSuitable) return false;
-      if (filterHasShades && meta.shadeCount === 0) return false;
-      return true;
-    });
-    return result;
-  }, [activeDepartment, searchQuery, searchScoreMap, activeCategory, activeType, activeTag, activeMaterial, activeColor, activeThickness, activeProject, projectScoreMap, buyingMode, filterHasShades]);
+  const filteredProducts = useMemo(() => featuredProducts.filter((product) => {
+    const meta = getProductDiscoveryMeta(product);
+    if (activeDepartment !== "All" && product.masterCategory !== activeDepartment) return false;
+    if (searchQuery.trim() && !searchScoreMap.has(product.slug)) return false;
+    if (activeCategory !== "All" && product.category !== activeCategory) return false;
+    if (activeType !== "All" && product.type !== activeType) return false;
+    if (activeTag !== "All" && !meta.crafts.includes(activeTag) && !(product.tags || []).includes(activeTag)) return false;
+    if (activeMaterial !== "All" && meta.material !== activeMaterial) return false;
+    if (activeThickness !== "All" && !meta.thicknesses.includes(activeThickness)) return false;
+    if (activeProject !== "All" && !projectScoreMap.has(product.slug)) return false;
+    if (buyingMode === "Retail" && !meta.retailSuitable) return false;
+    if (buyingMode === "Bulk" && !meta.bulkSuitable) return false;
+    return true;
+  }), [activeDepartment, searchQuery, searchScoreMap, activeCategory, activeType, activeTag, activeMaterial, activeThickness, activeProject, projectScoreMap, buyingMode]);
 
   const departmentCounts = useMemo(() => {
     const counts = { All: featuredProducts.length };
@@ -297,18 +286,6 @@ export default function Products() {
       result.sort((a, b) => a.name.localeCompare(b.name));
     } else if (sortBy === "category-asc") {
       result.sort((a, b) => a.category.localeCompare(b.category));
-    } else if (sortBy === "most-shades") {
-      result.sort((a, b) => (b.colors?.length || 0) - (a.colors?.length || 0) || a.name.localeCompare(b.name));
-    } else if (sortBy === "newest") {
-      const arrivalIndex = (product) => newArrivals.findIndex((arrival) => arrival.name.toLocaleLowerCase().includes(product.name.toLocaleLowerCase()));
-      result.sort((a, b) => {
-        const indexA = arrivalIndex(a);
-        const indexB = arrivalIndex(b);
-        if (indexA === -1 && indexB === -1) return 0;
-        if (indexA === -1) return 1;
-        if (indexB === -1) return -1;
-        return indexA - indexB;
-      });
     }
     return result;
   }, [filteredProducts, sortBy, searchQuery, activeProject, searchScoreMap, projectScoreMap]);
@@ -323,18 +300,16 @@ export default function Products() {
     setActiveType("All");
     setActiveTag("All");
     setActiveMaterial("All");
-    setActiveColor("All");
     setActiveThickness("All");
     setActiveProject("All");
     setBuyingMode("All");
-    setFilterHasShades(false);
     setSearchQuery("");
     setSortBy("featured");
     setShowSuggestions(false);
     setSuggestionIndex(-1);
   };
 
-  const hasActiveFilters = activeDepartment !== "All" || activeCategory !== "All" || activeType !== "All" || activeTag !== "All" || activeMaterial !== "All" || activeColor !== "All" || activeThickness !== "All" || activeProject !== "All" || buyingMode !== "All" || filterHasShades || Boolean(searchQuery.trim());
+  const hasActiveFilters = activeDepartment !== "All" || activeCategory !== "All" || activeType !== "All" || activeTag !== "All" || activeMaterial !== "All" || activeThickness !== "All" || activeProject !== "All" || buyingMode !== "All" || Boolean(searchQuery.trim());
   const project = PROJECTS.find((item) => item.slug === activeProject);
 
   return (
@@ -344,11 +319,11 @@ export default function Products() {
         motif="weave"
         eyebrow="Products"
         title="Find a material by project, craft or finish"
-        text="Search naturally, refine only when useful, compare options, then ask for current shades and quantity-based pricing."
+        text="Search naturally, refine only when useful, preview colours on the product photo, then ask for current supplier shades and quantity-based pricing."
       >
         <picture className="catalogue-hero-photo">
           <source srcSet="/assets/images/editorial/shade-library.avif" type="image/avif" />
-          <img src="/assets/images/editorial/shade-library.webp" alt="A curated library of yarn shades and material textures" width="1536" height="1024" loading="eager" fetchPriority="high" decoding="async" />
+          <img src="/assets/images/editorial/shade-library.webp" alt="A representative library of yarn colours and material textures" width="1536" height="1024" loading="eager" fetchPriority="high" decoding="async" />
         </picture>
       </PageHero>
 
@@ -400,7 +375,7 @@ export default function Products() {
             <div>
               <p className="eyebrow">Smart catalogue</p>
               <h2>{project ? `Materials for ${project.name.toLowerCase()}` : "Explore materials without the clutter"}</h2>
-              <p>{project ? project.description : "Try natural phrases like “yarn for baby blanket”, “pink macrame cord” or “crochet bag”, then refine the results only if needed."}</p>
+              <p>{project ? project.description : "Try natural phrases like “yarn for baby blanket”, “macrame cord” or “crochet bag”, then refine the results only if needed."}</p>
             </div>
             <span className="catalogue-result-pill" aria-live="polite">{sortedProducts.length} {sortedProducts.length === 1 ? "material" : "materials"}</span>
           </Reveal>
@@ -412,12 +387,12 @@ export default function Products() {
                   <MagnifyingGlass size={19} className="search-icon-inside" aria-hidden="true" />
                   <input
                     type="search"
-                    placeholder="Try “yarn for baby blanket” or “pink macrame”…"
+                    placeholder="Try “yarn for baby blanket” or “macrame cord”…"
                     value={searchQuery}
                     onChange={(event) => { setSearchQuery(event.target.value); setShowSuggestions(true); setSuggestionIndex(-1); if (event.target.value) setSortBy("relevance"); }}
                     onFocus={() => setShowSuggestions(true)}
                     onKeyDown={handleSearchKeyDown}
-                    aria-label="Search products by name, project, shade, craft or material"
+                    aria-label="Search products by name, project, craft or material"
                     role="combobox"
                     aria-autocomplete="list"
                     aria-expanded={showSuggestions && suggestions.length > 0}
@@ -462,10 +437,8 @@ export default function Products() {
                 <select id="product-sort-select" className="product-sort-select" value={sortBy} onChange={(event) => { setSortBy(event.target.value); trackEngagement("sort_changed", { sort: event.target.value, source: "catalogue" }); }}>
                   <option value="featured">Featured</option>
                   <option value="relevance">Craft / search relevance</option>
-                  <option value="most-shades">Most listed shades</option>
                   <option value="name-asc">Name A–Z</option>
                   <option value="category-asc">Category</option>
-                  <option value="newest">Recently added</option>
                 </select>
               </div>
 
@@ -489,14 +462,8 @@ export default function Products() {
               <FilterSelect label="Product type" id="catalogue-product-type" value={activeType} onChange={setActiveType} options={PRODUCT_TYPES.map((type) => type.value)} labels={Object.fromEntries(PRODUCT_TYPES.map((type) => [type.value, type.label]))} />
               <FilterSelect label="Craft use" id="catalogue-use-case" value={activeTag} onChange={setActiveTag} options={USE_CASES} allLabel="All craft uses" />
               <FilterSelect label="Material / fibre" id="catalogue-material" value={activeMaterial} onChange={setActiveMaterial} options={["All", ...DISCOVERY_FILTER_OPTIONS.materials]} allLabel="All known materials" />
-              <FilterSelect label="Thickness / size" id="catalogue-thickness" value={activeThickness} onChange={setActiveThickness} options={["All", ...thicknessOptions]} allLabel="All listed sizes" />
-              <FilterSelect label="Colour family" id="catalogue-color" value={activeColor} onChange={setActiveColor} options={["All", ...DISCOVERY_FILTER_OPTIONS.colors]} allLabel="All colour families" />
+              {thicknessOptions.length ? <FilterSelect label="Thickness / size" id="catalogue-thickness" value={activeThickness} onChange={setActiveThickness} options={["All", ...thicknessOptions]} allLabel="All listed sizes" /> : null}
               <FilterSelect label="Buying mode" id="catalogue-mode" value={buyingMode} onChange={setBuyingMode} options={BUYING_MODES} allLabel="Retail + bulk" labels={{ Retail: "Retail enquiries", Bulk: "Bulk / wholesale" }} />
-
-              <fieldset className="filter-select-box catalogue-checks">
-                <legend className="filter-label">Shade information</legend>
-                <label><input type="checkbox" checked={filterHasShades} onChange={(event) => setFilterHasShades(event.target.checked)} /><span>Has representative shades listed</span></label>
-              </fieldset>
 
               <div className="mobile-filter-sheet-actions">
                 <button type="button" className="btn btn-outline" onClick={handleResetFilters}>Clear all</button>
@@ -515,9 +482,7 @@ export default function Products() {
                   {activeTag !== "All" ? <FilterChip label={`Craft · ${activeTag}`} onClear={() => setActiveTag("All")} /> : null}
                   {activeMaterial !== "All" ? <FilterChip label={`Material · ${activeMaterial}`} onClear={() => setActiveMaterial("All")} /> : null}
                   {activeThickness !== "All" ? <FilterChip label={`Size · ${activeThickness}`} onClear={() => setActiveThickness("All")} /> : null}
-                  {activeColor !== "All" ? <FilterChip label={`Colour · ${activeColor}`} onClear={() => setActiveColor("All")} /> : null}
                   {buyingMode !== "All" ? <FilterChip label={buyingMode} onClear={() => setBuyingMode("All")} /> : null}
-                  {filterHasShades ? <FilterChip label="Has listed shades" onClear={() => setFilterHasShades(false)} /> : null}
                   {searchQuery.trim() ? <FilterChip label={`“${searchQuery.trim()}”`} onClear={() => setSearchQuery("")} /> : null}
                   <button type="button" className="clear-filters-btn" onClick={handleResetFilters}><XCircle size={15} /> Reset all</button>
                 </div>
@@ -527,12 +492,14 @@ export default function Products() {
             <div className={`product-gallery-view-wrapper view-mode-${viewMode}`}>
               <div ref={resultGridRef} className={viewMode === "grid" ? "card-grid product-grid product-grid--filtered" : "product-list-layout--filtered"} aria-live="polite" aria-busy="false">
                 {sortedProducts.length ? sortedProducts.map((product) => (
-                  <div key={product.slug} className="motion-grid-item" data-product-key={product.slug}><ProductCard product={product} compact={viewMode === "list"} /></div>
+                  <div key={product.slug} className="motion-grid-item" data-product-key={product.slug}>
+                    {viewMode === "grid" ? <ProductShowcaseCard product={product} /> : <ProductCard product={product} compact />}
+                  </div>
                 )) : (
                   <div className="empty-results-box">
                     <Question size={48} className="empty-state-icon" />
                     <h3>No products match that combination</h3>
-                    <p>Try a broader project, material, colour family or search phrase. The finder only matches information already present in the catalogue.</p>
+                    <p>Try a broader project, material, product type or search phrase. The finder only matches information already present in the catalogue.</p>
                     <div className="no-results-suggestions-box"><span>Try a natural search</span><div className="popular-terms-flex">{POPULAR_SEARCHES.map((term) => <button key={term} type="button" className="btn btn-outline btn-small" onClick={() => { handleResetFilters(); setSearchQuery(term); setSortBy("relevance"); }}>{term}</button>)}</div></div>
                     <button type="button" className="btn btn-primary" onClick={handleResetFilters}>Clear search and filters</button>
                   </div>
