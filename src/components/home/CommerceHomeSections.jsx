@@ -85,7 +85,6 @@ export function CommerceCategoryGrid({ categories }) {
 export function CommerceProductRail({ eyebrow, title, text, products, href = "/products" }) {
   const railRef = useRef(null);
   const [scrollState, setScrollState] = useState({ left: false, right: false, overflow: false });
-  if (!products.length) return null;
   const titleId = `rail-${title.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`;
 
   useEffect(() => {
@@ -111,6 +110,8 @@ export function CommerceProductRail({ eyebrow, title, text, products, href = "/p
       observer?.disconnect();
     };
   }, [products.length]);
+
+  if (!products.length) return null;
 
   const move = (direction) => {
     const rail = railRef.current;
