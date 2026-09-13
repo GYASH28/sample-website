@@ -35,7 +35,7 @@ export default function Contact() {
           <source srcSet="/assets/images/editorial/craft-stock-room.avif" type="image/avif" />
           <img
             src="/assets/images/editorial/craft-stock-room.webp"
-            alt="Organised yarn, cord, thread and bag-making supplies in the Fakhri Mart stock room"
+            alt="Representative display of yarn, cord and thread materials"
             width="1536"
             height="1024"
           />
