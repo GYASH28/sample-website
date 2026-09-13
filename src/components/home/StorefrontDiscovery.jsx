@@ -13,9 +13,9 @@ export function ShadeDiscovery() {
       <div className="container">
         <Reveal className="commerce-heading" variant="fade-up">
           <div>
-            <p className="eyebrow"><Swatches size={15} /> Shade-card support</p>
-            <h2 id="shade-discovery-title">Choose the material first. Confirm the exact shade second.</h2>
-            <p>The website no longer guesses live colours. Open a verified product line, shortlist it, then request the current supplier shade card or a live stock photo before finalising your order.</p>
+            <p className="eyebrow"><Swatches size={15} /> Colour preview + shade-card support</p>
+            <h2 id="shade-discovery-title">Try colours instantly. Confirm the real supplier shade before ordering.</h2>
+            <p>Open Quick View or a product page to recolour the same product photo in your browser—no duplicate colour images are loaded or generated. The preview is for visual exploration only; the current supplier shade card or live stock photo remains the source of truth for availability.</p>
           </div>
           <Link to="/products">Browse verified materials <ArrowRight size={17} /></Link>
         </Reveal>
