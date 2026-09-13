@@ -15,10 +15,9 @@ import { useWishlist } from "../hooks/useWishlist.js";
 import WhatsAppIcon from "./WhatsAppIcon.jsx";
 
 function getVariantOptions(product) {
-  if (product.slug === "t-shirt-yarn") return ["250gm", "500gm"];
-  if (product.slug.includes("macrame-cord")) return ["3MM", "4MM"];
-  if (product.slug === "crochet-hook") return ["2.0mm", "3.0mm", "4.0mm", "5.0mm"];
-  return [];
+  // Only render selectable variants when the verified product record supplies
+  // explicit options. Do not infer sizes from legacy slugs or sample products.
+  return Array.isArray(product.variantOptions) ? product.variantOptions : [];
 }
 
 export default function ProductQuickView({ product, open, onClose }) {
@@ -87,7 +86,7 @@ export default function ProductQuickView({ product, open, onClose }) {
     addedTimerRef.current = window.setTimeout(() => setAdded(false), 1_600);
   };
 
-  const message = `Hello Fakhri Mart, I want to enquire about *${product.name}*${color ? ` in *${color.name}*` : ""}${variant ? ` (${variant})` : ""}, quantity *${quantity} ${product.quantityOptions?.unit || "pcs"}*. Please share current availability, shade photos and price.`;
+  const message = `Hello Fakhri Mart, I want to enquire about *${product.name}*${color ? ` in *${color.name}*` : ""}${variant ? ` (${variant})` : ""}, quantity *${quantity} ${product.quantityOptions?.unit || "pcs"}*. Please share current availability, shade photos, pack details and price.`;
 
   return (
     <div className="quick-view-layer" role="presentation">
@@ -99,7 +98,7 @@ export default function ProductQuickView({ product, open, onClose }) {
 
         <div className="quick-view__media">
           <img key={gallery[imageIndex]} className="quick-view__main-image" src={gallery[imageIndex]} alt={product.name} width="720" height="720" decoding="async" />
-          <span>{product.stock === "out" ? "Currently unavailable" : "Availability confirmed live"}</span>
+          <span>Availability confirmed on enquiry</span>
           {gallery.length > 1 ? (
             <div className="quick-view__gallery" aria-label="Material views">
               {gallery.slice(0, 4).map((source, index) => (
@@ -153,7 +152,7 @@ export default function ProductQuickView({ product, open, onClose }) {
 
           {variants.length ? (
             <fieldset className="quick-view__choices">
-              <legend>Choose size</legend>
+              <legend>Choose option</legend>
               <div className="quick-view__variants">
                 {variants.map((option) => (
                   <button key={option} type="button" className={variant === option ? "is-active" : ""} onClick={() => setVariant(option)}>
@@ -165,7 +164,7 @@ export default function ProductQuickView({ product, open, onClose }) {
           ) : null}
 
           <div className="quick-view__quantity-row">
-            <span>Quantity</span>
+            <span>Requested quantity</span>
             <div className="quick-view__stepper">
               <button type="button" onClick={() => setQuantity((value) => Math.max(min, value - step))} aria-label="Decrease quantity"><Minus size={16} /></button>
               <output>{quantity}</output>
@@ -174,7 +173,7 @@ export default function ProductQuickView({ product, open, onClose }) {
           </div>
 
           <div className="quick-view__actions">
-            <button className="btn btn-primary" type="button" onClick={addToEnquiry} disabled={product.stock === "out"}>
+            <button className="btn btn-primary" type="button" onClick={addToEnquiry}>
               <ShoppingBagOpen size={18} /> {added ? "Added to enquiry" : "Add to enquiry"}
             </button>
             <a className="btn btn-outline" href={createWhatsAppLink(message)} target="_blank" rel="noreferrer">
