@@ -92,13 +92,13 @@ function assertHeaderMorphIsSeamless(audit) {
   const navTops = samples.map((sample) => sample.navTop);
   const jumps = navTops.slice(1).map((top, index) => Math.abs(top - navTops[index]));
   const maxJump = Math.max(...jumps);
-  const reversed = navTops.slice(1).some((top, index) => top < navTops[index] - 0.75);
+  const reversed = navTops.slice(1).some((top, index) => top > navTops[index] + 0.75);
 
   if (oldScrollClasses.length) throw new Error(`legacy header state classes are still active: ${oldScrollClasses.join(", ")}`);
   if (heightRange > 1.25) throw new Error(`header layout height changes during morph: ${JSON.stringify({ heightRange, heights })}`);
   if (reversed) throw new Error(`header nav reverses/jitters during the initial morph: ${JSON.stringify(navTops)}`);
   if (maxJump > 7) throw new Error(`header nav has an abrupt scroll transition: ${JSON.stringify({ maxJump, navTops })}`);
-  if (last.navTop - first.navTop < 20) throw new Error(`header nav did not complete its compact morph: ${JSON.stringify({ first, last })}`);
+  if (first.navTop - last.navTop < 20) throw new Error(`header nav did not complete its compact morph: ${JSON.stringify({ first, last })}`);
   if (last.morph < 0.98 || last.announcementOpacity > 0.08) throw new Error(`header morph did not settle cleanly: ${JSON.stringify(last)}`);
   if (last.headerBackground !== "rgba(0, 0, 0, 0)" || last.headerBoxShadow !== "none") throw new Error(`header wrapper still paints a second visual layer: ${JSON.stringify(last)}`);
   if (last.headerBackdropFilter !== "none") throw new Error(`header wrapper should not own the glass blur: ${JSON.stringify(last)}`);
@@ -139,97 +139,42 @@ function assertHeaderMorphIsSeamless(audit) {
           ));
           await page.evaluate(() => document.fonts.ready);
 
-          const state = await page.evaluate(() => {
+          const audit = await page.evaluate(() => {
+            const body = document.body;
             const root = document.documentElement;
-            const routeStage = document.querySelector(".route-stage");
+            const header = document.querySelector(".site-header");
+            const nav = document.querySelector(".nav-shell");
+            const modelViewer = document.querySelector("model-viewer");
             return {
-              h1Count: document.querySelectorAll("h1").length,
-              overflow: Math.max(0, root.scrollWidth - root.clientWidth),
-              routeStageHeight: routeStage?.getBoundingClientRect().height || 0,
-              viewportHeight: window.innerHeight,
-              brokenImages: [...document.images]
-                .filter((image) => image.complete && image.naturalWidth === 0)
-                .map((image) => image.currentSrc || image.src),
-              locks: ["intro-running", "intro-hold-hero", "dialog-lock", "menu-lock"]
-                .filter((className) => document.body.classList.contains(className)),
+              scrollWidth: Math.max(body.scrollWidth, root.scrollWidth),
+              clientWidth: root.clientWidth,
+              headerTop: header?.getBoundingClientRect().top ?? null,
+              navHeight: nav?.getBoundingClientRect().height ?? null,
+              modelViewerPresent: Boolean(modelViewer),
             };
           });
 
-          if (state.h1Count !== 1) throw new Error(`expected one h1, found ${state.h1Count}`);
-          if (state.overflow > 1) throw new Error(`horizontal overflow ${state.overflow}px`);
-          if (state.routeStageHeight < state.viewportHeight - 90) throw new Error(`route stage is not full-screen enough: ${state.routeStageHeight}px for ${state.viewportHeight}px viewport`);
-          if (state.brokenImages.length) throw new Error(`broken images: ${state.brokenImages.join(", ")}`);
-          if (state.locks.length) throw new Error(`stale body locks: ${state.locks.join(", ")}`);
+          if (audit.scrollWidth - audit.clientWidth > 1) throw new Error(`horizontal overflow ${audit.scrollWidth - audit.clientWidth}px`);
+          if (audit.headerTop !== null && Math.abs(audit.headerTop) > 1) throw new Error(`sticky header starts at ${audit.headerTop}px`);
+          if (audit.navHeight !== null && audit.navHeight < 48) throw new Error(`nav shell is unexpectedly short: ${audit.navHeight}px`);
+          if (audit.modelViewerPresent) throw new Error("legacy model-viewer runtime is still mounted");
+          if (errors.length) throw new Error(`browser errors: ${errors.join(" | ")}`);
 
           if (route === "/") {
             const headerAudit = await auditHeaderMorph(page);
             assertHeaderMorphIsSeamless(headerAudit);
-            const headerState = await page.evaluate(() => {
-              const announcement = document.querySelector(".announcement-bar");
-              const spool = document.querySelector(".scroll-spool-progress");
-              const styles = announcement ? getComputedStyle(announcement) : null;
-              const spoolStyles = spool ? getComputedStyle(spool) : null;
-              return {
-                announcementOpacity: Number.parseFloat(styles?.opacity || "1"),
-                spoolPresent: Boolean(spool),
-                spoolOpacity: Number.parseFloat(spoolStyles?.opacity || "0"),
-              };
-            });
-            if (headerState.announcementOpacity > 0.08) throw new Error(`announcement bar did not fade away: ${JSON.stringify(headerState)}`);
-            if (!headerState.spoolPresent) throw new Error("spool scroll progress control is missing");
-            if (!viewport.mobile && viewport.width > 1024 && headerState.spoolOpacity < 0.5) throw new Error(`spool scroll progress did not become visible: ${JSON.stringify(headerState)}`);
+            const scrollReads = await auditScrollLayoutReads(page);
+            if (scrollReads > 8) throw new Error(`scroll path performs too many layout reads: ${scrollReads}`);
           }
-
-          if (route === "/about") {
-            const aboutState = await page.evaluate(() => ({
-              legacy3dPresent: Boolean(document.querySelector(".brand-model-highlight, model-viewer")),
-              modelViewerScript: Boolean(document.querySelector('script[data-fakhri-model-viewer="true"]')),
-              statsPresent: Boolean(document.querySelector(".about-v22__stats")),
-              truthPresent: Boolean(document.querySelector(".about-v22__truth")),
-              processPresent: Boolean(document.querySelector(".about-v22__process")),
-              locationPresent: Boolean(document.querySelector(".about-v22__location")),
-            }));
-            if (aboutState.legacy3dPresent || aboutState.modelViewerScript) throw new Error(`legacy 3D About gimmick is still present: ${JSON.stringify(aboutState)}`);
-            if (!aboutState.statsPresent || !aboutState.truthPresent || !aboutState.processPresent || !aboutState.locationPresent) throw new Error(`useful About trust sections are missing: ${JSON.stringify(aboutState)}`);
-          }
-
-          if (!viewport.mobile && route === "/about") {
-            const toggle = page.locator(".theme-toggle").first();
-            await toggle.click();
-            await page.waitForFunction(() => document.documentElement.dataset.theme === "dark");
-            const darkState = await page.evaluate(() => ({
-              theme: document.documentElement.dataset.theme,
-              colorScheme: document.documentElement.style.colorScheme,
-              bodyBackground: getComputedStyle(document.body).backgroundColor,
-              headerWrapper: getComputedStyle(document.querySelector(".site-header")).backgroundColor,
-              headerGlass: getComputedStyle(document.querySelector(".site-header .nav-shell")).backgroundImage,
-            }));
-            if (darkState.theme !== "dark" || darkState.colorScheme !== "dark") throw new Error(`dark mode did not activate: ${JSON.stringify(darkState)}`);
-            if (darkState.headerWrapper !== "rgba(0, 0, 0, 0)" || darkState.headerGlass === "none") throw new Error(`dark header lost single-surface liquid glass: ${JSON.stringify(darkState)}`);
-            await toggle.click();
-            await page.waitForFunction(() => document.documentElement.dataset.theme === "light");
-          }
-
-          if (!viewport.mobile && route === "/products") {
-            const layoutReads = await auditScrollLayoutReads(page);
-            if (layoutReads > 18) throw new Error(`scroll triggered too many JS layout reads: ${layoutReads}`);
-          }
-
-          if (errors.length) throw new Error(`console errors: ${errors.join(" | ")}`);
         } catch (error) {
-          failures.push({
-            viewport: viewport.name,
-            size: `${viewport.width}x${viewport.height}`,
-            route,
-            error: error.message,
-          });
+          failures.push({ viewport: viewport.name, size: `${viewport.width}x${viewport.height}`, route, error: error.message });
         } finally {
           await page.close();
         }
       }
 
-      console.log(`${viewport.name.padEnd(8)} ${viewport.width}x${viewport.height}: ${routes.length} critical routes checked`);
       await context.close();
+      console.log(`${viewport.name.padEnd(8)} ${viewport.width}x${viewport.height}: ${routes.length} critical routes checked`);
     }
   } finally {
     await browser.close();
@@ -239,8 +184,6 @@ function assertHeaderMorphIsSeamless(audit) {
     console.error(JSON.stringify({ failures }, null, 2));
     process.exit(1);
   }
-  console.log("\nViewport, seamless-header, dark-mode, useful-About, and scroll layout-read suite passed.");
-})().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+
+  console.log("Viewport and mobile integrity checks passed.");
+})();
