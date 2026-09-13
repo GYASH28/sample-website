@@ -9,7 +9,7 @@ const INTRO_SELECTOR = '.commerce-intro[aria-label="Fakhri Mart opening sequence
 const runs = [
   {
     name: "mobile-normal",
-    expectedProfile: "compact",
+    expectedProfile: "lite",
     viewport: { width: 390, height: 844 },
     mobile: true,
     cpuRate: 1,
@@ -17,7 +17,7 @@ const runs = [
   },
   {
     name: "mobile-throttled-4x",
-    expectedProfile: "compact",
+    expectedProfile: "lite",
     viewport: { width: 390, height: 844 },
     mobile: true,
     cpuRate: 4,
@@ -95,7 +95,7 @@ try {
       ({ expectedProfile, repeat }) => {
         const hardware = {
           lite: { deviceMemory: 1, hardwareConcurrency: 2 },
-          compact: { deviceMemory: 4, hardwareConcurrency: 4 },
+          compact: { deviceMemory: 6, hardwareConcurrency: 6 },
           full: { deviceMemory: 8, hardwareConcurrency: 8 },
           reduced: { deviceMemory: 8, hardwareConcurrency: 8 },
         }[expectedProfile];
@@ -180,7 +180,6 @@ try {
             probe.complete = true;
             probe.end = now;
           }
-
           requestAnimationFrame(frame);
         };
 
@@ -209,9 +208,7 @@ try {
       await intro.waitFor({ state: "visible", timeout: 5_000 });
       await intro.waitFor({ state: "detached", timeout: 20_000 });
     } else {
-      await page.waitForFunction(() => {
-        return document.readyState === "complete" && document.querySelector(".route-stage");
-      });
+      await page.waitForFunction(() => document.readyState === "complete" && document.querySelector(".route-stage"));
       await page.waitForTimeout(600);
     }
 
@@ -290,16 +287,14 @@ const serialized = `${JSON.stringify(report, null, 2)}\n`;
 if (outputPath) await writeFile(outputPath, serialized, "utf8");
 process.stdout.write(serialized);
 
-const correctnessFailures = results.filter((result) => {
-  return (
-    result.actualProfile !== result.expectedProfile ||
-    result.introRendered !== result.expectedIntro ||
-    result.bodyLocked ||
-    result.overflow ||
-    result.brokenImages.length ||
-    result.consoleErrors.length
-  );
-});
+const correctnessFailures = results.filter((result) => (
+  result.actualProfile !== result.expectedProfile ||
+  result.introRendered !== result.expectedIntro ||
+  result.bodyLocked ||
+  result.overflow ||
+  result.brokenImages.length ||
+  result.consoleErrors.length
+));
 
 if (correctnessFailures.length) {
   console.error(`Intro performance audit found ${correctnessFailures.length} correctness failure(s).`);
