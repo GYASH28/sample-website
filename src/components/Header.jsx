@@ -47,6 +47,7 @@ export default function Header() {
   const [shortcutLabel, setShortcutLabel] = useState("Ctrl K");
   const menuButtonRef = useRef(null);
   const drawerRef = useRef(null);
+  const catalogueRef = useRef(null);
   const location = useLocation();
   const { language, setLanguage, t } = useLanguage();
   const { itemsCount } = useEnquiryBasket();
@@ -94,6 +95,15 @@ export default function Header() {
   }, [openSearch]);
 
   useEffect(() => {
+    if (!megaOpen) return undefined;
+    const onPointerDown = (event) => {
+      if (!catalogueRef.current?.contains(event.target)) setMegaOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [megaOpen]);
+
+  useEffect(() => {
     if (!menuOpen) return undefined;
     document.body.classList.add("menu-lock");
     const previous = document.activeElement;
@@ -137,8 +147,8 @@ export default function Header() {
           </Link>
 
           <nav className="desktop-nav" aria-label="Primary navigation">
-            <div className="catalogue-nav-item" onMouseEnter={() => setMegaOpen(true)} onMouseLeave={() => setMegaOpen(false)}>
-              <NavLink to="/products" onFocus={() => setMegaOpen(true)}>{t("catalogue")}</NavLink>
+            <div ref={catalogueRef} className="catalogue-nav-item">
+              <NavLink to="/products">{t("catalogue")}</NavLink>
               <button
                 type="button"
                 className={`mega-toggle${megaOpen ? " is-open" : ""}`}
@@ -146,7 +156,7 @@ export default function Header() {
                 aria-expanded={megaOpen}
                 aria-haspopup="true"
                 aria-controls="catalogue-navigation-menu"
-                aria-label="Show catalogue categories"
+                aria-label={megaOpen ? "Hide catalogue categories" : "Show catalogue categories"}
               >
                 <CaretDown size={14} weight="bold" aria-hidden="true" />
               </button>
@@ -154,7 +164,9 @@ export default function Header() {
                 <div
                   id="catalogue-navigation-menu"
                   className="category-mega-menu"
-                  onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setMegaOpen(false); }}
+                  onBlur={(event) => {
+                    if (!catalogueRef.current?.contains(event.relatedTarget)) setMegaOpen(false);
+                  }}
                 >
                   <div className="mega-intro">
                     <span className="eyebrow">Material library</span>
