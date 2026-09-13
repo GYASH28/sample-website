@@ -1,0 +1,477 @@
+/* Fakhri Mart — Theme Readability v25
+   Final cascade contract for components introduced after production-theme-v11.
+   Every interactive surface derives foregrounds/backgrounds from the semantic
+   theme tokens so light and dark mode cannot drift independently. */
+
+:root {
+  --readability-glass: rgba(255, 253, 249, 0.90);
+  --readability-glass-soft: rgba(255, 255, 255, 0.58);
+  --readability-glass-subtle: rgba(255, 255, 255, 0.36);
+  --readability-glass-active: rgba(225, 244, 240, 0.82);
+  --readability-glass-border: rgba(47, 38, 48, 0.14);
+  --readability-glass-highlight: rgba(255, 255, 255, 0.86);
+  --readability-overlay: rgba(24, 31, 29, 0.42);
+  --readability-control: color-mix(in srgb, var(--ui-surface, #fffdf9) 92%, var(--ui-accent, #14766f) 8%);
+  --readability-control-hover: color-mix(in srgb, var(--ui-surface, #fffdf9) 82%, var(--ui-accent, #14766f) 18%);
+}
+
+:root[data-theme="dark"] {
+  --readability-glass: rgba(29, 33, 29, 0.95);
+  --readability-glass-soft: rgba(255, 255, 255, 0.075);
+  --readability-glass-subtle: rgba(255, 255, 255, 0.045);
+  --readability-glass-active: rgba(115, 200, 189, 0.14);
+  --readability-glass-border: rgba(255, 255, 255, 0.12);
+  --readability-glass-highlight: rgba(255, 255, 255, 0.08);
+  --readability-overlay: rgba(4, 7, 6, 0.66);
+  --readability-control: color-mix(in srgb, var(--ui-surface, #20231f) 90%, var(--ui-accent, #73c8bd) 10%);
+  --readability-control-hover: color-mix(in srgb, var(--ui-surface-soft, #262a26) 82%, var(--ui-accent, #73c8bd) 18%);
+}
+
+/* Keep native widgets, scrollbars and form chrome aligned with the selected theme. */
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+body,
+#root,
+#main-content {
+  color: var(--ui-text) !important;
+}
+
+/* --------------------------------------------------------------------------
+   Liquid header + catalogue navigation
+   -------------------------------------------------------------------------- */
+
+.site-header .announcement-bar {
+  border-bottom-color: var(--readability-glass-border) !important;
+  background: color-mix(in srgb, var(--ui-bg-elevated) 88%, transparent) !important;
+  color: var(--ui-text-muted) !important;
+}
+
+.site-header .nav-shell,
+.site-header.is-scrolled .nav-shell,
+.site-header.is-deep .nav-shell,
+.site-header.is-scrolling .nav-shell {
+  border-color: var(--readability-glass-border) !important;
+  background: var(--readability-glass) !important;
+  color: var(--ui-text) !important;
+}
+
+.site-header .brand,
+.site-header .brand strong,
+.site-header .catalogue-nav-item > a,
+.site-header .desktop-nav > a,
+.site-header .mega-toggle {
+  color: var(--ui-text-strong) !important;
+}
+
+.site-header .brand small,
+.site-header .header-search-trigger,
+.site-header .header-search-trigger span,
+.site-header .desktop-nav > a:not(.active),
+.site-header .catalogue-nav-item > a:not(.active),
+.site-header .mega-toggle:not(.is-open) {
+  color: var(--ui-text-muted) !important;
+}
+
+.site-header .desktop-nav {
+  border-color: var(--readability-glass-border) !important;
+  background: var(--readability-glass-subtle) !important;
+  box-shadow: inset 0 1px 0 var(--readability-glass-highlight) !important;
+}
+
+.site-header .desktop-nav > a:hover,
+.site-header .catalogue-nav-item > a:hover,
+.site-header .desktop-nav > a.active,
+.site-header .catalogue-nav-item > a.active,
+.site-header .mega-toggle:is(:hover, :focus-visible, .is-open) {
+  background: var(--readability-glass-active) !important;
+  color: var(--ui-accent) !important;
+}
+
+.site-header :is(.header-search-trigger, .language-control, .icon-button, .theme-toggle, .menu-toggle) {
+  border-color: var(--readability-glass-border) !important;
+  background: var(--readability-glass-subtle) !important;
+  color: var(--ui-text-strong) !important;
+  box-shadow: inset 0 1px 0 var(--readability-glass-highlight) !important;
+}
+
+.site-header .language-control button {
+  color: var(--ui-text-muted) !important;
+}
+
+.site-header .language-control button.active,
+.site-header .language-control button:is(:hover, :focus-visible) {
+  background: var(--readability-glass-active) !important;
+  color: var(--ui-accent) !important;
+}
+
+.site-header kbd {
+  border-color: var(--readability-glass-border) !important;
+  background: var(--readability-glass-soft) !important;
+  color: var(--ui-text-subtle) !important;
+}
+
+.site-header .category-mega-menu {
+  border-color: var(--readability-glass-border) !important;
+  background: var(--readability-glass) !important;
+  color: var(--ui-text) !important;
+}
+
+.site-header .mega-intro {
+  border-right-color: var(--readability-glass-border) !important;
+}
+
+.site-header .mega-intro > strong,
+.site-header .mega-category-grid a span {
+  color: var(--ui-text-strong) !important;
+}
+
+.site-header .mega-intro > :is(a, .eyebrow),
+.site-header .mega-category-grid a small {
+  color: var(--ui-text-muted) !important;
+}
+
+.site-header .mega-intro > a:is(:hover, :focus-visible),
+.site-header .mega-category-grid a:is(:hover, :focus-visible) span {
+  color: var(--ui-accent) !important;
+}
+
+.site-header .mega-category-grid a:is(:hover, :focus-visible) {
+  background: var(--readability-glass-active) !important;
+}
+
+/* --------------------------------------------------------------------------
+   Mobile drawer + fixed bottom navigation
+   -------------------------------------------------------------------------- */
+
+.drawer-backdrop,
+.search-dialog-backdrop,
+.enquiry-drawer-backdrop,
+.quick-view-backdrop {
+  background: var(--readability-overlay) !important;
+}
+
+.mobile-nav-drawer,
+.search-dialog,
+.enquiry-drawer,
+.quick-view {
+  border-color: var(--readability-glass-border) !important;
+  background: var(--readability-glass) !important;
+  color: var(--ui-text) !important;
+}
+
+.mobile-nav-drawer :is(h2, h3, strong),
+.enquiry-drawer :is(h2, h3, strong),
+.quick-view :is(h2, h3, strong),
+.search-dialog :is(h2, h3, strong) {
+  color: var(--ui-text-strong) !important;
+}
+
+.mobile-nav-drawer :is(p, small, address, .eyebrow),
+.enquiry-drawer :is(p, small, .eyebrow),
+.quick-view__content > p:not(.eyebrow),
+.search-dialog :is(small, .eyebrow) {
+  color: var(--ui-text-muted) !important;
+}
+
+.mobile-primary-links a,
+.mobile-category-group a,
+.mobile-saved-actions a,
+.mobile-business-details,
+.mobile-business-details a,
+.mobile-search-button {
+  color: var(--ui-text-strong) !important;
+}
+
+.mobile-search-button,
+.mobile-category-group a,
+.mobile-saved-actions a {
+  border-color: var(--readability-glass-border) !important;
+  background: var(--readability-glass-soft) !important;
+}
+
+.mobile-primary-links a {
+  border-bottom-color: var(--readability-glass-border) !important;
+}
+
+.mobile-primary-links a:is(.active, :hover, :focus-visible),
+.mobile-category-group a:is(:hover, :focus-visible),
+.mobile-saved-actions a:is(:hover, :focus-visible),
+.mobile-business-details a:is(:hover, :focus-visible) {
+  color: var(--ui-accent) !important;
+}
+
+@media (max-width: 800px) {
+  .mobile-bottom-nav {
+    border-color: var(--readability-glass-border) !important;
+    background: var(--readability-glass) !important;
+    color: var(--ui-text) !important;
+  }
+
+  .mobile-bottom-nav > :is(a, button) {
+    color: var(--ui-text-muted) !important;
+  }
+
+  .mobile-bottom-nav > :is(a, button):is(:hover, :focus-visible),
+  .mobile-bottom-nav > a.is-active {
+    background: var(--readability-glass-active) !important;
+    color: var(--ui-accent) !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Search dialog — open-state readability was previously under-tested
+   -------------------------------------------------------------------------- */
+
+.search-dialog-heading,
+.search-results-heading {
+  color: var(--ui-text) !important;
+}
+
+.command-search {
+  border-color: var(--ui-border) !important;
+  background: var(--readability-control) !important;
+  color: var(--ui-text) !important;
+}
+
+.command-search input {
+  color: var(--ui-text-strong) !important;
+  background: transparent !important;
+}
+
+.command-search input::placeholder {
+  color: var(--ui-text-subtle) !important;
+  opacity: 1;
+}
+
+.command-search > svg,
+.search-project-suggestions > span,
+.recent-searches > span {
+  color: var(--ui-text-muted) !important;
+}
+
+.command-search kbd,
+.recent-searches button,
+.search-project-suggestions a,
+.search-category-strip a {
+  border-color: var(--ui-border) !important;
+  background: var(--readability-control) !important;
+  color: var(--ui-text) !important;
+}
+
+.recent-searches button:is(:hover, :focus-visible),
+.search-project-suggestions a:is(:hover, :focus-visible),
+.search-category-strip a:is(:hover, :focus-visible) {
+  border-color: color-mix(in srgb, var(--ui-accent) 46%, var(--ui-border)) !important;
+  background: var(--readability-control-hover) !important;
+  color: var(--ui-accent) !important;
+}
+
+.search-results-heading > span,
+.search-result-list small,
+.search-empty p {
+  color: var(--ui-text-muted) !important;
+}
+
+.search-results-heading a,
+.search-result-list em {
+  color: var(--ui-accent) !important;
+}
+
+.search-result-list li > a {
+  border-color: var(--ui-border) !important;
+  background: transparent !important;
+  color: var(--ui-text) !important;
+}
+
+.search-result-list li:is(.is-keyboard-active, :hover, :focus-within) > a {
+  background: var(--readability-control-hover) !important;
+}
+
+.search-result-list strong,
+.search-empty h3 {
+  color: var(--ui-text-strong) !important;
+}
+
+/* --------------------------------------------------------------------------
+   Quick View + enquiry drawer
+   -------------------------------------------------------------------------- */
+
+.quick-view__title-row > button,
+.quick-view__close,
+.enquiry-drawer__header .icon-button,
+.enquiry-drawer__item > button {
+  border-color: var(--ui-border) !important;
+  background: var(--readability-control) !important;
+  color: var(--ui-text-strong) !important;
+}
+
+.quick-view__choices,
+.quick-view__quantity-row,
+.enquiry-drawer__summary,
+.enquiry-drawer__note {
+  border-color: var(--ui-border) !important;
+}
+
+.quick-view__choices legend,
+.quick-view__quantity-row > span,
+.enquiry-drawer__item span,
+.enquiry-drawer__item small,
+.enquiry-drawer__summary span,
+.enquiry-drawer__note,
+.enquiry-drawer__empty p,
+.quick-view__photo-note {
+  color: var(--ui-text-muted) !important;
+}
+
+.quick-view__variants button,
+.quick-view__stepper,
+.quick-view__stepper button,
+.enquiry-drawer__summary button {
+  border-color: var(--ui-border) !important;
+  background: var(--readability-control) !important;
+  color: var(--ui-text) !important;
+}
+
+.quick-view__variants button:is(.is-active, :hover, :focus-visible),
+.quick-view__stepper button:is(:hover, :focus-visible),
+.enquiry-drawer__summary button:is(:hover, :focus-visible) {
+  background: var(--readability-control-hover) !important;
+  color: var(--ui-accent) !important;
+}
+
+.enquiry-drawer__item {
+  border-color: var(--ui-border) !important;
+  background: color-mix(in srgb, var(--ui-surface) 94%, transparent) !important;
+  color: var(--ui-text) !important;
+}
+
+.enquiry-drawer__item strong,
+.quick-view__quantity-row output {
+  color: var(--ui-text-strong) !important;
+}
+
+.quick-view__details {
+  color: var(--ui-accent) !important;
+}
+
+/* --------------------------------------------------------------------------
+   New v21/v22 content blocks
+   -------------------------------------------------------------------------- */
+
+.shade-preview-studio,
+.guides-hub,
+.about-v22 {
+  color: var(--ui-text) !important;
+}
+
+.shade-preview-studio {
+  border-color: var(--ui-border) !important;
+  background: color-mix(in srgb, var(--ui-surface) 94%, var(--ui-accent) 6%) !important;
+}
+
+.shade-preview-studio__heading strong {
+  color: var(--ui-text-strong) !important;
+}
+
+.shade-preview-studio__eyebrow,
+.shade-preview-studio__group > span,
+.shade-preview-studio__custom > span,
+.shade-preview-studio__swatches small,
+.shade-preview-studio__custom code,
+.shade-preview-studio__notice {
+  color: var(--ui-text-muted) !important;
+}
+
+.shade-preview-studio__reset {
+  background: var(--readability-control) !important;
+  color: var(--ui-accent) !important;
+}
+
+.shade-preview-studio__swatches button.is-active i {
+  box-shadow: 0 0 0 2px var(--ui-surface), 0 0 0 4px var(--ui-accent) !important;
+}
+
+.shade-preview-studio__custom input[type="color"] {
+  border-color: var(--ui-border) !important;
+  background: var(--ui-surface) !important;
+}
+
+.guides-hub :is(h1, h2, h3, h4, strong),
+.about-v22 :is(h1, h2, h3, h4, strong) {
+  color: var(--ui-text-strong);
+}
+
+.guides-hub :is(p, small, label),
+.about-v22 :is(p, small, label) {
+  color: var(--ui-text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   Common form + secondary-control contract
+   -------------------------------------------------------------------------- */
+
+:is(.search-dialog, .quick-view, .enquiry-drawer, .mobile-nav-drawer, .shade-preview-studio, .guides-hub, .about-v22)
+:is(input:not([type="color"]), textarea, select) {
+  border-color: var(--ui-border) !important;
+  background: var(--ui-surface) !important;
+  color: var(--ui-text-strong) !important;
+  caret-color: var(--ui-accent);
+}
+
+:is(.search-dialog, .quick-view, .enquiry-drawer, .mobile-nav-drawer, .shade-preview-studio, .guides-hub, .about-v22)
+:is(input, textarea)::placeholder {
+  color: var(--ui-text-subtle) !important;
+  opacity: 1;
+}
+
+:is(.search-dialog, .quick-view, .enquiry-drawer, .mobile-nav-drawer, .shade-preview-studio, .guides-hub, .about-v22)
+:is(input, textarea, select, button, a):focus-visible {
+  outline-color: var(--ui-accent) !important;
+}
+
+/* Low-transparency/lite fallbacks must remain theme-aware too. */
+html[data-motion-profile="lite"] :is(
+  .site-header .nav-shell,
+  .site-header .category-mega-menu,
+  .mobile-nav-drawer,
+  .search-dialog,
+  .enquiry-drawer,
+  .quick-view,
+  .mobile-bottom-nav
+) {
+  background: var(--ui-bg-elevated) !important;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :is(
+    .site-header .nav-shell,
+    .site-header .category-mega-menu,
+    .mobile-nav-drawer,
+    .search-dialog,
+    .enquiry-drawer,
+    .quick-view,
+    .mobile-bottom-nav
+  ) {
+    background: var(--ui-bg-elevated) !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :is(
+    .site-header .nav-shell,
+    .site-header .category-mega-menu,
+    .mobile-nav-drawer,
+    .search-dialog,
+    .enquiry-drawer,
+    .quick-view,
+    .mobile-bottom-nav
+  ) {
+    background: var(--ui-bg-elevated) !important;
+  }
+}
