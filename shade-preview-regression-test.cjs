@@ -67,15 +67,21 @@ function assert(condition, message) {
 
     const custom = studio.getByLabel("Choose a custom digital preview colour");
     await custom.evaluate((input) => {
-      input.value = "#123456";
-      input.dispatchEvent(new Event("input", { bubbles: true }));
-      input.dispatchEvent(new Event("change", { bubbles: true }));
+      // React tracks controlled-input values internally. Calling the native
+      // prototype setter changes the DOM value without updating React's value
+      // tracker first, so the bubbled input/change events are observed exactly
+      // like a real browser colour selection.
+      const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
+      if (!setter) throw new Error("Native HTMLInputElement value setter is unavailable");
+      setter.call(input, "#123456");
+      input.dispatchEvent(new Event("input", { bubbles: true, composed: true }));
+      input.dispatchEvent(new Event("change", { bubbles: true, composed: true }));
     });
 
     await page.waitForFunction(() => {
       const tint = document.querySelector(".product-detail-image-stage .shade-preview-tint");
       return tint?.style.getPropertyValue("--shade-preview-color").toUpperCase() === "#123456";
-    });
+    }, null, { timeout: 5000 });
 
     const customState = await page.evaluate(() => {
       const image = document.querySelector(".product-detail-hero-image");
@@ -95,7 +101,7 @@ function assert(condition, message) {
     assert(customState.heading.includes("#123456"), `Custom preview label did not update: ${JSON.stringify(customState)}`);
 
     await studio.getByRole("button", { name: "Original" }).click();
-    await page.waitForFunction(() => !document.querySelector(".product-detail-image-stage .shade-preview-tint"));
+    await page.waitForFunction(() => !document.querySelector(".product-detail-image-stage .shade-preview-tint"), null, { timeout: 5000 });
 
     const resetCurrentSrc = await hero.evaluate((image) => image.currentSrc);
     assert(resetCurrentSrc === originalImage.currentSrc, "Resetting preview should keep the original image URL");
