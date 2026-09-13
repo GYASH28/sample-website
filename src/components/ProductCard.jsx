@@ -12,10 +12,9 @@ import NativeProductImage from "./NativeProductImage.jsx";
 const MAX_SWATCHES_ON_CARD = 5;
 
 function getDefaultVariant(product) {
-  if (product.slug === "t-shirt-yarn") return "250gm";
-  if (product.slug.includes("macrame-cord")) return "3MM";
-  if (product.slug === "crochet-hook") return "2.0mm";
-  return null;
+  return Array.isArray(product.variantOptions) && product.variantOptions.length
+    ? product.variantOptions[0]
+    : null;
 }
 
 export default function ProductCard({ product, compact = false, showWishlistAction = true }) {
@@ -63,7 +62,7 @@ export default function ProductCard({ product, compact = false, showWishlistActi
       quantity: product.quantityOptions?.min || 1,
       unit: product.quantityOptions?.unit || "pcs",
       variant: getDefaultVariant(product),
-      note: activeColor ? `Selected ${activeColor.name} from catalogue card; please confirm current shade.` : "Please confirm current shade and availability.",
+      note: activeColor ? `Selected ${activeColor.name} from catalogue card; please confirm current shade.` : "Please confirm current shade, pack details and availability.",
     });
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1300);
