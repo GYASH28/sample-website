@@ -37,6 +37,7 @@ export default function CommerceHero() {
   const addedTimerRef = useRef(0);
   const { add } = useEnquiryBasket();
   const { has, toggle } = useWishlist();
+  const efficientMode = typeof document !== "undefined" && document.documentElement.dataset.experienceTier === "efficient";
 
   useEffect(() => {
     setColor(product?.colors?.[0] || null);
@@ -59,7 +60,8 @@ export default function CommerceHero() {
     if (
       autoPaused ||
       interactionPaused ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      efficientMode
     ) {
       return undefined;
     }
@@ -70,9 +72,10 @@ export default function CommerceHero() {
     }, AUTO_ADVANCE_MS);
 
     return () => window.clearTimeout(timer);
-  }, [index, autoPaused, interactionPaused]);
+  }, [index, autoPaused, interactionPaused, efficientMode]);
 
   useEffect(() => {
+    if (efficientMode) return undefined;
     const updateScroll = () => {
       scrollFrameRef.current = 0;
       const section = sectionRef.current;
@@ -94,7 +97,7 @@ export default function CommerceHero() {
     updateScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [efficientMode]);
 
   useEffect(
     () => () => {

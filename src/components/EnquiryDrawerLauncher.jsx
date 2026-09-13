@@ -1,7 +1,7 @@
 import { ShoppingBagOpen } from "@phosphor-icons/react";
-import { useState } from "react";
+import { Suspense, lazy, useState } from "react";
 import { useEnquiryBasket } from "../hooks/useEnquiryBasket.js";
-import EnquiryDrawer from "./EnquiryDrawer.jsx";
+const EnquiryDrawer = lazy(() => import("./EnquiryDrawer.jsx"));
 
 export default function EnquiryDrawerLauncher() {
   const [open, setOpen] = useState(false);
@@ -19,7 +19,7 @@ export default function EnquiryDrawerLauncher() {
         <span>Enquiry list</span>
         {itemsCount > 0 ? <strong>{itemsCount > 99 ? "99+" : itemsCount}</strong> : null}
       </button>
-      <EnquiryDrawer open={open} onClose={() => setOpen(false)} />
+      {open ? <Suspense fallback={null}><EnquiryDrawer open={open} onClose={() => setOpen(false)} /></Suspense> : null}
     </>
   );
 }

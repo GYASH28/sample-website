@@ -39,6 +39,7 @@ import "./theme-polish-v15.css";
 import "./theme-polish-v15-fixes.css";
 import "./premium-polish-v16.css";
 import "./commerce-intro-v19.css";
+import "./performance-foundation.css";
 
 applyCatalogueIntegrity();
 applyMotionProfile();

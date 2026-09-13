@@ -4,17 +4,16 @@ import FloatingWhatsApp from "./FloatingWhatsApp.jsx";
 import Footer from "./Footer.jsx";
 import Header from "./Header.jsx";
 import BasketToast from "./BasketToast.jsx";
-import ScrollDirector from "./ScrollDirector.jsx";
 import MobileBottomNav from "./MobileBottomNav.jsx";
 import EnquiryDrawerLauncher from "./EnquiryDrawerLauncher.jsx";
-import CommerceIntro from "./CommerceIntro.jsx";
-import MobileProductDock from "./MobileProductDock.jsx";
-import HeaderEnhancer from "./HeaderEnhancer.jsx";
 import ConnectionStatus from "./ConnectionStatus.jsx";
 import AnalyticsBridge from "./AnalyticsBridge.jsx";
 
 const ShoppingWorkspace = lazy(() => import("./ShoppingWorkspace.jsx"));
 const ProductRouteEnhancements = lazy(() => import("./ProductRouteEnhancements.jsx"));
+const MobileProductDock = lazy(() => import("./MobileProductDock.jsx"));
+const CommerceIntro = lazy(() => import("./CommerceIntro.jsx"));
+const HeaderEnhancer = lazy(() => import("./HeaderEnhancer.jsx"));
 
 function ScrollToTop() {
   const { hash, pathname } = useLocation();
@@ -73,15 +72,28 @@ export default function Layout() {
   const location = useLocation();
   const routeFamily = getRouteFamily(location.pathname);
   const isProductDetail = location.pathname.startsWith("/products/");
+  const [nonCriticalReady, setNonCriticalReady] = useState(false);
+  const efficientMode = typeof document !== "undefined" && document.documentElement.dataset.experienceTier === "efficient";
+
+  useEffect(() => {
+    // The shortlist is useful, but it is not needed to paint a product or the
+    // first interaction. Let low-end browsers reach an interactive homepage first.
+    const schedule = window.requestIdleCallback
+      ? window.requestIdleCallback(() => setNonCriticalReady(true), { timeout: 1600 })
+      : window.setTimeout(() => setNonCriticalReady(true), 700);
+    return () => {
+      if (window.cancelIdleCallback) window.cancelIdleCallback(schedule);
+      else window.clearTimeout(schedule);
+    };
+  }, []);
 
   return (
     <>
       <a href="#main-content" className="skip-link">Skip to main content</a>
       <AnalyticsBridge />
-      <CommerceIntro />
-      <ScrollDirector />
+      {!efficientMode ? <Suspense fallback={null}><CommerceIntro /></Suspense> : null}
       <ScrollToTop />
-      <HeaderEnhancer />
+      {!efficientMode ? <Suspense fallback={null}><HeaderEnhancer /></Suspense> : null}
       <Header />
       <RouteAnnouncer />
       <main id="main-content" data-route-family={routeFamily}>
@@ -99,10 +111,8 @@ export default function Layout() {
       <FloatingWhatsApp />
       <BasketToast />
       <EnquiryDrawerLauncher />
-      <Suspense fallback={null}>
-        <ShoppingWorkspace />
-      </Suspense>
-      <MobileProductDock />
+      {nonCriticalReady ? <Suspense fallback={null}><ShoppingWorkspace /></Suspense> : null}
+      {isProductDetail ? <Suspense fallback={null}><MobileProductDock /></Suspense> : null}
       <MobileBottomNav />
       <ConnectionStatus />
     </>

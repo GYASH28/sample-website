@@ -142,7 +142,7 @@ export function CommerceCraftFinder({ products }) {
       const searchable = [product.name, product.category, product.suitableFor, ...(product.tags || []), ...(product.filters || [])].join(" ");
       return activeCraft.test.test(searchable);
     });
-    return (filtered.length ? filtered : products).slice(0, 4);
+    return (filtered.length ? filtered : products).slice(0, 3);
   }, [activeCraft, products]);
 
   return (

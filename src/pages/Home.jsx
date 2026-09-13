@@ -1,5 +1,6 @@
 import CommerceHero from "../components/home/CommerceHero.jsx";
 import MakerHelpStrip from "../components/home/MakerHelpStrip.jsx";
+import DeferredSection from "../components/DeferredSection.jsx";
 import {
   CommerceBenefits,
   CommerceCategoryGrid,
@@ -22,7 +23,9 @@ import {
   websiteJsonLd,
 } from "../hooks/useJsonLd.js";
 
-const RAIL_SIZE = 6;
+// Two full-resolution material cards fit the initial journey without asking a
+// phone to decode an entire shelf before the customer starts browsing.
+const RAIL_SIZE = 2;
 const popularProducts = featuredProducts.slice(0, RAIL_SIZE);
 const yarnProducts = featuredProducts.filter((product) => product.masterCategory === "Yarns").slice(0, RAIL_SIZE);
 const threadProducts = featuredProducts.filter((product) => product.masterCategory === "Threads").slice(0, RAIL_SIZE);
@@ -58,46 +61,55 @@ export default function Home() {
         href="/products"
       />
 
-      <CommerceCraftFinder products={featuredProducts} />
-      <CommerceCategoryGrid categories={productCategories.slice(0, 8)} />
-      <ShadeDiscovery />
-      <RecentlyViewedHome />
+      <DeferredSection label="Project finder" minHeight={640}>
+        <CommerceCraftFinder products={featuredProducts} />
+        <CommerceCategoryGrid categories={productCategories.slice(0, 8)} />
+      </DeferredSection>
 
-      <CommerceProductRail
-        eyebrow="Yarn collection"
-        title="Yarns for crochet, knitting and soft projects"
-        text="Browse cotton, soft, baby and everyday yarn families with shade previews and project guidance."
-        products={yarnProducts.length ? yarnProducts : popularProducts}
-        href="/products?department=Yarns"
-      />
+      <DeferredSection label="Shade discovery" minHeight={480}>
+        <ShadeDiscovery />
+        <RecentlyViewedHome />
+      </DeferredSection>
 
-      <CommerceProductRail
-        eyebrow="Thread collection"
-        title="Crochet, embroidery and decorative threads"
-        text="Compare thread types, available shade families and the projects they suit before requesting current stock."
-        products={threadProducts.length ? threadProducts : featuredProducts.slice(4, 4 + RAIL_SIZE)}
-        href="/products?department=Threads"
-      />
+      <DeferredSection label="Material collections" minHeight={760}>
+        <CommerceProductRail
+          eyebrow="Yarn collection"
+          title="Yarns for crochet, knitting and soft projects"
+          text="Browse cotton, soft, baby and everyday yarn families with shade previews and project guidance."
+          products={yarnProducts.length ? yarnProducts : popularProducts}
+          href="/products?department=Yarns"
+        />
+        <CommerceProductRail
+          eyebrow="Thread collection"
+          title="Crochet, embroidery and decorative threads"
+          text="Compare thread types, available shade families and the projects they suit before requesting current stock."
+          products={threadProducts.length ? threadProducts : featuredProducts.slice(4, 4 + RAIL_SIZE)}
+          href="/products?department=Threads"
+        />
+      </DeferredSection>
 
-      <CommerceProductRail
-        eyebrow="Macrame and bag making"
-        title="Cords, handles, bases, beads and finishing pieces"
-        text="Build the whole project from one place instead of searching across unrelated category pages."
-        products={macrameAndBagProducts.length ? macrameAndBagProducts : accessoryProducts}
-        href="/products?department=Accessories"
-      />
+      <DeferredSection label="Project finishing materials" minHeight={760}>
+        <CommerceProductRail
+          eyebrow="Macrame and bag making"
+          title="Cords, handles, bases, beads and finishing pieces"
+          text="Build the whole project from one place instead of searching across unrelated category pages."
+          products={macrameAndBagProducts.length ? macrameAndBagProducts : accessoryProducts}
+          href="/products?department=Accessories"
+        />
+        <CommerceProductRail
+          eyebrow="Tools and accessories"
+          title="The useful extras that finish the work"
+          text="Hooks, rings, locks, charms and other practical materials for makers, classes and resale shelves."
+          products={accessoryProducts.length ? accessoryProducts : featuredProducts.slice(-RAIL_SIZE)}
+          href="/products?department=Accessories"
+        />
+      </DeferredSection>
 
-      <CommerceProductRail
-        eyebrow="Tools and accessories"
-        title="The useful extras that finish the work"
-        text="Hooks, rings, locks, charms and other practical materials for makers, classes and resale shelves."
-        products={accessoryProducts.length ? accessoryProducts : featuredProducts.slice(-RAIL_SIZE)}
-        href="/products?department=Accessories"
-      />
-
-      <CommerceBenefits />
-      <CommerceOrderFlow />
-      <CommerceWholesaleCta />
+      <DeferredSection label="Ordering information" minHeight={620}>
+        <CommerceBenefits />
+        <CommerceOrderFlow />
+        <CommerceWholesaleCta />
+      </DeferredSection>
     </div>
   );
 }

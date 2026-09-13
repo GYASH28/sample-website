@@ -7,6 +7,7 @@ import { useEnquiryBasket } from "../hooks/useEnquiryBasket.js";
 import { smartWhatsAppLink } from "../i18n.jsx";
 import { trackEngagement } from "../lib/engagementAnalytics.js";
 import CompareButton from "./CompareButton.jsx";
+import NativeProductImage from "./NativeProductImage.jsx";
 
 const MAX_SWATCHES_ON_CARD = 5;
 
@@ -113,14 +114,11 @@ export default function ProductCard({ product, compact = false, showWishlistActi
           >
             <div className={`product-image-wrapper ${!imageSrc ? "is-missing-image" : ""}`}>
               {imageSrc ? (
-                <img
+                <NativeProductImage
                   src={imageSrc}
                   alt={`Representative ${product.category} material photograph for ${product.name}`}
                   width="640"
                   height="640"
-                  loading="lazy"
-                  decoding="async"
-                  fetchPriority="low"
                   className="product-image"
                   onError={handleImageError}
                 />

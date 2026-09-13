@@ -40,12 +40,9 @@ export default function Reveal({
       return undefined;
     }
 
-    const rect = element.getBoundingClientRect();
-    if (rect.top < window.innerHeight * 0.92) {
-      reveal();
-      return undefined;
-    }
-
+    // Do not synchronously measure every card as a deferred section mounts.
+    // IntersectionObserver already performs that work off the scroll path and
+    // reveals elements that begin in the viewport immediately.
     const observer = getObserver();
     callbacks.set(element, reveal);
     observer.observe(element);

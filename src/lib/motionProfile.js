@@ -19,9 +19,12 @@ export function resolveMotionProfile() {
   const constrainedConnection =
     connection?.saveData ||
     ["slow-2g", "2g"].includes(connection?.effectiveType);
+  // Treat older four-core machines and entry-level phones as a first-class
+  // experience, rather than asking them to animate the desktop composition.
+  // This changes *work*, never image quality or catalogue content.
   const veryConstrainedHardware =
-    (navigator.deviceMemory && navigator.deviceMemory <= 2) ||
-    (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2);
+    (navigator.deviceMemory && navigator.deviceMemory <= 3) ||
+    (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
 
   if (constrainedConnection || veryConstrainedHardware) {
     return MOTION_PROFILES.lite;
@@ -44,6 +47,12 @@ export function resolveMotionProfile() {
 export function applyMotionProfile() {
   const profile = resolveMotionProfile();
   document.documentElement.dataset.motionProfile = profile;
+  document.documentElement.dataset.experienceTier =
+    profile === MOTION_PROFILES.lite || profile === MOTION_PROFILES.reduced
+      ? "efficient"
+      : profile === MOTION_PROFILES.compact
+        ? "balanced"
+        : "immersive";
   document.documentElement.classList.toggle(
     "motion-ready",
     profile !== MOTION_PROFILES.reduced,
