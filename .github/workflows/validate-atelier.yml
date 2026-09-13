@@ -103,6 +103,9 @@ jobs:
       - name: Run light and dark theme visual regression
         run: npm run test:theme
 
+      - name: Run opened-surface light and dark readability regression
+        run: npm run test:theme-open
+
       - name: Upload performance diagnostics
         if: always()
         uses: actions/upload-artifact@v7
