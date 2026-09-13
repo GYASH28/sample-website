@@ -16,6 +16,7 @@
     "test:cinematic": "node cinematic-regression-test.cjs",
     "test:faq": "node faq-interaction-test.cjs",
     "test:viewports": "node viewport-integrity-test.cjs",
+    "test:shade-preview": "node shade-preview-regression-test.cjs",
     "test:deps": "node dependency-audit.cjs",
     "test:seo": "node seo-integrity-test.cjs",
     "test:performance": "node performance-budget-test.cjs",
