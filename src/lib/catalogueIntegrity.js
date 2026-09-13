@@ -3,6 +3,7 @@ import {
   featuredProducts,
   MASTER_CATEGORIES,
   productCategories,
+  productInterestOptions,
 } from "../data/siteData.js";
 import {
   DISCOVERY_FILTER_OPTIONS,
@@ -129,6 +130,17 @@ export function applyCatalogueIntegrity() {
         products: products.map((product) => product.name).slice(0, 8),
       };
     }),
+  );
+
+  productInterestOptions.splice(
+    0,
+    productInterestOptions.length,
+    "Yarn Collections",
+    "Crochet / Decorative Thread",
+    "Embroidery Thread",
+    "Macrame Cord / Malai Dori",
+    "Wholesale / Repeat Supply",
+    "Other",
   );
 
   // There are no trustworthy product-specific colour values in the runtime
