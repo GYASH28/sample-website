@@ -14,6 +14,7 @@ const ProductRouteEnhancements = lazy(() => import("./ProductRouteEnhancements.j
 const MobileProductDock = lazy(() => import("./MobileProductDock.jsx"));
 const CommerceIntro = lazy(() => import("./CommerceIntro.jsx"));
 const HeaderEnhancer = lazy(() => import("./HeaderEnhancer.jsx"));
+const ScrollDirector = lazy(() => import("./ScrollDirector.jsx"));
 
 function ScrollToTop() {
   const { hash, pathname } = useLocation();
@@ -96,6 +97,7 @@ export default function Layout() {
       {!efficientMode ? <Suspense fallback={null}><HeaderEnhancer /></Suspense> : null}
       <Header />
       <RouteAnnouncer />
+      <Suspense fallback={null}><ScrollDirector /></Suspense>
       <main id="main-content" data-route-family={routeFamily}>
         <div key={`thread-${location.pathname}`} className="route-thread-transition" aria-hidden="true" />
         <div key={location.pathname} className="route-stage" data-route-family={routeFamily}>
