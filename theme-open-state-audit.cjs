@@ -115,9 +115,9 @@ async function runMobile(browser, theme, failures) {
 
     await page.locator(".menu-toggle").click();
     await auditVisibleSurface(page, ".mobile-nav-drawer", "mobile-drawer", theme, "mobile", failures);
-    await page.locator('.mobile-nav-drawer button[aria-label]').last().click().catch(async () => {
-      await page.keyboard.press("Escape");
-    });
+    await page.locator(".mobile-drawer-header .icon-button").click();
+    await page.locator(".mobile-nav-drawer").waitFor({ state: "hidden", timeout: 5_000 });
+    await assertTheme(page, theme);
 
     await page.evaluate(() => window.dispatchEvent(new Event("fakhri:open-search")));
     await auditVisibleSurface(page, ".search-dialog", "search-dialog", theme, "mobile", failures);
