@@ -204,13 +204,21 @@
   z-index: 3;
 }
 
-/* Keep the desktop dark header as one painted glass surface even when a
-   constrained profile disables blur. The wrapper stays transparent; the nav
-   alone owns the visual layer. */
+/* Keep the dark header as one painted glass surface on every motion profile.
+   Compact/lite selectors intentionally match the specificity of the legacy
+   solid-background fallback so this last-loaded production guard wins. */
 :root[data-theme="dark"] .site-header .nav-shell,
 :root[data-theme="dark"] .site-header.is-scrolled .nav-shell,
 :root[data-theme="dark"] .site-header.is-deep .nav-shell,
-:root[data-theme="dark"] .site-header.is-scrolling .nav-shell {
+:root[data-theme="dark"] .site-header.is-scrolling .nav-shell,
+:root[data-theme="dark"][data-motion-profile="compact"] .site-header .nav-shell,
+:root[data-theme="dark"][data-motion-profile="lite"] .site-header .nav-shell,
+:root[data-theme="dark"][data-motion-profile="compact"] .site-header.is-scrolled .nav-shell,
+:root[data-theme="dark"][data-motion-profile="lite"] .site-header.is-scrolled .nav-shell,
+:root[data-theme="dark"][data-motion-profile="compact"] .site-header.is-deep .nav-shell,
+:root[data-theme="dark"][data-motion-profile="lite"] .site-header.is-deep .nav-shell,
+:root[data-theme="dark"][data-motion-profile="compact"] .site-header.is-scrolling .nav-shell,
+:root[data-theme="dark"][data-motion-profile="lite"] .site-header.is-scrolling .nav-shell {
   background-image: linear-gradient(135deg, rgba(35, 40, 35, 0.95), rgba(20, 24, 20, 0.94) 54%, rgba(23, 61, 56, 0.72)) !important;
   background-color: rgba(24, 28, 24, 0.94) !important;
 }
