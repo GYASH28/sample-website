@@ -54,6 +54,33 @@ async function goto(page, path) {
     await goto(page, "/products?color=Pink");
     assert(await page.locator(".active-filter-chip").filter({ hasText: "Colour" }).count() === 0, "unsupported colour filter should be discarded until product-specific shade data exists");
 
+    // The colour simulator must reuse one product image. Picking a preview shade
+    // changes only the browser overlay: no color-*.webp request and no src swap.
+    const legacyColourRequests = [];
+    page.on("request", (request) => {
+      if (/\/color-[^/]+\.webp(?:\?|$)/i.test(request.url())) legacyColourRequests.push(request.url());
+    });
+    await goto(page, "/products/desire");
+    const heroImage = page.locator(".product-detail-hero-image");
+    const originalHeroSrc = await heroImage.getAttribute("src");
+    const previewButton = page.getByRole("button", { name: "Preview Teal" }).first();
+    assert(await previewButton.count() === 1, "digital shade preview controls missing from product detail");
+    await previewButton.click();
+    await page.waitForTimeout(80);
+    assert(await page.locator(".product-detail-image-stage .shade-preview-tint").count() === 1, "shade overlay was not rendered");
+    assert(await heroImage.getAttribute("src") === originalHeroSrc, "digital shade preview swapped the product image URL instead of tinting the same image");
+    const previewColor = await page.locator(".product-detail-image-stage .shade-preview-tint").evaluate((node) => node.style.getPropertyValue("--shade-preview-color").trim().toUpperCase());
+    assert(previewColor === "#328F89", `unexpected Teal preview value: ${previewColor}`);
+
+    const customPicker = page.locator('.shade-preview-studio__custom input[type="color"]').first();
+    await customPicker.fill("#123456");
+    await page.waitForTimeout(50);
+    const customPreview = await page.locator(".product-detail-image-stage .shade-preview-tint").evaluate((node) => node.style.getPropertyValue("--shade-preview-color").trim().toUpperCase());
+    assert(customPreview === "#123456", `custom digital shade did not reach product image: ${customPreview}`);
+    assert(await heroImage.getAttribute("src") === originalHeroSrc, "custom preview generated or swapped to a second colour image");
+    assert(legacyColourRequests.length === 0, `digital preview requested legacy colour image files: ${legacyColourRequests.join(", ")}`);
+    assert((await page.locator(".shade-preview-studio__notice").innerText()).includes("does not mean this exact shade is in stock"), "digital preview stock disclaimer is missing");
+
     // Shop by Project is a complete route and links back into catalogue intent state.
     await goto(page, "/projects");
     assert(await page.locator(".project-card").count() >= 8, "project discovery page should expose all configured projects");
@@ -124,20 +151,20 @@ async function goto(page, path) {
     assert(await page.locator('script[src="/_vercel/insights/script.js"]').count() === 0, "Vercel analytics script should not load on localhost previews");
 
     assert(errors.length === 0, `browser errors: ${errors.join(" | ")}`);
-    console.log("✓ desktop discovery, comparison, guide, enquiry and SEO paths");
+    console.log("✓ desktop discovery, comparison, guide, shade preview, enquiry and SEO paths");
     await page.close();
 
     // Mobile customer paths must remain horizontally stable.
     const mobile = await context.newPage();
     await mobile.setViewportSize({ width: 390, height: 844 });
     const mobileErrors = await prepare(mobile);
-    for (const route of ["/products", "/projects", "/compare", "/yarn-guide", "/enquiry"]) {
+    for (const route of ["/products", "/projects", "/compare", "/yarn-guide", "/enquiry", "/products/desire"]) {
       await goto(mobile, route);
       const overflow = await mobile.evaluate(() => Math.max(0, document.documentElement.scrollWidth - document.documentElement.clientWidth));
       assert(overflow <= 1, `${route}: mobile horizontal overflow ${overflow}px`);
     }
     assert(mobileErrors.length === 0, `mobile browser errors: ${mobileErrors.join(" | ")}`);
-    console.log("✓ mobile discovery routes have no horizontal overflow");
+    console.log("✓ mobile discovery routes and product shade preview have no horizontal overflow");
     await mobile.close();
   } finally {
     await context.close();
