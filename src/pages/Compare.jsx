@@ -14,17 +14,15 @@ const ROWS = [
   ["material", "Material"],
   ["thickness", "Thickness / size"],
   ["crafts", "Best for"],
-  ["shades", "Shade range"],
-  ["soldAs", "Pack format"],
-  ["retail", "Retail"],
+  ["retail", "Retail enquiry"],
   ["bulk", "Bulk / wholesale"],
-  ["variants", "Current catalogue options"],
+  ["variants", "Current catalogue note"],
 ];
 
 export default function Compare() {
   useDocumentMeta({
     title: "Compare Materials | Fakhri Mart",
-    description: "Compare up to three Fakhri Mart materials by craft use, listed shades, pack format and catalogue options before sending an enquiry.",
+    description: "Compare up to three Fakhri Mart materials by verified catalogue context, brand, intended use and current product notes before sending an enquiry.",
     canonical: "/compare",
   });
 
@@ -40,7 +38,7 @@ export default function Compare() {
       image: product.image,
       shade: product.colors?.[0] || null,
       quantity: product.quantityOptions?.min || 1,
-      unit: product.quantityOptions?.unit || "pcs",
+      unit: product.quantityOptions?.unit || "units",
       variant: null,
       note: "Added from comparison; please confirm current shade, pack details and availability.",
     }));
@@ -48,7 +46,7 @@ export default function Compare() {
   };
 
   const compareMessage = products.length
-    ? `Hello Fakhri Mart, I am comparing these materials:\n${products.map((product, index) => `${index + 1}. ${product.name}`).join("\n")}\n\nPlease help me compare the current pack details, shades and quantity pricing for my project.`
+    ? `Hello Fakhri Mart, I am comparing these materials:\n${products.map((product, index) => `${index + 1}. ${product.name}`).join("\n")}\n\nPlease help me compare the current material/pack details, available shades, quantity pricing and which option best suits my project.`
     : "Hello Fakhri Mart, I need help comparing materials for my project.";
 
   return (
@@ -56,8 +54,8 @@ export default function Compare() {
       <PageHero
         motif="focus"
         eyebrow="Material comparison"
-        title="Compare what actually matters"
-        text="Put up to three materials side by side without pretending price, stock or composition is fixed when it still needs current confirmation."
+        title="Compare what the catalogue can actually tell you"
+        text="Put up to three verified material lines side by side, then ask Fakhri Mart to confirm the live shade, pack, price and availability details that can change."
       />
 
       <section className="section compare-page">
@@ -67,15 +65,11 @@ export default function Compare() {
               <div className="compare-page__toolbar">
                 <div>
                   <strong>{products.length} of 3 materials selected</strong>
-                  <p>Compare catalogue facts first, then ask Fakhri Mart for the current commercial details.</p>
+                  <p>Compare stable catalogue context first, then ask Fakhri Mart for the current commercial details.</p>
                 </div>
                 <div className="compare-page__toolbar-actions">
-                  <button type="button" className="btn btn-outline" onClick={clear}>
-                    <Trash size={16} aria-hidden="true" /> Clear comparison
-                  </button>
-                  <Link className="btn btn-outline" to="/products">
-                    <ArrowLeft size={16} aria-hidden="true" /> Add another
-                  </Link>
+                  <button type="button" className="btn btn-outline" onClick={clear}><Trash size={16} aria-hidden="true" /> Clear comparison</button>
+                  <Link className="btn btn-outline" to="/products"><ArrowLeft size={16} aria-hidden="true" /> Add another</Link>
                 </div>
               </div>
 
@@ -89,9 +83,7 @@ export default function Compare() {
                           <div className="compare-product-head">
                             <img src={product.image} alt="" width="180" height="180" loading="lazy" decoding="async" />
                             <Link to={`/products/${product.slug}`}>{product.name}</Link>
-                            <button type="button" onClick={() => remove(product.slug)} aria-label={`Remove ${product.name} from comparison`}>
-                              <Trash size={15} /> Remove
-                            </button>
+                            <button type="button" onClick={() => remove(product.slug)} aria-label={`Remove ${product.name} from comparison`}><Trash size={15} /> Remove</button>
                           </div>
                         </th>
                       ))}
@@ -101,9 +93,7 @@ export default function Compare() {
                     {ROWS.map(([key, label]) => (
                       <tr key={key}>
                         <th scope="row">{label}</th>
-                        {products.map((product) => (
-                          <td key={`${product.slug}-${key}`}>{getCompareFacts(product)[key]}</td>
-                        ))}
+                        {products.map((product) => <td key={`${product.slug}-${key}`}>{getCompareFacts(product)[key]}</td>)}
                       </tr>
                     ))}
                   </tbody>
@@ -122,17 +112,10 @@ export default function Compare() {
                           <Link to={`/products/${product.slug}`}>{product.name}</Link>
                           <small>{product.category}</small>
                         </div>
-                        <button type="button" onClick={() => remove(product.slug)} aria-label={`Remove ${product.name} from comparison`}>
-                          <Trash size={17} aria-hidden="true" />
-                        </button>
+                        <button type="button" onClick={() => remove(product.slug)} aria-label={`Remove ${product.name} from comparison`}><Trash size={17} aria-hidden="true" /></button>
                       </div>
                       <dl className="compare-mobile-card__facts">
-                        {ROWS.map(([key, label]) => (
-                          <div key={key}>
-                            <dt>{label}</dt>
-                            <dd>{facts[key]}</dd>
-                          </div>
-                        ))}
+                        {ROWS.map(([key, label]) => <div key={key}><dt>{label}</dt><dd>{facts[key]}</dd></div>)}
                       </dl>
                     </article>
                   );
@@ -143,28 +126,18 @@ export default function Compare() {
                 <div>
                   <p className="eyebrow">Next step</p>
                   <h2>Turn the shortlist into one useful enquiry</h2>
-                  <p>Add all compared products to your enquiry basket, or ask the team to help choose between them based on your exact project.</p>
+                  <p>Add all compared material lines to your enquiry basket, or ask the team to help choose based on your exact project and current stock information.</p>
                 </div>
                 <div className="compare-page__decision-actions">
-                  <button type="button" className="btn btn-primary" onClick={addAll}>
-                    <ShoppingBag size={17} aria-hidden="true" /> Add all to enquiry
-                  </button>
-                  <a
-                    className="btn btn-whatsapp"
-                    href={createWhatsAppLink(compareMessage)}
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={() => trackEngagement("compare_whatsapp_click", { count: products.length, source: "compare-page" })}
-                  >
-                    <ChatCircleDots size={17} aria-hidden="true" /> Ask which suits my project
-                  </a>
+                  <button type="button" className="btn btn-primary" onClick={addAll}><ShoppingBag size={17} aria-hidden="true" /> Add all to enquiry</button>
+                  <a className="btn btn-whatsapp" href={createWhatsAppLink(compareMessage)} target="_blank" rel="noreferrer" onClick={() => trackEngagement("compare_whatsapp_click", { count: products.length, source: "compare-page" })}><ChatCircleDots size={17} aria-hidden="true" /> Ask which suits my project</a>
                 </div>
               </div>
             </>
           ) : (
             <div className="compare-empty">
               <h2>Your comparison is empty</h2>
-              <p>Choose up to three materials from the catalogue. Comparison works without an account and stays on this device.</p>
+              <p>Choose up to three materials from the verified catalogue. Comparison works without an account and stays on this device.</p>
               <Link className="btn btn-primary" to="/products">Browse materials</Link>
             </div>
           )}
