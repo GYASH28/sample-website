@@ -76,8 +76,13 @@ function normaliseProduct(product) {
   } else {
     product.category = "Crochet & Decorative Threads";
     product.masterCategory = "Threads";
-    product.type = product.name.toLocaleLowerCase().includes("cotton") ? "cotton-thread" : "crochet-thread";
-    product.filters = ["Crochet Threads"];
+    if (supplierCategory === "Decorative Threads") {
+      product.type = "decorative-thread";
+      product.filters = ["Decorative Threads"];
+    } else {
+      product.type = product.name.toLocaleLowerCase().includes("cotton") ? "cotton-thread" : "crochet-thread";
+      product.filters = ["Crochet Threads"];
+    }
     product.suitableFor = "Crochet, decorative handwork, embellishment and craft projects";
   }
 
@@ -88,12 +93,17 @@ function normaliseProduct(product) {
   product.colors = [];
   product.palette = ["#ede4d8", "#d8c7b6", "#f4eee6"];
 
-  if (product.quantityOptions) {
-    product.quantityOptions = {
-      ...product.quantityOptions,
-      soldAs: null,
-    };
-  }
+  // Quantity is a request field, not a statement about supplier pack format.
+  // Use neutral units until the current supplier material confirms how the
+  // exact line is sold/packed.
+  product.quantityOptions = {
+    unit: "units",
+    min: 1,
+    max: 500,
+    step: 1,
+    presets: [1, 12, 50, 100],
+    soldAs: null,
+  };
 
   product.tags = [...new Set([...(product.tags || []), product.brand, "Shade Card", "Retail", "Bulk Orders"].filter(Boolean))];
 
