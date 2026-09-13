@@ -1,4 +1,5 @@
 import {
+  blogPosts,
   businessInfo,
   featuredProducts,
   MASTER_CATEGORIES,
@@ -43,7 +44,7 @@ const CATEGORY_DEFINITIONS = [
     icon: "Cable",
     tone: "gold",
     image: "/assets/images/cat_macrame.webp",
-    description: "Macrame cord and Malai Dori in the supplier-confirmed sizes for knotting, decor, bags and handmade projects.",
+    description: "Macrame cord and Malai Dori for knotting, decor, bags and handmade projects. Confirm the current construction and listed size before ordering.",
   },
 ];
 
@@ -88,8 +89,8 @@ function normaliseProduct(product) {
 
   // These universal swatches were placeholders, not product-specific live
   // shades. Removing them prevents product cards, search filters and enquiries
-  // from implying that a colour is currently available. Current shades are
-  // confirmed from the supplier card / live stock photo instead.
+  // from implying that a colour is currently available. The separate digital
+  // shade preview is browser-only and never writes into product.colors.
   product.colors = [];
   product.palette = ["#ede4d8", "#d8c7b6", "#f4eee6"];
 
@@ -120,6 +121,40 @@ function rewriteProject(slug, changes) {
 function rewriteCollection(slug, changes) {
   const collection = SEO_COLLECTIONS.find((item) => item.slug === slug);
   if (collection) Object.assign(collection, changes);
+}
+
+function rewriteBlogPost(slug, changes) {
+  const post = blogPosts.find((item) => item.slug === slug);
+  if (post) Object.assign(post, changes);
+}
+
+function rewriteCraftGuides() {
+  rewriteBlogPost("how-to-choose-yarn-weight", {
+    excerpt: "A practical guide to reading yarn labels, matching pattern gauge and comparing thickness without treating ply count as a universal weight standard.",
+    body: `Yarn thickness matters, but there is no single shortcut that works for every yarn. Ply count alone does not universally determine yarn weight or thickness, and fibre, twist and construction can make two yarns with similar labels behave very differently. Start with the pattern's recommended yarn weight or gauge, then compare the current product label.
+
+When substituting yarn, use the most useful specifications actually available on the pack: stated weight category, length for a given weight, recommended gauge and tool size. Make a gauge swatch when fit or finished dimensions matter, and judge the resulting drape, softness and structure for the project you are making.
+
+A soft yarn may suit a blanket or wearable while a firmer construction may be useful for a bag, but those properties should be checked on the actual yarn rather than inferred from ply count alone. For Fakhri Mart catalogue lines, ask for the current pack label or supplier information whenever a specification is not published on the website.`,
+  });
+
+  rewriteBlogPost("macrame-basics-for-beginners", {
+    excerpt: "Learn a small set of useful macrame knots, how cord construction affects the result and what to confirm before choosing material for a first project.",
+    body: `Macrame becomes much easier once you practise a few repeatable knots. Beginner projects commonly use techniques such as the lark's head for mounting cords, square knots for stable patterns, half knots or half hitches for spirals and lines, double half hitches for shaped rows, and gathering knots for finishing groups of cords.
+
+Those knots are a useful starting set, not a claim that every macrame pattern uses only five techniques. Practise each knot with scrap cord first so you can see how spacing and tension change the final texture.
+
+Material choice matters too. Single, twisted and braided cords can fringe, hold structure and show knots differently, while diameter changes the scale of the finished piece. Before ordering, compare the project requirement with the current cord construction, listed size and shade information from the supplier.`,
+  });
+
+  rewriteBlogPost("crochet-vs-knitting-which-to-learn-first", {
+    excerpt: "A beginner-friendly comparison of crochet and knitting that focuses on tools, fabric behaviour and the kind of project you actually want to make.",
+    body: `Crochet and knitting are both approachable, but they build fabric differently. Crochet generally uses one hook and works one active loop at a time, while knitting usually uses two needles and keeps many live stitches on the needle. That difference affects the look, stretch, density and repair process of the finished fabric.
+
+Neither craft is universally faster, easier or more forgiving. Crochet can feel straightforward for small shaped pieces and textured motifs; knitting can feel natural for people who enjoy rows of interlocking stitches and elastic fabric. The better first choice is usually the one that matches the project you are excited to finish.
+
+Pick a small first project, use a yarn and tool combination recommended by that pattern, and practise the basic stitch before buying a large quantity. If you are choosing from the Fakhri Mart catalogue, shortlist the material family first and ask for the current pack details when gauge, fibre composition or tool-size guidance is not published.`,
+  });
 }
 
 function sanitizeLegacyCatalogueQuery() {
@@ -158,6 +193,7 @@ export function applyCatalogueIntegrity() {
   Object.assign(businessInfo, verifiedBusiness);
 
   featuredProducts.forEach(normaliseProduct);
+  rewriteCraftGuides();
 
   MASTER_CATEGORIES.splice(0, MASTER_CATEGORIES.length, "Yarns", "Threads", "Macrame & Cords");
 
