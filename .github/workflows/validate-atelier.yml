@@ -79,6 +79,9 @@ jobs:
       - name: Run one-image shade preview regression
         run: npm run test:shade-preview
 
+      - name: Run Guides and About usefulness regression
+        run: npm run test:guide-about
+
       - name: Run discovery and conversion regression
         run: npm run test:discovery
 
