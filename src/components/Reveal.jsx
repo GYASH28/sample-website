@@ -26,6 +26,8 @@ export default function Reveal({
   delay = 0,
   variant = "fade-up",
   children,
+  style,
+  ...rest
 }) {
   const ref = useRef(null);
   const cappedDelay = Math.min(Math.max(Number(delay) || 0, 0), 220);
@@ -55,10 +57,11 @@ export default function Reveal({
 
   return (
     <Tag
+      {...rest}
       ref={ref}
       className={`reveal reveal-${variant} ${className}`}
       data-reveal={variant}
-      style={{ "--reveal-delay": `${cappedDelay}ms` }}
+      style={{ ...style, "--reveal-delay": `${cappedDelay}ms` }}
     >
       {children}
     </Tag>
