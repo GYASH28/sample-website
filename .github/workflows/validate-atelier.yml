@@ -91,6 +91,12 @@ jobs:
       - name: Run SEO and business identity integrity
         run: npm run test:seo
 
+      - name: Run light and dark theme visual regression
+        run: npm run test:theme
+
+      - name: Run opened-surface light and dark readability regression
+        run: npm run test:theme-open
+
       - name: Run bundle and scroll performance budgets
         run: npm run test:performance
 
@@ -99,12 +105,6 @@ jobs:
 
       - name: Profile route motion performance
         run: npm run audit:motion -- http://127.0.0.1:4173 motion-performance-report.json
-
-      - name: Run light and dark theme visual regression
-        run: npm run test:theme
-
-      - name: Run opened-surface light and dark readability regression
-        run: npm run test:theme-open
 
       - name: Upload performance diagnostics
         if: always()
