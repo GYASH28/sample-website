@@ -8,6 +8,7 @@ import {
   X,
 } from "@phosphor-icons/react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import { createWhatsAppLink } from "../data/siteData.js";
 import { useEnquiryBasket } from "../hooks/useEnquiryBasket.js";
@@ -81,7 +82,7 @@ export default function ProductQuickView({ product, open, onClose }) {
     };
   }, [onClose, open]);
 
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
 
   const step = product.quantityOptions?.step || 1;
   const min = product.quantityOptions?.min || 1;
@@ -111,7 +112,7 @@ export default function ProductQuickView({ product, open, onClose }) {
 
   const message = `Hello Fakhri Mart, I want to enquire about *${product.name}*${color ? ` in *${color.name}*` : ""}${variant ? ` (${variant})` : ""}, quantity *${quantity} ${unit}*.${previewHex ? ` I used the website's digital colour preview at *${previewHex.toUpperCase()}* as a visual reference only; please show me the nearest currently available supplier shade.` : ""} Please share current availability, shade photos, pack details and price.`;
 
-  return (
+  return createPortal(
     <div className="quick-view-layer" role="presentation">
       <button className="quick-view-backdrop" type="button" onClick={onClose} aria-label="Close quick view" />
       <section ref={panelRef} className="quick-view" role="dialog" aria-modal="true" aria-labelledby={`quick-view-${product.slug}`}>
@@ -212,6 +213,7 @@ export default function ProductQuickView({ product, open, onClose }) {
           </Link>
         </div>
       </section>
-    </div>
+    </div>,
+    document.body,
   );
 }
