@@ -42,10 +42,17 @@ async function goto(page, path) {
     await goto(page, "/products?q=macrme&sort=relevance");
     assert(await page.locator(".product-card").count() > 0, "one-edit typo search should find macrame-related products");
 
-    // Deep filter state is represented in the URL and UI.
-    await goto(page, "/products?material=Cotton&color=Pink&sort=most-shades");
-    assert(await page.locator(".active-filter-chip").filter({ hasText: "Material · Cotton" }).count() === 1, "material filter chip missing");
-    assert(await page.locator(".active-filter-chip").filter({ hasText: "Colour · Pink" }).count() === 1, "colour filter chip missing");
+    // Deep filter state is represented in the URL and UI using attributes the
+    // supplier data can actually support. Colour filtering is intentionally not
+    // asserted because exact live shades are confirmed from current shade cards.
+    await goto(page, "/products?department=Macrame%20%26%20Cords&type=macrame-cord");
+    assert(await page.locator(".active-filter-chip").filter({ hasText: "Macrame & Cords" }).count() === 1, "department filter chip missing");
+    assert(await page.locator(".active-filter-chip").filter({ hasText: "Macramé cords" }).count() === 1, "product type filter chip missing");
+    assert(await page.locator(".product-card").count() > 0, "verified macrame department returned no products");
+
+    // A stale unsupported colour URL must not create a fake active filter.
+    await goto(page, "/products?color=Pink");
+    assert(await page.locator(".active-filter-chip").filter({ hasText: "Colour" }).count() === 0, "unsupported colour filter should be discarded until product-specific shade data exists");
 
     // Shop by Project is a complete route and links back into catalogue intent state.
     await goto(page, "/projects");
@@ -82,7 +89,8 @@ async function goto(page, path) {
     assert(await page.locator(".workspace-product-row").count() === 2, "workspace compare tab did not reflect comparison state");
     await page.locator(".shopping-workspace__head .icon-button").click();
 
-    // Exact shade context flows into photo-request CTA.
+    // Product cards must not invent swatches. If a future verified product gains
+    // product-specific shade data, the selected shade must flow into its photo CTA.
     await goto(page, "/products");
     const firstCard = page.locator(".product-card").first();
     const firstSwatch = firstCard.locator(".swatch-dot-button").first();
