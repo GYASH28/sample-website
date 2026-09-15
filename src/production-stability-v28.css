@@ -23,3 +23,132 @@
 [data-theme="dark"] .mobile-nav-drawer .mobile-drawer-header .brand strong {
   color: #f6faf7 !important;
 }
+
+/* -------------------------------------------------------------------------- */
+/* Product media integrity                                                     */
+/* -------------------------------------------------------------------------- */
+
+/* Product photography is the content. No decorative frosted/glass layer is
+   allowed to sit over it. A legacy visual layer could expand into a large pale
+   rounded rectangle and obscure nearly the whole photo while still leaving the
+   underlying <img> technically loaded, so normal broken-image tests missed it. */
+.product-card,
+.product-showcase-card,
+.product-card-image-link,
+.product-image-wrapper,
+.native-product-image-shell {
+  isolation: isolate;
+}
+
+.product-card::before,
+.product-card::after,
+.product-showcase-card::before,
+.product-showcase-card::after,
+.product-card-image-link::before,
+.product-card-image-link::after,
+.product-image-wrapper::before,
+.product-image-wrapper::after,
+.native-product-image-shell::before,
+.native-product-image-shell::after {
+  display: none !important;
+  content: none !important;
+}
+
+.product-card .product-image-wrapper {
+  position: relative !important;
+  overflow: hidden !important;
+  background: var(--ui-surface-muted, var(--fm-surface-soft, #f2eee6)) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.product-card .product-image-wrapper > .native-product-image-shell {
+  position: absolute !important;
+  z-index: 1 !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: hidden !important;
+  border-radius: inherit !important;
+  background: transparent !important;
+  opacity: 1 !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  transform: none !important;
+}
+
+.product-card .product-image-wrapper > .native-product-image-shell > img,
+.product-card .product-image-wrapper .product-image {
+  position: absolute !important;
+  z-index: 1 !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  object-fit: cover !important;
+  border-radius: inherit !important;
+  opacity: 1 !important;
+  filter: none !important;
+  clip-path: none !important;
+  mix-blend-mode: normal !important;
+}
+
+.product-card .product-image-wrapper > .product-card-badge-floating {
+  position: absolute !important;
+  z-index: 4 !important;
+}
+
+/* The lazy placeholder may occupy the image area only before the real image is
+   mounted. Keep it opaque and full-frame so it cannot resemble a floating glass
+   pane or remain visually layered over a loaded photograph. */
+.product-card .native-product-image-shell__placeholder {
+  position: absolute !important;
+  z-index: 0 !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: inherit !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Quick View must always remain a compact control. Explicit geometry prevents
+   broad button/layout rules from ever stretching it across the product photo. */
+.product-showcase-card__quick {
+  position: absolute !important;
+  z-index: 16 !important;
+  top: 14px !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: 14px !important;
+  display: inline-flex !important;
+  width: auto !important;
+  max-width: 148px !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 40px !important;
+  padding: 8px 12px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  overflow: hidden !important;
+  border-radius: 999px !important;
+  white-space: nowrap !important;
+  line-height: 1 !important;
+  backdrop-filter: blur(10px) saturate(1.06) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(1.06) !important;
+}
+
+@media (max-width: 800px) {
+  .product-showcase-card__quick {
+    top: 12px !important;
+    left: 12px !important;
+    max-width: 136px !important;
+    min-height: 40px !important;
+    padding: 8px 11px !important;
+  }
+}
