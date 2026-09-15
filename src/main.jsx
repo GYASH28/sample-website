@@ -45,6 +45,7 @@ import "./guide-about-v22.css";
 import "./liquid-navigation-v23.css";
 import "./interaction-stability-v24.css";
 import "./theme-readability-v25.css";
+import "./mobile-polish-v26.css";
 
 applyCatalogueIntegrity();
 applyMotionProfile();
