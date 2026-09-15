@@ -35,6 +35,7 @@ export default function ProductQuickView({ product, open, onClose }) {
   const [added, setAdded] = useState(false);
   const [imageIndex, setImageIndex] = useState(0);
   const isSaved = has(product.slug);
+  const dialogId = `quick-view-panel-${product.slug}`;
 
   useEffect(() => {
     setColor(product.colors?.[0] || null);
@@ -115,15 +116,17 @@ export default function ProductQuickView({ product, open, onClose }) {
   return createPortal(
     <div className="quick-view-layer" role="presentation">
       <button className="quick-view-backdrop" type="button" onClick={onClose} aria-label="Close quick view" />
-      <section ref={panelRef} className="quick-view" role="dialog" aria-modal="true" aria-labelledby={`quick-view-${product.slug}`}>
+      <section id={dialogId} ref={panelRef} className="quick-view" role="dialog" aria-modal="true" aria-labelledby={`quick-view-${product.slug}`}>
         <button ref={closeRef} className="quick-view__close" type="button" onClick={onClose} aria-label="Close quick view">
-          <X size={22} />
+          <X size={22} aria-hidden="true" />
         </button>
 
-        <div className="quick-view__media shade-preview-surface">
-          <img key={gallery[imageIndex]} className="quick-view__main-image" src={gallery[imageIndex]} alt={product.name} width="720" height="720" decoding="async" />
-          <ShadePreviewTint value={imageIndex === 0 ? previewHex : null} />
-          <span>Availability confirmed on enquiry</span>
+        <div className="quick-view__media">
+          <div className="quick-view__image-stage shade-preview-surface">
+            <img key={gallery[imageIndex]} className="quick-view__main-image" src={gallery[imageIndex]} alt={product.name} width="720" height="720" decoding="async" />
+            <ShadePreviewTint value={imageIndex === 0 ? previewHex : null} />
+          </div>
+          <span className="quick-view__availability">Availability confirmed on enquiry</span>
           {gallery.length > 1 ? (
             <div className="quick-view__gallery" aria-label="Material views">
               {gallery.slice(0, 4).map((source, index) => (
@@ -148,7 +151,7 @@ export default function ProductQuickView({ product, open, onClose }) {
           <div className="quick-view__title-row">
             <h2 id={`quick-view-${product.slug}`}>{product.name}</h2>
             <button className={isSaved ? "is-saved" : ""} type="button" onClick={() => toggle(product.slug)} aria-label={isSaved ? "Remove from wishlist" : "Save to wishlist"}>
-              <Heart size={21} weight={isSaved ? "fill" : "regular"} />
+              <Heart size={21} weight={isSaved ? "fill" : "regular"} aria-hidden="true" />
             </button>
           </div>
           <p>{product.description}</p>
@@ -168,7 +171,7 @@ export default function ProductQuickView({ product, open, onClose }) {
                   >
                     <i style={{ backgroundColor: shade.hex }} />
                     <span>{shade.name}</span>
-                    {color?.name === shade.name ? <Check size={13} /> : null}
+                    {color?.name === shade.name ? <Check size={13} aria-hidden="true" /> : null}
                   </button>
                 ))}
               </div>
@@ -193,15 +196,15 @@ export default function ProductQuickView({ product, open, onClose }) {
           <div className="quick-view__quantity-row">
             <span>Requested quantity</span>
             <div className="quick-view__stepper">
-              <button type="button" onClick={() => setQuantity((value) => Math.max(min, value - step))} aria-label="Decrease quantity"><Minus size={16} /></button>
+              <button type="button" onClick={() => setQuantity((value) => Math.max(min, value - step))} aria-label="Decrease quantity"><Minus size={16} aria-hidden="true" /></button>
               <output>{quantity}</output>
-              <button type="button" onClick={() => setQuantity((value) => Math.min(max, value + step))} aria-label="Increase quantity"><Plus size={16} /></button>
+              <button type="button" onClick={() => setQuantity((value) => Math.min(max, value + step))} aria-label="Increase quantity"><Plus size={16} aria-hidden="true" /></button>
             </div>
           </div>
 
           <div className="quick-view__actions">
             <button className="btn btn-primary" type="button" onClick={addToEnquiry}>
-              <ShoppingBagOpen size={18} /> {added ? "Added to enquiry" : "Add to enquiry"}
+              <ShoppingBagOpen size={18} aria-hidden="true" /> {added ? "Added to enquiry" : "Add to enquiry"}
             </button>
             <a className="btn btn-outline" href={createWhatsAppLink(message)} target="_blank" rel="noreferrer">
               <WhatsAppIcon size={18} /> Ask on WhatsApp
@@ -209,7 +212,7 @@ export default function ProductQuickView({ product, open, onClose }) {
           </div>
 
           <Link className="quick-view__details" to={`/products/${product.slug}`} onClick={onClose}>
-            View full product details <ArrowRight size={17} />
+            View full product details <ArrowRight size={17} aria-hidden="true" />
           </Link>
         </div>
       </section>
