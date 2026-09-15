@@ -10,8 +10,15 @@ export default function ProductShowcaseCard({ product }) {
   return (
     <div className="product-showcase-card">
       <ProductCard product={product} />
-      <button className="product-showcase-card__quick" type="button" onClick={() => setOpen(true)}>
-        <Eye size={17} /> Quick view
+      <button
+        className="product-showcase-card__quick"
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        aria-label={`Quick view ${product.name}`}
+      >
+        <Eye size={17} aria-hidden="true" /> Quick view
       </button>
       <ProductQuickView product={product} open={open} onClose={close} />
     </div>
