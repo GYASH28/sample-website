@@ -16,6 +16,7 @@ export default function ProductShowcaseCard({ product }) {
         onClick={() => setOpen(true)}
         aria-haspopup="dialog"
         aria-expanded={open}
+        aria-controls={`quick-view-panel-${product.slug}`}
         aria-label={`Quick view ${product.name}`}
       >
         <Eye size={17} aria-hidden="true" /> Quick view
