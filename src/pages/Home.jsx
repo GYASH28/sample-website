@@ -48,9 +48,9 @@ export default function Home() {
       <MakerHelpStrip />
 
       <CommerceProductRail
-        eyebrow="Verified catalogue"
-        title="Start with a few current material highlights"
-        text="Open a verified product line, choose the quantity you need and add it to one enquiry. Current shades and final pricing are confirmed before ordering."
+        eyebrow="Catalogue highlights"
+        title="A few materials worth starting with"
+        text="Explore a verified product line, choose what you need and add it to one enquiry. We confirm current shades, pack details and final pricing before you order."
         products={featuredCatalogueProducts}
         href="/products"
       />
@@ -71,14 +71,14 @@ export default function Home() {
         <CommerceProductRail
           eyebrow="Yarn collection"
           title="Yarns for crochet, knitting and handmade projects"
-          text="Browse the current verified yarn lines from Ganga, Vardhaman and Taj, then request the latest shade card or stock photo before finalising your choice."
+          text="Browse current lines from Ganga, Vardhaman and Taj, then request the latest shade card or stock photo before finalising your choice."
           products={yarnProducts.length ? yarnProducts : featuredCatalogueProducts}
           href="/products?department=Yarns"
         />
         <CommerceProductRail
           eyebrow="Thread collection"
           title="Crochet, embroidery and decorative threads"
-          text="Compare the verified thread families and their intended uses, then confirm the exact current shade and pack details with the store."
+          text="Compare thread families by use, then confirm the exact current shade and pack details with the store."
           products={threadProducts.length ? threadProducts : featuredProducts.slice(0, RAIL_SIZE)}
           href="/products?department=Threads"
         />
@@ -88,7 +88,7 @@ export default function Home() {
         <CommerceProductRail
           eyebrow="Macrame & dori"
           title="Cord and dori for knotting, decor and handmade projects"
-          text="Browse the supplier-confirmed Macrame Cord and Malai Dori lines, then confirm construction, size, shade and quantity before ordering."
+          text="Explore Macrame Cord and Malai Dori lines, then confirm construction, size, shade and quantity before ordering."
           products={macrameProducts}
           href="/products?department=Macrame%20%26%20Cords"
         />
