@@ -122,7 +122,7 @@ export default function ProductQuickView({ product, open, onClose }) {
         </button>
 
         <div className="quick-view__media">
-          <div className="quick-view__image-stage shade-preview-surface">
+          <div className="quick-view__image-stage shade-preview-surface" style={{ borderRadius: "20px" }}>
             <img key={gallery[imageIndex]} className="quick-view__main-image" src={gallery[imageIndex]} alt={product.name} width="720" height="720" decoding="async" />
             <ShadePreviewTint value={imageIndex === 0 ? previewHex : null} />
           </div>
