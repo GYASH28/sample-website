@@ -79,6 +79,9 @@ jobs:
       - name: Run navigation, overlay and carousel integrity
         run: npm run test:interaction
 
+      - name: Run product media obstruction regression
+        run: npm run test:product-media
+
       - name: Run one-image shade preview regression
         run: npm run test:shade-preview
 
