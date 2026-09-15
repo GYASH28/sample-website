@@ -122,7 +122,7 @@ export default function ProductCard({ product, compact = false, showWishlistActi
                   onError={handleImageError}
                 />
               ) : <span className="product-image-placeholder" aria-hidden="true">FM</span>}
-              <span className="product-card-badge-floating">Representative photo</span>
+              <span className="product-card-badge-floating">Reference image</span>
             </div>
           </Link>
 
@@ -153,12 +153,12 @@ export default function ProductCard({ product, compact = false, showWishlistActi
                   ))}
                   {overflowCount > 0 ? <span className="swatch-more-tag" aria-hidden="true">+{overflowCount}</span> : null}
                 </div>
-                <span className="swatches-count-label">{activeColor?.name || `${product.colors.length} representative shades`}</span>
+                <span className="swatches-count-label">{activeColor?.name || `${product.colors.length} shade previews`}</span>
               </div>
             ) : null}
 
             <p className="product-card-variants">{product.variants}</p>
-            {soldAs ? <div className="product-card-sold-as"><span>Listed as {soldAs}</span>{bulkAvailable ? <em>Bulk enquiries welcome</em> : null}</div> : null}
+            {soldAs ? <div className="product-card-sold-as"><span>{soldAs}</span>{bulkAvailable ? <em>Bulk available</em> : null}</div> : null}
             <dl className="product-card-specs"><div><dt>Best for:</dt><dd>{product.suitableFor}</dd></div></dl>
           </div>
         </div>
@@ -175,7 +175,7 @@ export default function ProductCard({ product, compact = false, showWishlistActi
           aria-label={`Ask about ${product.name}${activeColor ? ` in ${activeColor.name}` : ""} on WhatsApp`}
           onClick={() => trackEngagement("whatsapp_click", { product: product.slug, category: product.category, shade: activeColor?.name || "none", source: "product-card" })}
         >
-          <ChatCircle size={16} aria-hidden="true" /> {activeColor ? `Ask about ${activeColor.name}` : "Ask price & availability"}
+          <ChatCircle size={16} aria-hidden="true" /> {activeColor ? `Ask about ${activeColor.name}` : "Price & availability"}
         </a>
       </div>
 
