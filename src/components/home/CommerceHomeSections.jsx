@@ -39,6 +39,33 @@ export function CommerceCategoryNav({ categories }) {
   );
 }
 
+export function CommerceBrandNav({ brands }) {
+  if (!brands?.length) return null;
+
+  return (
+    <nav className="commerce-brand-nav" aria-label="Browse by brand">
+      <div className="container commerce-brand-nav__inner">
+        <span className="commerce-brand-nav__label">Browse brands</span>
+        <div className="commerce-brand-nav__scroller">
+          {brands.map((brand) => (
+            <Link
+              key={brand.name}
+              to={`/products?brand=${encodeURIComponent(brand.name)}`}
+              className="commerce-brand-nav__chip"
+            >
+              <strong>{brand.name}</strong>
+              <small>{brand.count}</small>
+            </Link>
+          ))}
+        </div>
+        <Link className="commerce-brand-nav__all" to="/products">
+          Full catalogue <ArrowRight size={15} />
+        </Link>
+      </div>
+    </nav>
+  );
+}
+
 export function CommerceCategoryGrid({ categories }) {
   return (
     <section className="commerce-section commerce-category-section" aria-labelledby="shop-category-title">
@@ -82,7 +109,7 @@ export function CommerceCategoryGrid({ categories }) {
   );
 }
 
-export function CommerceProductRail({ eyebrow, title, text, products, href = "/products" }) {
+export function CommerceProductRail({ eyebrow, title, text, products, href = "/products", priority = false }) {
   const railRef = useRef(null);
   const [scrollState, setScrollState] = useState({ left: false, right: false, overflow: false });
   const titleId = `rail-${title.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`;
@@ -133,7 +160,7 @@ export function CommerceProductRail({ eyebrow, title, text, products, href = "/p
   };
 
   return (
-    <section className="commerce-section commerce-product-section" aria-labelledby={titleId}>
+    <section className={`commerce-section commerce-product-section ${priority ? "commerce-product-section--priority" : ""}`} aria-labelledby={titleId} data-product-count={products.length}>
       <div className="container">
         <Reveal className="commerce-heading commerce-heading--rail" variant="fade-up">
           <div>
