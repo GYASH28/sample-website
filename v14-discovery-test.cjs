@@ -50,6 +50,13 @@ async function goto(page, path) {
     assert(await page.locator(".active-filter-chip").filter({ hasText: "Macramé cords" }).count() === 1, "product type filter chip missing");
     assert(await page.locator(".product-card").count() > 0, "verified macrame department returned no products");
 
+    // Brand is a first-class catalogue dimension, separate from material family.
+    await goto(page, "/products?brand=Ganga&sort=brand-asc");
+    assert(await page.locator(".active-filter-chip").filter({ hasText: "Brand · Ganga" }).count() === 1, "brand filter chip missing");
+    assert(await page.locator("#catalogue-brand").inputValue() === "Ganga", "brand filter control did not restore from URL");
+    assert(await page.locator(".product-card").count() > 0, "Ganga brand filter returned no products");
+    assert(new URL(page.url()).searchParams.get("brand") === "Ganga", "brand catalogue state did not persist in the URL");
+
     // A stale unsupported colour URL must not create a fake active filter.
     await goto(page, "/products?color=Pink");
     assert(await page.locator(".active-filter-chip").filter({ hasText: "Colour" }).count() === 0, "unsupported colour filter should be discarded until product-specific shade data exists");
