@@ -103,6 +103,22 @@ async function testDesktop(browser) {
     header: Number.parseInt(getComputedStyle(document.querySelector(".site-header")).zIndex, 10) || 0,
   }));
   if (modalLayers.quick <= modalLayers.header) throw new Error(`quick view must cover the header: ${JSON.stringify(modalLayers)}`);
+
+  // New enquiry controls must work inside Quick View, not just render.
+  const bulkMode = quick.getByRole("button", { name: "Bulk / wholesale" });
+  await bulkMode.click();
+  if ((await bulkMode.getAttribute("aria-pressed")) !== "true") throw new Error("Quick View bulk mode did not activate");
+  const hundredPreset = quick.locator(".quick-view__quantity-presets button").filter({ hasText: /^100$/ });
+  if (await hundredPreset.count() !== 1) throw new Error("Quick View bulk quantity preset 100 is missing");
+  await hundredPreset.click();
+  const requestedQuantity = (await quick.locator(".quick-view__stepper output").textContent())?.trim();
+  if (requestedQuantity !== "100") throw new Error(`Quick View bulk preset did not update quantity: ${requestedQuantity}`);
+  await quick.getByRole("button", { name: /^Add to enquiry$/ }).click();
+  const basketItem = await page.evaluate(() => JSON.parse(localStorage.getItem("fakhri_enquiry_basket") || "[]")[0]);
+  if (!basketItem || basketItem.quantity !== 100 || !basketItem.note?.includes("Enquiry mode: Bulk")) {
+    throw new Error(`Quick View did not persist bulk mode and quantity into enquiry basket: ${JSON.stringify(basketItem)}`);
+  }
+
   await page.locator(".quick-view__details").focus();
   await page.keyboard.press("Tab");
   const wrappedToClose = await page.locator(".quick-view__close").evaluate((node) => document.activeElement === node);
