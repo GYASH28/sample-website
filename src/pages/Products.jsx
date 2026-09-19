@@ -44,7 +44,7 @@ const PRODUCT_TYPES = [
 ];
 
 const USE_CASES = ["All", ...DISCOVERY_FILTER_OPTIONS.crafts];
-const SORT_OPTIONS = new Set(["featured", "relevance", "name-asc", "category-asc"]);
+const SORT_OPTIONS = new Set(["featured", "relevance", "name-asc", "category-asc", "brand-asc"]);
 const VIEW_OPTIONS = new Set(["grid", "list"]);
 const POPULAR_SEARCHES = ["yarn for baby blanket", "crochet bag", "soft yarn", "macrame cord", "embroidery thread", "cotton"];
 const BUYING_MODES = ["All", "Retail", "Bulk"];
@@ -108,6 +108,8 @@ export default function Products() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const categoryNames = useMemo(() => new Set(productCategories.map((category) => category.name)), []);
+  const brandOptions = useMemo(() => [...new Set(featuredProducts.map((product) => product.brand).filter(Boolean))].sort((a, b) => a.localeCompare(b)), []);
+  const brandValues = useMemo(() => new Set(["All", ...brandOptions]), [brandOptions]);
   const productTypeValues = useMemo(() => new Set(PRODUCT_TYPES.map((type) => type.value)), []);
   const useCaseValues = useMemo(() => new Set(USE_CASES), []);
   const departmentValues = useMemo(() => new Set(["All", ...MASTER_CATEGORIES]), []);
@@ -119,6 +121,7 @@ export default function Products() {
   const [searchQuery, setSearchQuery] = useState(() => searchParams.get("q") || "");
   const [activeDepartment, setActiveDepartment] = useState(() => allowedOrAll(searchParams, "department", departmentValues));
   const [activeCategory, setActiveCategory] = useState(() => allowedOrAll(searchParams, "category", new Set(["All", ...categoryNames])));
+  const [activeBrand, setActiveBrand] = useState(() => allowedOrAll(searchParams, "brand", brandValues));
   const [activeType, setActiveType] = useState(() => allowedOrAll(searchParams, "type", productTypeValues));
   const [activeTag, setActiveTag] = useState(() => allowedOrAll(searchParams, "tag", useCaseValues));
   const [activeMaterial, setActiveMaterial] = useState(() => allowedOrAll(searchParams, "material", materialValues));
@@ -140,6 +143,7 @@ export default function Products() {
     setSearchQuery(searchParams.get("q") || "");
     setActiveDepartment(allowedOrAll(searchParams, "department", departmentValues));
     setActiveCategory(allowedOrAll(searchParams, "category", new Set(["All", ...categoryNames])));
+    setActiveBrand(allowedOrAll(searchParams, "brand", brandValues));
     setActiveType(allowedOrAll(searchParams, "type", productTypeValues));
     setActiveTag(allowedOrAll(searchParams, "tag", useCaseValues));
     setActiveMaterial(allowedOrAll(searchParams, "material", materialValues));
@@ -149,13 +153,14 @@ export default function Products() {
     setSortBy(SORT_OPTIONS.has(searchParams.get("sort")) ? searchParams.get("sort") : "featured");
     const requestedView = searchParams.get("view");
     if (VIEW_OPTIONS.has(requestedView)) setViewMode(requestedView);
-  }, [searchParams, departmentValues, categoryNames, productTypeValues, useCaseValues, materialValues, thicknessValues, projectValues]);
+  }, [searchParams, departmentValues, categoryNames, brandValues, productTypeValues, useCaseValues, materialValues, thicknessValues, projectValues]);
 
   useEffect(() => {
     const next = new URLSearchParams();
     if (searchQuery.trim()) next.set("q", searchQuery.trim());
     if (activeDepartment !== "All") next.set("department", activeDepartment);
     if (activeCategory !== "All") next.set("category", activeCategory);
+    if (activeBrand !== "All") next.set("brand", activeBrand);
     if (activeType !== "All") next.set("type", activeType);
     if (activeTag !== "All") next.set("tag", activeTag);
     if (activeMaterial !== "All") next.set("material", activeMaterial);
@@ -165,7 +170,7 @@ export default function Products() {
     if (sortBy !== "featured") next.set("sort", sortBy);
     if (viewMode !== "grid") next.set("view", viewMode);
     if (next.toString() !== searchParams.toString()) setSearchParams(next, { replace: true });
-  }, [searchQuery, activeDepartment, activeCategory, activeType, activeTag, activeMaterial, activeThickness, activeProject, buyingMode, sortBy, viewMode, searchParams, setSearchParams]);
+  }, [searchQuery, activeDepartment, activeCategory, activeBrand, activeType, activeTag, activeMaterial, activeThickness, activeProject, buyingMode, sortBy, viewMode, searchParams, setSearchParams]);
 
   useEffect(() => {
     try { localStorage.setItem("fakhri_catalogue_view", viewMode); } catch { /* optional */ }
@@ -241,6 +246,7 @@ export default function Products() {
   const selectDepartment = (department) => {
     setActiveDepartment(department);
     setActiveCategory("All");
+    setActiveBrand("All");
     setActiveType("All");
     trackEngagement("filter_used", { filter: `department:${department}`, source: "catalogue" });
   };
@@ -260,6 +266,7 @@ export default function Products() {
     if (activeDepartment !== "All" && product.masterCategory !== activeDepartment) return false;
     if (searchQuery.trim() && !searchScoreMap.has(product.slug)) return false;
     if (activeCategory !== "All" && product.category !== activeCategory) return false;
+    if (activeBrand !== "All" && product.brand !== activeBrand) return false;
     if (activeType !== "All" && product.type !== activeType) return false;
     if (activeTag !== "All" && !meta.crafts.includes(activeTag) && !(product.tags || []).includes(activeTag)) return false;
     if (activeMaterial !== "All" && meta.material !== activeMaterial) return false;
@@ -268,7 +275,7 @@ export default function Products() {
     if (buyingMode === "Retail" && !meta.retailSuitable) return false;
     if (buyingMode === "Bulk" && !meta.bulkSuitable) return false;
     return true;
-  }), [activeDepartment, searchQuery, searchScoreMap, activeCategory, activeType, activeTag, activeMaterial, activeThickness, activeProject, projectScoreMap, buyingMode]);
+  }), [activeDepartment, searchQuery, searchScoreMap, activeCategory, activeBrand, activeType, activeTag, activeMaterial, activeThickness, activeProject, projectScoreMap, buyingMode]);
 
   const departmentCounts = useMemo(() => {
     const counts = { All: featuredProducts.length };
@@ -286,6 +293,8 @@ export default function Products() {
       result.sort((a, b) => a.name.localeCompare(b.name));
     } else if (sortBy === "category-asc") {
       result.sort((a, b) => a.category.localeCompare(b.category));
+    } else if (sortBy === "brand-asc") {
+      result.sort((a, b) => (a.brand || "").localeCompare(b.brand || "") || a.name.localeCompare(b.name));
     }
     return result;
   }, [filteredProducts, sortBy, searchQuery, activeProject, searchScoreMap, projectScoreMap]);
@@ -309,7 +318,7 @@ export default function Products() {
     setSuggestionIndex(-1);
   };
 
-  const hasActiveFilters = activeDepartment !== "All" || activeCategory !== "All" || activeType !== "All" || activeTag !== "All" || activeMaterial !== "All" || activeThickness !== "All" || activeProject !== "All" || buyingMode !== "All" || Boolean(searchQuery.trim());
+  const hasActiveFilters = activeDepartment !== "All" || activeCategory !== "All" || activeBrand !== "All" || activeType !== "All" || activeTag !== "All" || activeMaterial !== "All" || activeThickness !== "All" || activeProject !== "All" || buyingMode !== "All" || Boolean(searchQuery.trim());
   const project = PROJECTS.find((item) => item.slug === activeProject);
 
   return (
@@ -438,7 +447,8 @@ export default function Products() {
                   <option value="featured">Featured</option>
                   <option value="relevance">Craft / search relevance</option>
                   <option value="name-asc">Name A–Z</option>
-                  <option value="category-asc">Category</option>
+                  <option value="category-asc">Material family</option>
+                  <option value="brand-asc">Brand</option>
                 </select>
               </div>
 
@@ -458,7 +468,8 @@ export default function Products() {
                 <button ref={filterCloseRef} type="button" className="icon-button" onClick={() => setMobileFiltersOpen(false)} aria-label="Close filters"><X size={22} /></button>
               </div>
 
-              <FilterSelect label="Category" id="catalogue-category" value={activeCategory} onChange={setActiveCategory} options={["All", ...productCategories.map((category) => category.name)]} allLabel="All categories" />
+              <FilterSelect label="Material family" id="catalogue-category" value={activeCategory} onChange={setActiveCategory} options={["All", ...productCategories.map((category) => category.name)]} allLabel="All material families" />
+              <FilterSelect label="Brand" id="catalogue-brand" value={activeBrand} onChange={setActiveBrand} options={["All", ...brandOptions]} allLabel="All brands" />
               <FilterSelect label="Product type" id="catalogue-product-type" value={activeType} onChange={setActiveType} options={PRODUCT_TYPES.map((type) => type.value)} labels={Object.fromEntries(PRODUCT_TYPES.map((type) => [type.value, type.label]))} />
               <FilterSelect label="Craft use" id="catalogue-use-case" value={activeTag} onChange={setActiveTag} options={USE_CASES} allLabel="All craft uses" />
               <FilterSelect label="Material / fibre" id="catalogue-material" value={activeMaterial} onChange={setActiveMaterial} options={["All", ...DISCOVERY_FILTER_OPTIONS.materials]} allLabel="All known materials" />
@@ -478,6 +489,7 @@ export default function Products() {
                   {activeProject !== "All" ? <FilterChip label={`Project · ${project?.name || activeProject}`} onClear={() => setActiveProject("All")} /> : null}
                   {activeDepartment !== "All" ? <FilterChip label={activeDepartment} onClear={() => selectDepartment("All")} /> : null}
                   {activeCategory !== "All" ? <FilterChip label={activeCategory} onClear={() => setActiveCategory("All")} /> : null}
+                  {activeBrand !== "All" ? <FilterChip label={`Brand · ${activeBrand}`} onClear={() => setActiveBrand("All")} /> : null}
                   {activeType !== "All" ? <FilterChip label={PRODUCT_TYPES.find((type) => type.value === activeType)?.label || activeType} onClear={() => setActiveType("All")} /> : null}
                   {activeTag !== "All" ? <FilterChip label={`Craft · ${activeTag}`} onClear={() => setActiveTag("All")} /> : null}
                   {activeMaterial !== "All" ? <FilterChip label={`Material · ${activeMaterial}`} onClear={() => setActiveMaterial("All")} /> : null}
