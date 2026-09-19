@@ -91,6 +91,11 @@ function buildSuggestions(query) {
     .slice(0, 3)
     .forEach((material) => rows.push({ group: "Materials", type: "material", value: material, label: material }));
 
+  [...new Set(featuredProducts.map((product) => product.brand).filter(Boolean))]
+    .filter((brand) => brand.toLocaleLowerCase().includes(q))
+    .slice(0, 3)
+    .forEach((brand) => rows.push({ group: "Brands", type: "brand", value: brand, label: brand }));
+
   searchProducts(featuredProducts, normalized)
     .slice(0, 5)
     .forEach(({ product }) => rows.push({ group: "Products", type: "product", value: product.slug, label: product.name, meta: product.category }));
@@ -213,6 +218,7 @@ export default function Products() {
     if (suggestion.type === "category") setActiveCategory(suggestion.value);
     if (suggestion.type === "craft") setActiveTag(suggestion.value);
     if (suggestion.type === "material") setActiveMaterial(suggestion.value);
+    if (suggestion.type === "brand") setActiveBrand(suggestion.value);
     if (suggestion.type === "project") setActiveProject(suggestion.value);
     setSearchQuery("");
     setShowSuggestions(false);
@@ -306,6 +312,7 @@ export default function Products() {
   const handleResetFilters = () => {
     setActiveDepartment("All");
     setActiveCategory("All");
+    setActiveBrand("All");
     setActiveType("All");
     setActiveTag("All");
     setActiveMaterial("All");
