@@ -32,6 +32,7 @@ export default function ProductQuickView({ product, open, onClose }) {
   const gallery = useMemo(() => [product.image, ...(product.galleryImages || [])].filter(Boolean), [product]);
   const [variant, setVariant] = useState(variants[0] || null);
   const [quantity, setQuantity] = useState(product.quantityOptions?.min || 1);
+  const [mode, setMode] = useState("Retail");
   const [added, setAdded] = useState(false);
   const [imageIndex, setImageIndex] = useState(0);
   const isSaved = has(product.slug);
@@ -42,6 +43,7 @@ export default function ProductQuickView({ product, open, onClose }) {
     setPreviewHex(null);
     setVariant(variants[0] || null);
     setQuantity(product.quantityOptions?.min || 1);
+    setMode("Retail");
     setAdded(false);
     setImageIndex(0);
   }, [product, variants]);
@@ -104,14 +106,14 @@ export default function ProductQuickView({ product, open, onClose }) {
       quantity,
       unit,
       variant,
-      note: previewNote,
+      note: [`Enquiry mode: ${mode}`, previewNote].filter(Boolean).join(". "),
     });
     setAdded(true);
     window.clearTimeout(addedTimerRef.current);
     addedTimerRef.current = window.setTimeout(() => setAdded(false), 1_600);
   };
 
-  const message = `Hello Fakhri Mart, I want to enquire about *${product.name}*${color ? ` in *${color.name}*` : ""}${variant ? ` (${variant})` : ""}, quantity *${quantity} ${unit}*.${previewHex ? ` I used the website's digital colour preview at *${previewHex.toUpperCase()}* as a visual reference only; please show me the nearest currently available supplier shade.` : ""} Please share current availability, shade photos, pack details and price.`;
+  const message = `Hello Fakhri Mart, I want to make a *${mode.toLowerCase()} enquiry* for *${product.name}*${color ? ` in *${color.name}*` : ""}${variant ? ` (${variant})` : ""}, quantity *${quantity} ${unit}*.${previewHex ? ` I used the website's digital colour preview at *${previewHex.toUpperCase()}* as a visual reference only; please show me the nearest currently available supplier shade.` : ""} Please share current availability, shade photos, pack details and price.`;
 
   return createPortal(
     <div className="quick-view-layer" role="presentation">
@@ -193,6 +195,17 @@ export default function ProductQuickView({ product, open, onClose }) {
             </fieldset>
           ) : null}
 
+          <div className="quick-view__mode" role="group" aria-label="Enquiry mode">
+            <span>Enquiry mode</span>
+            <div>
+              {["Retail", "Bulk"].map((option) => (
+                <button key={option} type="button" className={mode === option ? "is-active" : ""} onClick={() => setMode(option)} aria-pressed={mode === option}>
+                  {option === "Bulk" ? "Bulk / wholesale" : "Retail"}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="quick-view__quantity-row">
             <span>Requested quantity</span>
             <div className="quick-view__stepper">
@@ -200,6 +213,17 @@ export default function ProductQuickView({ product, open, onClose }) {
               <output>{quantity}</output>
               <button type="button" onClick={() => setQuantity((value) => Math.min(max, value + step))} aria-label="Increase quantity"><Plus size={16} aria-hidden="true" /></button>
             </div>
+          </div>
+
+          <div className="quick-view__quantity-presets" aria-label="Quick quantity choices">
+            {(mode === "Bulk" ? [50, 100, 200, 500] : (product.quantityOptions?.presets || [1, 6, 12, 24]))
+              .filter((value) => value >= min && value <= max)
+              .slice(0, 4)
+              .map((value) => (
+                <button key={value} type="button" className={quantity === value ? "is-active" : ""} onClick={() => setQuantity(value)} aria-pressed={quantity === value}>
+                  {value}
+                </button>
+              ))}
           </div>
 
           <div className="quick-view__actions">
