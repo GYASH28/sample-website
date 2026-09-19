@@ -48,6 +48,7 @@ import "./theme-readability-v25.css";
 import "./mobile-polish-v26.css";
 import "./site-polish-v27.css";
 import "./production-stability-v28.css";
+import "./product-merchandising-v29.css";
 
 applyCatalogueIntegrity();
 applyMotionProfile();
