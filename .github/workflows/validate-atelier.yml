@@ -94,10 +94,10 @@ jobs:
       - name: Run SEO and business identity integrity
         run: npm run test:seo
 
-      - name: Run light and dark theme visual regression
+      - name: Run light-only visual regression
         run: npm run test:theme
 
-      - name: Run opened-surface light and dark readability regression
+      - name: Run opened-surface light-only readability regression
         run: npm run test:theme-open
 
       - name: Run bundle and scroll performance budgets
