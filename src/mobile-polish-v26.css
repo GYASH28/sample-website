@@ -287,7 +287,7 @@ body.quick-view-open {
 }
 
 /* Quick View trigger: polished and reliably touchable instead of hover-only. */
-.product-showcase-card__quick {
+.product-card-quick-view {
   min-height: 42px !important;
   padding: 9px 13px !important;
   border-color: color-mix(in srgb, var(--ui-border, #ddd) 72%, white) !important;
@@ -297,7 +297,7 @@ body.quick-view-open {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .product-showcase-card__quick:is(:hover, :focus-visible) {
+  .product-card-quick-view:is(:hover, :focus-visible) {
     border-color: color-mix(in srgb, var(--ui-accent, #14766f) 32%, var(--ui-border, #ddd)) !important;
     background: var(--ui-bg-elevated, #fffdf9) !important;
     color: var(--ui-accent, #14766f) !important;
@@ -434,7 +434,7 @@ body.quick-view-open {
     min-height: 34px !important;
   }
 
-  .product-showcase-card__quick {
+  .product-card-quick-view {
     top: 12px !important;
     left: 12px !important;
     min-height: 44px !important;
@@ -653,7 +653,7 @@ body.quick-view-open {
 }
 
 :root[data-theme="dark"] .quick-view__close,
-:root[data-theme="dark"] .product-showcase-card__quick,
+:root[data-theme="dark"] .product-card-quick-view,
 :root[data-theme="dark"] .quick-view__media > span:not(.shade-preview-tint) {
   background: color-mix(in srgb, var(--ui-bg-elevated, #20251f) 91%, transparent) !important;
 }
@@ -662,7 +662,7 @@ body.quick-view-open {
   .quick-view,
   .quick-view-backdrop,
   .quick-view__gallery button,
-  .product-showcase-card__quick {
+  .product-card-quick-view {
     animation: none !important;
     transition-duration: 0.01ms !important;
   }
