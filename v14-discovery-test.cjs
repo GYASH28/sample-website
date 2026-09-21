@@ -57,6 +57,27 @@ async function goto(page, path) {
     assert(await page.locator(".product-card").count() > 0, "Ganga brand filter returned no products");
     assert(new URL(page.url()).searchParams.get("brand") === "Ganga", "brand catalogue state did not persist in the URL");
 
+    // Filter state must behave like normal browser navigation, not a one-way
+    // client state machine. Back/forward and copied URLs should restore exactly.
+    await goto(page, "/products");
+    await page.locator("#catalogue-brand").selectOption("Ganga");
+    await page.waitForFunction(() => new URL(location.href).searchParams.get("brand") === "Ganga");
+    await page.locator("#catalogue-mode").selectOption("Bulk");
+    await page.waitForFunction(() => new URL(location.href).searchParams.get("mode") === "Bulk");
+    await page.goBack({ waitUntil: "networkidle" });
+    await page.waitForFunction(() => document.querySelector("#catalogue-brand")?.value === "Ganga" && document.querySelector("#catalogue-mode")?.value === "All");
+    await page.goForward({ waitUntil: "networkidle" });
+    await page.waitForFunction(() => document.querySelector("#catalogue-brand")?.value === "Ganga" && document.querySelector("#catalogue-mode")?.value === "Bulk");
+    await page.getByRole("button", { name: /Reset all/i }).click();
+    await page.waitForFunction(() => !new URL(location.href).searchParams.has("brand") && !new URL(location.href).searchParams.has("mode"));
+
+    // A genuinely empty search must become a helpful reset state, not a dead end.
+    await goto(page, "/products?q=zzzz-no-such-fakhri-material&sort=relevance");
+    assert(await page.locator(".product-card").count() === 0, "impossible query unexpectedly returned products");
+    assert(await page.locator(".empty-results-box").count() === 1, "zero-results state is missing");
+    await page.getByRole("button", { name: /Clear search and filters/i }).click();
+    await page.waitForFunction(() => document.querySelectorAll(".product-card").length > 0);
+
     // A stale unsupported colour URL must not create a fake active filter.
     await goto(page, "/products?color=Pink");
     assert(await page.locator(".active-filter-chip").filter({ hasText: "Colour" }).count() === 0, "unsupported colour filter should be discarded until product-specific shade data exists");
@@ -123,9 +144,10 @@ async function goto(page, path) {
     assert(await page.locator(".workspace-product-row").count() === 2, "workspace compare tab did not reflect comparison state");
     await page.locator(".shopping-workspace__head .icon-button").click();
 
-    // Product cards must not invent swatches. If a future verified product gains
-    // product-specific shade data, the selected shade must flow into its photo CTA.
+    // Product cards must not invent swatches. When verified preview swatches are
+    // present, the selected shade must remain visible and flow into the enquiry.
     await goto(page, "/products");
+    await page.evaluate(() => localStorage.removeItem("fakhri_enquiry_basket"));
     const firstCard = page.locator(".product-card").first();
     const firstSwatch = firstCard.locator(".swatch-dot-button").first();
     if (await firstSwatch.count()) {
@@ -133,13 +155,18 @@ async function goto(page, path) {
       const match = label?.match(/representative (.+) shade/i);
       await firstSwatch.click();
       if (match?.[1]) {
-        const secondaryText = await firstCard.locator(".product-card-secondary-actions").innerText();
-        assert(secondaryText.toLocaleLowerCase().includes(match[1].toLocaleLowerCase()), "selected shade was not preserved in current-photo CTA");
+        const selectedLabel = await firstCard.locator(".swatches-count-label").innerText();
+        assert(selectedLabel.toLocaleLowerCase().includes(match[1].toLocaleLowerCase()), "selected shade is not visible on the product card");
+        await firstCard.getByRole("button", { name: /Add to enquiry/i }).click();
+        const selectedItem = await page.evaluate(() => JSON.parse(localStorage.getItem("fakhri_enquiry_basket") || "[]")[0]);
+        assert(selectedItem?.shade?.name === match[1], "selected shade did not persist into the enquiry basket");
       }
     }
 
     // Add a material and ensure the upgraded enquiry brief is available.
-    await firstCard.getByRole("button", { name: /Add to enquiry/i }).click();
+    if ((await page.evaluate(() => JSON.parse(localStorage.getItem("fakhri_enquiry_basket") || "[]").length)) === 0) {
+      await firstCard.getByRole("button", { name: /Add to enquiry/i }).click();
+    }
     await goto(page, "/enquiry");
     assert(await page.locator(".enquiry-summary-tools").count() === 1, "enquiry summary builder missing for basket enquiries");
     const toolText = await page.locator(".enquiry-summary-tools").innerText();
