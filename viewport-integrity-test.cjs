@@ -31,12 +31,7 @@ async function auditScrollLayoutReads(page) {
     };
   });
 
-  await page.evaluatefunction isIgnorableGoogleMapsError(value) {
-  const text = String(value || "");
-  return /maps\.gstatic\.com\/maps-api|maps\.googleapis\.com\/\$rpc\/google\.internal\.maps|<gmp-place-details-compact>/i.test(text);
-}
-
-(async () => {
+  await page.evaluate(async () => {
     window.__scrollLayoutReads = 0;
     const root = document.documentElement;
     const maximum = Math.max(0, Math.min(root.scrollHeight - window.innerHeight, 2600));
@@ -86,6 +81,11 @@ async function auditHeaderMorph(page) {
       oldScrollClasses: ["is-scrolled", "is-deep", "is-scrolling"].filter((name) => header.classList.contains(name)),
     };
   });
+}
+
+function isIgnorableGoogleMapsError(value) {
+  const text = String(value || "");
+  return /maps\.gstatic\.com\/maps-api|maps\.googleapis\.com\/\$rpc\/google\.internal\.maps|<gmp-place-details-compact>/i.test(text);
 }
 
 function assertHeaderMorphIsSeamless(audit) {
