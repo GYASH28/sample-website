@@ -88,6 +88,9 @@ jobs:
       - name: Run responsive commerce regression matrix
         run: npm run test:responsive-commerce
 
+      - name: Run enquiry basket end-to-end regression
+        run: npm run test:enquiry-basket
+
       - name: Run one-image shade preview regression
         run: npm run test:shade-preview
 
