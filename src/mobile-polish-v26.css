@@ -582,11 +582,60 @@ body.quick-view-open {
 }
 
 @media (max-width: 620px) {
-  /* Information-rich cards are substantially easier to scan as one column on
-     narrow phones; tablets still keep the denser grid. */
+  /* The catalogue, unlike the homepage, is a dense browsing surface. Keep two
+     columns on normal phones and reserve the one-column fallback for the
+     genuinely narrow 320px class below. */
   .product-grid--filtered,
   .card-grid.product-grid--filtered {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .product-grid--filtered .product-card {
+    border-radius: 16px !important;
+  }
+
+  .product-grid--filtered .product-content {
+    padding: 12px 11px 8px !important;
+  }
+
+  .product-grid--filtered .product-card-meta {
+    font-size: 0.62rem !important;
+    line-height: 1.35 !important;
+  }
+
+  .product-grid--filtered .product-card-title {
+    font-size: clamp(0.94rem, 4.2vw, 1.08rem) !important;
+    line-height: 1.18 !important;
+  }
+
+  .product-grid--filtered .product-card-variants {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    font-size: 0.7rem !important;
+    line-height: 1.4 !important;
+  }
+
+  .product-grid--filtered .product-card-swatches {
+    gap: 5px !important;
+  }
+
+  .product-grid--filtered .swatches-count-label {
+    font-size: 0.6rem !important;
+  }
+
+  .product-grid--filtered .product-actions {
     grid-template-columns: minmax(0, 1fr) !important;
+    gap: 6px !important;
+    padding: 0 10px 11px !important;
+  }
+
+  .product-grid--filtered .product-actions .btn {
+    min-height: 44px !important;
+    padding-inline: 8px !important;
+    font-size: 0.7rem !important;
   }
 
   .product-card-title {
@@ -615,6 +664,22 @@ body.quick-view-open {
 
   .quick-view__media .quick-view__main-image {
     height: min(27dvh, 225px) !important;
+  }
+}
+
+@media (max-width: 340px) {
+  .product-grid--filtered,
+  .card-grid.product-grid--filtered {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  .product-grid--filtered .product-content {
+    padding: 14px 14px 9px !important;
+  }
+
+  .product-grid--filtered .product-actions {
+    padding-inline: 14px !important;
   }
 }
 
