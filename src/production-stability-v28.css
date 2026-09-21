@@ -11,6 +11,14 @@
   -webkit-backdrop-filter: none !important;
 }
 
+/* The header position is already updated once per animation frame by
+   HeaderEnhancer. Older v8 transition rules were interpolating the nav transform
+   a second time, occasionally lagging and then catching up by >7px in a single
+   viewport sample. Keep the scroll morph frame-synchronous instead. */
+.site-header .nav-shell {
+  transition: none !important;
+}
+
 /* The inherited mobile-brand pill stayed light in dark mode while its text was
    white, producing a 1.53:1 contrast failure. Give the drawer brand an actual
    dark-theme surface rather than changing the brand text to an off-theme color. */
