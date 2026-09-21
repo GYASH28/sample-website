@@ -287,7 +287,7 @@ body.quick-view-open {
 }
 
 /* Quick View trigger: polished and reliably touchable instead of hover-only. */
-.product-showcase-card__quick {
+.product-card-quick-view {
   min-height: 42px !important;
   padding: 9px 13px !important;
   border-color: color-mix(in srgb, var(--ui-border, #ddd) 72%, white) !important;
@@ -297,7 +297,7 @@ body.quick-view-open {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .product-showcase-card__quick:is(:hover, :focus-visible) {
+  .product-card-quick-view:is(:hover, :focus-visible) {
     border-color: color-mix(in srgb, var(--ui-accent, #14766f) 32%, var(--ui-border, #ddd)) !important;
     background: var(--ui-bg-elevated, #fffdf9) !important;
     color: var(--ui-accent, #14766f) !important;
@@ -434,12 +434,9 @@ body.quick-view-open {
     min-height: 34px !important;
   }
 
-  .product-showcase-card__quick {
-    top: 12px !important;
-    left: 12px !important;
+  .product-card-quick-view {
+    min-width: 44px !important;
     min-height: 44px !important;
-    opacity: 1 !important;
-    transform: none !important;
   }
 
   /* Floating utilities stay above, not on top of, the bottom nav. */
@@ -460,8 +457,8 @@ body.quick-view-open {
     grid-template-rows: auto minmax(0, 1fr) !important;
     width: 100% !important;
     max-width: none !important;
-    height: auto !important;
-    max-height: calc(100dvh - max(8px, env(safe-area-inset-top))) !important;
+    height: min(92dvh, 760px) !important;
+    max-height: min(92dvh, 760px) !important;
     border-right: 0 !important;
     border-bottom: 0 !important;
     border-left: 0 !important;
@@ -585,11 +582,60 @@ body.quick-view-open {
 }
 
 @media (max-width: 620px) {
-  /* Information-rich cards are substantially easier to scan as one column on
-     narrow phones; tablets still keep the denser grid. */
+  /* The catalogue, unlike the homepage, is a dense browsing surface. Keep two
+     columns on normal phones and reserve the one-column fallback for the
+     genuinely narrow 320px class below. */
   .product-grid--filtered,
   .card-grid.product-grid--filtered {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .product-grid--filtered .product-card {
+    border-radius: 16px !important;
+  }
+
+  .product-grid--filtered .product-content {
+    padding: 12px 11px 8px !important;
+  }
+
+  .product-grid--filtered .product-card-meta {
+    font-size: 0.62rem !important;
+    line-height: 1.35 !important;
+  }
+
+  .product-grid--filtered .product-card-title {
+    font-size: clamp(0.94rem, 4.2vw, 1.08rem) !important;
+    line-height: 1.18 !important;
+  }
+
+  .product-grid--filtered .product-card-variants {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    font-size: 0.7rem !important;
+    line-height: 1.4 !important;
+  }
+
+  .product-grid--filtered .product-card-swatches {
+    gap: 5px !important;
+  }
+
+  .product-grid--filtered .swatches-count-label {
+    font-size: 0.6rem !important;
+  }
+
+  .product-grid--filtered .product-actions {
     grid-template-columns: minmax(0, 1fr) !important;
+    gap: 6px !important;
+    padding: 0 10px 11px !important;
+  }
+
+  .product-grid--filtered .product-actions .btn {
+    min-height: 44px !important;
+    padding-inline: 8px !important;
+    font-size: 0.7rem !important;
   }
 
   .product-card-title {
@@ -618,6 +664,22 @@ body.quick-view-open {
 
   .quick-view__media .quick-view__main-image {
     height: min(27dvh, 225px) !important;
+  }
+}
+
+@media (max-width: 340px) {
+  .product-grid--filtered,
+  .card-grid.product-grid--filtered {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  .product-grid--filtered .product-content {
+    padding: 14px 14px 9px !important;
+  }
+
+  .product-grid--filtered .product-actions {
+    padding-inline: 14px !important;
   }
 }
 
@@ -653,7 +715,7 @@ body.quick-view-open {
 }
 
 :root[data-theme="dark"] .quick-view__close,
-:root[data-theme="dark"] .product-showcase-card__quick,
+:root[data-theme="dark"] .product-card-quick-view,
 :root[data-theme="dark"] .quick-view__media > span:not(.shade-preview-tint) {
   background: color-mix(in srgb, var(--ui-bg-elevated, #20251f) 91%, transparent) !important;
 }
@@ -662,7 +724,7 @@ body.quick-view-open {
   .quick-view,
   .quick-view-backdrop,
   .quick-view__gallery button,
-  .product-showcase-card__quick {
+  .product-card-quick-view {
     animation: none !important;
     transition-duration: 0.01ms !important;
   }

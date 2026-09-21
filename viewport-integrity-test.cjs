@@ -83,6 +83,11 @@ async function auditHeaderMorph(page) {
   });
 }
 
+function isIgnorableGoogleMapsError(value) {
+  const text = String(value || "");
+  return /maps\.gstatic\.com\/maps-api|maps\.googleapis\.com\/\$rpc\/google\.internal\.maps|<gmp-place-details-compact>/i.test(text);
+}
+
 function assertHeaderMorphIsSeamless(audit) {
   const { samples, oldScrollClasses } = audit;
   const first = samples[0];
@@ -124,9 +129,12 @@ function assertHeaderMorphIsSeamless(audit) {
       for (const route of routes) {
         const page = await context.newPage();
         const errors = [];
-        page.on("pageerror", (error) => errors.push(error.message));
+        page.on("pageerror", (error) => {
+          const detail = error.stack || error.message;
+          if (!isIgnorableGoogleMapsError(detail)) errors.push(error.message);
+        });
         page.on("console", (message) => {
-          if (message.type() === "error") errors.push(message.text());
+          if (message.type() === "error" && !isIgnorableGoogleMapsError(`${message.text()} ${message.location()?.url || ""}`)) errors.push(message.text());
         });
 
         try {

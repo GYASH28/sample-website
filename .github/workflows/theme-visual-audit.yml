@@ -42,7 +42,7 @@ jobs:
           cat /tmp/theme-audit-preview.log
           exit 1
 
-      - name: Render and audit light/dark themes
+      - name: Render and audit light-only theme
         run: node theme-visual-audit.cjs
 
       - name: Upload rendered theme audit

@@ -5,20 +5,22 @@ const path = require("node:path");
 
 const BASE_URL = process.env.THEME_AUDIT_BASE_URL || "http://127.0.0.1:4173";
 const OUTPUT = path.resolve(process.cwd(), "theme-audit-artifacts");
-const themes = ["light", "dark"];
+const themes = ["light"];
 
 async function openPage(browser, theme, viewport) {
-  const context = await browser.newContext({ viewport, reducedMotion: "reduce", colorScheme: theme });
+  const context = await browser.newContext({ viewport, reducedMotion: "reduce", colorScheme: "dark" });
   await context.addInitScript(({ selectedTheme }) => {
-    localStorage.setItem("fakhri_theme", selectedTheme);
+    localStorage.setItem("fakhri_theme", "dark");
     sessionStorage.setItem("fakhri_intro_cinematic_v2", "played");
   }, { selectedTheme: theme });
   const page = await context.newPage();
   return { context, page };
 }
 
-async function assertTheme(page, theme) {
-  await page.waitForFunction((selectedTheme) => document.documentElement.dataset.theme === selectedTheme, theme);
+async function assertTheme(page) {
+  await page.waitForFunction(() => document.documentElement.dataset.theme === "light" && document.documentElement.style.colorScheme === "light");
+  const toggles = await page.locator(".theme-toggle").count();
+  if (toggles !== 0) throw new Error(`Theme toggle is still present in light-only mode: ${toggles}`);
 }
 
 async function auditVisibleSurface(page, selector, label, theme, viewportName, failures) {
@@ -82,7 +84,7 @@ async function runDesktop(browser, theme, failures) {
   const { context, page } = await openPage(browser, theme, { width: 1440, height: 960 });
   try {
     await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle", timeout: 30_000 });
-    await assertTheme(page, theme);
+    await assertTheme(page);
 
     await page.locator(".mega-toggle").click();
     await auditVisibleSurface(page, ".category-mega-menu", "mega-menu", theme, "desktop", failures);
@@ -93,8 +95,8 @@ async function runDesktop(browser, theme, failures) {
     await page.keyboard.press("Escape");
 
     await page.goto(`${BASE_URL}/products`, { waitUntil: "networkidle", timeout: 30_000 });
-    await assertTheme(page, theme);
-    await page.locator(".product-showcase-card__quick").first().click();
+    await assertTheme(page);
+    await page.locator(".product-card-quick-view").first().click();
     await auditVisibleSurface(page, ".quick-view", "quick-view", theme, "desktop", failures);
     await page.locator(".quick-view__close").click();
 
@@ -109,7 +111,7 @@ async function runMobile(browser, theme, failures) {
   const { context, page } = await openPage(browser, theme, { width: 390, height: 844 });
   try {
     await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle", timeout: 30_000 });
-    await assertTheme(page, theme);
+    await assertTheme(page);
 
     await auditVisibleSurface(page, ".mobile-bottom-nav", "bottom-nav", theme, "mobile", failures);
 
@@ -117,7 +119,7 @@ async function runMobile(browser, theme, failures) {
     await auditVisibleSurface(page, ".mobile-nav-drawer", "mobile-drawer", theme, "mobile", failures);
     await page.locator(".mobile-drawer-header .icon-button").click();
     await page.locator(".mobile-nav-drawer").waitFor({ state: "hidden", timeout: 5_000 });
-    await assertTheme(page, theme);
+    await assertTheme(page);
 
     await page.evaluate(() => window.dispatchEvent(new Event("fakhri:open-search")));
     await auditVisibleSurface(page, ".search-dialog", "search-dialog", theme, "mobile", failures);
@@ -145,7 +147,7 @@ async function runMobile(browser, theme, failures) {
     console.error(JSON.stringify(failures.slice(0, 8), null, 2));
     process.exit(1);
   }
-  console.log("Open-state light/dark readability audit passed mega menu, search, Quick View, enquiry drawer, mobile drawer and bottom navigation.");
+  console.log("Open-state light-only readability audit passed mega menu, search, Quick View, enquiry drawer, mobile drawer and bottom navigation.");
 })().catch((error) => {
   console.error(error);
   process.exit(1);

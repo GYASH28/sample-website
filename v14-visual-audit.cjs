@@ -17,10 +17,19 @@ const viewports = [
   ["desktop", { width: 1440, height: 960 }],
   ["mobile", { width: 390, height: 844 }],
 ];
-const themes = ["light", "dark"];
+const themes = ["light"];
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
+}
+
+function isIgnorableGoogleMapsConsoleNoise(message) {
+  const text = message.text();
+  const sourceUrl = message.location()?.url || "";
+  const googleMapsSource = /(?:^|\.)maps\.googleapis\.com|google\.com\/maps/i.test(sourceUrl);
+  const googleMapsRpc = text.includes("maps.googleapis.com/$rpc/google.internal.maps.mapsjs") ||
+    text.includes("<gmp-place-details-compact>: Encountered a network request error");
+  return googleMapsSource || googleMapsRpc;
 }
 
 async function settle(page) {
@@ -46,9 +55,9 @@ async function settle(page) {
   try {
     for (const [viewportName, viewport] of viewports) {
       for (const theme of themes) {
-        const context = await browser.newContext({ viewport, reducedMotion: "reduce", colorScheme: theme });
+        const context = await browser.newContext({ viewport, reducedMotion: "reduce", colorScheme: "dark" });
         await context.addInitScript(({ selectedTheme }) => {
-          localStorage.setItem("fakhri_theme", selectedTheme);
+          localStorage.setItem("fakhri_theme", "dark");
           sessionStorage.setItem("fakhri_intro_cinematic_v2", "played");
           sessionStorage.setItem("fakhri_commerce_intro_v2", "played");
           if (!localStorage.getItem("fakhri_compare_v1")) localStorage.setItem("fakhri_compare_v1", JSON.stringify(["blankie-solid", "cotone"]));
@@ -58,7 +67,9 @@ async function settle(page) {
           const page = await context.newPage();
           const errors = [];
           page.on("pageerror", (error) => errors.push(error.message));
-          page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
+          page.on("console", (message) => {
+            if (message.type() === "error" && !isIgnorableGoogleMapsConsoleNoise(message)) errors.push(message.text());
+          });
           await page.goto(`${BASE_URL}${route}`, { waitUntil: "networkidle", timeout: 30_000 });
           await page.waitForFunction(() => document.querySelector("main#main-content"));
           await page.evaluate(() => document.fonts.ready);
@@ -86,7 +97,9 @@ async function settle(page) {
           const axe = await new AxeBuilder({ page }).withRules(["color-contrast"]).analyze();
           const entry = { viewportName, theme, route, errors, ...metrics, contrast: axe.violations.length };
           report.push(entry);
-          if (errors.length || metrics.theme !== theme || metrics.overflow > 1 || metrics.h1 !== 1 || metrics.brokenImages.length || axe.violations.length) failures.push(entry);
+          const toggles = await page.locator(".theme-toggle").count();
+          entry.themeToggleCount = toggles;
+          if (errors.length || metrics.theme !== "light" || toggles !== 0 || metrics.overflow > 1 || metrics.h1 !== 1 || metrics.brokenImages.length || axe.violations.length) failures.push(entry);
 
           await page.screenshot({
             path: path.join(OUTPUT, `${viewportName}-${theme}-${name}.png`),
@@ -110,7 +123,7 @@ async function settle(page) {
   }
 
   assert(report.length === routes.length * viewports.length * themes.length, "incomplete rendered-state matrix");
-  console.log(`✓ v14 visual audit passed ${report.length} rendered states`);
+  console.log(`✓ v14 light-only visual audit passed ${report.length} rendered states`);
 })().catch((error) => {
   console.error(error);
   process.exit(1);

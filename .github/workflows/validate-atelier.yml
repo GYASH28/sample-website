@@ -82,6 +82,15 @@ jobs:
       - name: Run product media obstruction regression
         run: npm run test:product-media
 
+      - name: Run homepage architecture regression
+        run: npm run test:homepage
+
+      - name: Run responsive commerce regression matrix
+        run: npm run test:responsive-commerce
+
+      - name: Run enquiry basket end-to-end regression
+        run: npm run test:enquiry-basket
+
       - name: Run one-image shade preview regression
         run: npm run test:shade-preview
 
@@ -94,10 +103,10 @@ jobs:
       - name: Run SEO and business identity integrity
         run: npm run test:seo
 
-      - name: Run light and dark theme visual regression
+      - name: Run light-only visual regression
         run: npm run test:theme
 
-      - name: Run opened-surface light and dark readability regression
+      - name: Run opened-surface light-only readability regression
         run: npm run test:theme-open
 
       - name: Run bundle and scroll performance budgets

@@ -74,7 +74,7 @@ async function auditRoute(context, route) {
         const shell = card.querySelector(".native-product-image-shell");
         const image = wrapper?.querySelector("img");
         const showcase = card.closest(".product-showcase-card");
-        const quick = showcase?.querySelector(".product-showcase-card__quick") || null;
+        const quick = showcase?.querySelector(".product-card-quick-view") || null;
         const wrapperRect = wrapper?.getBoundingClientRect();
         const imageRect = image?.getBoundingClientRect();
         const quickRect = quick?.getBoundingClientRect();
@@ -83,6 +83,50 @@ async function auditRoute(context, route) {
         const centerHit = wrapperRect
           ? document.elementFromPoint(wrapperRect.left + wrapperRect.width / 2, wrapperRect.top + wrapperRect.height / 2)
           : null;
+
+        const obstructionCandidates = wrapperRect
+          ? [...card.querySelectorAll("*")].flatMap((element) => {
+              if (!(element instanceof HTMLElement) && !(element instanceof SVGElement)) return [];
+              if (element === wrapper || element === link || element === shell || element === image) return [];
+              if (element.classList?.contains("product-card-badge-floating")) return [];
+              const rect = element.getBoundingClientRect();
+              const left = Math.max(rect.left, wrapperRect.left);
+              const right = Math.min(rect.right, wrapperRect.right);
+              const top = Math.max(rect.top, wrapperRect.top);
+              const bottom = Math.min(rect.bottom, wrapperRect.bottom);
+              const intersection = Math.max(0, right - left) * Math.max(0, bottom - top);
+              const mediaArea = wrapperRect.width * wrapperRect.height;
+              if (!mediaArea || intersection / mediaArea < 0.18) return [];
+              const style = getComputedStyle(element);
+              const bg = style.backgroundColor;
+              const bgImage = style.backgroundImage;
+              const shadow = style.boxShadow;
+              const painted = (bg && bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") ||
+                (bgImage && bgImage !== "none") ||
+                (shadow && shadow !== "none");
+              if (!painted || style.display === "none" || style.visibility === "hidden" || Number(style.opacity || 1) < 0.05) return [];
+              return [{
+                tag: element.tagName,
+                className: String(element.className?.baseVal || element.className || ""),
+                width: Math.round(rect.width),
+                height: Math.round(rect.height),
+                overlapRatio: Number((intersection / mediaArea).toFixed(3)),
+                background: bg,
+                backgroundImage: bgImage,
+                boxShadow: shadow,
+              }];
+            })
+          : [];
+
+        const centerStack = wrapperRect
+          ? document.elementsFromPoint(wrapperRect.left + wrapperRect.width / 2, wrapperRect.top + wrapperRect.height / 2)
+              .filter((element) => card.contains(element))
+              .slice(0, 8)
+              .map((element) => ({
+                tag: element.tagName,
+                className: String(element.className?.baseVal || element.className || ""),
+              }))
+          : [];
 
         return {
           index,
@@ -94,7 +138,9 @@ async function auditRoute(context, route) {
           imageBlend: imageStyle?.mixBlendMode || "normal",
           shellBackdrop: shellStyle?.backdropFilter || shellStyle?.webkitBackdropFilter || "none",
           centerHitClass: centerHit ? String(centerHit.className || centerHit.tagName) : "",
-          quick: quickRect ? { width: quickRect.width, height: quickRect.height } : null,
+          centerStack,
+          obstructionCandidates,
+          quick: quickRect ? { width: quickRect.width, height: quickRect.height, insideActions: Boolean(quick?.closest(".product-card-floating-actions")) } : null,
           pseudo: {
             cardBefore: pseudoState(card, "::before"),
             cardAfter: pseudoState(card, "::after"),
@@ -120,9 +166,12 @@ async function auditRoute(context, route) {
 
       const blockingPseudo = Object.entries(item.pseudo).find(([, state]) => state?.blocksMedia);
       assert(!blockingPseudo, `${route} ${item.name}: painted pseudo-layer can obscure product media: ${JSON.stringify(blockingPseudo)}`);
+      assert(item.obstructionCandidates.length === 0,
+        `${route} ${item.name}: painted element covers a significant part of product media: ${JSON.stringify({ candidates: item.obstructionCandidates, centerStack: item.centerStack })}`);
 
       if (item.quick) {
-        assert(item.quick.width <= 170, `${route} ${item.name}: Quick View stretched to ${item.quick.width.toFixed(1)}px wide`);
+        assert(item.quick.insideActions, `${route} ${item.name}: Quick View is not owned by the compact product action cluster`);
+        assert(item.quick.width <= 64, `${route} ${item.name}: Quick View stretched to ${item.quick.width.toFixed(1)}px wide`);
         assert(item.quick.height <= 64, `${route} ${item.name}: Quick View stretched to ${item.quick.height.toFixed(1)}px tall`);
         assert(item.quick.width * item.quick.height < item.wrapper.width * item.wrapper.height * 0.25,
           `${route} ${item.name}: Quick View covers too much of the product photo: ${JSON.stringify(item)}`);

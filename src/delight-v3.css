@@ -13,7 +13,7 @@ a,
 
 .btn,
 .icon-button,
-.product-showcase-card__quick,
+.product-card-quick-view,
 .commerce-category-card,
 .search-result-list a {
   transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
@@ -21,7 +21,7 @@ a,
 
 .btn:active,
 .icon-button:active,
-.product-showcase-card__quick:active {
+.product-card-quick-view:active {
   transform: translateY(1px) scale(0.985);
 }
 
@@ -206,10 +206,6 @@ a,
 
 .product-image {
   transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1), filter 300ms ease;
-}
-
-.product-showcase-card__quick {
-  backdrop-filter: blur(14px) saturate(1.15);
 }
 
 /* Rails get a subtle edge fade on wide screens, communicating horizontal discovery. */

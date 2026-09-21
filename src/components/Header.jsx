@@ -18,7 +18,6 @@ import {
   createWhatsAppLink,
   productCategories,
 } from "../data/siteData.js";
-import ThemeToggle from "./ThemeToggle.jsx";
 import WhatsAppIcon from "./WhatsAppIcon.jsx";
 
 const SearchDialog = lazy(() => import("./SearchDialog.jsx"));
@@ -195,7 +194,6 @@ export default function Header() {
               <button type="button" className={language === "en" ? "active" : ""} onClick={() => setLanguage("en")} aria-pressed={language === "en"}>EN</button>
               <button type="button" className={language === "hi" ? "active" : ""} onClick={() => setLanguage("hi")} aria-pressed={language === "hi"}>हिं</button>
             </div>
-            <ThemeToggle compact />
             <Link className="icon-button desktop-icon-action" to="/wishlist" aria-label={`${t("wishlist")}: ${wishlistCount}`}><Heart size={21} /><Counter value={wishlistCount} /></Link>
             <Link className="icon-button desktop-icon-action" to="/enquiry" aria-label={`${t("enquiry")}: ${itemsCount}`}><ShoppingBagOpen size={22} /><Counter value={itemsCount} /></Link>
             <a className="header-whatsapp" href={createWhatsAppLink()} target="_blank" rel="noreferrer"><WhatsAppIcon size={17} /><span>{t("whatsapp")}</span></a>
@@ -215,7 +213,6 @@ export default function Header() {
         </div>
         <div className="mobile-drawer-utilities">
           <button className="mobile-search-button" type="button" onClick={openSearch}><MagnifyingGlass size={20} /><span>{t("searchHint")}</span></button>
-          <ThemeToggle />
         </div>
         <nav className="mobile-primary-links" aria-label="Mobile primary navigation">
           {primaryLinks.map((item) => <NavLink key={item.to} to={item.to} onClick={closeMenu}>{t(item.key)}</NavLink>)}
