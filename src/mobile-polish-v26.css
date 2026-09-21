@@ -435,11 +435,8 @@ body.quick-view-open {
   }
 
   .product-card-quick-view {
-    top: 12px !important;
-    left: 12px !important;
+    min-width: 44px !important;
     min-height: 44px !important;
-    opacity: 1 !important;
-    transform: none !important;
   }
 
   /* Floating utilities stay above, not on top of, the bottom nav. */
