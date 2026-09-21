@@ -23,6 +23,15 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
+function isIgnorableGoogleMapsConsoleNoise(message) {
+  const text = message.text();
+  const sourceUrl = message.location()?.url || "";
+  const googleMapsSource = /(?:^|\.)maps\.googleapis\.com|google\.com\/maps/i.test(sourceUrl);
+  const googleMapsRpc = text.includes("maps.googleapis.com/$rpc/google.internal.maps.mapsjs") ||
+    text.includes("<gmp-place-details-compact>: Encountered a network request error");
+  return googleMapsSource || googleMapsRpc;
+}
+
 async function settle(page) {
   await page.evaluate(async () => {
     const max = Math.max(0, document.documentElement.scrollHeight - innerHeight);
@@ -58,7 +67,9 @@ async function settle(page) {
           const page = await context.newPage();
           const errors = [];
           page.on("pageerror", (error) => errors.push(error.message));
-          page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
+          page.on("console", (message) => {
+            if (message.type() === "error" && !isIgnorableGoogleMapsConsoleNoise(message)) errors.push(message.text());
+          });
           await page.goto(`${BASE_URL}${route}`, { waitUntil: "networkidle", timeout: 30_000 });
           await page.waitForFunction(() => document.querySelector("main#main-content"));
           await page.evaluate(() => document.fonts.ready);
