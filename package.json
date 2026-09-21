@@ -28,7 +28,8 @@
     "test:theme-open": "node theme-open-state-audit.cjs",
     "audit:intro": "node src/scripts/intro-performance-audit.mjs",
     "audit:motion": "node src/scripts/motion-audit.mjs",
-    "test:homepage": "node homepage-architecture-test.cjs"
+    "test:homepage": "node homepage-architecture-test.cjs",
+    "test:responsive-commerce": "node responsive-commerce-test.cjs"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.3.0",
