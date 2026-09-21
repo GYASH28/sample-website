@@ -67,7 +67,7 @@
 
 :root[data-theme="dark"] .card-floating-btn,
 :root[data-theme="dark"] .favorite-toggle-btn-card,
-:root[data-theme="dark"] .product-showcase-card__quick,
+:root[data-theme="dark"] .product-card-quick-view,
 :root[data-theme="dark"] .mobile-filter-trigger,
 :root[data-theme="dark"] .mobile-product-dock__save,
 :root[data-theme="dark"] .btn-detail-action-circle,
@@ -87,7 +87,7 @@
 }
 
 :root[data-theme="dark"] .enquiry-launcher:hover,
-:root[data-theme="dark"] .product-showcase-card__quick:hover,
+:root[data-theme="dark"] .product-card-quick-view:hover,
 :root[data-theme="dark"] .card-floating-btn:hover,
 :root[data-theme="dark"] .back-to-top:hover,
 :root[data-theme="dark"] main[data-route-family="home"] button[aria-label^="Scroll "]:hover {
@@ -95,7 +95,7 @@
   color: var(--ui-accent) !important;
 }
 
-:root[data-theme="dark"] .commerce-section button:not(.btn):not(.product-showcase-card__quick),
+:root[data-theme="dark"] .commerce-section button:not(.btn):not(.product-card-quick-view),
 :root[data-theme="dark"] .hero-v6 button:not(.btn) {
   border-color: var(--ui-border) !important;
 }
