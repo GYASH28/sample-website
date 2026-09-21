@@ -71,9 +71,11 @@ async function goto(page, path) {
     await page.getByRole("button", { name: /Reset all/i }).click();
     await page.waitForFunction(() => !new URL(location.href).searchParams.has("brand") && !new URL(location.href).searchParams.has("mode"));
 
-    // A genuinely empty search must become a helpful reset state, not a dead end.
-    await goto(page, "/products?q=zzzz-no-such-fakhri-material&sort=relevance");
-    assert(await page.locator(".product-card").count() === 0, "impossible query unexpectedly returned products");
+    // A genuinely incompatible supported filter combination must become a
+    // helpful reset state, not a dead end. Ganga is a yarn brand in the current
+    // verified catalogue, so combining it with the Threads department is empty.
+    await goto(page, "/products?brand=Ganga&department=Threads");
+    assert(await page.locator(".product-card").count() === 0, "incompatible brand/department filters unexpectedly returned products");
     assert(await page.locator(".empty-results-box").count() === 1, "zero-results state is missing");
     await page.getByRole("button", { name: /Clear search and filters/i }).click();
     await page.waitForFunction(() => document.querySelectorAll(".product-card").length > 0);
