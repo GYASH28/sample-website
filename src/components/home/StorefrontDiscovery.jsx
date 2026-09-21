@@ -1,4 +1,4 @@
-import { ArrowRight, ClockCounterClockwise, Swatches } from "@phosphor-icons/react";
+import { ArrowRight, ClockCounterClockwise, Eye, Swatches } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
 import { featuredProducts } from "../../data/siteData.js";
 import { useRecentlyViewed } from "../../hooks/useRecentlyViewed.js";
@@ -6,26 +6,34 @@ import ProductShowcaseCard from "../ProductShowcaseCard.jsx";
 import Reveal from "../Reveal.jsx";
 
 export function ShadeDiscovery() {
-  const products = featuredProducts.slice(0, 4);
-
   return (
-    <section className="commerce-section shade-discovery" aria-labelledby="shade-discovery-title">
-      <div className="container">
+    <section className="commerce-section shade-discovery shade-discovery--support" aria-labelledby="shade-discovery-title">
+      <div className="container shade-discovery__support-grid">
         <Reveal className="commerce-heading" variant="fade-up">
           <div>
             <p className="eyebrow"><Swatches size={15} /> Colour preview + shade-card support</p>
-            <h2 id="shade-discovery-title">Try colours instantly. Confirm the real supplier shade before ordering.</h2>
-            <p>Open Quick View or a product page to recolour the same product photo in your browser—no duplicate colour images are loaded or generated. The preview is for visual exploration only; the current supplier shade card or live stock photo remains the source of truth for availability.</p>
+            <h2 id="shade-discovery-title">Use digital colour as direction. Confirm the real supplier shade before ordering.</h2>
+            <p>The browser preview helps you explore a direction without creating fake inventory. Current supplier shade cards, pack labels and live product photos remain the source of truth.</p>
           </div>
-          <Link to="/products">Browse verified materials <ArrowRight size={17} /></Link>
         </Reveal>
 
-        <div className="shade-discovery__grid">
-          {products.map((product, index) => (
-            <Reveal key={product.slug} delay={index * 45} variant="fade-up">
-              <ProductShowcaseCard product={product} />
-            </Reveal>
-          ))}
+        <div className="shade-discovery__support-actions">
+          <Link className="shade-discovery__support-card" to="/yarn-guide">
+            <Eye size={22} aria-hidden="true" />
+            <span>
+              <strong>Choose the right material</strong>
+              <small>Start with your project and compare verified catalogue families.</small>
+            </span>
+            <ArrowRight size={17} aria-hidden="true" />
+          </Link>
+          <Link className="shade-discovery__support-card" to="/blog#shade-checklist">
+            <Swatches size={22} aria-hidden="true" />
+            <span>
+              <strong>Check a shade properly</strong>
+              <small>See what to confirm from the current shade card or live stock photo.</small>
+            </span>
+            <ArrowRight size={17} aria-hidden="true" />
+          </Link>
         </div>
       </div>
     </section>
