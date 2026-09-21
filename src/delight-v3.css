@@ -208,10 +208,6 @@ a,
   transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1), filter 300ms ease;
 }
 
-.product-card-quick-view {
-  backdrop-filter: blur(14px) saturate(1.15);
-}
-
 /* Rails get a subtle edge fade on wide screens, communicating horizontal discovery. */
 @media (min-width: 800px) {
   .commerce-product-rail {
