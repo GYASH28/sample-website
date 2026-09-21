@@ -96,7 +96,7 @@ async function runDesktop(browser, theme, failures) {
 
     await page.goto(`${BASE_URL}/products`, { waitUntil: "networkidle", timeout: 30_000 });
     await assertTheme(page);
-    await page.locator(".product-showcase-card__quick").first().click();
+    await page.locator(".product-card-quick-view").first().click();
     await auditVisibleSurface(page, ".quick-view", "quick-view", theme, "desktop", failures);
     await page.locator(".quick-view__close").click();
 
