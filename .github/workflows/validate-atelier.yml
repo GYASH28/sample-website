@@ -82,6 +82,9 @@ jobs:
       - name: Run product media obstruction regression
         run: npm run test:product-media
 
+      - name: Run homepage architecture regression
+        run: npm run test:homepage
+
       - name: Run one-image shade preview regression
         run: npm run test:shade-preview
 
