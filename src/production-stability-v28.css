@@ -1,8 +1,8 @@
 /* Fakhri Mart — production stability v28
-   Regression-only overrides. Keep this file small and focused on test-backed fixes. */
+   Regression-only rules. Keep this file small and test-backed. */
 
-/* The sticky header wrapper must remain structurally transparent. The nav shell
-   owns the single liquid-glass surface during the compact scroll morph. */
+/* The sticky header wrapper stays structurally transparent. The nav shell owns
+   the single visual surface during the compact scroll morph. */
 .site-header {
   border-bottom-color: transparent !important;
   background: transparent !important;
@@ -11,152 +11,71 @@
   -webkit-backdrop-filter: none !important;
 }
 
-/* The header position is already updated once per animation frame by
-   HeaderEnhancer. Older v8 transition rules were interpolating the nav transform
-   a second time, occasionally lagging and then catching up by >7px in a single
-   viewport sample. Keep the scroll morph frame-synchronous instead. */
+/* HeaderEnhancer updates the morph once per animation frame. Do not interpolate
+   that transform again in CSS or the nav can lag and catch up between samples. */
 .site-header .nav-shell {
   transition: none !important;
 }
 
-/* The inherited mobile-brand pill stayed light in dark mode while its text was
-   white, producing a 1.53:1 contrast failure. Give the drawer brand an actual
-   dark-theme surface rather than changing the brand text to an off-theme color. */
-[data-theme="dark"] .mobile-nav-drawer .mobile-drawer-header .brand {
-  border: 1px solid rgba(255, 255, 255, 0.10) !important;
-  background: rgba(255, 255, 255, 0.055) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.055) !important;
-}
-
-[data-theme="dark"] .mobile-nav-drawer .mobile-drawer-header .brand strong {
-  color: #f6faf7 !important;
-}
-
-/* -------------------------------------------------------------------------- */
-/* Product media integrity                                                     */
-/* -------------------------------------------------------------------------- */
-
-/* Product photography is the content. No decorative frosted/glass layer is
-   allowed to sit over it. A legacy visual layer could expand into a large pale
-   rounded rectangle and obscure nearly the whole photo while still leaving the
-   underlying <img> technically loaded, so normal broken-image tests missed it. */
-.product-card,
-.product-showcase-card,
-.product-card-image-link,
-.product-image-wrapper,
-.native-product-image-shell {
-  isolation: isolate;
-}
-
-.product-card::before,
-.product-card::after,
-.product-showcase-card::before,
-.product-showcase-card::after,
-.product-card-image-link::before,
-.product-card-image-link::after,
-.product-image-wrapper::before,
-.product-image-wrapper::after,
-.native-product-image-shell::before,
-.native-product-image-shell::after {
-  display: none !important;
-  content: none !important;
-}
-
+/* Product media contract.
+   Root cause of the old pale obstruction was architectural: Quick View was a
+   frosted, absolutely-positioned sibling of the whole showcase card, so later
+   button/layout rules could enlarge a painted control over the photo. Quick View
+   now lives inside the compact floating-action cluster. The media stack itself
+   therefore needs only three explicit layers: placeholder -> image -> badges/actions. */
 .product-card .product-image-wrapper {
   position: relative !important;
+  isolation: isolate;
   overflow: hidden !important;
-  background: var(--ui-surface-muted, var(--fm-surface-soft, #f2eee6)) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
 
-.product-card .product-image-wrapper > .native-product-image-shell {
-  position: absolute !important;
-  z-index: 1 !important;
-  inset: 0 !important;
-  display: block !important;
-  width: 100% !important;
-  height: 100% !important;
-  overflow: hidden !important;
-  border-radius: inherit !important;
-  background: transparent !important;
-  opacity: 1 !important;
-  filter: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  transform: none !important;
+.product-card .native-product-image-shell {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
+  background: transparent;
 }
 
-.product-card .product-image-wrapper > .native-product-image-shell > img,
-.product-card .product-image-wrapper .product-image {
-  position: absolute !important;
-  z-index: 1 !important;
-  inset: 0 !important;
-  display: block !important;
+.product-card .native-product-image-shell > img,
+.product-card .product-image {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: block;
   width: 100% !important;
   height: 100% !important;
-  max-width: none !important;
+  max-width: none;
   object-fit: cover !important;
-  border-radius: inherit !important;
   opacity: 1 !important;
   filter: none !important;
-  clip-path: none !important;
-  mix-blend-mode: normal !important;
+  mix-blend-mode: normal;
 }
 
-.product-card .product-image-wrapper > .product-card-badge-floating {
-  position: absolute !important;
-  z-index: 4 !important;
-}
-
-/* The lazy placeholder may occupy the image area only before the real image is
-   mounted. Keep it opaque and full-frame so it cannot resemble a floating glass
-   pane or remain visually layered over a loaded photograph. */
 .product-card .native-product-image-shell__placeholder {
-  position: absolute !important;
-  z-index: 0 !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  border-radius: inherit !important;
-  filter: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  filter: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
-/* Quick View must always remain a compact control. Explicit geometry prevents
-   broad button/layout rules from ever stretching it across the product photo. */
-.product-showcase-card__quick {
-  position: absolute !important;
-  z-index: 16 !important;
-  top: 14px !important;
-  right: auto !important;
-  bottom: auto !important;
-  left: 14px !important;
-  display: inline-flex !important;
-  width: auto !important;
-  max-width: 148px !important;
-  height: auto !important;
-  min-width: 0 !important;
-  min-height: 40px !important;
-  padding: 8px 12px !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 6px !important;
-  overflow: hidden !important;
-  border-radius: 999px !important;
-  white-space: nowrap !important;
-  line-height: 1 !important;
-  backdrop-filter: blur(10px) saturate(1.06) !important;
-  -webkit-backdrop-filter: blur(10px) saturate(1.06) !important;
+.product-card .product-card-badge-floating {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
 }
 
-@media (max-width: 800px) {
-  .product-showcase-card__quick {
-    top: 12px !important;
-    left: 12px !important;
-    max-width: 136px !important;
-    min-height: 40px !important;
-    padding: 8px 11px !important;
-  }
+.product-card .product-card-floating-actions {
+  z-index: 3;
 }
