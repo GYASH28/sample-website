@@ -18,7 +18,10 @@ async function goto(page, route) {
   await context.addInitScript(() => {
     sessionStorage.setItem("fakhri_intro_cinematic_v2", "played");
     sessionStorage.setItem("fakhri_commerce_intro_v2", "played");
-    localStorage.removeItem("fakhri_enquiry_basket");
+    if (!sessionStorage.getItem("fakhri_enquiry_regression_initialized")) {
+      localStorage.removeItem("fakhri_enquiry_basket");
+      sessionStorage.setItem("fakhri_enquiry_regression_initialized", "1");
+    }
     window.open = (url) => {
       window.__lastEnquiryPopup = String(url || "");
       return null;
