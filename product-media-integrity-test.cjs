@@ -74,7 +74,7 @@ async function auditRoute(context, route) {
         const shell = card.querySelector(".native-product-image-shell");
         const image = wrapper?.querySelector("img");
         const showcase = card.closest(".product-showcase-card");
-        const quick = showcase?.querySelector(".product-showcase-card__quick") || null;
+        const quick = showcase?.querySelector(".product-card-quick-view") || null;
         const wrapperRect = wrapper?.getBoundingClientRect();
         const imageRect = image?.getBoundingClientRect();
         const quickRect = quick?.getBoundingClientRect();
@@ -94,7 +94,7 @@ async function auditRoute(context, route) {
           imageBlend: imageStyle?.mixBlendMode || "normal",
           shellBackdrop: shellStyle?.backdropFilter || shellStyle?.webkitBackdropFilter || "none",
           centerHitClass: centerHit ? String(centerHit.className || centerHit.tagName) : "",
-          quick: quickRect ? { width: quickRect.width, height: quickRect.height } : null,
+          quick: quickRect ? { width: quickRect.width, height: quickRect.height, insideActions: Boolean(quick?.closest(".product-card-floating-actions")) } : null,
           pseudo: {
             cardBefore: pseudoState(card, "::before"),
             cardAfter: pseudoState(card, "::after"),
@@ -122,7 +122,8 @@ async function auditRoute(context, route) {
       assert(!blockingPseudo, `${route} ${item.name}: painted pseudo-layer can obscure product media: ${JSON.stringify(blockingPseudo)}`);
 
       if (item.quick) {
-        assert(item.quick.width <= 170, `${route} ${item.name}: Quick View stretched to ${item.quick.width.toFixed(1)}px wide`);
+        assert(item.quick.insideActions, `${route} ${item.name}: Quick View is not owned by the compact product action cluster`);
+        assert(item.quick.width <= 64, `${route} ${item.name}: Quick View stretched to ${item.quick.width.toFixed(1)}px wide`);
         assert(item.quick.height <= 64, `${route} ${item.name}: Quick View stretched to ${item.quick.height.toFixed(1)}px tall`);
         assert(item.quick.width * item.quick.height < item.wrapper.width * item.wrapper.height * 0.25,
           `${route} ${item.name}: Quick View covers too much of the product photo: ${JSON.stringify(item)}`);
