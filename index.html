@@ -6,19 +6,12 @@
     <meta name="theme-color" content="#FFF7EC" />
     <script>
       (() => {
+        document.documentElement.dataset.theme = "light";
+        document.documentElement.style.colorScheme = "light";
         try {
-          const stored = localStorage.getItem("fakhri_theme");
-          const theme = stored === "dark" || stored === "light"
-            ? stored
-            : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-          document.documentElement.dataset.theme = theme;
-          document.documentElement.style.colorScheme = theme;
-          document.querySelector('meta[name="theme-color"]')?.setAttribute(
-            "content",
-            theme === "dark" ? "#171717" : "#FFF7EC",
-          );
+          localStorage.removeItem("fakhri_theme");
         } catch {
-          document.documentElement.dataset.theme = "light";
+          // Storage is optional. Fakhri Mart is intentionally light-mode only.
         }
       })();
     </script>
