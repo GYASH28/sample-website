@@ -1,10 +1,9 @@
-import { Camera, ChatCircle, ClipboardText, Heart, Tag } from "@phosphor-icons/react";
+import { ClipboardText, Eye, Heart, Tag } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { createWhatsAppLink, productCategories } from "../data/siteData.js";
+import { productCategories } from "../data/siteData.js";
 import { useWishlist } from "../hooks/useWishlist.js";
 import { useEnquiryBasket } from "../hooks/useEnquiryBasket.js";
-import { smartWhatsAppLink } from "../i18n.jsx";
 import { trackEngagement } from "../lib/engagementAnalytics.js";
 import CompareButton from "./CompareButton.jsx";
 import NativeProductImage from "./NativeProductImage.jsx";
@@ -17,7 +16,7 @@ function getDefaultVariant(product) {
     : null;
 }
 
-export default function ProductCard({ product, compact = false, showWishlistAction = true }) {
+export default function ProductCard({ product, compact = false, showWishlistAction = true, onQuickView = null, quickViewOpen = false }) {
   const categoryData = productCategories.find((category) => category.name === product.category);
   const productBaseImage = product.image || categoryData?.image || null;
   const [imageSrc, setImageSrc] = useState(productBaseImage);
@@ -35,22 +34,8 @@ export default function ProductCard({ product, compact = false, showWishlistActi
     setAdded(false);
   }, [product.slug, productBaseImage]);
 
-  const enquireLink = smartWhatsAppLink({
-    type: "product-card",
-    productName: product.name,
-    category: product.category,
-    shade: activeColor?.name,
-  });
-
-  const photoLink = createWhatsAppLink(
-    `Hello Fakhri Mart, I am interested in *${product.name}*${activeColor ? `, especially the *${activeColor.name}* shade` : ""}. Please send me a current product/batch photo and the latest available shade photo/card before I decide. Thank you!`,
-  );
-
   const colorsToShow = (product.colors || []).slice(0, MAX_SWATCHES_ON_CARD);
   const overflowCount = Math.max(0, (product.colors?.length || 0) - MAX_SWATCHES_ON_CARD);
-  const soldAs = product.quantityOptions?.soldAs;
-  const presets = product.quantityOptions?.presets || [];
-  const bulkAvailable = presets.some((preset) => preset >= 50) || (product.tags || []).includes("Bulk Orders");
 
   const addDefaultToBasket = () => {
     addToBasket({
@@ -90,6 +75,25 @@ export default function ProductCard({ product, compact = false, showWishlistActi
 
       <div className="product-card-link-wrapper-container">
         <div className="product-card-floating-actions">
+          {onQuickView ? (
+            <button
+              type="button"
+              className="card-floating-btn product-card-quick-view"
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                trackEngagement("quick_view_open", { product: product.slug, category: product.category, source: "product-card" });
+                onQuickView();
+              }}
+              aria-label={`Quick view ${product.name}`}
+              aria-haspopup="dialog"
+              aria-expanded={quickViewOpen}
+              aria-controls={`quick-view-panel-${product.slug}`}
+              title="Quick view"
+            >
+              <Eye size={17} aria-hidden="true" />
+            </button>
+          ) : null}
           {showWishlistAction ? (
             <button
               type="button"
@@ -127,12 +131,7 @@ export default function ProductCard({ product, compact = false, showWishlistActi
           </Link>
 
           <div className="product-content">
-            <div className="product-card-topline">
-              <div className="product-badges" aria-label="Product highlights">
-                {(product.badges || ["Catalogue"]).slice(0, 2).map((badge) => <span key={badge} className="badge-highlight">{badge}</span>)}
-              </div>
-            </div>
-
+            <p className="product-card-meta">{[product.brand, product.category].filter(Boolean).join(" · ")}</p>
             <h3 className="product-card-title"><Link to={`/products/${product.slug}`}>{product.name}</Link></h3>
 
             {product.colors?.length ? (
@@ -157,9 +156,7 @@ export default function ProductCard({ product, compact = false, showWishlistActi
               </div>
             ) : null}
 
-            <p className="product-card-variants">{product.variants}</p>
-            {soldAs ? <div className="product-card-sold-as"><span>{soldAs}</span>{bulkAvailable ? <em>Bulk available</em> : null}</div> : null}
-            <dl className="product-card-specs"><div><dt>Best for:</dt><dd>{product.suitableFor}</dd></div></dl>
+            <p className="product-card-variants">{product.variants || product.suitableFor}</p>
           </div>
         </div>
       </div>
@@ -167,28 +164,9 @@ export default function ProductCard({ product, compact = false, showWishlistActi
       <div className="product-actions">
         <Link to={`/products/${product.slug}`} className="btn btn-outline btn-small"><Tag size={16} aria-hidden="true" /> Details</Link>
         <button className={`btn btn-primary btn-small ${added ? "btn-success" : ""}`} type="button" onClick={addDefaultToBasket}><ClipboardText size={16} aria-hidden="true" /> {added ? "Added" : "Add to enquiry"}</button>
-        <a
-          className="btn btn-whatsapp btn-small"
-          href={enquireLink}
-          target="_blank"
-          rel="noreferrer"
-          aria-label={`Ask about ${product.name}${activeColor ? ` in ${activeColor.name}` : ""} on WhatsApp`}
-          onClick={() => trackEngagement("whatsapp_click", { product: product.slug, category: product.category, shade: activeColor?.name || "none", source: "product-card" })}
-        >
-          <ChatCircle size={16} aria-hidden="true" /> {activeColor ? `Ask about ${activeColor.name}` : "Price & availability"}
-        </a>
+
       </div>
 
-      <div className="product-card-secondary-actions">
-        <a
-          href={photoLink}
-          target="_blank"
-          rel="noreferrer"
-          onClick={() => trackEngagement("current_photo_request", { product: product.slug, shade: activeColor?.name || "none", source: "product-card" })}
-        >
-          <Camera size={14} aria-hidden="true" /> {activeColor ? `Request current ${activeColor.name} photo` : "Request current photos"}
-        </a>
-      </div>
     </article>
   );
 }
