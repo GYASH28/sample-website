@@ -21,7 +21,7 @@ const routes = [
   ["delivery", "/delivery-enquiries"],
 ];
 const viewports = [["desktop", { width: 1440, height: 960 }], ["mobile", { width: 390, height: 844 }]];
-const themes = ["light", "dark"];
+const themes = ["light"];
 const SECTION_VISUAL_ROUTES = new Set(["home", "catalogue", "product", "projects", "collection", "contact", "yarn-guide", "enquiry"]);
 const THEME_SURFACE_SELECTORS = [
   ".site-header .brand",
@@ -180,26 +180,25 @@ async function inspectRenderedState(page) {
   }, { surfaceSelectors: THEME_SURFACE_SELECTORS });
 }
 
-async function verifyThemeControls(browser) {
-  const context = await browser.newContext({ viewport: { width: 1440, height: 960 }, colorScheme: "light", reducedMotion: "reduce" });
-  await context.addInitScript(() => sessionStorage.setItem("fakhri_intro_cinematic_v2", "played"));
+async function verifyLightOnlyTheme(browser) {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 960 }, colorScheme: "dark", reducedMotion: "reduce" });
+  await context.addInitScript(() => {
+    localStorage.setItem("fakhri_theme", "dark");
+    sessionStorage.setItem("fakhri_intro_cinematic_v2", "played");
+  });
   const page = await context.newPage();
   await page.goto(`${BASE_URL}/about`, { waitUntil: "networkidle", timeout: 30_000 });
-  await page.evaluate(() => localStorage.removeItem("fakhri_theme"));
-  await page.reload({ waitUntil: "networkidle" });
-  await page.waitForFunction(() => document.querySelectorAll(".theme-toggle").length >= 2);
-  const before = await page.evaluate(() => ({ theme: document.documentElement.dataset.theme, states: [...document.querySelectorAll(".theme-toggle")].map((button) => button.getAttribute("aria-pressed")) }));
-  if (before.theme !== "light") throw new Error(`Expected system-light fallback, got ${before.theme}`);
-
-  await page.locator(".theme-toggle").first().click();
-  await page.waitForFunction(() => document.documentElement.dataset.theme === "dark");
-  const synchronized = await page.evaluate(() => ({ stored: localStorage.getItem("fakhri_theme"), states: [...document.querySelectorAll(".theme-toggle")].map((button) => button.getAttribute("aria-pressed")) }));
-  if (synchronized.stored !== "dark" || synchronized.states.some((state) => state !== "true")) throw new Error(`Theme controls did not synchronize: ${JSON.stringify(synchronized)}`);
-
-  await page.reload({ waitUntil: "networkidle" });
-  await page.waitForFunction(() => document.querySelectorAll(".theme-toggle").length >= 2);
-  const persisted = await page.evaluate(() => ({ theme: document.documentElement.dataset.theme, states: [...document.querySelectorAll(".theme-toggle")].map((button) => button.getAttribute("aria-pressed")) }));
-  if (persisted.theme !== "dark" || persisted.states.some((state) => state !== "true")) throw new Error(`Dark preference did not persist: ${JSON.stringify(persisted)}`);
+  const state = await page.evaluate(() => ({
+    theme: document.documentElement.dataset.theme,
+    colorScheme: document.documentElement.style.colorScheme,
+    storedTheme: localStorage.getItem("fakhri_theme"),
+    toggles: document.querySelectorAll(".theme-toggle").length,
+  }));
+  if (state.theme !== "light" || state.colorScheme !== "light") {
+    throw new Error(`Light-only theme contract failed: ${JSON.stringify(state)}`);
+  }
+  if (state.storedTheme !== null) throw new Error(`Legacy theme preference was not cleared: ${JSON.stringify(state)}`);
+  if (state.toggles !== 0) throw new Error(`Theme toggle still rendered in light-only mode: ${JSON.stringify(state)}`);
   await context.close();
 }
 
@@ -210,12 +209,12 @@ async function verifyThemeControls(browser) {
   const failures = [];
   const report = [];
   try {
-    await verifyThemeControls(browser);
+    await verifyLightOnlyTheme(browser);
     for (const [viewportName, viewport] of viewports) {
       for (const theme of themes) {
         const context = await browser.newContext({ viewport, reducedMotion: "reduce", colorScheme: theme });
         await context.addInitScript(({ selectedTheme }) => {
-          localStorage.setItem("fakhri_theme", selectedTheme);
+          localStorage.setItem("fakhri_theme", "dark");
           sessionStorage.setItem("fakhri_intro_cinematic_v2", "played");
           localStorage.setItem("fakhri_compare_v1", JSON.stringify(["blankie-solid", "cotone", "macrame-cord"]));
         }, { selectedTheme: theme });
@@ -257,7 +256,7 @@ async function verifyThemeControls(browser) {
     console.error(JSON.stringify(failures.slice(0, 6), null, 2));
     process.exit(1);
   }
-  console.log(`Theme visual audit passed ${report.length} route/theme/viewport combinations with semantic surface contracts, Axe contrast, section visibility, overflow and persistence checks.`);
+  console.log(`Light-only visual audit passed ${report.length} route/viewport combinations with semantic surface contracts, Axe contrast, section visibility, overflow and theme-lock checks.`);
 })().catch((error) => {
   console.error(error);
   process.exit(1);
