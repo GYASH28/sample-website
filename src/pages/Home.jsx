@@ -12,15 +12,15 @@ import {
   CommerceProductRail,
   CommerceWholesaleCta,
 } from "../components/home/CommerceHomeSections.jsx";
-import { RecentlyViewedHome, ShadeDiscovery } from "../components/home/StorefrontDiscovery.jsx";
+import { ShadeDiscovery } from "../components/home/StorefrontDiscovery.jsx";
 import {
   businessInfo,
   featuredProducts,
   productCategories,
 } from "../data/siteData.js";
 import {
-  buildHomeMerchandisingShelves,
   getBrandOptions,
+  getFeaturedHomeProducts,
 } from "../data/merchandisingData.js";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
 import {
@@ -38,58 +38,38 @@ export default function Home() {
   useJsonLd(localBusinessJsonLd(businessInfo));
   useJsonLd(websiteJsonLd());
 
-  const shelves = buildHomeMerchandisingShelves(featuredProducts);
-  const priorityShelves = shelves.filter((shelf) => shelf.priority);
-  const remainingShelves = shelves.filter((shelf) => !shelf.priority);
+  const featured = getFeaturedHomeProducts(featuredProducts);
   const brands = getBrandOptions(featuredProducts);
 
   return (
     <div className="fm-home commerce-home product-first-home">
       <CommerceHero />
+
       <CommerceCategoryNav categories={productCategories} />
-      <CommerceBrandNav brands={brands} />
-
-      <section className="home-product-first-stack" aria-label="Featured catalogue collections">
-        {priorityShelves.map((shelf) => (
-          <CommerceProductRail
-            key={shelf.id}
-            eyebrow={shelf.eyebrow}
-            title={shelf.title}
-            text={shelf.text}
-            products={shelf.products}
-            href={shelf.href}
-            priority
-          />
-        ))}
-      </section>
-
       <MakerHelpStrip />
 
-      <DeferredSection label="More product collections" minHeight={1450}>
-        <div className="home-product-first-stack home-product-first-stack--secondary">
-          {remainingShelves.map((shelf) => (
-            <CommerceProductRail
-              key={shelf.id}
-              eyebrow={shelf.eyebrow}
-              title={shelf.title}
-              text={shelf.text}
-              products={shelf.products}
-              href={shelf.href}
-            />
-          ))}
-        </div>
+      <CommerceProductRail
+        eyebrow="Featured catalogue"
+        title="A useful starting point, not the whole warehouse."
+        text="Eight representative material lines across yarn, thread, embroidery and macrame. Use Quick View to compare, then move into the full catalogue when you want depth."
+        products={featured}
+        href="/products"
+        priority
+      />
+
+      <DeferredSection label="Browse by material and brand" minHeight={840}>
+        <CommerceCategoryGrid categories={productCategories} />
+        <CommerceBrandNav brands={brands} />
       </DeferredSection>
 
-      <DeferredSection label="Project finder" minHeight={720}>
+      <DeferredSection label="Project finder" minHeight={620}>
         <CommerceCraftFinder products={featuredProducts} />
-        <CommerceCategoryGrid categories={productCategories} />
       </DeferredSection>
 
       <GuideHelpSection />
 
-      <DeferredSection label="Shade-card support" minHeight={520}>
+      <DeferredSection label="Shade-card support" minHeight={360}>
         <ShadeDiscovery />
-        <RecentlyViewedHome />
       </DeferredSection>
 
       <DeferredSection label="Ordering information" minHeight={620}>
