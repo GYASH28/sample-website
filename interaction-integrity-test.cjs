@@ -93,7 +93,7 @@ async function testDesktop(browser) {
   const resumedIndex = (await heroIndex.textContent())?.trim();
   if (resumedIndex === pausedIndex) throw new Error("carousel did not resume after pressing play");
 
-  const quickButton = page.locator(".product-showcase-card__quick").first();
+  const quickButton = page.locator(".product-card-quick-view").first();
   await quickButton.scrollIntoViewIfNeeded();
   await quickButton.click();
   const quick = page.locator(".quick-view");
