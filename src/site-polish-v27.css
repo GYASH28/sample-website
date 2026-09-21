@@ -606,20 +606,22 @@ textarea {
   top: 12px !important;
   left: 12px !important;
   padding: 7px 9px !important;
-  border: 1px solid rgba(255,255,255,.45) !important;
+  border: 1px solid var(--fm-line) !important;
   border-radius: 999px !important;
-  background: rgba(255,253,249,.84) !important;
+  background: var(--ui-bg-elevated, #fffdf9) !important;
   color: #56615d !important;
   font-size: .63rem !important;
   font-weight: 700 !important;
   letter-spacing: .025em !important;
-  box-shadow: 0 6px 18px rgba(24,34,31,.08) !important;
-  backdrop-filter: blur(10px);
+  box-shadow: 0 5px 14px rgba(24,34,31,.07) !important;
+  backdrop-filter: none !important;
 }
 
 .product-card-floating-actions {
   top: 20px !important;
   right: 20px !important;
+  left: auto !important;
+  justify-content: flex-end !important;
   gap: 6px !important;
 }
 
@@ -631,9 +633,9 @@ textarea {
   min-height: 40px !important;
   border: 1px solid rgba(31,43,40,.10) !important;
   border-radius: 50% !important;
-  background: rgba(255,253,249,.91) !important;
+  background: var(--ui-bg-elevated, #fffdf9) !important;
   box-shadow: 0 7px 20px rgba(28,40,36,.08) !important;
-  backdrop-filter: blur(12px);
+  backdrop-filter: none !important;
 }
 
 .product-content {
@@ -666,6 +668,16 @@ textarea {
 
 .product-card-title a {
   color: var(--ui-text-strong, var(--fm-ink)) !important;
+}
+
+.product-card-meta {
+  margin: 0 0 8px !important;
+  color: var(--ui-text-muted, var(--fm-ink-soft)) !important;
+  font-size: .68rem !important;
+  font-weight: 760 !important;
+  letter-spacing: .055em !important;
+  line-height: 1.4 !important;
+  text-transform: uppercase;
 }
 
 .product-card-variants,
@@ -703,8 +715,9 @@ textarea {
 }
 
 .product-actions {
+  grid-template-columns: 1fr 1fr !important;
   gap: 8px !important;
-  padding: 0 20px 12px !important;
+  padding: 0 20px 18px !important;
 }
 
 .product-actions .btn {
