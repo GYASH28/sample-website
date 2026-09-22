@@ -781,6 +781,7 @@ const STANDARD_SHADES = [
 const PACK_REFERENCE_SLUGS = new Set([
   "olivia", "blankie-solid", "blankie-multi", "superstitch", "baby-soft", "cotone",
 ]);
+const LABELLED_IMAGE_REVISION = "labels-20260923";
 
 const realRange = [
   ["Desire", "Ganga Products", "Ganga", "Soft yarn range for handmade projects", "Yarns"],
@@ -833,7 +834,7 @@ const verifiedProducts = realRange.map(([name, category, brand, variants, master
   suitableFor: masterCategory === "Yarns" ? "Crochet, knitting and handmade yarn projects" : masterCategory === "Threads" ? "Crochet, embroidery and decorative handwork" : "Macramé, craft décor and handmade accessories",
   // Every listed product line has a separate generated studio image. These are
   // representative studio reconstructions, not current-stock evidence.
-  image: `/assets/images/products/verified-web/${slug}.webp`,
+  image: `/assets/images/products/verified-web/${slug}.webp?v=${LABELLED_IMAGE_REVISION}`,
   labeledVisual: true,
   packReferenceAvailable: PACK_REFERENCE_SLUGS.has(slug),
   type: masterCategory === "Yarns" ? "yarn-ball" : masterCategory === "Threads" ? "crochet-thread" : "macrame-cord",
