@@ -5,7 +5,6 @@ import Footer from "./Footer.jsx";
 import Header from "./Header.jsx";
 import BasketToast from "./BasketToast.jsx";
 import MobileBottomNav from "./MobileBottomNav.jsx";
-import EnquiryDrawerLauncher from "./EnquiryDrawerLauncher.jsx";
 import ConnectionStatus from "./ConnectionStatus.jsx";
 import AnalyticsBridge from "./AnalyticsBridge.jsx";
 
@@ -112,7 +111,6 @@ export default function Layout() {
       <Footer />
       <FloatingWhatsApp />
       <BasketToast />
-      <EnquiryDrawerLauncher />
       {nonCriticalReady ? <Suspense fallback={null}><ShoppingWorkspace /></Suspense> : null}
       {isProductDetail ? <Suspense fallback={null}><MobileProductDock /></Suspense> : null}
       <MobileBottomNav />

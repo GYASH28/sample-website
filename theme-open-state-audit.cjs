@@ -98,7 +98,7 @@ async function runDesktop(browser, theme, failures) {
     await auditVisibleSurface(page, ".quick-view", "quick-view", theme, "desktop", failures);
     await page.locator(".quick-view__close").click();
 
-    await page.locator(".enquiry-launcher").click();
+    await page.locator(".header-enquiry-launcher").click();
     await auditVisibleSurface(page, ".enquiry-drawer", "enquiry-drawer", theme, "desktop", failures);
   } finally {
     await context.close();

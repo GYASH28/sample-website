@@ -155,6 +155,31 @@ async function auditRoute(context, route) {
       });
     }, count);
 
+    const closedOverlayLeaks = await page.evaluate(() => {
+      const selectors = [
+        ".drawer-backdrop",
+        ".search-dialog-backdrop",
+        ".enquiry-drawer-backdrop",
+        ".shopping-workspace-backdrop",
+        ".catalogue-filter-backdrop",
+        ".quick-view-backdrop",
+      ];
+      return selectors.flatMap((selector) => [...document.querySelectorAll(selector)])
+        .filter((element) => !element.classList.contains("is-open"))
+        .flatMap((element) => {
+          const style = getComputedStyle(element);
+          const opacity = Number(style.opacity || 0);
+          if (opacity <= 0.01 && style.visibility === "hidden" && style.pointerEvents === "none") return [];
+          return [{
+            className: element.className,
+            opacity,
+            visibility: style.visibility,
+            pointerEvents: style.pointerEvents,
+            backdropFilter: style.backdropFilter || style.webkitBackdropFilter || "none",
+          }];
+        });
+    });
+
     for (const item of audit) {
       assert(item.wrapper && item.image, `${route} ${item.name}: product media is missing`);
       assert(item.image.width >= item.wrapper.width * 0.96, `${route} ${item.name}: image does not fill wrapper width: ${JSON.stringify(item)}`);
@@ -177,6 +202,9 @@ async function auditRoute(context, route) {
           `${route} ${item.name}: Quick View covers too much of the product photo: ${JSON.stringify(item)}`);
       }
     }
+
+    assert(closedOverlayLeaks.length === 0,
+      `${route}: closed UI backdrops are still painted over the page: ${JSON.stringify(closedOverlayLeaks)}`);
 
     assert(errors.length === 0, `${route}: browser errors detected: ${errors.join(" | ")}`);
     console.log(`✓ ${route}: ${audit.length} product cards keep photography unobstructed and Quick View compact`);

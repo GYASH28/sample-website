@@ -74,40 +74,6 @@ export default function ProductCard({ product, compact = false, showWishlistActi
       <div className="product-card-palette-strip" aria-hidden="true" style={{ background: `linear-gradient(90deg, ${(product.palette || ["#E8DCC4"]).join(", ")})` }} />
 
       <div className="product-card-link-wrapper-container">
-        <div className="product-card-floating-actions">
-          {onQuickView ? (
-            <button
-              type="button"
-              className="card-floating-btn product-card-quick-view"
-              onClick={(event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                trackEngagement("quick_view_open", { product: product.slug, category: product.category, source: "product-card" });
-                onQuickView();
-              }}
-              aria-label={`Quick view ${product.name}`}
-              aria-haspopup="dialog"
-              aria-expanded={quickViewOpen}
-              aria-controls={`quick-view-panel-${product.slug}`}
-              title="Quick view"
-            >
-              <Eye size={17} aria-hidden="true" />
-            </button>
-          ) : null}
-          {showWishlistAction ? (
-            <button
-              type="button"
-              className={`card-floating-btn favorite-toggle-btn-card ${isFavorited ? "active" : ""}`}
-              onClick={handleWishlist}
-              aria-label={isFavorited ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
-              aria-pressed={isFavorited}
-            >
-              <Heart size={16} weight={isFavorited ? "fill" : "regular"} aria-hidden="true" />
-            </button>
-          ) : null}
-          <CompareButton product={product} compact />
-        </div>
-
         <div className="product-card-link-wrapper">
           <Link
             to={`/products/${product.slug}`}
@@ -126,9 +92,43 @@ export default function ProductCard({ product, compact = false, showWishlistActi
                   onError={handleImageError}
                 />
               ) : <span className="product-image-placeholder" aria-hidden="true">FM</span>}
-              <span className="product-card-badge-floating">Reference image</span>
             </div>
           </Link>
+
+          <div className="product-card-floating-actions product-card-utility-row" aria-label={`${product.name} product tools`}>
+            {onQuickView ? (
+              <button
+                type="button"
+                className="card-floating-btn product-card-quick-view"
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  trackEngagement("quick_view_open", { product: product.slug, category: product.category, source: "product-card" });
+                  onQuickView();
+                }}
+                aria-label={`Quick view ${product.name}`}
+                aria-haspopup="dialog"
+                aria-expanded={quickViewOpen}
+                aria-controls={`quick-view-panel-${product.slug}`}
+                title="Quick view"
+              >
+                <Eye size={17} aria-hidden="true" />
+              </button>
+            ) : null}
+            {showWishlistAction ? (
+              <button
+                type="button"
+                className={`card-floating-btn favorite-toggle-btn-card ${isFavorited ? "active" : ""}`}
+                onClick={handleWishlist}
+                aria-label={isFavorited ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
+                aria-pressed={isFavorited}
+                title={isFavorited ? "Saved" : "Save product"}
+              >
+                <Heart size={16} weight={isFavorited ? "fill" : "regular"} aria-hidden="true" />
+              </button>
+            ) : null}
+            <CompareButton product={product} compact />
+          </div>
 
           <div className="product-content">
             <p className="product-card-meta">{[product.brand, product.category].filter(Boolean).join(" · ")}</p>

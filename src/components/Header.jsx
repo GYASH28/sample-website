@@ -20,6 +20,7 @@ import {
 } from "../data/siteData.js";
 import ThemeToggle from "./ThemeToggle.jsx";
 import WhatsAppIcon from "./WhatsAppIcon.jsx";
+import EnquiryDrawerLauncher from "./EnquiryDrawerLauncher.jsx";
 
 const SearchDialog = lazy(() => import("./SearchDialog.jsx"));
 const OPEN_SEARCH_EVENT = "fakhri:open-search";
@@ -197,7 +198,7 @@ export default function Header() {
             </div>
             <ThemeToggle compact />
             <Link className="icon-button desktop-icon-action" to="/wishlist" aria-label={`${t("wishlist")}: ${wishlistCount}`}><Heart size={21} /><Counter value={wishlistCount} /></Link>
-            <Link className="icon-button desktop-icon-action" to="/enquiry" aria-label={`${t("enquiry")}: ${itemsCount}`}><ShoppingBagOpen size={22} /><Counter value={itemsCount} /></Link>
+            <EnquiryDrawerLauncher compact />
             <a className="header-whatsapp" href={createWhatsAppLink()} target="_blank" rel="noreferrer"><WhatsAppIcon size={17} /><span>{t("whatsapp")}</span></a>
             <button ref={menuButtonRef} className="menu-toggle" type="button" onClick={() => setMenuOpen(true)} aria-label={t("menu")} aria-expanded={menuOpen}><List size={25} /></button>
           </div>

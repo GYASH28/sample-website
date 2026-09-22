@@ -1,0 +1,174 @@
+/* Fakhri Mart — UI recovery v30
+   Final structural overrides for inert overlays, clean product photography,
+   and uncluttered low-end/mobile interaction surfaces. */
+
+/* A disabled-state opacity rule must never make an inert backdrop visible. */
+:where(
+  .drawer-backdrop,
+  .search-dialog-backdrop,
+  .enquiry-drawer-backdrop,
+  .shopping-workspace-backdrop,
+  .catalogue-filter-backdrop,
+  .quick-view-backdrop
+):not(.is-open) {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+:where(
+  .drawer-backdrop,
+  .search-dialog-backdrop,
+  .enquiry-drawer-backdrop,
+  .shopping-workspace-backdrop,
+  .catalogue-filter-backdrop,
+  .quick-view-backdrop
+).is-open {
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+/* Routes should never begin as a blank page while a decorative animation runs. */
+.motion-ready .route-stage {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* Product photography is the hero: complete image, no crop and no painted UI. */
+.product-card .product-image-wrapper {
+  aspect-ratio: 1 / 1 !important;
+  margin: 10px 10px 0 !important;
+  border-radius: 16px !important;
+  background: #fff !important;
+}
+
+.product-card .native-product-image-shell,
+.product-card .native-product-image-shell > img,
+.product-card .product-image {
+  border-radius: inherit !important;
+}
+
+.product-card .native-product-image-shell > img,
+.product-card .product-image {
+  object-fit: contain !important;
+  object-position: center !important;
+  transform: none !important;
+}
+
+.product-card:hover .product-image {
+  transform: none !important;
+}
+
+.product-card-badge-floating {
+  display: none !important;
+}
+
+/* Product tools live in document flow below the photo, never over it. */
+.product-card .product-card-utility-row {
+  position: static !important;
+  z-index: auto !important;
+  display: flex !important;
+  width: auto !important;
+  margin: 9px 10px 0 !important;
+  padding: 0 !important;
+  gap: 7px !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+}
+
+.product-card .product-card-utility-row > .product-card-quick-view {
+  width: 38px !important;
+  min-width: 38px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 0 !important;
+  border-radius: 10px !important;
+  background: var(--ui-surface-soft, #f7f1ea) !important;
+  box-shadow: none !important;
+}
+
+.product-card .product-card-utility-row > .card-floating-btn,
+.product-card .product-card-utility-row .compare-action--compact {
+  width: 38px !important;
+  min-width: 38px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  border-radius: 10px !important;
+  background: var(--ui-surface-soft, #f7f1ea) !important;
+  box-shadow: none !important;
+}
+
+.product-card .product-card-utility-row .compare-action-wrap {
+  display: inline-flex !important;
+}
+
+/* The rail owns each card's width. A late min-width rule made 430px cards
+   occupy 285-330px grid tracks, so adjacent cards painted on top of controls. */
+.commerce-product-rail > * {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+/* Three redundant floating launchers were competing for the same corner. */
+.shopping-workspace-launcher,
+.floating-whatsapp,
+.floating-whatsapp-button {
+  display: none !important;
+}
+
+.header-enquiry-launcher {
+  position: relative;
+}
+
+.header-enquiry-launcher .nav-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+}
+
+@media (max-width: 800px) {
+  .mobile-bottom-nav {
+    background: color-mix(in srgb, var(--ui-bg-elevated, #fffdf9) 98%, transparent) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .product-card .product-image-wrapper {
+    margin: 7px 7px 0 !important;
+    border-radius: 13px !important;
+  }
+
+  .product-card .product-card-utility-row {
+    margin: 7px 7px 0 !important;
+    gap: 5px !important;
+    justify-content: space-between !important;
+  }
+
+  .product-card .product-card-utility-row > .product-card-quick-view {
+    flex: 0 0 36px !important;
+    width: 36px !important;
+    min-width: 36px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    padding: 0 !important;
+  }
+
+  .product-card .product-card-utility-row > .card-floating-btn,
+  .product-card .product-card-utility-row .compare-action--compact {
+    width: 36px !important;
+    min-width: 36px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-card,
+  .product-card * {
+    scroll-behavior: auto !important;
+  }
+}
