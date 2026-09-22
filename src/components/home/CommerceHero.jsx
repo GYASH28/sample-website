@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { featuredProducts } from "../../data/siteData.js";
 import { useEnquiryBasket } from "../../hooks/useEnquiryBasket.js";
 import { useWishlist } from "../../hooks/useWishlist.js";
+import { getCardOptimizedImage, getResponsiveProductImageProps } from "../../lib/productImage.js";
 
 const spotlightProducts = featuredProducts.slice(0, 6);
 const AUTO_ADVANCE_MS = 6500;
@@ -43,7 +44,7 @@ export default function CommerceHero() {
   const { has, toggle } = useWishlist();
   const efficientMode = typeof document !== "undefined" && document.documentElement.dataset.experienceTier === "efficient";
   const reducedMotion = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const autoplayRunning = !autoPaused && !interactionPaused && heroVisible && documentVisible && !reducedMotion;
+  const autoplayRunning = !autoPaused && !interactionPaused && heroVisible && documentVisible && !reducedMotion && !efficientMode;
 
   useEffect(() => {
     setColor(product?.colors?.[0] || null);
@@ -81,9 +82,8 @@ export default function CommerceHero() {
   }, []);
 
   useEffect(() => {
-    // Autoplay is intentionally cheap: one timeout every 6.5 seconds. Do not
-    // disable it for the efficient hardware tier; that made the carousel look
-    // broken on many ordinary laptops/phones. Reduced-motion still disables it.
+    // Keep the same carousel and manual controls on constrained hardware, but
+    // avoid background image swaps while a customer is reading or scrolling.
     if (!autoplayRunning || spotlightProducts.length < 2) return undefined;
 
     const timer = window.setTimeout(() => {
@@ -417,7 +417,7 @@ export default function CommerceHero() {
               <div className="hero-v6__image-wrap hero-v7__image-wrap">
                 <img
                   key={`${product.slug}-${direction}`}
-                  src={product.image}
+                  {...getResponsiveProductImageProps(product.image, "(max-width: 800px) calc(100vw - 40px), 580px")}
                   alt={product.name}
                   width="900"
                   height="900"
@@ -480,7 +480,7 @@ export default function CommerceHero() {
                   style={{ "--thumb-index": itemIndex }}
                 >
                   <img
-                    src={item.image}
+                    src={getCardOptimizedImage(item.image)}
                     alt=""
                     width="62"
                     height="62"

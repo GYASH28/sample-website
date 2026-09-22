@@ -11,6 +11,7 @@ import { featuredProducts, productCategories } from "../data/siteData.js";
 import { PROJECTS, searchProducts } from "../data/discoveryData.js";
 import { useLanguage } from "../context/LanguageContext.jsx";
 import { trackEngagement } from "../lib/engagementAnalytics.js";
+import { getCardOptimizedImage } from "../lib/productImage.js";
 
 const RECENT_KEY = "fakhri-recent-searches";
 
@@ -162,7 +163,7 @@ export default function SearchDialog({ open, onClose }) {
               {results.map((product, resultIndex) => (
                 <li key={product.slug} id={`search-result-${product.slug}`} className={resultIndex === activeIndex ? "is-keyboard-active" : ""} role="option" aria-selected={resultIndex === activeIndex}>
                   <Link to={`/products/${product.slug}`} onClick={closeWithSearch} onMouseEnter={() => setActiveIndex(resultIndex)}>
-                    <img src={product.image} alt="" width="72" height="72" loading="lazy" decoding="async" />
+                    <img src={getCardOptimizedImage(product.image)} alt="" width="72" height="72" loading="lazy" decoding="async" />
                     <span>
                       <strong>{product.name}</strong>
                       <small>{product.brand || product.category} · {product.masterCategory}</small>

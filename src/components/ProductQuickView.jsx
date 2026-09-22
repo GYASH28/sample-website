@@ -13,6 +13,7 @@ import { Link } from "react-router-dom";
 import { createWhatsAppLink } from "../data/siteData.js";
 import { useEnquiryBasket } from "../hooks/useEnquiryBasket.js";
 import { useWishlist } from "../hooks/useWishlist.js";
+import { getCardOptimizedImage } from "../lib/productImage.js";
 import ShadePreviewStudio, { ShadePreviewTint } from "./ShadePreviewStudio.jsx";
 import WhatsAppIcon from "./WhatsAppIcon.jsx";
 
@@ -140,7 +141,7 @@ export default function ProductQuickView({ product, open, onClose }) {
                   aria-label={`Show material view ${index + 1}`}
                   aria-pressed={index === imageIndex}
                 >
-                  <img src={source} alt="" width="58" height="58" loading="lazy" decoding="async" />
+                  <img src={getCardOptimizedImage(source)} alt="" width="58" height="58" loading="lazy" decoding="async" />
                 </button>
               ))}
             </div>

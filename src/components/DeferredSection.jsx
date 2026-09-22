@@ -19,16 +19,23 @@ export default function DeferredSection({ children, label = "More from Fakhri Ma
         setReady(true);
         observer.disconnect();
       },
-      // A short runway feels instant when scrolling, without hydrating every
-      // rail in one fling on slower CPUs.
-      { rootMargin: "360px 0px" },
+      // Start before the section is visible so customers do not reach an empty
+      // reserved block, while still avoiding a page-long initial DOM.
+      { rootMargin: "720px 0px" },
     );
     observer.observe(element);
     return () => observer.disconnect();
   }, []);
 
   return (
-    <div ref={ref} className={`deferred-section ${ready ? "is-ready" : ""}`} style={{ "--deferred-height": `${minHeight}px` }}>
+    <div
+      ref={ref}
+      className={`deferred-section ${ready ? "is-ready" : ""}`}
+      style={{
+        "--deferred-height": `${minHeight}px`,
+        "--deferred-reserve": `${Math.min(minHeight, 280)}px`,
+      }}
+    >
       {ready ? children : <div className="deferred-section__placeholder" aria-label={label} role="status"><span /><span /><span /></div>}
     </div>
   );

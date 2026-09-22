@@ -14,6 +14,7 @@ import { Link } from "react-router-dom";
 import ProductShowcaseCard from "../ProductShowcaseCard.jsx";
 import Reveal from "../Reveal.jsx";
 import WhatsAppIcon from "../WhatsAppIcon.jsx";
+import { getCardOptimizedImage } from "../../lib/productImage.js";
 import {
   catalogueMessage,
   createWhatsAppLink,
@@ -87,7 +88,7 @@ export function CommerceCategoryGrid({ categories }) {
                 to={`/products?category=${encodeURIComponent(category.name)}`}
               >
                 <img
-                  src={category.image}
+                  src={getCardOptimizedImage(category.image)}
                   alt={`${category.name} products`}
                   width="520"
                   height="360"
@@ -245,7 +246,7 @@ export function CommerceCraftFinder({ products }) {
           {matches.map((product, index) => (
             <Reveal key={`${activeCraft.name}-${product.slug}`} delay={index * 45} variant="fade-up">
               <Link to={`/products/${product.slug}`} className="commerce-craft-product">
-                <img src={product.image} alt={product.name} width="420" height="420" loading="lazy" decoding="async" />
+                <img src={getCardOptimizedImage(product.image)} alt={product.name} width="420" height="420" loading="lazy" decoding="async" />
                 <span>
                   <small>{product.brand || product.category}</small>
                   <strong>{product.name}</strong>

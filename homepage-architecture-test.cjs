@@ -15,6 +15,7 @@ async function audit(viewport) {
   });
   await context.addInitScript(() => {
     sessionStorage.setItem("fakhri_intro_cinematic_v2", "played");
+    sessionStorage.setItem("fakhri_commerce_intro_v3", "played");
     localStorage.setItem("fakhri_theme", "dark");
   });
 
@@ -28,6 +29,17 @@ async function audit(viewport) {
   try {
     await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle", timeout: 30_000 });
     await page.waitForFunction(() => document.querySelector("#main-content"));
+    // Deferred discovery sections intentionally stay out of the first render.
+    // Exercise the full page before auditing its complete information architecture.
+    await page.evaluate(async () => {
+      for (let top = 0; top < document.documentElement.scrollHeight; top += Math.max(420, window.innerHeight * 0.75)) {
+        window.scrollTo({ top, behavior: "instant" });
+        await new Promise((resolve) => window.setTimeout(resolve, 45));
+      }
+      window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" });
+    });
+    await page.waitForFunction(() => document.querySelector(".commerce-order-flow"), null, { timeout: 10_000 });
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
 
     const metrics = await page.evaluate(() => {
       const rails = [...document.querySelectorAll(".commerce-product-section")];
@@ -50,8 +62,8 @@ async function audit(viewport) {
       };
     });
 
-    assert(metrics.theme === "light", `${viewport.name}: homepage did not remain light-only`);
-    assert(metrics.themeToggles === 0, `${viewport.name}: theme toggle still exists`);
+    assert(metrics.theme === "dark", `${viewport.name}: saved dark theme was not preserved`);
+    assert(metrics.themeToggles >= 1, `${viewport.name}: accessible theme control is missing`);
     assert(metrics.productSections === 1, `${viewport.name}: homepage rendered ${metrics.productSections} giant product shelves instead of one featured rail`);
     assert(metrics.productCardsInFeatured >= 6 && metrics.productCardsInFeatured <= 10, `${viewport.name}: featured rail should contain 6–10 products, got ${metrics.productCardsInFeatured}`);
     assert(metrics.categoryLinks >= 4, `${viewport.name}: top-level material discovery is missing`);

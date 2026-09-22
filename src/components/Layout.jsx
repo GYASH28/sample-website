@@ -74,6 +74,7 @@ export default function Layout() {
   const routeFamily = getRouteFamily(location.pathname);
   const isProductDetail = location.pathname.startsWith("/products/");
   const [nonCriticalReady, setNonCriticalReady] = useState(false);
+  const immersiveMode = typeof document !== "undefined" && document.documentElement.dataset.experienceTier === "immersive";
 
   useEffect(() => {
     // The shortlist is useful, but it is not needed to paint a product or the
@@ -96,7 +97,7 @@ export default function Layout() {
       <Suspense fallback={null}><HeaderEnhancer /></Suspense>
       <Header />
       <RouteAnnouncer />
-      <Suspense fallback={null}><ScrollDirector /></Suspense>
+      {immersiveMode ? <Suspense fallback={null}><ScrollDirector /></Suspense> : null}
       <main id="main-content" data-route-family={routeFamily}>
         <div key={`thread-${location.pathname}`} className="route-thread-transition" aria-hidden="true" />
         <div key={location.pathname} className="route-stage" data-route-family={routeFamily}>

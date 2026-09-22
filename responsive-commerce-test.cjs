@@ -49,7 +49,7 @@ async function auditViewport(browser, viewport) {
   });
   await context.addInitScript(() => {
     sessionStorage.setItem("fakhri_intro_cinematic_v2", "played");
-    sessionStorage.setItem("fakhri_commerce_intro_v2", "played");
+    sessionStorage.setItem("fakhri_commerce_intro_v3", "played");
     localStorage.setItem("fakhri_theme", "dark");
   });
 
@@ -64,8 +64,8 @@ async function auditViewport(browser, viewport) {
     await openRoute(page, "/");
     await assertNoOverflow(page, `${viewport.name} home`);
     assert(await page.locator(".commerce-product-section").count() === 1, `${viewport.name}: homepage should keep one primary featured product section`);
-    assert(await page.locator(".theme-toggle").count() === 0, `${viewport.name}: theme toggle returned`);
-    assert(await page.evaluate(() => document.documentElement.dataset.theme) === "light", `${viewport.name}: stale dark preference escaped the light-only lock`);
+    assert(await page.locator(".theme-toggle").count() >= 1, `${viewport.name}: accessible theme control is missing`);
+    assert(await page.evaluate(() => document.documentElement.dataset.theme) === "dark", `${viewport.name}: saved dark preference was not preserved`);
 
     if (viewport.width <= 430) {
       const rail = page.locator(".commerce-product-rail");
@@ -85,7 +85,7 @@ async function auditViewport(browser, viewport) {
       const drawer = page.locator(".mobile-nav-drawer.is-open");
       await drawer.waitFor({ state: "visible" });
       const drawerBox = await drawer.boundingBox();
-      assert(drawerBox && drawerBox.left >= -1 && drawerBox.right <= viewport.width + 1, `${viewport.name}: mobile drawer leaves the viewport`);
+      assert(drawerBox && drawerBox.x >= -1 && drawerBox.x + drawerBox.width <= viewport.width + 1, `${viewport.name}: mobile drawer leaves the viewport: ${JSON.stringify(drawerBox)}`);
       await page.locator(".mobile-drawer-header .icon-button").click();
       await page.locator(".mobile-nav-drawer").waitFor({ state: "hidden" });
     }
@@ -109,7 +109,7 @@ async function auditViewport(browser, viewport) {
       const sheet = page.locator(".smart-filter-panel.is-open");
       await sheet.waitFor({ state: "visible" });
       const box = await sheet.boundingBox();
-      assert(box && box.left >= -1 && box.right <= viewport.width + 1 && box.top >= -1 && box.bottom <= viewport.height + 1,
+      assert(box && box.x >= -1 && box.x + box.width <= viewport.width + 1 && box.y >= -1 && box.y + box.height <= viewport.height + 1,
         `${viewport.name}: filter sheet is outside the viewport: ${JSON.stringify(box)}`);
       await page.locator(".mobile-filter-sheet-header .icon-button").click();
       await page.waitForFunction(() => !document.querySelector(".smart-filter-panel")?.classList.contains("is-open"));
@@ -123,7 +123,7 @@ async function auditViewport(browser, viewport) {
       const quick = page.locator(".quick-view");
       await quick.waitFor({ state: "visible" });
       const box = await quick.boundingBox();
-      assert(box && box.left >= -1 && box.right <= viewport.width + 1 && box.top >= -1 && box.bottom <= viewport.height + 1,
+      assert(box && box.x >= -1 && box.x + box.width <= viewport.width + 1 && box.y >= -1 && box.y + box.height <= viewport.height + 1,
         `${viewport.name}: Quick View is outside the viewport: ${JSON.stringify(box)}`);
       assert(await page.locator("body.quick-view-open").count() === 1, `${viewport.name}: Quick View did not lock page scrolling`);
       assert(await quick.getByRole("button", { name: "Bulk / wholesale" }).count() === 1, `${viewport.name}: Quick View bulk mode is missing`);

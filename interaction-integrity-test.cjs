@@ -26,7 +26,10 @@ async function testDesktop(browser) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 960 } });
   await context.addInitScript(() => {
     sessionStorage.setItem("fakhri_intro_cinematic_v2", "played");
+    sessionStorage.setItem("fakhri_commerce_intro_v3", "played");
     localStorage.setItem("fakhri_theme", "light");
+    Object.defineProperty(navigator, "deviceMemory", { configurable: true, get: () => 8 });
+    Object.defineProperty(navigator, "hardwareConcurrency", { configurable: true, get: () => 8 });
   });
   const { page, errors } = await openPage(context);
 
@@ -144,6 +147,7 @@ async function testMobile(browser) {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
   await context.addInitScript(() => {
     sessionStorage.setItem("fakhri_intro_cinematic_v2", "played");
+    sessionStorage.setItem("fakhri_commerce_intro_v3", "played");
     localStorage.setItem("fakhri_theme", "light");
   });
   const { page, errors } = await openPage(context);

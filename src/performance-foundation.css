@@ -6,7 +6,7 @@ html[data-experience-tier="efficient"] {
 }
 
 .deferred-section {
-  min-height: var(--deferred-height, 520px);
+  min-height: var(--deferred-reserve, 280px);
   content-visibility: auto;
   contain-intrinsic-size: auto var(--deferred-height, 520px);
 }
@@ -20,7 +20,7 @@ html[data-experience-tier="efficient"] {
   display: grid;
   gap: 14px;
   width: min(var(--max), calc(100% - 40px));
-  min-height: min(42vw, 380px);
+  min-height: min(32vw, 240px);
   margin: 36px auto;
   padding: 28px;
   border: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
@@ -42,12 +42,14 @@ html[data-experience-tier="efficient"] {
 
 /* The full resolution WebP files remain untouched. These rules only make the
    browser decode them when their card actually becomes useful on screen. */
-.product-card,
-.product-showcase-card,
 .commerce-craft-product,
 .commerce-category-card {
   content-visibility: auto;
   contain-intrinsic-size: auto 420px;
+}
+
+.product-showcase-card {
+  contain: layout style;
 }
 
 .native-product-image-shell {
@@ -70,7 +72,6 @@ html[data-experience-tier="efficient"] {
     linear-gradient(135deg, var(--surface-soft, #fff2ef), var(--bg-warm, #f7efe0));
 }
 
-html[data-experience-tier="efficient"] .commerce-intro,
 html[data-experience-tier="efficient"] .scroll-director,
 html[data-experience-tier="efficient"] .hero-v7__ambient,
 html[data-experience-tier="efficient"] .hero-v7__thread-line {
@@ -108,7 +109,7 @@ html[data-experience-tier="efficient"] .product-card::after {
     background: linear-gradient(180deg, var(--bg), #fff 48rem);
   }
 
-  .deferred-section__placeholder { min-height: 250px; margin-block: 22px; }
+  .deferred-section__placeholder { min-height: 180px; margin-block: 18px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

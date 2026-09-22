@@ -50,7 +50,7 @@ async function settle(page) {
         await context.addInitScript(({ selectedTheme }) => {
           localStorage.setItem("fakhri_theme", selectedTheme);
           sessionStorage.setItem("fakhri_intro_cinematic_v2", "played");
-          sessionStorage.setItem("fakhri_commerce_intro_v2", "played");
+          sessionStorage.setItem("fakhri_commerce_intro_v3", "played");
           if (!localStorage.getItem("fakhri_compare_v1")) localStorage.setItem("fakhri_compare_v1", JSON.stringify(["blankie-solid", "cotone"]));
         }, { selectedTheme: theme });
 

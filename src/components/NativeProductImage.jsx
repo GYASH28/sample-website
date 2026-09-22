@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { getCardOptimizedImage } from "../lib/productImage.js";
 
 // Browser lazy-loading sees a horizontal rail as one visible row and can fetch
 // every card in it. This tiny observer is two-dimensional: a native-resolution
@@ -30,7 +31,7 @@ export default function NativeProductImage({ src, alt, width, height, className 
     <span ref={hostRef} className="native-product-image-shell" style={{ "--native-image-ratio": `${width} / ${height}` }}>
       {shouldLoad ? (
         <img
-          src={src}
+          src={getCardOptimizedImage(src)}
           alt={alt}
           width={width}
           height={height}

@@ -26,7 +26,7 @@ async function goto(page, path) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 960 } });
   await context.addInitScript(() => {
     sessionStorage.setItem("fakhri_intro_cinematic_v2", "played");
-    sessionStorage.setItem("fakhri_commerce_intro_v2", "played");
+    sessionStorage.setItem("fakhri_commerce_intro_v3", "played");
     localStorage.setItem("fakhri_theme", "light");
   });
 

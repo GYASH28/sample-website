@@ -215,9 +215,16 @@ async function verifyThemeControls(browser) {
       for (const theme of themes) {
         const context = await browser.newContext({ viewport, reducedMotion: "reduce", colorScheme: theme });
         await context.addInitScript(({ selectedTheme }) => {
-          localStorage.setItem("fakhri_theme", selectedTheme);
-          sessionStorage.setItem("fakhri_intro_cinematic_v2", "played");
-          localStorage.setItem("fakhri_compare_v1", JSON.stringify(["blankie-solid", "cotone", "macrame-cord"]));
+          // The script also runs in sandboxed third-party frames, where storage
+          // access is intentionally denied. Only seed first-party documents.
+          try {
+            localStorage.setItem("fakhri_theme", selectedTheme);
+            sessionStorage.setItem("fakhri_intro_cinematic_v2", "played");
+            sessionStorage.setItem("fakhri_commerce_intro_v3", "played");
+            localStorage.setItem("fakhri_compare_v1", JSON.stringify(["blankie-solid", "cotone", "macrame-cord"]));
+          } catch {
+            // Ignore sandboxed frame storage restrictions.
+          }
         }, { selectedTheme: theme });
 
         for (const [name, route] of routes) {

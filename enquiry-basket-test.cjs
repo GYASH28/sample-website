@@ -17,7 +17,7 @@ async function goto(page, route) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 960 }, reducedMotion: "reduce" });
   await context.addInitScript(() => {
     sessionStorage.setItem("fakhri_intro_cinematic_v2", "played");
-    sessionStorage.setItem("fakhri_commerce_intro_v2", "played");
+    sessionStorage.setItem("fakhri_commerce_intro_v3", "played");
     if (!sessionStorage.getItem("fakhri_enquiry_regression_initialized")) {
       localStorage.removeItem("fakhri_enquiry_basket");
       sessionStorage.setItem("fakhri_enquiry_regression_initialized", "1");
@@ -43,7 +43,7 @@ async function goto(page, route) {
 
     // First item: exercise the exact wholesale path customers use from Quick View.
     const first = cards.nth(0);
-    const firstName = (await first.locator(".product-card-title").innerText()).trim();
+    const firstName = (await first.locator(".product-card-title").textContent()).trim();
     await first.locator(".product-card-quick-view").click();
     const quick = page.locator(".quick-view");
     await quick.waitFor({ state: "visible" });
@@ -56,7 +56,7 @@ async function goto(page, route) {
 
     // Second item: normal catalogue-card add path.
     const second = cards.nth(1);
-    const secondName = (await second.locator(".product-card-title").innerText()).trim();
+    const secondName = (await second.locator(".product-card-title").textContent()).trim();
     await second.getByRole("button", { name: /Add to enquiry/i }).click();
 
     let basket = await page.evaluate(() => JSON.parse(localStorage.getItem("fakhri_enquiry_basket") || "[]"));

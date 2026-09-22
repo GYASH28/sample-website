@@ -6,6 +6,7 @@ import { useCompare } from "../hooks/useCompare.js";
 import { useRecentlyViewed } from "../hooks/useRecentlyViewed.js";
 import { useWishlist } from "../hooks/useWishlist.js";
 import { trackEngagement } from "../lib/engagementAnalytics.js";
+import { getCardOptimizedImage } from "../lib/productImage.js";
 
 const TABS = [
   { id: "recent", label: "Recent", icon: ClockCounterClockwise },
@@ -112,7 +113,7 @@ export default function ShoppingWorkspace() {
               {activeProducts.map((product) => (
                 <article key={product.slug} className="workspace-product-row">
                   <Link to={`/products/${product.slug}`} onClick={() => setOpen(false)}>
-                    <img src={product.image} alt="" width="64" height="64" loading="lazy" decoding="async" />
+                    <img src={getCardOptimizedImage(product.image)} alt="" width="64" height="64" loading="lazy" decoding="async" />
                     <span><strong>{product.name}</strong><small>{product.category}</small></span>
                   </Link>
                   {tab === "compare" ? (

@@ -17,6 +17,24 @@
   transition: none !important;
 }
 
+/* Keep the drawer's contrast deterministic instead of asking contrast engines
+   (or low-end compositors) to resolve translucent glass over moving content. */
+:root[data-theme="dark"] .mobile-nav-drawer {
+  background: #171b18 !important;
+}
+
+:root[data-theme="dark"] .mobile-nav-drawer .brand strong {
+  color: #fffaf3 !important;
+}
+
+:root[data-theme="dark"] .mobile-nav-drawer .brand {
+  background: #252b27 !important;
+}
+
+:root[data-theme="dark"] .mobile-nav-drawer .brand small {
+  color: #c9c5bd !important;
+}
+
 /* Product media contract.
    Root cause of the old pale obstruction was architectural: Quick View was a
    frosted, absolutely-positioned sibling of the whole showcase card, so later

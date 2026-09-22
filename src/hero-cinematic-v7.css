@@ -762,6 +762,30 @@ html[data-motion-profile="lite"] .hero-v7__ambient {
   opacity: 0.08;
 }
 
+/* Compact and constrained devices should never wait for staged headline
+   transforms before the primary message becomes readable. */
+html[data-motion-profile="compact"] .hero-v7__headline-line > span,
+html[data-motion-profile="lite"] .hero-v7__headline-line > span,
+html[data-motion-profile="reduced"] .hero-v7__headline-line > span {
+  animation: none !important;
+  transform: none !important;
+}
+
+html[data-motion-profile="compact"] .hero-v7__intro,
+html[data-motion-profile="compact"] .hero-v7__discover-row,
+html[data-motion-profile="compact"] .hero-v7__featured,
+html[data-motion-profile="compact"] .hero-v7__actions,
+html[data-motion-profile="compact"] .hero-v7__assurance,
+html[data-motion-profile="lite"] .hero-v7__intro,
+html[data-motion-profile="lite"] .hero-v7__discover-row,
+html[data-motion-profile="lite"] .hero-v7__featured,
+html[data-motion-profile="lite"] .hero-v7__actions,
+html[data-motion-profile="lite"] .hero-v7__assurance {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
 html[data-motion-profile="lite"] .hero-v7__pointer-light,
 html[data-motion-profile="lite"] .hero-v7__back-card--two {
   display: none;

@@ -2,6 +2,7 @@ node_modules/
 dist/
 output/
 test-results/
+theme-audit-artifacts/
 .playwright-cli/
 /home-390-final.png
 *.log

@@ -73,6 +73,10 @@ async function assertIntroShell(page, label) {
       if (message.type() === "error") errors.push(message.text());
     });
     page.on("pageerror", (error) => errors.push(error.message));
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, "deviceMemory", { configurable: true, get: () => 8 });
+      Object.defineProperty(navigator, "hardwareConcurrency", { configurable: true, get: () => 8 });
+    });
 
     await page.goto(`${BASE_URL}/?intro=1`, { waitUntil: "domcontentloaded" });
     const intro = page.locator(INTRO_SELECTOR);
