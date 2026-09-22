@@ -16,7 +16,7 @@ function getDefaultVariant(product) {
     : null;
 }
 
-export default function ProductCard({ product, compact = false, showWishlistAction = true, onQuickView = null, quickViewOpen = false }) {
+export default function ProductCard({ product, compact = false, showWishlistAction = true, onQuickView = null, quickViewOpen = false, imagePriority = false }) {
   const categoryData = productCategories.find((category) => category.name === product.category);
   const productBaseImage = product.image || categoryData?.image || null;
   const [imageSrc, setImageSrc] = useState(productBaseImage);
@@ -90,6 +90,7 @@ export default function ProductCard({ product, compact = false, showWishlistActi
                   height="640"
                   className="product-image"
                   onError={handleImageError}
+                  priority={imagePriority}
                 />
               ) : <span className="product-image-placeholder" aria-hidden="true">FM</span>}
             </div>

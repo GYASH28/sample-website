@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 
 const STORAGE_KEY = "fakhri_theme";
 const THEME_EVENT = "fakhri:theme-change";
-const DARK_QUERY = "(prefers-color-scheme: dark)";
 
 function isTheme(value) {
   return value === "dark" || value === "light";
@@ -27,7 +26,7 @@ function readTheme() {
   if (typeof window !== "undefined") {
     const stored = readStoredTheme();
     if (stored) return stored;
-    return window.matchMedia?.(DARK_QUERY).matches ? "dark" : "light";
+    return "light";
   }
 
   return "light";
@@ -64,8 +63,6 @@ export default function ThemeToggle({ compact = false }) {
     // component resilient if it is rendered in another document/test harness.
     applyTheme(theme);
 
-    const media = window.matchMedia(DARK_QUERY);
-
     const syncTheme = (nextTheme) => {
       if (!isTheme(nextTheme)) return;
       applyTheme(nextTheme);
@@ -80,23 +77,17 @@ export default function ThemeToggle({ compact = false }) {
         return;
       }
 
-      // If an explicit preference is cleared in another tab, return to the
-      // operating-system preference instead of getting stuck on stale state.
-      syncTheme(media.matches ? "dark" : "light");
-    };
-    const onSystemTheme = (event) => {
-      // Follow the OS only while the user has not made an explicit choice.
-      if (!readStoredTheme()) syncTheme(event.matches ? "dark" : "light");
+      // Clearing the explicit preference always returns to the light-first
+      // storefront baseline.
+      syncTheme("light");
     };
 
     window.addEventListener(THEME_EVENT, onThemeEvent);
     window.addEventListener("storage", onStorage);
-    media.addEventListener?.("change", onSystemTheme);
 
     return () => {
       window.removeEventListener(THEME_EVENT, onThemeEvent);
       window.removeEventListener("storage", onStorage);
-      media.removeEventListener?.("change", onSystemTheme);
     };
   }, []);
 

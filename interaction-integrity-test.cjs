@@ -44,11 +44,11 @@ async function testDesktop(browser) {
   const initialTop = await page.locator(".site-header .nav-shell").evaluate((node) => node.getBoundingClientRect().top);
   await page.evaluate(() => window.scrollTo({ top: 120, behavior: "instant" }));
   await page.waitForTimeout(140);
-  const collapsedTop = await page.locator(".site-header .nav-shell").evaluate((node) => node.getBoundingClientRect().top);
-  if (initialTop - collapsedTop < 20) {
-    throw new Error(`header did not collapse upward: ${JSON.stringify({ initialTop, collapsedTop })}`);
+  const scrolledTop = await page.locator(".site-header .nav-shell").evaluate((node) => node.getBoundingClientRect().top);
+  if (Math.abs(initialTop - scrolledTop) > 2) {
+    throw new Error(`header shifted or clipped while scrolling: ${JSON.stringify({ initialTop, scrolledTop })}`);
   }
-  if (collapsedTop < -2) throw new Error(`collapsed navigation escaped above viewport: ${collapsedTop}`);
+  if (scrolledTop < -2) throw new Error(`navigation escaped above viewport: ${scrolledTop}`);
 
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   await page.waitForTimeout(100);

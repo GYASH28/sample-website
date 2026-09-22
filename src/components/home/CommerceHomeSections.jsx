@@ -189,7 +189,7 @@ export function CommerceProductRail({ eyebrow, title, text, products, href = "/p
         >
           {products.map((product, index) => (
             <Reveal key={product.slug} delay={(index % 5) * 34} variant="fade-up">
-              <ProductShowcaseCard product={product} />
+              <ProductShowcaseCard product={product} imagePriority={priority && index < 4} />
             </Reveal>
           ))}
         </div>

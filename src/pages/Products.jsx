@@ -14,6 +14,7 @@ import {
 import CatalogueCta from "../components/CatalogueCta.jsx";
 import PageHero from "../components/PageHero.jsx";
 import ProductCard from "../components/ProductCard.jsx";
+import AnimatedNumber from "../components/AnimatedNumber.jsx";
 import ProductShowcaseCard from "../components/ProductShowcaseCard.jsx";
 import Reveal from "../components/Reveal.jsx";
 import {
@@ -393,7 +394,7 @@ export default function Products() {
               <h2>{project ? `Materials for ${project.name.toLowerCase()}` : "Explore materials without the clutter"}</h2>
               <p>{project ? project.description : "Try natural phrases like “yarn for baby blanket”, “macrame cord” or “crochet bag”, then refine the results only if needed."}</p>
             </div>
-            <span className="catalogue-result-pill" aria-live="polite">{sortedProducts.length} {sortedProducts.length === 1 ? "material" : "materials"}</span>
+            <span className="catalogue-result-pill" aria-live="polite"><AnimatedNumber value={sortedProducts.length} /> {sortedProducts.length === 1 ? "material" : "materials"}</span>
           </Reveal>
 
           <Reveal variant="fade-up" delay={60}>
@@ -490,7 +491,7 @@ export default function Products() {
             </Reveal>
 
             <div className="active-chips-summary-row">
-              <span className="result-count-text">Showing <strong>{sortedProducts.length}</strong> of <strong>{featuredProducts.length}</strong> products</span>
+              <span className="result-count-text">Showing <strong><AnimatedNumber value={sortedProducts.length} /></strong> of <strong><AnimatedNumber value={featuredProducts.length} /></strong> products</span>
               {hasActiveFilters ? (
                 <div className="active-chips-flex" aria-label="Active catalogue filters">
                   {activeProject !== "All" ? <FilterChip label={`Project · ${project?.name || activeProject}`} onClear={() => setActiveProject("All")} /> : null}
@@ -510,9 +511,9 @@ export default function Products() {
 
             <div className={`product-gallery-view-wrapper view-mode-${viewMode}`}>
               <div ref={resultGridRef} className={viewMode === "grid" ? "card-grid product-grid product-grid--filtered" : "product-list-layout--filtered"} aria-live="polite" aria-busy="false">
-                {sortedProducts.length ? sortedProducts.map((product) => (
+                {sortedProducts.length ? sortedProducts.map((product, index) => (
                   <div key={product.slug} className="motion-grid-item" data-product-key={product.slug}>
-                    {viewMode === "grid" ? <ProductShowcaseCard product={product} /> : <ProductCard product={product} compact />}
+                    {viewMode === "grid" ? <ProductShowcaseCard product={product} imagePriority={index < 4} /> : <ProductCard product={product} compact imagePriority={index < 4} />}
                   </div>
                 )) : (
                   <div className="empty-results-box">

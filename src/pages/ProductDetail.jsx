@@ -224,23 +224,25 @@ export default function ProductDetail() {
           <div className="product-detail-grid">
             <div className="product-detail-visual">
               <div className="sticky-visual-wrapper">
-                <div
+                <button
+                  type="button"
                   className="product-image-container product-detail-image-stage shade-preview-surface group"
-                  style={{ position: "relative", display: "flex", width: "100%", aspectRatio: "1/1", borderRadius: "var(--radius)", overflow: "hidden", backgroundColor: "#faf6f0", border: "1px solid rgba(50, 48, 45, 0.05)", cursor: "zoom-in" }}
+                  style={{ position: "relative", display: "flex", width: "100%", aspectRatio: "1/1", borderRadius: "var(--radius)", overflow: "hidden", backgroundColor: "#faf6f0", border: "1px solid rgba(50, 48, 45, 0.05)", cursor: "zoom-in", padding: 0 }}
                   onClick={() => setLightboxOpen(true)}
+                  aria-label={`Open larger view of ${productImages[activeGalleryIndex]?.label || product.name}`}
                 >
                   <img
                     key={productImages[activeGalleryIndex]?.src}
                     src={productImages[activeGalleryIndex]?.src}
                     alt={productImages[activeGalleryIndex]?.label || product.name}
                     className="product-detail-hero-image"
-                    style={{ position: "relative", zIndex: 1, width: "100%", height: "100%", objectFit: "cover" }}
+                    style={{ position: "relative", zIndex: 1, width: "100%", height: "100%", objectFit: "contain" }}
                   />
                   <ShadePreviewTint value={activeGalleryIndex === 0 ? previewHex : null} />
-                  <div className="image-zoom-overlay-badge" style={{ position: "absolute", bottom: "16px", right: "16px", zIndex: 5, background: "rgba(0,0,0,0.5)", color: "#fff", padding: "8px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <div className="image-zoom-overlay-badge" aria-hidden="true" style={{ position: "absolute", bottom: "16px", right: "16px", zIndex: 5, background: "rgba(0,0,0,0.5)", color: "#fff", padding: "8px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <ArrowsOut size={16} />
                   </div>
-                </div>
+                </button>
 
                 <div className="gallery-thumbnail-strip" style={{ marginTop: "16px" }}>
                   <span className="thumbnail-label" style={{ display: "block", marginBottom: "8px", fontWeight: "600", fontSize: "14px", color: "var(--text-muted)" }}>Representative material views</span>

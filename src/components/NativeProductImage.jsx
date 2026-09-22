@@ -4,11 +4,15 @@ import { getCardOptimizedImage } from "../lib/productImage.js";
 // Browser lazy-loading sees a horizontal rail as one visible row and can fetch
 // every card in it. This tiny observer is two-dimensional: a native-resolution
 // photo begins downloading only when its own card is close to the viewport.
-export default function NativeProductImage({ src, alt, width, height, className = "", onError }) {
+export default function NativeProductImage({ src, alt, width, height, className = "", onError, priority = false }) {
   const hostRef = useRef(null);
-  const [shouldLoad, setShouldLoad] = useState(false);
+  const [shouldLoad, setShouldLoad] = useState(priority);
 
   useEffect(() => {
+    if (priority) {
+      setShouldLoad(Boolean(src));
+      return undefined;
+    }
     setShouldLoad(false);
     const host = hostRef.current;
     if (!host || !src || typeof IntersectionObserver === "undefined") {
@@ -25,7 +29,7 @@ export default function NativeProductImage({ src, alt, width, height, className 
     );
     observer.observe(host);
     return () => observer.disconnect();
-  }, [src]);
+  }, [priority, src]);
 
   return (
     <span ref={hostRef} className="native-product-image-shell" style={{ "--native-image-ratio": `${width} / ${height}` }}>
@@ -35,9 +39,9 @@ export default function NativeProductImage({ src, alt, width, height, className 
           alt={alt}
           width={width}
           height={height}
-          loading="lazy"
+          loading={priority ? "eager" : "lazy"}
           decoding="async"
-          fetchPriority="low"
+          fetchPriority={priority ? "high" : "low"}
           className={className}
           onError={onError}
         />

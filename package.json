@@ -30,7 +30,8 @@
     "audit:motion": "node src/scripts/motion-audit.mjs",
     "test:homepage": "node homepage-architecture-test.cjs",
     "test:responsive-commerce": "node responsive-commerce-test.cjs",
-    "test:enquiry-basket": "node enquiry-basket-test.cjs"
+    "test:enquiry-basket": "node enquiry-basket-test.cjs",
+    "test:refinement": "node site-refinement-test.cjs"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.3.0",

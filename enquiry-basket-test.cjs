@@ -66,7 +66,7 @@ async function goto(page, route) {
     assert(basket[1].name === secondName, `second catalogue item was not stored: ${JSON.stringify(basket[1])}`);
 
     // Drawer must reflect the same state and build a truthful WhatsApp URL.
-    const launcher = page.locator(".enquiry-launcher");
+    const launcher = page.locator(".header-enquiry-launcher");
     await launcher.click();
     const drawer = page.locator(".enquiry-drawer.is-open");
     await drawer.waitFor({ state: "visible" });

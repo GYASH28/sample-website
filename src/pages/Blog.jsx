@@ -176,10 +176,19 @@ export default function Blog() {
         text="Use this page while you are planning, comparing or preparing an order. It explains what to check, calculates a known pattern requirement and shows when you should ask Fakhri Mart for live shade, stock or pack confirmation."
       >
         <div className="guides-hero-proof" aria-label="What this guide hub helps with">
-          <span><CheckCircle size={17} weight="fill" /> Material choice</span>
-          <span><CheckCircle size={17} weight="fill" /> Quantity planning</span>
-          <span><CheckCircle size={17} weight="fill" /> Shade confidence</span>
-          <span><CheckCircle size={17} weight="fill" /> Bulk enquiry prep</span>
+          <div className="guides-hero-proof__intro">
+            <span className="guides-hero-proof__icon"><BookOpen size={27} weight="duotone" /></span>
+            <div>
+              <strong>Practical help, built around the real catalogue</strong>
+              <p>Choose a starting point now, then jump straight to the relevant checklist or calculator.</p>
+            </div>
+          </div>
+          <div className="guides-hero-proof__topics">
+            <span><CheckCircle size={17} weight="fill" /> Material choice</span>
+            <span><CheckCircle size={17} weight="fill" /> Quantity planning</span>
+            <span><CheckCircle size={17} weight="fill" /> Shade confidence</span>
+            <span><CheckCircle size={17} weight="fill" /> Bulk enquiry prep</span>
+          </div>
         </div>
       </PageHero>
 

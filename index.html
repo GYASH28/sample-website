@@ -8,9 +8,9 @@
       (() => {
         try {
           const stored = localStorage.getItem("fakhri_theme");
-          const theme = stored === "dark" || stored === "light"
-            ? stored
-            : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+          // Fakhri Mart is light-first. Dark mode is an explicit visitor
+          // preference, never an automatic surprise inherited from the OS.
+          const theme = stored === "dark" || stored === "light" ? stored : "light";
           document.documentElement.dataset.theme = theme;
           document.documentElement.style.colorScheme = theme;
           document.querySelector('meta[name="theme-color"]')?.setAttribute(

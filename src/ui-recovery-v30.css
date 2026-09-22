@@ -172,3 +172,514 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* -------------------------------------------------------------------------- */
+/* Site-wide clarity and structural refinement                                 */
+/* -------------------------------------------------------------------------- */
+
+:root[data-theme="light"] {
+  --ui-text: #2a2229;
+  --ui-text-strong: #211a20;
+  --ui-text-muted: #62575f;
+  --ui-text-subtle: #756a72;
+  --ui-border: rgba(53, 43, 51, .16);
+}
+
+:root[data-theme="light"] body {
+  background: #fffaf5;
+  color: var(--ui-text);
+}
+
+/* Light is the deliberately legible default. Keep the announcement visible
+   and stop the scroll-state transforms from clipping either header row. */
+.site-header {
+  --header-shift: 0px !important;
+  --header-announcement-opacity: 1 !important;
+}
+
+.site-header .announcement-bar,
+.site-header.is-scrolled .announcement-bar,
+.site-header.is-deep .announcement-bar,
+.site-header.is-scrolling .announcement-bar {
+  opacity: 1 !important;
+  transform: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.site-header .nav-shell,
+.site-header.is-scrolled .nav-shell,
+.site-header.is-deep .nav-shell,
+.site-header.is-scrolling .nav-shell {
+  transform: translate3d(-50%, 0, 0) !important;
+}
+
+:root[data-theme="light"] .site-header .announcement-bar {
+  border-bottom-color: rgba(27, 105, 95, .15) !important;
+  background: #edf6f3 !important;
+  color: #2f5953 !important;
+}
+
+:root[data-theme="light"] .announcement-bar__inner,
+:root[data-theme="light"] .announcement-bar__inner span {
+  color: #315b55 !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+:root[data-theme="light"] .announcement-bar__inner span + span {
+  border-left-color: rgba(49, 91, 85, .22) !important;
+}
+
+/* Secondary-page heroes should be emphatic without swallowing the viewport. */
+.page-hero-grid {
+  align-items: stretch !important;
+  gap: clamp(32px, 6vw, 88px) !important;
+}
+
+.page-hero-grid > * {
+  min-width: 0;
+}
+
+.page-hero h1 {
+  max-width: 12ch;
+  font-size: clamp(2.8rem, 4.8vw, 5.25rem) !important;
+  line-height: .96 !important;
+  text-wrap: balance;
+}
+
+.page-hero-text {
+  max-width: 68ch !important;
+  color: var(--ui-text-muted) !important;
+}
+
+.page-hero-side {
+  align-self: stretch !important;
+  min-height: 0 !important;
+  height: auto !important;
+}
+
+.guides-hero-proof {
+  display: grid !important;
+  grid-template-rows: 1fr auto;
+  align-content: stretch;
+  height: 100%;
+  min-height: 100%;
+  margin: 0 !important;
+  padding: clamp(24px, 3.4vw, 42px);
+  border: 1px solid var(--ui-border);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 100% 0, color-mix(in srgb, var(--ui-accent) 13%, transparent), transparent 54%),
+    var(--ui-bg-elevated, #fffdf9);
+  box-shadow: 0 20px 52px rgba(43, 35, 41, .08);
+}
+
+.guides-hero-proof__intro {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 16px;
+  align-content: start;
+}
+
+.guides-hero-proof__icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--ui-accent) 13%, transparent);
+  color: var(--ui-accent-strong, #176c64);
+}
+
+.guides-hero-proof__intro strong {
+  display: block;
+  max-width: 18ch;
+  color: var(--ui-text-strong);
+  font-size: clamp(1.25rem, 2vw, 1.8rem);
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.guides-hero-proof__intro p {
+  max-width: 38ch !important;
+  margin: 10px 0 0;
+  color: var(--ui-text-muted) !important;
+  font-size: .9rem !important;
+  line-height: 1.55 !important;
+}
+
+.guides-hero-proof__topics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  margin-top: 28px;
+}
+
+.guides-hero-proof__topics > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--ui-border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ui-bg-elevated, #fff) 91%, var(--ui-accent) 9%);
+  color: var(--ui-text-muted);
+  font-size: .78rem;
+  font-weight: 750;
+}
+
+.guides-hero-proof__topics svg {
+  flex: 0 0 auto;
+  color: var(--ui-accent-strong, #176c64);
+}
+
+/* The footer is one brand column, one navigation group and one contact group.
+   Explicit tracks prevent Information and Contact from occupying the same area. */
+.site-footer {
+  overflow: hidden;
+}
+
+:root[data-theme="light"] .site-footer {
+  background:
+    radial-gradient(circle at 0 0, rgba(20, 118, 111, .08), transparent 31rem),
+    #f4ede6 !important;
+  color: var(--ui-text) !important;
+}
+
+.footer-main {
+  display: grid !important;
+  grid-template-columns: minmax(290px, .88fr) minmax(470px, 1.34fr) minmax(250px, .72fr) !important;
+  gap: clamp(32px, 4vw, 64px) !important;
+  align-items: start;
+  padding-block: clamp(58px, 7vw, 92px) !important;
+}
+
+.footer-statement,
+.footer-navigation,
+.footer-navigation > div,
+.footer-contact {
+  min-width: 0;
+}
+
+.footer-statement h2 {
+  max-width: 11ch;
+  color: var(--ui-text-strong) !important;
+  font-size: clamp(2.45rem, 3.65vw, 4.45rem) !important;
+  line-height: .96 !important;
+  text-wrap: balance;
+}
+
+.footer-statement .eyebrow {
+  color: #9a7028 !important;
+}
+
+.footer-statement > p,
+.footer-navigation a,
+.footer-contact a,
+.footer-contact p,
+.footer-contact small,
+.footer-bottom,
+.footer-bottom p {
+  color: var(--ui-text-muted) !important;
+}
+
+.footer-navigation {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: clamp(22px, 3vw, 42px) !important;
+}
+
+.footer-navigation > div {
+  display: grid;
+  align-content: start;
+  gap: 11px;
+}
+
+.footer-navigation > div > span,
+.footer-contact > span {
+  color: var(--ui-text-strong) !important;
+}
+
+.footer-contact {
+  display: grid !important;
+  align-content: start;
+  gap: 13px !important;
+  overflow-wrap: anywhere;
+}
+
+.footer-contact > :is(a, p) {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  justify-content: start;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+}
+
+.footer-contact > :is(a, p) > svg:first-child {
+  flex: 0 0 auto;
+}
+
+.footer-contact small {
+  display: block;
+  margin-top: 3px;
+  font-size: .75rem;
+  line-height: 1.55;
+}
+
+.footer-google-links {
+  display: grid !important;
+  gap: 9px !important;
+  margin-top: 5px;
+}
+
+:root[data-theme="dark"] .site-footer {
+  background:
+    radial-gradient(circle at 0 0, rgba(52, 156, 144, .12), transparent 31rem),
+    #141c19 !important;
+}
+
+:root[data-theme="dark"] .footer-statement h2,
+:root[data-theme="dark"] .footer-navigation > div > span,
+:root[data-theme="dark"] .footer-contact > span {
+  color: #f3f6f4 !important;
+}
+
+/* Product details: preserve the complete source image and keep the information
+   column readable on ordinary laptop displays. */
+.product-detail-grid {
+  grid-template-columns: minmax(0, 1.03fr) minmax(360px, .97fr) !important;
+  gap: clamp(30px, 4.6vw, 68px) !important;
+}
+
+.product-detail-grid > *,
+.product-detail-content {
+  min-width: 0;
+}
+
+.product-image-container {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  border: 1px solid var(--ui-border) !important;
+  border-radius: 24px !important;
+  background: #fff !important;
+  color: inherit;
+  cursor: zoom-in;
+}
+
+.product-detail-hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain !important;
+  object-position: center;
+  transform: none !important;
+}
+
+.product-detail-title-new {
+  max-width: 14ch;
+  font-size: clamp(2.5rem, 4.4vw, 4.65rem) !important;
+  line-height: .98 !important;
+  text-wrap: balance;
+}
+
+.product-detail-content p {
+  line-height: 1.67;
+}
+
+.guided-finder__shell {
+  gap: clamp(20px, 3vw, 40px) !important;
+}
+
+.guided-finder__summary {
+  overflow: hidden;
+}
+
+.guided-finder__summary h2 {
+  font-size: clamp(2.3rem, 4.5vw, 4.4rem) !important;
+  line-height: .98 !important;
+  text-wrap: balance;
+}
+
+.animated-number {
+  display: inline-block;
+  min-width: .75ch;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Clear keyboard navigation on both themes. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--ui-accent, #14766d) 78%, white) !important;
+  outline-offset: 3px !important;
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  :where(.guides-start-card > a, .commerce-category-card, .project-card, .article-card) {
+    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease !important;
+  }
+
+  :where(.guides-start-card > a, .commerce-category-card, .project-card, .article-card):hover {
+    transform: translate3d(0, -4px, 0);
+  }
+}
+
+@media (max-width: 1180px) {
+  .footer-main {
+    grid-template-columns: minmax(260px, .78fr) minmax(0, 1.35fr) !important;
+  }
+
+  .footer-contact {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-top: 30px;
+    border-top: 1px solid var(--ui-border);
+  }
+
+  .footer-contact > span,
+  .footer-contact small,
+  .footer-google-links {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 900px) {
+  .page-hero-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .page-hero h1 {
+    max-width: 14ch;
+  }
+
+  .guides-hero-proof {
+    min-height: 300px;
+  }
+
+  .product-detail-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .sticky-visual-wrapper {
+    position: static !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .footer-main {
+    grid-template-columns: 1fr !important;
+    gap: 26px !important;
+    padding-block: 36px 28px !important;
+  }
+
+  .footer-brand-seal {
+    width: 62px !important;
+    height: 62px !important;
+    margin-bottom: 15px !important;
+  }
+
+  .footer-statement h2 {
+    max-width: 12ch;
+    font-size: clamp(2.2rem, 10.5vw, 3rem) !important;
+  }
+
+  .footer-statement > p {
+    font-size: .92rem !important;
+    line-height: 1.55 !important;
+  }
+
+  .footer-navigation {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 25px 18px !important;
+  }
+
+  .footer-navigation > div:last-child {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .footer-navigation > div:last-child > span {
+    grid-column: 1 / -1;
+  }
+
+  .footer-contact {
+    grid-column: auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px 14px !important;
+    padding-top: 23px;
+  }
+
+  .footer-contact > span,
+  .footer-contact > p,
+  .footer-contact > a:nth-of-type(3),
+  .footer-contact small,
+  .footer-google-links {
+    grid-column: 1 / -1;
+  }
+
+  .footer-bottom {
+    gap: 8px !important;
+    min-height: 0 !important;
+    padding-bottom: calc(88px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .page-hero {
+    padding-block: 42px 52px !important;
+  }
+
+  .page-hero h1 {
+    font-size: clamp(2.65rem, 13vw, 4rem) !important;
+  }
+
+  .guides-hero-proof {
+    min-height: 0;
+    padding: 22px;
+    border-radius: 22px;
+  }
+
+  .guides-hero-proof__topics {
+    grid-template-columns: 1fr;
+  }
+
+  .product-detail-title-new,
+  .guided-finder__summary h2 {
+    font-size: clamp(2.25rem, 11vw, 3.45rem) !important;
+  }
+}
+
+@media (max-width: 430px) {
+  .footer-navigation a,
+  .footer-contact a,
+  .footer-contact p {
+    font-size: .86rem;
+  }
+
+  .guides-hero-proof__intro {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --ui-text-muted: var(--ui-text);
+    --ui-border: currentColor;
+  }
+
+  :where(.product-card, .guides-hero-proof, .guided-question, .guided-finder__summary) {
+    border-width: 2px !important;
+  }
+}

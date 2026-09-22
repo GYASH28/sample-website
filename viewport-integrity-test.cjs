@@ -96,10 +96,10 @@ function assertHeaderMorphIsSeamless(audit) {
 
   if (oldScrollClasses.length) throw new Error(`legacy header state classes are still active: ${oldScrollClasses.join(", ")}`);
   if (heightRange > 1.25) throw new Error(`header layout height changes during morph: ${JSON.stringify({ heightRange, heights })}`);
-  if (reversed) throw new Error(`header nav reverses/jitters during the initial morph: ${JSON.stringify(navTops)}`);
-  if (maxJump > 7) throw new Error(`header nav has an abrupt scroll transition: ${JSON.stringify({ maxJump, navTops })}`);
-  if (first.navTop - last.navTop < 20) throw new Error(`header nav did not complete its compact morph: ${JSON.stringify({ first, last })}`);
-  if (last.morph < 0.98 || last.announcementOpacity > 0.08) throw new Error(`header morph did not settle cleanly: ${JSON.stringify(last)}`);
+  if (reversed) throw new Error(`header nav reverses/jitters while scrolling: ${JSON.stringify(navTops)}`);
+  if (maxJump > 2) throw new Error(`header nav has an abrupt scroll transition: ${JSON.stringify({ maxJump, navTops })}`);
+  if (Math.abs(first.navTop - last.navTop) > 2) throw new Error(`header nav shifted or clipped while scrolling: ${JSON.stringify({ first, last })}`);
+  if (last.announcementOpacity < 0.98) throw new Error(`announcement became unreadable while scrolling: ${JSON.stringify(last)}`);
   if (last.headerBackground !== "rgba(0, 0, 0, 0)" || last.headerBoxShadow !== "none") throw new Error(`header wrapper still paints a second visual layer: ${JSON.stringify(last)}`);
   if (last.headerBackdropFilter !== "none") throw new Error(`header wrapper should not own the glass blur: ${JSON.stringify(last)}`);
   if (!last.navBackgroundImage || last.navBackgroundImage === "none") throw new Error(`single nav surface is missing its liquid-glass paint: ${JSON.stringify(last)}`);

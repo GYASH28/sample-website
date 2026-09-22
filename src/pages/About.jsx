@@ -12,6 +12,7 @@ import {
 import { Link } from "react-router-dom";
 import Reveal from "../components/Reveal.jsx";
 import StoreLocation from "../components/StoreLocation.jsx";
+import AnimatedNumber from "../components/AnimatedNumber.jsx";
 import { businessInfo, featuredProducts } from "../data/siteData.js";
 import useDocumentMeta from "../hooks/useDocumentMeta.js";
 
@@ -143,7 +144,7 @@ export default function About() {
       <section className="about-v22__stats" aria-label="Current catalogue summary">
         <div className="container about-v22__stats-grid">
           {trustStats.map((item) => (
-            <div key={item.label}><strong>{item.value}</strong><span>{item.label}</span></div>
+            <div key={item.label}><strong><AnimatedNumber value={item.value} /></strong><span>{item.label}</span></div>
           ))}
         </div>
       </section>
