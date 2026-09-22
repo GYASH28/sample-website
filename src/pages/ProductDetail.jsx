@@ -95,13 +95,13 @@ export default function ProductDetail() {
   }, [product.slug]);
 
   const productImages = useMemo(() => [
-    { type: "hero", src: baseImageUrl, label: "Representative product view" },
+    { type: "hero", src: baseImageUrl, label: product.labeledVisual ? `Labelled studio view of ${product.name}` : "Representative product view" },
     ...(product.galleryImages || []).map((img, i) => ({
       type: `gallery-${i + 1}`,
       src: img,
       label: `Representative material view ${i + 1}`,
     })),
-  ], [product.galleryImages, baseImageUrl]);
+  ], [product.galleryImages, product.labeledVisual, product.name, baseImageUrl]);
 
   const relatedProducts = useMemo(() => {
     if (!product.relatedSlugs) return [];
@@ -238,13 +238,13 @@ export default function ProductDetail() {
                     className="product-detail-hero-image"
                     style={{ position: "relative", zIndex: 1, width: "100%", height: "100%", objectFit: "contain" }}
                   />
-                  <ShadePreviewTint value={activeGalleryIndex === 0 ? previewHex : null} />
+                  <ShadePreviewTint value={!product.labeledVisual && activeGalleryIndex === 0 ? previewHex : null} />
                   <div className="image-zoom-overlay-badge" aria-hidden="true" style={{ position: "absolute", bottom: "16px", right: "16px", zIndex: 5, background: "rgba(0,0,0,0.5)", color: "#fff", padding: "8px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <ArrowsOut size={16} />
                   </div>
                 </button>
 
-                <div className="gallery-thumbnail-strip" style={{ marginTop: "16px" }}>
+                {productImages.length > 1 ? <div className="gallery-thumbnail-strip" style={{ marginTop: "16px" }}>
                   <span className="thumbnail-label" style={{ display: "block", marginBottom: "8px", fontWeight: "600", fontSize: "14px", color: "var(--text-muted)" }}>Representative material views</span>
                   <div className="thumbnail-grid-row" style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "6px" }}>
                     {productImages.map((img, i) => {
@@ -273,7 +273,7 @@ export default function ProductDetail() {
                       );
                     })}
                   </div>
-                </div>
+                </div> : null}
               </div>
             </div>
 
@@ -360,6 +360,7 @@ export default function ProductDetail() {
               <div className="detail-section-configured">
                 <ShadePreviewStudio
                   value={previewHex}
+                  preservePackaging={product.labeledVisual}
                   onChange={(hex) => {
                     setPreviewHex(hex);
                     setActiveGalleryIndex(0);

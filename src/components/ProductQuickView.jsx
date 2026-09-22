@@ -127,7 +127,7 @@ export default function ProductQuickView({ product, open, onClose }) {
         <div className="quick-view__media">
           <div className="quick-view__image-stage shade-preview-surface" style={{ borderRadius: "20px" }}>
             <img key={gallery[imageIndex]} className="quick-view__main-image" src={gallery[imageIndex]} alt={product.name} width="720" height="720" decoding="async" />
-            <ShadePreviewTint value={imageIndex === 0 ? previewHex : null} />
+            <ShadePreviewTint value={!product.labeledVisual && imageIndex === 0 ? previewHex : null} />
           </div>
           <span className="quick-view__availability">Availability confirmed on enquiry</span>
           {gallery.length > 1 ? (
@@ -146,7 +146,7 @@ export default function ProductQuickView({ product, open, onClose }) {
               ))}
             </div>
           ) : null}
-          <small className="quick-view__photo-note">Representative material photos · use colour preview for visual exploration, then confirm the current supplier shade.</small>
+          <small className="quick-view__photo-note">{product.labeledVisual ? "Labelled studio illustration · confirm current packaging and shade with the supplier." : "Representative material photos · use colour preview for visual exploration, then confirm the current supplier shade."}</small>
         </div>
 
         <div className="quick-view__content">
@@ -181,7 +181,7 @@ export default function ProductQuickView({ product, open, onClose }) {
             </fieldset>
           ) : null}
 
-          <ShadePreviewStudio value={previewHex} onChange={(hex) => { setPreviewHex(hex); setImageIndex(0); }} compact />
+          <ShadePreviewStudio value={previewHex} onChange={(hex) => { setPreviewHex(hex); setImageIndex(0); }} compact preservePackaging={product.labeledVisual} />
 
           {variants.length ? (
             <fieldset className="quick-view__choices">

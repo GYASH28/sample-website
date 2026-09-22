@@ -775,6 +775,13 @@ const STANDARD_SHADES = [
   { name: "Natural", hex: "#e5d2b5" },
 ];
 
+// These studio reconstructions were guided by a supplied photograph or an
+// official catalogue pack image. All other bands identify the confirmed range
+// but should not be mistaken for an exact manufacturer packaging photograph.
+const PACK_REFERENCE_SLUGS = new Set([
+  "olivia", "blankie-solid", "blankie-multi", "superstitch", "baby-soft", "cotone",
+]);
+
 const realRange = [
   ["Desire", "Ganga Products", "Ganga", "Soft yarn range for handmade projects", "Yarns"],
   ["Olivia", "Ganga Products", "Ganga", "Olivia collection; consult the supplied shade card", "Yarns"],
@@ -794,7 +801,7 @@ const realRange = [
   ["Superstitch", "Ganga Products", "Ganga", "Chunky yarn collection for quick, cosy makes", "Yarns"],
   ["Starlite", "Ganga Products", "Ganga", "Yarn collection; shades confirmed on enquiry", "Yarns"],
   ["Anchor Embroidery Thread", "Embroidery Threads", "Anchor", "Embroidery skeins; select shades from the current shade card", "Threads"],
-  ["Ambika Embroidery Thread", "Embroidery Threads", "Ambika", "Embroidery skeins; select shades from the current shade card", "Threads"],
+  ["Ambica Embroidery Thread", "Embroidery Threads", "Ambica", "Embroidery skeins; select shades from the current shade card", "Threads"],
   ["Dolly Embroidery Skeins", "Embroidery Threads", "Dolly", "Embroidery skeins; select shades from the current shade card", "Threads"],
   ["Malai Dori 0.8 mm", "Macrame Cord", "Fakhri Mart", "Fine malai dori for detailed craft work", "Accessories"],
   ["Malai Dori 1 mm", "Macrame Cord", "Fakhri Mart", "Fine malai dori for detailed craft work", "Accessories"],
@@ -812,18 +819,23 @@ const realRange = [
   ["Velvet Taj", "Taj Yarns", "Taj", "Velvet yarn collection; current shades confirmed on enquiry", "Yarns"],
 ];
 
-const verifiedProducts = realRange.map(([name, category, brand, variants, masterCategory]) => ({
+const verifiedProducts = realRange.map(([name, category, brand, variants, masterCategory]) => {
+  // The handover spelled this Ambika; its photographed shade card says Ambica.
+  // Keep the existing URL and asset filename while correcting the visible name.
+  const slug = name === "Ambica Embroidery Thread" ? "ambika-embroidery-thread" : slugify(name);
+  return ({
   name,
-  slug: slugify(name),
+  slug,
   category,
   filters: masterCategory === "Yarns" ? ["Yarns"] : masterCategory === "Threads" ? ["Crochet Threads", "Embroidery"] : ["Macrame", "Accessories"],
   variants,
   description: `${name} is part of the current Fakhri Mart supplier-confirmed range. Please request the latest shade card, product photo, availability and quotation before placing an order.`,
   suitableFor: masterCategory === "Yarns" ? "Crochet, knitting and handmade yarn projects" : masterCategory === "Threads" ? "Crochet, embroidery and decorative handwork" : "Macramé, craft décor and handmade accessories",
   // Every listed product line has a separate generated studio image. These are
-  // representative of the material family; shade cards remain the authority
-  // for the exact live colour chosen by the customer.
-  image: `/assets/images/products/verified-web/${slugify(name)}.webp`,
+  // representative studio reconstructions, not current-stock evidence.
+  image: `/assets/images/products/verified-web/${slug}.webp`,
+  labeledVisual: true,
+  packReferenceAvailable: PACK_REFERENCE_SLUGS.has(slug),
   type: masterCategory === "Yarns" ? "yarn-ball" : masterCategory === "Threads" ? "crochet-thread" : "macrame-cord",
   brand,
   tags: ["Shade Card", "Retail", "Bulk Orders"],
@@ -835,7 +847,8 @@ const verifiedProducts = realRange.map(([name, category, brand, variants, master
   bundleWith: [],
   masterCategory,
   stock: "enquire",
-}));
+  });
+});
 
 // Surface genuine neighbouring lines on each detail page. This replaces the
 // retired sample-product relationships with useful links within the verified
@@ -859,8 +872,8 @@ productCategories.splice(0, productCategories.length,
   {
     name: "Embroidery Threads", shortName: "Embroidery", icon: "Palette", tone: "violet",
     count: "3 skein brands", image: "/assets/reference/product-photos/glace-cotton-thread.jpeg",
-    description: "Anchor, Ambika and Dolly embroidery skeins. Shade selection is confirmed against the current shade card.",
-    products: ["Anchor", "Ambika", "Dolly"],
+    description: "Anchor, Ambica and Dolly embroidery skeins. Shade selection is confirmed against the current shade card.",
+    products: ["Anchor", "Ambica", "Dolly"],
   },
   {
     name: "Macrame Cord", shortName: "Cord", icon: "Cable", tone: "gold",
@@ -898,25 +911,13 @@ export const featuredProducts = verifiedProducts.map(
   ({ rating: _rating, reviewCount: _reviewCount, ...product }) => ({
     ...product,
     image: product.image || representativeImages[product.slug],
-    galleryImages:
-      product.masterCategory === "Accessories" && product.slug === "purse-handles"
-        ? [
-            "/assets/images/cat_purse_handles.webp",
-            "/assets/images/editorial/crochet-bag-worktable.webp",
-          ]
-        : product.type?.includes("macrame")
-          ? [
-              "/assets/images/cat_macrame.webp",
-              "/assets/images/editorial/craft-stock-room.webp",
-            ]
-          : product.type?.includes("embroidery") || product.slug.includes("lacchi")
-            ? [
-                "/assets/images/cat_embroidery.webp",
-                "/assets/images/editorial/shade-library.webp",
-              ]
-            : galleryByMasterCategory[product.masterCategory],
-    imageNote:
-      "Representative material-family image. Ask on WhatsApp for current stock, packaging and live shade photos.",
+    // Generic lifestyle photos were not views of this exact product and made
+    // the gallery misleading. Show only a line-specific image until a real
+    // supplier gallery is available.
+    galleryImages: [],
+    imageNote: product.packReferenceAvailable
+      ? "Studio reconstruction guided by the supplied pack photo or supplier catalogue. Confirm the exact current label, shade and stock on WhatsApp."
+      : "Illustrative labelled product image: the supplier and line are identified, but the actual pack design may differ. Request a current stock photo before ordering.",
   }),
 );
 

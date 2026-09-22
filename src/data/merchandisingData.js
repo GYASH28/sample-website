@@ -38,7 +38,7 @@ export function getBrandOptions(products) {
     counts.set(brand, (counts.get(brand) || 0) + 1);
   });
 
-  const preferred = ["Ganga", "Vardhaman", "Taj", "Anchor", "Ambika", "Dolly", "Bliss", "Fakhri Mart"];
+  const preferred = ["Ganga", "Vardhaman", "Taj", "Anchor", "Ambica", "Dolly", "Bliss", "Fakhri Mart"];
   return [...counts.entries()]
     .sort(([a], [b]) => {
       const ai = preferred.indexOf(a);

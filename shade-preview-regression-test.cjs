@@ -31,7 +31,7 @@ function assert(condition, message) {
 
     await page.goto(`${BASE_URL}${PRODUCT_PATH}`, { waitUntil: "networkidle", timeout: 30_000 });
 
-    const studio = page.getByRole("region", { name: "Digital colour preview" }).first();
+    const studio = page.getByRole("region", { name: "Colour reference picker" }).first();
     await studio.waitFor({ state: "visible", timeout: 5000 });
 
     const hero = page.locator(".product-detail-hero-image");
@@ -44,12 +44,9 @@ function assert(condition, message) {
     assert(originalImage.src, "Product hero should have a source before previewing colours");
     assert(originalImage.currentSrc, "Product hero should resolve an image before previewing colours");
 
-    const teal = studio.getByRole("button", { name: "Preview Teal" });
+    const teal = studio.getByRole("button", { name: "Select Teal" });
     await teal.click();
-    await page.waitForFunction(() => {
-      const tint = document.querySelector(".product-detail-image-stage .shade-preview-tint");
-      return tint?.style.getPropertyValue("--shade-preview-color").toUpperCase() === "#328F89";
-    });
+    await page.waitForFunction(() => document.querySelector(".shade-preview-studio__heading strong")?.textContent?.includes("#328F89"));
 
     const tealState = await page.evaluate(() => {
       const image = document.querySelector(".product-detail-hero-image");
@@ -63,9 +60,9 @@ function assert(condition, message) {
 
     assert(tealState.src === originalImage.src, `Preset preview changed image src: ${JSON.stringify({ originalImage, tealState })}`);
     assert(tealState.currentSrc === originalImage.currentSrc, `Preset preview downloaded/switched another image: ${JSON.stringify({ originalImage, tealState })}`);
-    assert(tealState.tint.toUpperCase() === "#328F89", `Teal tint was not applied: ${JSON.stringify(tealState)}`);
+    assert(!tealState.tint, `A colour overlay obscured the new product label: ${JSON.stringify(tealState)}`);
 
-    const custom = studio.getByLabel("Choose a custom digital preview colour");
+    const custom = studio.getByLabel("Choose a custom colour enquiry reference");
     await custom.evaluate((input) => {
       // React tracks controlled-input values internally. Calling the native
       // prototype setter changes the DOM value without updating React's value
@@ -78,10 +75,7 @@ function assert(condition, message) {
       input.dispatchEvent(new Event("change", { bubbles: true, composed: true }));
     });
 
-    await page.waitForFunction(() => {
-      const tint = document.querySelector(".product-detail-image-stage .shade-preview-tint");
-      return tint?.style.getPropertyValue("--shade-preview-color").toUpperCase() === "#123456";
-    }, null, { timeout: 5000 });
+    await page.waitForFunction(() => document.querySelector(".shade-preview-studio__heading strong")?.textContent?.includes("#123456"), null, { timeout: 5000 });
 
     const customState = await page.evaluate(() => {
       const image = document.querySelector(".product-detail-hero-image");
@@ -97,10 +91,10 @@ function assert(condition, message) {
 
     assert(customState.src === originalImage.src, `Custom preview changed image src: ${JSON.stringify({ originalImage, customState })}`);
     assert(customState.currentSrc === originalImage.currentSrc, `Custom preview downloaded/switched another image: ${JSON.stringify({ originalImage, customState })}`);
-    assert(customState.tint.toUpperCase() === "#123456", `Custom tint was not applied: ${JSON.stringify(customState)}`);
+    assert(!customState.tint, `Custom colour obscured the new product label: ${JSON.stringify(customState)}`);
     assert(customState.heading.includes("#123456"), `Custom preview label did not update: ${JSON.stringify(customState)}`);
 
-    await studio.getByRole("button", { name: "Original" }).click();
+    await studio.getByRole("button", { name: "Clear" }).click();
     await page.waitForFunction(() => !document.querySelector(".product-detail-image-stage .shade-preview-tint"), null, { timeout: 5000 });
 
     const resetCurrentSrc = await hero.evaluate((image) => image.currentSrc);
@@ -108,7 +102,7 @@ function assert(condition, message) {
     assert(legacyColourImageRequests.length === 0, `Legacy per-colour images were requested:\n${legacyColourImageRequests.join("\n")}`);
     assert(errors.length === 0, `Browser errors detected:\n${errors.join("\n")}`);
 
-    console.log("✓ Digital shade preview recolours one product image for preset/custom colours without switching or requesting per-colour image files");
+    console.log("✓ Colour references preserve labelled packaging and do not request per-colour image files");
   } finally {
     await browser.close();
   }

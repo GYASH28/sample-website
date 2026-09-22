@@ -41,7 +41,7 @@ const CATEGORY_DEFINITIONS = [
     icon: "Palette",
     tone: "violet",
     image: "/assets/images/products/verified-web/anchor-embroidery-thread.webp",
-    description: "Anchor, Ambika and Dolly embroidery thread lines. Ask for the current shade card before finalising colours.",
+    description: "Anchor, Ambica and Dolly embroidery thread lines. Ask for the current shade card before finalising colours.",
   },
   {
     name: "Macrame & Dori",
@@ -184,7 +184,7 @@ function rewriteDormantCatalogueData() {
     },
     {
       title: "Embroidery Threads",
-      label: "Anchor, Ambika and Dolly embroidery lines; confirm exact colours from the current shade card.",
+      label: "Anchor, Ambica and Dolly embroidery lines; confirm exact colours from the current shade card.",
       type: "shade",
       colors: ["#b4a0d3", "#c96f90", "#78b5d6", "#e7c95e"],
     },

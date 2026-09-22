@@ -9,7 +9,7 @@ Prepared from the supplier WhatsApp handover and the downloaded shade cards on 1
 | Ganga yarn range | Desire, Olivia, Blankie Solid, Blankie Multi, Nova, Picnic, Cotton Delight, Souffle, Summer Love, Alisha, Milka, Spectrum, Plush, Cotton Candy, Hobby India, Superstitch, Starlite | Confirm current shade, quantity and availability before price. |
 | Vardhaman yarn range | Baby Soft, Cotone | Use the supplied product/shade material to identify the line, then confirm the current shade, pack details, quantity and availability before price. |
 | Taj yarn range | Faux Fur, Kiddos, Metallic T-Shirt Yarn, Taj Caramel, Velvet Taj | Use the supplied shade cards to identify the requested line/shade, then confirm current availability, pack details and quantity before price. |
-| Embroidery skeins | Anchor, Ambika, Dolly | Use the current shade card to select the shade, then confirm availability and quantity. |
+| Embroidery skeins | Anchor, Ambica, Dolly | The handover said “Ambika”; the supplied shade card prints “Ambica”. Use the current shade card to select the shade, then confirm availability and quantity. |
 | Cord & macramé | Malai Dori 0.8 mm, 1 mm, 2 mm, 3 mm & 4 mm; Macrame Cord | Confirm size, colour, quantity and construction before price. |
 | Crochet & decorative thread | Glacé Cotton Thread Art 545; Kasab | Confirm shade, quantity and current product photo before price. |
 

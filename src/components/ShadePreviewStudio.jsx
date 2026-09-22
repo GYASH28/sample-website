@@ -60,17 +60,17 @@ export function ShadePreviewTint({ value }) {
   );
 }
 
-export default function ShadePreviewStudio({ value, onChange, compact = false }) {
+export default function ShadePreviewStudio({ value, onChange, compact = false, preservePackaging = false }) {
   return (
-    <section className={`shade-preview-studio ${compact ? "shade-preview-studio--compact" : ""}`} aria-label="Digital colour preview">
+    <section className={`shade-preview-studio ${compact ? "shade-preview-studio--compact" : ""}`} aria-label={preservePackaging ? "Colour reference picker" : "Digital colour preview"}>
       <div className="shade-preview-studio__heading">
         <div>
-          <span className="shade-preview-studio__eyebrow">Digital colour preview</span>
-          <strong>{value ? `Previewing ${value.toUpperCase()}` : "Try any colour on this product"}</strong>
+          <span className="shade-preview-studio__eyebrow">{preservePackaging ? "Colour enquiry reference" : "Digital colour preview"}</span>
+          <strong>{value ? `${preservePackaging ? "Colour reference" : "Previewing"} ${value.toUpperCase()}` : preservePackaging ? "Choose a colour to ask about" : "Try any colour on this product"}</strong>
         </div>
         {value ? (
           <button type="button" className="shade-preview-studio__reset" onClick={() => onChange(null)}>
-            Original
+            {preservePackaging ? "Clear" : "Original"}
           </button>
         ) : null}
       </div>
@@ -89,9 +89,9 @@ export default function ShadePreviewStudio({ value, onChange, compact = false })
                     className={active ? "is-active" : ""}
                     style={{ "--preview-swatch": hex }}
                     onClick={() => onChange(active ? null : hex)}
-                    aria-label={`${active ? "Remove" : "Preview"} ${name}`}
+                    aria-label={`${active ? "Remove" : preservePackaging ? "Select" : "Preview"} ${name}`}
                     aria-pressed={active}
-                    title={`${name} — digital preview only`}
+                    title={`${name} — ${preservePackaging ? "enquiry reference only" : "digital preview only"}`}
                   >
                     <i aria-hidden="true" />
                     {!compact ? <small>{name}</small> : null}
@@ -109,13 +109,15 @@ export default function ShadePreviewStudio({ value, onChange, compact = false })
           type="color"
           value={value || "#328F89"}
           onChange={(event) => onChange(event.target.value)}
-          aria-label="Choose a custom digital preview colour"
+          aria-label={preservePackaging ? "Choose a custom colour enquiry reference" : "Choose a custom digital preview colour"}
         />
         <code>{value ? value.toUpperCase() : "ANY"}</code>
       </label>
 
       <p className="shade-preview-studio__notice">
-        Preview only — this recolours the existing photo in your browser. It does not mean this exact shade is in stock. Confirm the current supplier shade card or live product photo before ordering.
+        {preservePackaging
+          ? "Colour reference only — the labelled product image stays unchanged so its packaging remains readable. Ask for the current supplier shade card or live stock photo before ordering."
+          : "Preview only — this recolours the existing photo in your browser. It does not mean this exact shade is in stock. Confirm the current supplier shade card or live product photo before ordering."}
       </p>
     </section>
   );

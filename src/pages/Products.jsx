@@ -336,7 +336,7 @@ export default function Products() {
         motif="weave"
         eyebrow="Products"
         title="Find a material by project, craft or finish"
-        text="Search naturally, refine only when useful, preview colours on the product photo, then ask for current supplier shades and quantity-based pricing."
+        text="Search naturally, refine only when useful, choose colour references for your enquiry, then ask for current supplier shades and quantity-based pricing."
       >
         <picture className="catalogue-hero-photo">
           <source srcSet="/assets/images/editorial/shade-library.avif" type="image/avif" />
